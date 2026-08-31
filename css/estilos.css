@@ -24,19 +24,21 @@ body {
 
 .login h2 {
     text-align: center;
+    color: #333333;
 }
 
 label {
     display: block;
     margin-top: 15px;
+    font-weight: bold;
 }
 
-input,
-select,
-textarea {
+input {
     width: 100%;
     padding: 10px;
     margin-top: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
 }
 
 button {
@@ -44,12 +46,8 @@ button {
     padding: 10px;
     margin-top: 20px;
     border: none;
+    border-radius: 5px;
     background-color: #1d5d9b;
     color: white;
     cursor: pointer;
-    border-radius: 5px;
-}
-
-button:hover {
-    background-color: #164875;
 }
