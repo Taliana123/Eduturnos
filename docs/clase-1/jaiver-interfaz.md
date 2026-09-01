@@ -26,4 +26,4 @@ Se configuraron los estilos generales de la página, el formulario de inicio de 
 
 ## Resultado
 
-Se configuró la apariencia visual de la pantalla de inicio de sesión de EDUTURNOS, estableciendo tamaños, márgenes, colores, bordes, e
+Se configuró la apariencia visual de la pantalla de inicio de sesión de EDUTURNOS, estableciendo tamaños, márgenes, colores, bordes, etc.
