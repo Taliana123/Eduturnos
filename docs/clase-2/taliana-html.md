@@ -1,5 +1,5 @@
 ```markdown
-# 👩🏻 TALIANA — HTML — CLASE 2
+#  HTML — CLASE 2
 
 ## Actividad
 
