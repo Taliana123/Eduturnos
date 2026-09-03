@@ -1,55 +1,139 @@
 * {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
 body {
-    margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f2f6fa;
+    background: #f4f6f8;
+    color: #222;
 }
 
-.login {
-    width: 350px;
-    margin: 100px auto;
-    padding: 30px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #cccccc;
-}
-
-.login h1 {
-    text-align: center;
-    color: #1d5d9b;
-}
-
-.login h2 {
-    text-align: center;
-}
-
-label {
-    display: block;
-    margin-top: 15px;
-}
-
-input,
-select,
-textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
-    border: none;
-    background-color: #1d5d9b;
+.topbar {
+    height: 65px;
+    background: #1565c0;
     color: white;
-    cursor: pointer;
-    border-radius: 5px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 25px;
 }
 
-button:hover {
-    background-color: #164875;
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.usuario {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.usuario button {
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.layout {
+    display: flex;
+    min-height: calc(100vh - 65px);
+}
+
+.sidebar {
+    width: 230px;
+    background: white;
+    border-right: 1px solid #ddd;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar a {
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #eee;
+}
+
+.sidebar a:hover {
+    background: #eaf2ff;
+}
+
+.contenido {
+    flex: 1;
+    padding: 30px;
+}
+
+.bienvenida {
+    margin: 10px 0 25px;
+    color: #666;
+}
+
+.estadisticas {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.tarjeta {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.tarjeta h2 {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.tarjeta p {
+    font-size: 32px;
+    font-weight: bold;
+    color: #1565c0;
+}
+
+.panel {
+    margin-top: 25px;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+@media (max-width: 800px) {
+
+    .sidebar {
+        width: 180px;
+    }
+
+    .estadisticas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .estadisticas {
+        grid-template-columns: 1fr;
+    }
+
+    .contenido {
+        padding: 15px;
+    }
 }
