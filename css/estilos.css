@@ -1,137 +1,139 @@
 * {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
 body {
-    margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f2f6fa;
+    background: #f4f6f8;
+    color: #222;
 }
 
-.login {
-    width: 350px;
-    margin: 100px auto;
-    padding: 30px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #cccccc;
+.topbar {
+    height: 65px;
+    background: #1565c0;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 25px;
 }
 
-.login h1 {
-    text-align: center;
-    color: #1d5d9b;
-}
-
-.login h2 {
-    text-align: center;
-    color: #333333;
-}
-
-label {
-    display: block;
-    margin-top: 15px;
+.logo {
+    font-size: 24px;
     font-weight: bold;
 }
 
-input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #cccccc;
-    border-radius: 5px;
+.usuario {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
+.usuario button {
     border: none;
+    padding: 8px 15px;
     border-radius: 5px;
-    background-color: #1d5d9b;
-    color: white;
     cursor: pointer;
 }
 
-/* ============================= */
-/* CLASE 2 - JAIVER              */
-/* Estilos del Dashboard         */
-/* ============================= */
-
-.contenedor {
+.layout {
     display: flex;
-    min-height: 100vh;
+    min-height: calc(100vh - 65px);
 }
 
-.menu {
+.sidebar {
     width: 230px;
-    background-color: #174a7c;
-    padding: 20px;
+    background: white;
+    border-right: 1px solid #ddd;
 }
 
-.menu h1 {
-    color: white;
-    text-align: center;
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
 }
 
-.menu a {
-    display: block;
-    padding: 12px;
-    margin-top: 5px;
-    color: white;
+.sidebar a {
+    padding: 15px 20px;
     text-decoration: none;
-    border-radius: 5px;
+    color: #333;
+    border-bottom: 1px solid #eee;
 }
 
-.menu a:hover {
-    background-color: #246aa5;
+.sidebar a:hover {
+    background: #eaf2ff;
 }
 
 .contenido {
     flex: 1;
     padding: 30px;
-    background-color: #f2f6fa;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.bienvenida {
+    margin: 10px 0 25px;
+    color: #666;
 }
 
-.tarjetas {
+.estadisticas {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
-    margin-top: 25px;
 }
 
 .tarjeta {
-    background-color: white;
-    padding: 20px;
+    background: white;
+    padding: 25px;
     border-radius: 10px;
-    box-shadow: 0 2px 8px #cccccc;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.tarjeta h2 {
+    font-size: 16px;
+    margin-bottom: 15px;
 }
 
 .tarjeta p {
-    font-size: 30px;
+    font-size: 32px;
     font-weight: bold;
+    color: #1565c0;
 }
 
-.tabla {
-    margin-top: 30px;
-    background-color: white;
-    padding: 20px;
+.panel {
+    margin-top: 25px;
+    background: white;
+    padding: 25px;
     border-radius: 10px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+@media (max-width: 800px) {
+
+    .sidebar {
+        width: 180px;
+    }
+
+    .estadisticas {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
-th,
-td {
-    padding: 12px;
-    border-bottom: 1px solid #dddddd;
-    text-align: left;
+@media (max-width: 600px) {
+
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .estadisticas {
+        grid-template-columns: 1fr;
+    }
+
+    .contenido {
+        padding: 15px;
+    }
 }
