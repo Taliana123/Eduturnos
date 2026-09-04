@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDUTURNOS - Verificación</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+<div class="contenedor-formulario">
+
+    <h1>EDUTURNOS</h1>
+    <h2>Verificar cuenta</h2>
+
+    <p>
+        Ingrese el código de verificación enviado a su correo.
+    </p>
+
+    <form action="api/verificar.php" method="POST">
+
+        <label>Número de documento</label>
+        <input type="text" name="documento" required>
+
+        <label>Código de verificación</label>
+        <input type="text" name="codigo" maxlength="6" required>
+
+        <button type="submit">Verificar cuenta</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
