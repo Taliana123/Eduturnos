@@ -264,3 +264,37 @@ body {
         font-size: 14px;
     }
 }
+
+.tabla-citas {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.tabla-citas th,
+.tabla-citas td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.estado {
+    padding: 5px 10px;
+    border-radius: 15px;
+}
+
+.estado-pendiente {
+    background: #fff3cd;
+}
+
+.estado-confirmada {
+    background: #d1ecf1;
+}
+
+.estado-realizada {
+    background: #d4edda;
+}
+
+.estado-cancelada {
+    background: #f8d7da;
+}
