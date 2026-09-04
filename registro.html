@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDUTURNOS - Registro</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+<div class="contenedor-formulario">
+
+    <h1>EDUTURNOS</h1>
+    <h2>Crear cuenta</h2>
+
+    <form action="api/registro.php" method="POST">
+
+        <label>Tipo de documento</label>
+        <select name="tipo_documento" required>
+            <option value="">Seleccione</option>
+            <option value="CC">Cédula de ciudadanía</option>
+            <option value="TI">Tarjeta de identidad</option>
+        </select>
+
+        <label>Número de documento</label>
+        <input type="text" name="documento" required>
+
+        <label>Nombres</label>
+        <input type="text" name="nombres" required>
+
+        <label>Apellidos</label>
+        <input type="text" name="apellidos" required>
+
+        <label>Correo electrónico</label>
+        <input type="email" name="correo" required>
+
+        <label>Contraseña</label>
+        <input type="password" name="contrasena" required>
+
+        <button type="submit">Registrarse</button>
+
+    </form>
+
+    <a href="index.html">Volver al inicio</a>
+
+</div>
+
+</body>
+</html>

@@ -1,58 +1,66 @@
-# DOCUMENTACIÓN CLASE 2 – JAIVER
+# CLASE 2 – CSS Y DISEÑO EDUTURNOS
 
-## Estilos de interfaz EDUTURNOS
-
-### Responsable
+## Responsable
 
 Jaiver
 
-### Actividad
+## Actividad
 
-Desarrollo y aplicación de estilos CSS para la interfaz principal de EDUTURNOS.
-
-### Archivo trabajado
-
-`css/estilos.css`
+Desarrollo de los estilos visuales de la interfaz principal de EDUTURNOS.
 
 ## Descripción
 
-Durante la Clase 2 se modificó el archivo `estilos.css` existente del proyecto EDUTURNOS para agregar los estilos correspondientes al Dashboard.
+Durante el Día 2 se desarrolló el diseño visual de la interfaz principal de EDUTURNOS mediante CSS, tomando como base la estructura HTML del Dashboard.
 
-Se diseñó la distribución principal de la interfaz mediante un contenedor flexible, un menú lateral y un área de contenido.
+El objetivo fue establecer una apariencia organizada, clara y adaptable para los diferentes elementos del sistema.
 
 ## Trabajo realizado
 
-Se agregaron estilos para:
+Se implementaron los siguientes elementos:
 
-* Contenedor principal de la aplicación.
+* Estilos generales para la página.
+* Encabezado principal o `topbar`.
+* Logo de EDUTURNOS.
+* Menú de usuario.
+* Botón de cierre de sesión.
+* Estructura principal del Dashboard.
 * Menú lateral de navegación.
-* Título EDUTURNOS.
-* Enlaces del menú.
-* Efecto visual al pasar el cursor sobre los enlaces.
-* Área principal de contenido.
-* Encabezado del Dashboard.
-* Tarjetas informativas.
-* Tabla de próximas citaciones.
-* Espaciado, bordes, fondos y sombras.
+* Área de contenido.
+* Tarjetas de estadísticas.
+* Panel de próximas citaciones.
+* Efectos visuales para los enlaces del menú.
+* Diseño responsive para diferentes tamaños de pantalla.
+
+## Diseño responsive
+
+Se utilizaron reglas `@media` para adaptar la interfaz a diferentes resoluciones.
+
+En pantallas menores a 800 píxeles, las tarjetas de estadísticas se organizan en dos columnas.
+
+En pantallas menores a 600 píxeles, el menú lateral pasa a ocupar todo el ancho y las tarjetas se organizan en una sola columna.
+
+## Archivo trabajado
+
+```text
+css/estilos.css
+```
+
+## Documentación
+
+```text
+docs/jaiver-css.md
+```
+
+## Tecnologías utilizadas
+
+* CSS3
+* HTML5
+* Visual Studio Code
+* Git
+* GitHub
 
 ## Resultado
 
-Los estilos permiten que el Dashboard de EDUTURNOS tenga una estructura visual organizada, con un menú lateral y un área principal donde se muestran las estadísticas y las próximas citaciones.
+Se obtuvo una interfaz visual organizada y adaptable para EDUTURNOS, estableciendo los estilos necesarios para el Dashboard, el menú lateral, las tarjetas de estadísticas y los demás componentes de la interfaz.
 
-## Integración
-
-El archivo `dashboard.html` utiliza el archivo:
-
-`css/estilos.css`
-
-Por esta razón, los estilos agregados por Jaiver se aplican directamente al Dashboard desarrollado en HTML.
-
-## Control de versiones
-
-Los cambios fueron guardados mediante Git y posteriormente enviados a la rama:
-
-`nueva-historia`
-
-### Commit
-
-`Clase 2: estilos del dashboard - Jaiver`
+Este trabajo servirá como base visual para la integración de las funcionalidades del sistema en las siguientes etapas del proyecto.
