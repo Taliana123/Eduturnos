@@ -137,3 +137,130 @@ body {
         padding: 15px;
     }
 }
+
+/* ============================================
+   CLASE 3 - FORMULARIOS Y AUTENTICACIÓN
+   RESPONSABLE: JAIVER
+   ============================================ */
+
+.contenedor-formulario {
+    width: 90%;
+    max-width: 450px;
+    margin: 60px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.10);
+}
+
+.contenedor-formulario h1 {
+    text-align: center;
+    color: #1557a6;
+    margin-bottom: 10px;
+}
+
+.contenedor-formulario h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.contenedor-formulario p {
+    text-align: center;
+    color: #666;
+    line-height: 1.5;
+}
+
+.contenedor-formulario label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.contenedor-formulario input,
+.contenedor-formulario select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+.contenedor-formulario input:focus,
+.contenedor-formulario select:focus {
+    outline: none;
+    border-color: #1557a6;
+}
+
+.contenedor-formulario button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #1557a6;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.contenedor-formulario button:hover {
+    background: #0d4385;
+}
+
+.contenedor-formulario a {
+    display: block;
+    margin-top: 15px;
+    text-align: center;
+    color: #1557a6;
+    text-decoration: none;
+}
+
+.contenedor-formulario a:hover {
+    text-decoration: underline;
+}
+
+/* Mensajes */
+
+.mensaje {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+/* Tarjetas */
+
+.tarjeta-formulario {
+    background: white;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Diseño responsive */
+
+@media (max-width: 600px) {
+
+    .contenedor-formulario {
+        width: 85%;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    .contenedor-formulario h1 {
+        font-size: 24px;
+    }
+
+    .contenedor-formulario h2 {
+        font-size: 20px;
+    }
+
+    .contenedor-formulario input,
+    .contenedor-formulario select,
+    .contenedor-formulario button {
+        font-size: 14px;
+    }
+}
