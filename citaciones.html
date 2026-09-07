@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Citaciones - EDUTURNOS</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+
+</head>
+
+<body>
+
+<main class="contenedor">
+
+    <h1>Citaciones</h1>
+
+    <a
+        href="crear-citacion.html"
+        class="boton"
+    >
+        Nueva citación
+    </a>
+
+    <div class="tabla-contenedor">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Estudiante</th>
+                    <th>Docente</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="tablaCitas">
+
+                <tr>
+                    <td colspan="6">
+                        Cargando...
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+<script>
+
+async function cargarCitas() {
+
+    const tabla =
+        document.getElementById(
+            "tablaCitas"
+        );
+
+    try {
+
+        const respuesta =
+            await fetch(
+                "api/listar_citas.php"
+            );
+
+        const resultado =
+            await respuesta.json();
+
+        if (!resultado.ok) {
+
+            tabla.innerHTML =
+                `<tr>
+                    <td colspan="6">
+                        ${resultado.mensaje}
+                    </td>
+                </tr>`;
+
+            return;
+        }
+
+        tabla.innerHTML = "";
+
+        resultado.datos.forEach(
+            cita => {
+
+                const fila =
+                    document.createElement(
+                        "tr"
+                    );
+
+                fila.innerHTML = `
+
+                    <td>
+                        ${cita.fecha}
+                    </td>
+
+                    <td>
+                        ${cita.hora}
+                    </td>
+
+                    <td>
+                        ${cita.estudiante_nombres}
+                        ${cita.estudiante_apellidos}
+                    </td>
+
+                    <td>
+                        ${cita.docente_nombres}
+                        ${cita.docente_apellidos}
+                    </td>
+
+                    <td>
+                        ${cita.motivo}
+                    </td>
+
+                    <td>
+                        ${cita.estado}
+                    </td>
+
+                `;
+
+                tabla.appendChild(fila);
+
+            }
+        );
+
+    } catch (error) {
+
+        tabla.innerHTML =
+            `<tr>
+                <td colspan="6">
+                    Error al consultar las citas.
+                </td>
+            </tr>`;
+    }
+}
+
+cargarCitas();
+
+</script>
+
+</body>
+
+</html>

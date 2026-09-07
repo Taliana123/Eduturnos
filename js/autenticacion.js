@@ -1,25 +1,229 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
 
-    const formulario = document.getElementById("formLogin");
+    const formLogin =
+        document.getElementById("formLogin");
 
-    if (!formulario) {
-        return;
+    const formRegistro =
+        document.getElementById("formRegistro");
+
+    const formVerificar =
+        document.getElementById("formVerificar");
+
+
+    if (formLogin) {
+
+        formLogin.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+                const datos =
+                    new FormData(formLogin);
+
+                const mensaje =
+                    document.getElementById(
+                        "mensajeLogin"
+                    );
+
+                mensaje.textContent =
+                    "Iniciando sesión...";
+
+                try {
+
+                    const respuesta =
+                        await fetch(
+                            "api/login.php",
+                            {
+                                method: "POST",
+                                body: datos
+                            }
+                        );
+
+                    const resultado =
+                        await respuesta.json();
+
+                    if (!resultado.ok) {
+
+                        mensaje.textContent =
+                            resultado.mensaje;
+
+                        return;
+                    }
+
+                    sessionStorage.setItem(
+                        "usuario",
+                        JSON.stringify(
+                            resultado.datos.usuario
+                        )
+                    );
+
+                    window.location.href =
+                        "dashboard.html";
+
+                } catch (error) {
+
+                    mensaje.textContent =
+                        "No fue posible conectarse con el servidor.";
+                }
+
+            }
+        );
+
     }
 
-    formulario.addEventListener("submit", function (evento) {
 
-        evento.preventDefault();
+    if (formRegistro) {
 
-        const correo = document.getElementById("correo").value.trim();
-        const contrasena = document.getElementById("contrasena").value.trim();
+        formRegistro.addEventListener(
+            "submit",
+            async function (event) {
 
-        if (correo === "" || contrasena === "") {
-            alert("Debe completar todos los campos.");
-            return;
-        }
+                event.preventDefault();
 
-        alert("Datos recibidos. La autenticación será integrada posteriormente con PHP.");
+                const datos =
+                    new FormData(formRegistro);
 
-    });
+                const mensaje =
+                    document.getElementById(
+                        "mensajeRegistro"
+                    );
+
+                mensaje.textContent =
+                    "Registrando usuario...";
+
+                try {
+
+                    const respuesta =
+                        await fetch(
+                            "api/registro.php",
+                            {
+                                method: "POST",
+                                body: datos
+                            }
+                        );
+
+                    const resultado =
+                        await respuesta.json();
+
+                    if (!resultado.ok) {
+
+                        mensaje.textContent =
+                            resultado.mensaje;
+
+                        return;
+                    }
+
+                    sessionStorage.setItem(
+                        "documentoVerificacion",
+                        resultado.datos.documento
+                    );
+
+                    alert(
+                        "Cuenta creada.\n\n" +
+                        "Código de desarrollo: " +
+                        resultado.datos.codigo_desarrollo
+                    );
+
+                    window.location.href =
+                        "verificar.html";
+
+                } catch (error) {
+
+                    mensaje.textContent =
+                        "No fue posible registrar la cuenta.";
+                }
+
+            }
+        );
+
+    }
+
+
+    if (formVerificar) {
+
+        formVerificar.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+                const datos =
+                    new FormData(formVerificar);
+
+                const mensaje =
+                    document.getElementById(
+                        "mensajeVerificar"
+                    );
+
+                mensaje.textContent =
+                    "Verificando...";
+
+                try {
+
+                    const respuesta =
+                        await fetch(
+                            "api/verificar.php",
+                            {
+                                method: "POST",
+                                body: datos
+                            }
+                        );
+
+                    const resultado =
+                        await respuesta.json();
+
+                    if (!resultado.ok) {
+
+                        mensaje.textContent =
+                            resultado.mensaje;
+
+                        return;
+                    }
+
+                    mensaje.textContent =
+                        "Cuenta verificada correctamente.";
+
+                    setTimeout(() => {
+
+                        window.location.href =
+                            "login.html";
+
+                    }, 1200);
+
+                } catch (error) {
+
+                    mensaje.textContent =
+                        "No fue posible verificar la cuenta.";
+                }
+
+            }
+        );
+
+    }
 
 });
+
+
+async function cerrarSesion() {
+
+    try {
+
+        await fetch(
+            "api/logout.php",
+            {
+                method: "POST"
+            }
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+    sessionStorage.clear();
+
+    window.location.href =
+        "login.html";
+}
