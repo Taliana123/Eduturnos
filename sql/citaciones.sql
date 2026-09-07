@@ -1,44 +1,41 @@
-# DÍA 4 — BASE DE DATOS DEL MÓDULO DE CITACIONES
+USE eduturnos;
 
-## Responsable
+CREATE TABLE IF NOT EXISTS motivos (
+    id_motivo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    estado TINYINT(1) DEFAULT 1
+);
 
-Díaz
+CREATE TABLE IF NOT EXISTS estados_cita (
+    id_estado INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE
+);
 
-## Actividad
+CREATE TABLE IF NOT EXISTS citas (
+    id_cita INT AUTO_INCREMENT PRIMARY KEY,
+    id_estudiante INT NOT NULL,
+    id_acudiente INT NOT NULL,
+    id_docente INT NOT NULL,
+    id_motivo INT NOT NULL,
+    id_estado INT NOT NULL,
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    lugar VARCHAR(150),
+    observaciones TEXT,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-Desarrollo de la estructura de base de datos necesaria para el módulo de citaciones de EDUTURNOS.
+    FOREIGN KEY (id_estudiante)
+        REFERENCES estudiantes(id_estudiante),
 
-## Descripción del trabajo
+    FOREIGN KEY (id_acudiente)
+        REFERENCES acudientes(id_acudiente),
 
-Durante el Día 4, me encargué de complementar la base de datos existente de EDUTURNOS con las estructuras necesarias para administrar las citaciones.
+    FOREIGN KEY (id_docente)
+        REFERENCES docentes(id_docente),
 
-Se creó el archivo `sql/citaciones.sql`, donde se definieron las tablas `motivos`, `estados_cita` y `citas`.
+    FOREIGN KEY (id_motivo)
+        REFERENCES motivos(id_motivo),
 
-La tabla `motivos` permite almacenar los diferentes motivos por los cuales se genera una citación. La tabla `estados_cita` permite controlar los diferentes estados que puede presentar una cita durante su proceso.
-
-La tabla `citas` almacena la información principal de cada citación, incluyendo el estudiante, acudiente, docente, motivo, estado, fecha, hora, lugar y observaciones.
-
-También se establecieron claves foráneas para relacionar las citaciones con las tablas existentes de `estudiantes`, `acudientes` y `docentes`, además de las tablas de motivos y estados.
-
-De esta manera, la nueva estructura se integra con la base de datos desarrollada en los días anteriores sin crear nuevamente las tablas que ya existen.
-
-## Archivo creado
-
-`sql/citaciones.sql`
-
-## Trabajo realizado
-
-* Creación de la tabla `motivos`.
-* Creación de la tabla `estados_cita`.
-* Creación de la tabla `citas`.
-* Configuración de claves primarias.
-* Configuración de claves foráneas.
-* Relación con estudiantes.
-* Relación con acudientes.
-* Relación con docentes.
-* Relación con motivos.
-* Relación con estados de las citaciones.
-
-## Resultado
-
-Se complementó la base de datos de EDUTURNOS con la estructura necesaria para almacenar y administrar las citaciones, manteniendo las relaciones con las tablas creadas anteriormente.
+    FOREIGN KEY (id_estado)
+        REFERENCES estados_cita(id_estado)
+);
