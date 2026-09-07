@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EDUTURNOS - Reportes</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+<main class="contenido">
+
+    <h1>Reportes</h1>
+
+    <form action="api/reportes.php" method="GET">
+
+        <label>Fecha inicial</label>
+        <input type="date" name="fecha_inicio">
+
+        <label>Fecha final</label>
+        <input type="date" name="fecha_fin">
+
+        <label>Estado</label>
+
+        <select name="estado">
+            <option value="">Todos</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Confirmada">Confirmada</option>
+            <option value="Realizada">Realizada</option>
+            <option value="Cancelada">Cancelada</option>
+            <option value="Reprogramada">Reprogramada</option>
+        </select>
+
+        <button type="submit">
+            Consultar reporte
+        </button>
+
+    </form>
+
+</main>
+
+</body>
+</html>
