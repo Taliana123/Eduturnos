@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>EDUTURNOS - Crear citación</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+<div class="contenedor-formulario">
+
+    <h1>EDUTURNOS</h1>
+    <h2>Nueva citación</h2>
+
+    <form action="api/crear_cita.php" method="POST">
+
+        <label>Estudiante</label>
+        <input type="text" name="estudiante" required>
+
+        <label>Acudiente</label>
+        <input type="text" name="acudiente" required>
+
+        <label>Docente responsable</label>
+        <input type="text" name="docente" required>
+
+        <label>Motivo</label>
+        <textarea name="motivo" required></textarea>
+
+        <label>Fecha</label>
+        <input type="date" name="fecha" required>
+
+        <label>Hora</label>
+        <input type="time" name="hora" required>
+
+        <label>Lugar</label>
+        <input type="text" name="lugar" required>
+
+        <label>Observaciones</label>
+        <textarea name="observaciones"></textarea>
+
+        <button type="submit">Crear citación</button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
