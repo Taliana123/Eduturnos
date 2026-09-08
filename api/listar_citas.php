@@ -66,78 +66,51 @@ switch ($usuario["rol"]) {
 
         break;
 
-    case "Acudiente":
+   case "Acudiente":
 
-        $stmt = $conexion->prepare(
-            "SELECT id_acudiente
-             FROM acudientes
-             WHERE id_usuario = ?
-             LIMIT 1"
-        );
-
-        $stmt->bind_param(
-            "i",
-            $usuario["id_usuario"]
-        );
-
-        $stmt->execute();
-
-        $fila = $stmt->get_result()->fetch_assoc();
-
-        $stmt->close();
-
-        if (!$fila) {
-            responder(
-                true,
-                "No hay citas asociadas.",
-                []
-            );
-        }
-
-        $condiciones[] = "c.id_acudiente = ?";
-        $parametros[] = $fila["id_acudiente"];
-        $tipos .= "i";
-
-        break;
-
-    case "Estudiante":
-
-        $condiciones[] = "e.documento = ?";
-        $parametros[] = $usuario["documento"];
-        $tipos .= "s";
-
-        break;
-}
-
-if (!empty($condiciones)) {
-    $sql .= " WHERE " . implode(" AND ", $condiciones);
-}
-
-$sql .= " ORDER BY c.fecha DESC, c.hora DESC";
-
-$stmt = $conexion->prepare($sql);
-
-if (!empty($parametros)) {
-    $stmt->bind_param(
-        $tipos,
-        ...$parametros
+    $stmt = $conexion->prepare(
+        "SELECT id_acudiente
+         FROM acudientes
+         WHERE documento = ?
+         LIMIT 1"
     );
-}
 
-$stmt->execute();
+    if (!$stmt) {
+        responder(
+            false,
+            "Error al consultar el acudiente.",
+            [],
+            500
+        );
+    }
 
-$resultado = $stmt->get_result();
+    $documentoUsuario = $usuario["documento"];
 
-$citas = [];
+    $stmt->bind_param(
+        "s",
+        $documentoUsuario
+    );
 
-while ($fila = $resultado->fetch_assoc()) {
-    $citas[] = $fila;
-}
+    $stmt->execute();
 
-$stmt->close();
+    $resultado = $stmt->get_result();
 
-responder(
-    true,
-    "Citaciones consultadas.",
-    $citas
-);
+    $fila = $resultado->fetch_assoc();
+
+    $stmt->close();
+
+    if (!$fila) {
+        responder(
+            true,
+            "No hay citas asociadas.",
+            []
+        );
+    }
+
+    $condiciones[] = "c.id_acudiente = ?";
+
+    $parametros[] = $fila["id_acudiente"];
+
+    $tipos .= "i";
+
+    break;

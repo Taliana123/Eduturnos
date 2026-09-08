@@ -199,7 +199,7 @@ function obtenerEstadoNombre($conexion, $idEstado)
     return $fila["nombre"] ?? "";
 }
 
-function notificarCita(
+ffunction notificarCita(
     $conexion,
     $idCita,
     $titulo,
@@ -207,22 +207,36 @@ function notificarCita(
 ) {
     $sql = "
         SELECT
-            a.id_usuario AS id_acudiente_usuario,
+            au.id_usuario AS id_acudiente_usuario,
             d.id_usuario AS id_docente_usuario
         FROM citas c
+
         INNER JOIN acudientes a
             ON c.id_acudiente = a.id_acudiente
+
+        LEFT JOIN usuarios au
+            ON au.documento = a.documento
+
         INNER JOIN docentes d
             ON c.id_docente = d.id_docente
+
         WHERE c.id_cita = ?
+
         LIMIT 1
     ";
 
     $stmt = $conexion->prepare($sql);
+
+    if (!$stmt) {
+        return;
+    }
+
     $stmt->bind_param("i", $idCita);
+
     $stmt->execute();
 
     $resultado = $stmt->get_result();
+
     $fila = $resultado->fetch_assoc();
 
     $stmt->close();
@@ -231,19 +245,27 @@ function notificarCita(
         return;
     }
 
-    crearNotificacion(
-        $conexion,
-        $fila["id_acudiente_usuario"],
-        $idCita,
-        $titulo,
-        $mensaje
-    );
+    // Notificar al acudiente
+    if (!empty($fila["id_acudiente_usuario"])) {
 
-    crearNotificacion(
-        $conexion,
-        $fila["id_docente_usuario"],
-        $idCita,
-        $titulo,
-        $mensaje
-    );
+        crearNotificacion(
+            $conexion,
+            $fila["id_acudiente_usuario"],
+            $idCita,
+            $titulo,
+            $mensaje
+        );
+    }
+
+    // Notificar al docente
+    if (!empty($fila["id_docente_usuario"])) {
+
+        crearNotificacion(
+            $conexion,
+            $fila["id_docente_usuario"],
+            $idCita,
+            $titulo,
+            $mensaje
+        );
+    }
 }
