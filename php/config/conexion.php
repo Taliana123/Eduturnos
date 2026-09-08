@@ -1,21 +1,20 @@
 <?php
 
-$servidor = "localhost";
+$host = "localhost";
 $usuario = "root";
 $contrasena = "";
-$baseDatos = "eduturnos";
+$base_datos = "eduturnos";
 
-$conn = new mysqli(
-    $servidor,
+$conexion = new mysqli(
+    $host,
     $usuario,
     $contrasena,
-    $baseDatos
+    $base_datos
 );
 
-if ($conn->connect_error) {
+if ($conexion->connect_error) {
+    http_response_code(500);
     die("Error de conexión con la base de datos.");
 }
 
-$conn->set_charset("utf8mb4");
-
-?>
+$conexion->set_charset("utf8mb4");
