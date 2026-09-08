@@ -1,0 +1,5395 @@
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\cancelar_cita.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+exigirRol([
+    "Super Admin",
+    "Coordinador",
+    "Docente",
+    "Acudiente"
+]);
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    responder(false, "Método no permitido.", [], 405);
+}
+
+$idCita = (int)($_POST["id_cita"] ?? 0);
+
+if (!$idCita) {
+    responder(false, "Debe indicar la citación.", [], 400);
+}
+
+$stmt = $conexion->prepare(
+    "SELECT
+        c.id_estado,
+        ec.nombre AS estado
+     FROM citas c
+     INNER JOIN estados_cita ec
+        ON c.id_estado = ec.id_estado
+     WHERE c.id_cita = ?
+     LIMIT 1"
+);
+
+$stmt->bind_param("i", $idCita);
+$stmt->execute();
+
+$cita = $stmt->get_result()->fetch_assoc();
+
+$stmt->close();
+
+if (!$cita) {
+    responder(false, "La citación no existe.", [], 404);
+}
+
+if (
+    in_array(
+        $cita["estado"],
+        ["Cancelada", "Realizada", "Justificada"],
+        true
+    )
+) {
+    responder(
+        false,
+        "La citación ya no puede cancelarse.",
+        [],
+        409
+    );
+}
+
+$idEstado = obtenerEstadoId(
+    $conexion,
+    "Cancelada"
+);
+
+$stmt = $conexion->prepare(
+    "UPDATE citas
+     SET id_estado = ?
+     WHERE id_cita = ?"
+);
+
+$stmt->bind_param(
+    "ii",
+    $idEstado,
+    $idCita
+);
+
+$stmt->execute();
+$stmt->close();
+
+registrarSeguimiento(
+    $conexion,
+    $idCita,
+    $cita["estado"],
+    "Cancelada",
+    "Citación cancelada."
+);
+
+notificarCita(
+    $conexion,
+    $idCita,
+    "Citación cancelada",
+    "La citación ha sido cancelada."
+);
+
+registrarAuditoria(
+    $conexion,
+    "Cancelar citación",
+    "citas",
+    $idCita,
+    "Citación cancelada."
+);
+
+responder(
+    true,
+    "Citación cancelada correctamente."
+);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\catalogos.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+exigirLogin();
+
+$tipo = $_GET["tipo"] ?? "";
+
+switch ($tipo) {
+
+    case "estudiantes":
+
+        $sql = "
+            SELECT
+                id_estudiante,
+                codigo_estudiantil,
+                documento,
+                nombres,
+                apellidos,
+                id_sede,
+                id_jornada,
+                id_grado,
+                id_grupo,
+                estado
+            FROM estudiantes
+            WHERE estado = 'Activo'
+            ORDER BY apellidos, nombres
+        ";
+
+        $resultado = $conexion->query($sql);
+
+        $datos = [];
+
+        while ($fila = $resultado->fetch_assoc()) {
+            $datos[] = $fila;
+        }
+
+        responder(true, "Estudiantes encontrados.", $datos);
+        break;
+
+
+    case "acudientes":
+
+        $sql = "
+            SELECT
+                id_acudiente,
+                documento,
+                nombres,
+                apellidos,
+                parentesco,
+                telefono,
+                correo
+            FROM acudientes
+            WHERE estado = 1
+            ORDER BY apellidos, nombres
+        ";
+
+        $resultado = $conexion->query($sql);
+
+        $datos = [];
+
+        while ($fila = $resultado->fetch_assoc()) {
+            $datos[] = $fila;
+        }
+
+        responder(true, "Acudientes encontrados.", $datos);
+        break;
+
+
+    case "docentes":
+
+        $sql = "
+            SELECT
+                d.id_docente,
+                d.id_usuario,
+                u.nombres,
+                u.apellidos,
+                u.documento
+            FROM docentes d
+            INNER JOIN usuarios u
+                ON d.id_usuario = u.id_usuario
+            WHERE d.estado = 1
+              AND u.estado = 1
+            ORDER BY u.apellidos, u.nombres
+        ";
+
+        $resultado = $conexion->query($sql);
+
+        $datos = [];
+
+        while ($fila = $resultado->fetch_assoc()) {
+            $datos[] = $fila;
+        }
+
+        responder(true, "Docentes encontrados.", $datos);
+        break;
+
+
+    case "motivos":
+
+        $sql = "
+            SELECT
+                id_motivo,
+                nombre
+            FROM motivos
+            WHERE estado = 1
+            ORDER BY nombre
+        ";
+
+        $resultado = $conexion->query($sql);
+
+        $datos = [];
+
+        while ($fila = $resultado->fetch_assoc()) {
+            $datos[] = $fila;
+        }
+
+        responder(true, "Motivos encontrados.", $datos);
+        break;
+
+
+    default:
+
+        responder(
+            false,
+            "Tipo de catálogo no válido.",
+            [],
+            400
+        );
+}
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\confirmar_cita.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+exigirRol([
+    "Super Admin",
+    "Coordinador",
+    "Acudiente"
+]);
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    responder(false, "Método no permitido.", [], 405);
+}
+
+$idCita = (int)($_POST["id_cita"] ?? 0);
+
+if (!$idCita) {
+    responder(false, "Debe indicar la citación.", [], 400);
+}
+
+$stmt = $conexion->prepare(
+    "SELECT
+        c.id_estado,
+        ec.nombre AS estado
+     FROM citas c
+     INNER JOIN estados_cita ec
+        ON c.id_estado = ec.id_estado
+     WHERE c.id_cita = ?
+     LIMIT 1"
+);
+
+$stmt->bind_param("i", $idCita);
+$stmt->execute();
+
+$cita = $stmt->get_result()->fetch_assoc();
+
+$stmt->close();
+
+if (!$cita) {
+    responder(false, "La citación no existe.", [], 404);
+}
+
+if ($cita["estado"] !== "Pendiente") {
+    responder(
+        false,
+        "Solo se pueden confirmar citas pendientes.",
+        [],
+        409
+    );
+}
+
+$idEstado = obtenerEstadoId(
+    $conexion,
+    "Confirmada"
+);
+
+$stmt = $conexion->prepare(
+    "UPDATE citas
+     SET id_estado = ?
+     WHERE id_cita = ?"
+);
+
+$stmt->bind_param(
+    "ii",
+    $idEstado,
+    $idCita
+);
+
+$stmt->execute();
+$stmt->close();
+
+registrarSeguimiento(
+    $conexion,
+    $idCita,
+    "Pendiente",
+    "Confirmada",
+    "Citación confirmada."
+);
+
+notificarCita(
+    $conexion,
+    $idCita,
+    "Citación confirmada",
+    "La citación ha sido confirmada."
+);
+
+registrarAuditoria(
+    $conexion,
+    "Confirmar citación",
+    "citas",
+    $idCita,
+    "Citación confirmada."
+);
+
+responder(
+    true,
+    "Citación confirmada correctamente."
+);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\crear_cita.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+exigirRol([
+    "Super Admin",
+    "Coordinador",
+    "Docente",
+    "Acudiente"
+]);
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    responder(false, "Método no permitido.", [], 405);
+}
+
+$idEstudiante = (int)($_POST["id_estudiante"] ?? 0);
+$idAcudiente = (int)($_POST["id_acudiente"] ?? 0);
+$idDocente = (int)($_POST["id_docente"] ?? 0);
+$idMotivo = (int)($_POST["id_motivo"] ?? 0);
+$fecha = trim($_POST["fecha"] ?? "");
+$hora = trim($_POST["hora"] ?? "");
+$lugar = trim($_POST["lugar"] ?? "");
+$observaciones = trim($_POST["observaciones"] ?? "");
+
+if (
+    !$idEstudiante ||
+    !$idAcudiente ||
+    !$idDocente ||
+    !$idMotivo ||
+    !$fecha ||
+    !$hora
+) {
+    responder(false, "Complete todos los campos obligatorios.", [], 400);
+}
+
+if ($fecha < date("Y-m-d")) {
+    responder(false, "No se puede crear una cita en una fecha pasada.", [], 400);
+}
+
+/*
+ * Verificar estudiante
+ */
+$stmt = $conexion->prepare(
+    "SELECT id_estudiante
+     FROM estudiantes
+     WHERE id_estudiante = ?
+       AND estado = 'Activo'
+     LIMIT 1"
+);
+
+$stmt->bind_param("i", $idEstudiante);
+$stmt->execute();
+
+if ($stmt->get_result()->num_rows === 0) {
+    $stmt->close();
+
+    responder(
+        false,
+        "El estudiante no existe o está retirado.",
+        [],
+        400
+    );
+}
+
+$stmt->close();
+
+/*
+ * Verificar acudiente
+ */
+$stmt = $conexion->prepare(
+    "SELECT id_acudiente
+     FROM acudientes
+     WHERE id_acudiente = ?
+       AND estado = 1
+     LIMIT 1"
+);
+
+$stmt->bind_param("i", $idAcudiente);
+$stmt->execute();
+
+if ($stmt->get_result()->num_rows === 0) {
+    $stmt->close();
+
+    responder(
+        false,
+        "El acudiente no existe o está inactivo.",
+        [],
+        400
+    );
+}
+
+$stmt->close();
+
+/*
+ * Verificar relación estudiante/acudiente
+ */
+$stmt = $conexion->prepare(
+    "SELECT id_estudiante
+     FROM estudiante_acudiente
+     WHERE id_estudiante = ?
+       AND id_acudiente = ?
+     LIMIT 1"
+);
+
+$stmt->bind_param(
+    "ii",
+    $idEstudiante,
+    $idAcudiente
+);
+
+$stmt->execute();
+
+if ($stmt->get_result()->num_rows === 0) {
+    $stmt->close();
+
+    responder(
+        false,
+        "El acudiente no está relacionado con el estudiante.",
+        [],
+        400
+    );
+}
+
+$stmt->close();
+
+/*
+ * Verificar docente
+ */
+$stmt = $conexion->prepare(
+    "SELECT id_docente
+     FROM docentes
+     WHERE id_docente = ?
+       AND estado = 1
+     LIMIT 1"
+);
+
+$stmt->bind_param("i", $idDocente);
+$stmt->execute();
+
+if ($stmt->get_result()->num_rows === 0) {
+    $stmt->close();
+
+    responder(
+        false,
+        "El docente no existe o está inactivo.",
+        [],
+        400
+    );
+}
+
+$stmt->close();
+
+/*
+ * Verificar motivo
+ */
+$stmt = $conexion->prepare(
+    "SELECT id_motivo
+     FROM motivos
+     WHERE id_motivo = ?
+       AND estado = 1
+     LIMIT 1"
+);
+
+$stmt->bind_param("i", $idMotivo);
+$stmt->execute();
+
+if ($stmt->get_result()->num_rows === 0) {
+    $stmt->close();
+
+    responder(
+        false,
+        "El motivo no existe.",
+        [],
+        400
+    );
+}
+
+$stmt->close();
+
+/*
+ * Evitar duplicidad
+ */
+$sql = "
+    SELECT id_cita
+    FROM citas
+    WHERE fecha = ?
+      AND hora = ?
+      AND id_docente = ?
+      AND id_estado IN (
+          SELECT id_estado
+          FROM estados_cita
+          WHERE nombre IN (
+              'Pendiente',
+              'Confirmada',
+              'Reprogramada'
+          )
+      )
+    LIMIT 1
+";
+
+$stmt = $conexion->prepare($sql);
+
+$stmt->bind_param(
+    "ssi",
+    $fecha,
+    $hora,
+    $idDocente
+);
+
+$stmt->execute();
+
+if ($stmt->get_result()->num_rows > 0) {
+    $stmt->close();
+
+    responder(
+        false,
+        "El docente ya tiene una cita en ese horario.",
+        [],
+        409
+    );
+}
+
+$stmt->close();
+
+$idEstado = obtenerEstadoId(
+    $conexion,
+    "Pendiente"
+);
+
+$stmt = $conexion->prepare(
+    "INSERT INTO citas
+    (
+        id_estudiante,
+        id_acudiente,
+        id_docente,
+        id_motivo,
+        id_estado,
+        fecha,
+        hora,
+        lugar,
+        observaciones
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+);
+
+$stmt->bind_param(
+    "iiiiissss",
+    $idEstudiante,
+    $idAcudiente,
+    $idDocente,
+    $idMotivo,
+    $idEstado,
+    $fecha,
+    $hora,
+    $lugar,
+    $observaciones
+);
+
+if (!$stmt->execute()) {
+    $stmt->close();
+
+    responder(
+        false,
+        "No fue posible crear la citación.",
+        [],
+        500
+    );
+}
+
+$idCita = $conexion->insert_id;
+
+$stmt->close();
+
+registrarSeguimiento(
+    $conexion,
+    $idCita,
+    null,
+    "Pendiente",
+    "Citación creada."
+);
+
+notificarCita(
+    $conexion,
+    $idCita,
+    "Nueva citación",
+    "Se ha creado una nueva citación para el estudiante."
+);
+
+registrarAuditoria(
+    $conexion,
+    "Crear citación",
+    "citas",
+    $idCita,
+    "Nueva citación creada."
+);
+
+responder(
+    true,
+    "Citación creada correctamente.",
+    [
+        "id_cita" => $idCita
+    ]
+);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\editar_cita.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+exigirRol([
+    "Super Admin",
+    "Coordinador",
+    "Docente"
+]);
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    responder(false, "Método no permitido.", [], 405);
+}
+
+$idCita = (int)($_POST["id_cita"] ?? 0);
+$fecha = trim($_POST["fecha"] ?? "");
+$hora = trim($_POST["hora"] ?? "");
+$lugar = trim($_POST["lugar"] ?? "");
+$observaciones = trim($_POST["observaciones"] ?? "");
+
+if (!$idCita || !$fecha || !$hora) {
+    responder(false, "Datos incompletos.", [], 400);
+}
+
+if ($fecha < date("Y-m-d")) {
+    responder(false, "La fecha no puede ser anterior a hoy.", [], 400);
+}
+
+$stmt = $conexion->prepare(
+    "SELECT
+        c.id_cita,
+        c.id_docente,
+        ec.nombre AS estado
+     FROM citas c
+     INNER JOIN estados_cita ec
+        ON c.id_estado = ec.id_estado
+     WHERE c.id_cita = ?
+     LIMIT 1"
+);
+
+$stmt->bind_param("i", $idCita);
+$stmt->execute();
+
+$cita = $stmt->get_result()->fetch_assoc();
+
+$stmt->close();
+
+if (!$cita) {
+    responder(false, "La citación no existe.", [], 404);
+}
+
+if (
+    in_array(
+        $cita["estado"],
+        ["Cancelada", "Realizada", "Justificada"],
+        true
+    )
+) {
+    responder(
+        false,
+        "Esta citación ya no puede ser modificada.",
+        [],
+        409
+    );
+}
+
+$stmt = $conexion->prepare(
+    "SELECT id_cita
+     FROM citas
+     WHERE fecha = ?
+       AND hora = ?
+       AND id_docente = ?
+       AND id_cita <> ?
+       AND id_estado IN (
+           SELECT id_estado
+           FROM estados_cita
+           WHERE nombre IN (
+               'Pendiente',
+               'Confirmada',
+               'Reprogramada'
+           )
+       )
+     LIMIT 1"
+);
+
+$stmt->bind_param(
+    "ssii",
+    $fecha,
+    $hora,
+    $cita["id_docente"],
+    $idCita
+);
+
+$stmt->execute();
+
+if ($stmt->get_result()->num_rows > 0) {
+    $stmt->close();
+
+    responder(
+        false,
+        "Ese horario ya está ocupado.",
+        [],
+        409
+    );
+}
+
+$stmt->close();
+
+$stmt = $conexion->prepare(
+    "UPDATE citas
+     SET fecha = ?,
+         hora = ?,
+         lugar = ?,
+         observaciones = ?
+     WHERE id_cita = ?"
+);
+
+$stmt->bind_param(
+    "ssssi",
+    $fecha,
+    $hora,
+    $lugar,
+    $observaciones,
+    $idCita
+);
+
+$stmt->execute();
+$stmt->close();
+
+registrarSeguimiento(
+    $conexion,
+    $idCita,
+    $cita["estado"],
+    $cita["estado"],
+    "Citación modificada. Nueva fecha: $fecha $hora."
+);
+
+notificarCita(
+    $conexion,
+    $idCita,
+    "Citación modificada",
+    "La fecha u horario de una citación ha sido modificado."
+);
+
+registrarAuditoria(
+    $conexion,
+    "Editar citación",
+    "citas",
+    $idCita,
+    "Se modificaron los datos de la citación."
+);
+
+responder(
+    true,
+    "Citación actualizada correctamente."
+);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\listar_citas.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+exigirLogin();
+
+$usuario = usuarioActual();
+
+$sql = "
+    SELECT
+        c.id_cita,
+        c.fecha,
+        c.hora,
+        c.lugar,
+        c.observaciones,
+        c.fecha_creacion,
+
+        e.id_estudiante,
+        e.codigo_estudiantil,
+        e.nombres AS estudiante_nombres,
+        e.apellidos AS estudiante_apellidos,
+
+        a.id_acudiente,
+        a.nombres AS acudiente_nombres,
+        a.apellidos AS acudiente_apellidos,
+
+        d.id_docente,
+        du.nombres AS docente_nombres,
+        du.apellidos AS docente_apellidos,
+
+        m.nombre AS motivo,
+        ec.nombre AS estado
+
+    FROM citas c
+
+    INNER JOIN estudiantes e
+        ON c.id_estudiante = e.id_estudiante
+
+    INNER JOIN acudientes a
+        ON c.id_acudiente = a.id_acudiente
+
+    INNER JOIN docentes d
+        ON c.id_docente = d.id_docente
+
+    INNER JOIN usuarios du
+        ON d.id_usuario = du.id_usuario
+
+    INNER JOIN motivos m
+        ON c.id_motivo = m.id_motivo
+
+    INNER JOIN estados_cita ec
+        ON c.id_estado = ec.id_estado
+";
+
+$condiciones = [];
+$parametros = [];
+$tipos = "";
+
+switch ($usuario["rol"]) {
+
+    case "Docente":
+
+        $condiciones[] = "d.id_usuario = ?";
+        $parametros[] = $usuario["id_usuario"];
+        $tipos .= "i";
+
+        break;
+
+    case "Acudiente":
+
+        $stmt = $conexion->prepare(
+            "SELECT id_acudiente
+             FROM acudientes
+             WHERE id_usuario = ?
+             LIMIT 1"
+        );
+
+        $stmt->bind_param(
+            "i",
+            $usuario["id_usuario"]
+        );
+
+        $stmt->execute();
+
+        $fila = $stmt->get_result()->fetch_assoc();
+
+        $stmt->close();
+
+        if (!$fila) {
+            responder(
+                true,
+                "No hay citas asociadas.",
+                []
+            );
+        }
+
+        $condiciones[] = "c.id_acudiente = ?";
+        $parametros[] = $fila["id_acudiente"];
+        $tipos .= "i";
+
+        break;
+
+    case "Estudiante":
+
+        $condiciones[] = "e.documento = ?";
+        $parametros[] = $usuario["documento"];
+        $tipos .= "s";
+
+        break;
+}
+
+if (!empty($condiciones)) {
+    $sql .= " WHERE " . implode(" AND ", $condiciones);
+}
+
+$sql .= " ORDER BY c.fecha DESC, c.hora DESC";
+
+$stmt = $conexion->prepare($sql);
+
+if (!empty($parametros)) {
+    $stmt->bind_param(
+        $tipos,
+        ...$parametros
+    );
+}
+
+$stmt->execute();
+
+$resultado = $stmt->get_result();
+
+$citas = [];
+
+while ($fila = $resultado->fetch_assoc()) {
+    $citas[] = $fila;
+}
+
+$stmt->close();
+
+responder(
+    true,
+    "Citaciones consultadas.",
+    $citas
+);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\login.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    responder(false, "Método no permitido.", [], 405);
+}
+
+$documento = trim($_POST["documento"] ?? "");
+$contrasena = $_POST["contrasena"] ?? "";
+
+if ($documento === "" || $contrasena === "") {
+    responder(false, "Documento y contraseña son obligatorios.", [], 400);
+}
+
+$sql = "
+    SELECT
+        u.id_usuario,
+        u.documento,
+        u.nombres,
+        u.apellidos,
+        u.correo,
+        u.telefono,
+        u.contrasena,
+        u.verificado,
+        u.estado,
+        r.nombre AS rol
+    FROM usuarios u
+    INNER JOIN roles r
+        ON u.id_rol = r.id_rol
+    WHERE u.documento = ?
+    LIMIT 1
+";
+
+$stmt = $conexion->prepare($sql);
+
+$stmt->bind_param(
+    "s",
+    $documento
+);
+
+$stmt->execute();
+
+$resultado = $stmt->get_result();
+$usuario = $resultado->fetch_assoc();
+
+$stmt->close();
+
+if (!$usuario) {
+    responder(false, "Documento o contraseña incorrectos.", [], 401);
+}
+
+if (!password_verify($contrasena, $usuario["contrasena"])) {
+    responder(false, "Documento o contraseña incorrectos.", [], 401);
+}
+
+if ((int)$usuario["estado"] !== 1) {
+    responder(false, "El usuario está inactivo.", [], 403);
+}
+
+if ((int)$usuario["verificado"] !== 1) {
+    responder(false, "Debe verificar su cuenta antes de ingresar.", [], 403);
+}
+
+unset($usuario["contrasena"]);
+
+session_regenerate_id(true);
+
+$_SESSION["usuario"] = $usuario;
+
+registrarAuditoria(
+    $conexion,
+    "Inicio de sesión",
+    "usuarios",
+    $usuario["id_usuario"],
+    "Inicio de sesión exitoso."
+);
+
+responder(
+    true,
+    "Inicio de sesión correcto.",
+    [
+        "usuario" => $usuario
+    ]
+);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\logout.php
+==============================
+<?php
+
+session_start();
+
+$_SESSION = [];
+
+if (ini_get("session.use_cookies")) {
+
+    $parametros = session_get_cookie_params();
+
+    setcookie(
+        session_name(),
+        "",
+        time() - 42000,
+        $parametros["path"],
+        $parametros["domain"],
+        $parametros["secure"],
+        $parametros["httponly"]
+    );
+}
+
+session_destroy();
+
+header("Content-Type: application/json; charset=utf-8");
+
+echo json_encode([
+    "ok" => true,
+    "mensaje" => "Sesión cerrada correctamente."
+], JSON_UNESCAPED_UNICODE);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\notificaciones.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+exigirLogin();
+
+$idUsuario = $_SESSION["usuario"]["id_usuario"];
+
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+
+    $sql = "
+        SELECT
+            id_notificacion,
+            id_cita,
+            titulo,
+            mensaje,
+            leida,
+            fecha_envio
+        FROM notificaciones
+        WHERE id_usuario = ?
+        ORDER BY fecha_envio DESC
+    ";
+
+    $stmt = $conexion->prepare($sql);
+
+    $stmt->bind_param(
+        "i",
+        $idUsuario
+    );
+
+    $stmt->execute();
+
+    $resultado = $stmt->get_result();
+
+    $notificaciones = [];
+
+    while ($fila = $resultado->fetch_assoc()) {
+        $notificaciones[] = $fila;
+    }
+
+    $stmt->close();
+
+    responder(
+        true,
+        "Notificaciones consultadas.",
+        $notificaciones
+    );
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $idNotificacion = (int)(
+        $_POST["id_notificacion"] ?? 0
+    );
+
+    if (!$idNotificacion) {
+        responder(
+            false,
+            "Debe indicar la notificación.",
+            [],
+            400
+        );
+    }
+
+    $stmt = $conexion->prepare(
+        "UPDATE notificaciones
+         SET leida = 1
+         WHERE id_notificacion = ?
+           AND id_usuario = ?"
+    );
+
+    $stmt->bind_param(
+        "ii",
+        $idNotificacion,
+        $idUsuario
+    );
+
+    $stmt->execute();
+    $stmt->close();
+
+    responder(
+        true,
+        "Notificación marcada como leída."
+    );
+}
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\registro.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    responder(false, "Método no permitido.", [], 405);
+}
+
+$tipoDocumento = trim($_POST["tipo_documento"] ?? "");
+$documento = trim($_POST["documento"] ?? "");
+$nombres = trim($_POST["nombres"] ?? "");
+$apellidos = trim($_POST["apellidos"] ?? "");
+$correo = trim($_POST["correo"] ?? "");
+$telefono = trim($_POST["telefono"] ?? "");
+$contrasena = $_POST["contrasena"] ?? "";
+$confirmar = $_POST["confirmar_contrasena"] ?? "";
+
+if (
+    $documento === "" ||
+    $nombres === "" ||
+    $apellidos === "" ||
+    $correo === "" ||
+    $contrasena === ""
+) {
+    responder(false, "Complete todos los campos obligatorios.", [], 400);
+}
+
+if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+    responder(false, "El correo no es válido.", [], 400);
+}
+
+if (strlen($contrasena) < 6) {
+    responder(false, "La contraseña debe tener mínimo 6 caracteres.", [], 400);
+}
+
+if ($contrasena !== $confirmar) {
+    responder(false, "Las contraseñas no coinciden.", [], 400);
+}
+
+$stmt = $conexion->prepare(
+    "SELECT id_usuario
+     FROM usuarios
+     WHERE documento = ? OR correo = ?
+     LIMIT 1"
+);
+
+$stmt->bind_param("ss", $documento, $correo);
+$stmt->execute();
+
+$resultado = $stmt->get_result();
+
+if ($resultado->num_rows > 0) {
+    $stmt->close();
+
+    responder(
+        false,
+        "El documento o correo ya está registrado.",
+        [],
+        409
+    );
+}
+
+$stmt->close();
+
+$stmt = $conexion->prepare(
+    "SELECT id_rol
+     FROM roles
+     WHERE nombre = 'Acudiente'
+     LIMIT 1"
+);
+
+$stmt->execute();
+
+$resultado = $stmt->get_result();
+$rol = $resultado->fetch_assoc();
+
+$stmt->close();
+
+if (!$rol) {
+    responder(false, "No existe el rol Acudiente.", [], 500);
+}
+
+$idRol = $rol["id_rol"];
+
+$hash = password_hash(
+    $contrasena,
+    PASSWORD_DEFAULT
+);
+
+$conexion->begin_transaction();
+
+try {
+
+    $stmt = $conexion->prepare(
+        "INSERT INTO usuarios
+        (
+            id_rol,
+            tipo_documento,
+            documento,
+            nombres,
+            apellidos,
+            correo,
+            telefono,
+            contrasena,
+            verificado,
+            estado
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 1)"
+    );
+
+    $stmt->bind_param(
+        "isssssss",
+        $idRol,
+        $tipoDocumento,
+        $documento,
+        $nombres,
+        $apellidos,
+        $correo,
+        $telefono,
+        $hash
+    );
+
+    $stmt->execute();
+
+    $idUsuario = $conexion->insert_id;
+
+    $stmt->close();
+
+    $stmt = $conexion->prepare(
+        "INSERT INTO acudientes
+        (
+            id_usuario,
+            documento,
+            nombres,
+            apellidos,
+            telefono,
+            correo,
+            estado
+        )
+        VALUES (?, ?, ?, ?, ?, ?, 1)"
+    );
+
+    $stmt->bind_param(
+        "isssss",
+        $idUsuario,
+        $documento,
+        $nombres,
+        $apellidos,
+        $telefono,
+        $correo
+    );
+
+    $stmt->execute();
+    $stmt->close();
+
+    $codigo = (string) random_int(100000, 999999);
+
+    $stmt = $conexion->prepare(
+        "INSERT INTO codigos_verificacion
+        (
+            id_usuario,
+            codigo,
+            fecha_expiracion,
+            utilizado
+        )
+        VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE), 0)"
+    );
+
+    $stmt->bind_param(
+        "is",
+        $idUsuario,
+        $codigo
+    );
+
+    $stmt->execute();
+    $stmt->close();
+
+    registrarAuditoria(
+        $conexion,
+        "Registro de usuario",
+        "usuarios",
+        $idUsuario,
+        "Nuevo usuario registrado."
+    );
+
+    $conexion->commit();
+
+    responder(
+        true,
+        "Registro realizado. Verifique su cuenta.",
+        [
+            "id_usuario" => $idUsuario,
+            "documento" => $documento,
+            "codigo_desarrollo" => $codigo
+        ]
+    );
+
+} catch (Throwable $e) {
+
+    $conexion->rollback();
+
+    responder(
+        false,
+        "No fue posible completar el registro.",
+        [],
+        500
+    );
+}
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\reportes.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+exigirRol([
+    "Super Admin",
+    "Coordinador",
+    "Docente"
+]);
+
+$desde = $_GET["desde"] ?? "";
+$hasta = $_GET["hasta"] ?? "";
+$estado = $_GET["estado"] ?? "";
+$idDocente = (int)($_GET["id_docente"] ?? 0);
+$idMotivo = (int)($_GET["id_motivo"] ?? 0);
+
+$sql = "
+    SELECT
+        c.id_cita,
+        c.fecha,
+        c.hora,
+
+        CONCAT(
+            e.nombres,
+            ' ',
+            e.apellidos
+        ) AS estudiante,
+
+        CONCAT(
+            u.nombres,
+            ' ',
+            u.apellidos
+        ) AS docente,
+
+        a.nombres AS acudiente,
+        m.nombre AS motivo,
+        ec.nombre AS estado,
+        c.lugar,
+        c.observaciones
+
+    FROM citas c
+
+    INNER JOIN estudiantes e
+        ON c.id_estudiante = e.id_estudiante
+
+    INNER JOIN acudientes a
+        ON c.id_acudiente = a.id_acudiente
+
+    INNER JOIN docentes d
+        ON c.id_docente = d.id_docente
+
+    INNER JOIN usuarios u
+        ON d.id_usuario = u.id_usuario
+
+    INNER JOIN motivos m
+        ON c.id_motivo = m.id_motivo
+
+    INNER JOIN estados_cita ec
+        ON c.id_estado = ec.id_estado
+
+    WHERE 1 = 1
+";
+
+$tipos = "";
+$parametros = [];
+
+if ($desde !== "") {
+    $sql .= " AND c.fecha >= ?";
+    $tipos .= "s";
+    $parametros[] = $desde;
+}
+
+if ($hasta !== "") {
+    $sql .= " AND c.fecha <= ?";
+    $tipos .= "s";
+    $parametros[] = $hasta;
+}
+
+if ($estado !== "") {
+    $sql .= " AND ec.nombre = ?";
+    $tipos .= "s";
+    $parametros[] = $estado;
+}
+
+if ($idDocente > 0) {
+    $sql .= " AND c.id_docente = ?";
+    $tipos .= "i";
+    $parametros[] = $idDocente;
+}
+
+if ($idMotivo > 0) {
+    $sql .= " AND c.id_motivo = ?";
+    $tipos .= "i";
+    $parametros[] = $idMotivo;
+}
+
+$sql .= "
+    ORDER BY c.fecha DESC, c.hora DESC
+";
+
+$stmt = $conexion->prepare($sql);
+
+if (!empty($parametros)) {
+    $stmt->bind_param(
+        $tipos,
+        ...$parametros
+    );
+}
+
+$stmt->execute();
+
+$resultado = $stmt->get_result();
+
+$registros = [];
+
+while ($fila = $resultado->fetch_assoc()) {
+    $registros[] = $fila;
+}
+
+$stmt->close();
+
+/*
+ * Resumen
+ */
+$resumen = [
+    "total" => count($registros),
+    "pendientes" => 0,
+    "confirmadas" => 0,
+    "realizadas" => 0,
+    "canceladas" => 0,
+    "reprogramadas" => 0,
+    "no_asistio" => 0,
+    "justificadas" => 0
+];
+
+foreach ($registros as $registro) {
+
+    switch ($registro["estado"]) {
+
+        case "Pendiente":
+            $resumen["pendientes"]++;
+            break;
+
+        case "Confirmada":
+            $resumen["confirmadas"]++;
+            break;
+
+        case "Realizada":
+            $resumen["realizadas"]++;
+            break;
+
+        case "Cancelada":
+            $resumen["canceladas"]++;
+            break;
+
+        case "Reprogramada":
+            $resumen["reprogramadas"]++;
+            break;
+
+        case "No asistió":
+            $resumen["no_asistio"]++;
+            break;
+
+        case "Justificada":
+            $resumen["justificadas"]++;
+            break;
+    }
+}
+
+responder(
+    true,
+    "Reporte generado.",
+    [
+        "resumen" => $resumen,
+        "registros" => $registros
+    ]
+);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\reprogramar_cita.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+exigirRol([
+    "Super Admin",
+    "Coordinador",
+    "Docente",
+    "Acudiente"
+]);
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    responder(false, "Método no permitido.", [], 405);
+}
+
+$idCita = (int)($_POST["id_cita"] ?? 0);
+$nuevaFecha = trim($_POST["fecha"] ?? "");
+$nuevaHora = trim($_POST["hora"] ?? "");
+
+if (!$idCita || !$nuevaFecha || !$nuevaHora) {
+    responder(false, "Datos incompletos.", [], 400);
+}
+
+if ($nuevaFecha < date("Y-m-d")) {
+    responder(
+        false,
+        "La nueva fecha no puede ser anterior a hoy.",
+        [],
+        400
+    );
+}
+
+$stmt = $conexion->prepare(
+    "SELECT
+        c.id_docente,
+        ec.nombre AS estado
+     FROM citas c
+     INNER JOIN estados_cita ec
+        ON c.id_estado = ec.id_estado
+     WHERE c.id_cita = ?
+     LIMIT 1"
+);
+
+$stmt->bind_param("i", $idCita);
+$stmt->execute();
+
+$cita = $stmt->get_result()->fetch_assoc();
+
+$stmt->close();
+
+if (!$cita) {
+    responder(false, "La citación no existe.", [], 404);
+}
+
+if (
+    in_array(
+        $cita["estado"],
+        ["Cancelada", "Realizada", "Justificada"],
+        true
+    )
+) {
+    responder(
+        false,
+        "Esta citación no puede reprogramarse.",
+        [],
+        409
+    );
+}
+
+$stmt = $conexion->prepare(
+    "SELECT id_cita
+     FROM citas
+     WHERE fecha = ?
+       AND hora = ?
+       AND id_docente = ?
+       AND id_cita <> ?
+       AND id_estado IN (
+           SELECT id_estado
+           FROM estados_cita
+           WHERE nombre IN (
+               'Pendiente',
+               'Confirmada',
+               'Reprogramada'
+           )
+       )
+     LIMIT 1"
+);
+
+$stmt->bind_param(
+    "ssii",
+    $nuevaFecha,
+    $nuevaHora,
+    $cita["id_docente"],
+    $idCita
+);
+
+$stmt->execute();
+
+if ($stmt->get_result()->num_rows > 0) {
+    $stmt->close();
+
+    responder(
+        false,
+        "El nuevo horario ya está ocupado.",
+        [],
+        409
+    );
+}
+
+$stmt->close();
+
+$idEstado = obtenerEstadoId(
+    $conexion,
+    "Reprogramada"
+);
+
+$stmt = $conexion->prepare(
+    "UPDATE citas
+     SET fecha = ?,
+         hora = ?,
+         id_estado = ?
+     WHERE id_cita = ?"
+);
+
+$stmt->bind_param(
+    "ssii",
+    $nuevaFecha,
+    $nuevaHora,
+    $idEstado,
+    $idCita
+);
+
+$stmt->execute();
+$stmt->close();
+
+registrarSeguimiento(
+    $conexion,
+    $idCita,
+    $cita["estado"],
+    "Reprogramada",
+    "Nueva fecha: $nuevaFecha $nuevaHora."
+);
+
+notificarCita(
+    $conexion,
+    $idCita,
+    "Citación reprogramada",
+    "La citación fue reprogramada para $nuevaFecha a las $nuevaHora."
+);
+
+registrarAuditoria(
+    $conexion,
+    "Reprogramar citación",
+    "citas",
+    $idCita,
+    "Citación reprogramada."
+);
+
+responder(
+    true,
+    "Citación reprogramada correctamente."
+);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\seguimiento.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+exigirLogin();
+
+$idCita = (int)($_GET["id_cita"] ?? 0);
+
+if (!$idCita) {
+    responder(
+        false,
+        "Debe indicar la citación.",
+        [],
+        400
+    );
+}
+
+$sql = "
+    SELECT
+        s.id_seguimiento,
+        s.id_cita,
+        s.estado_anterior,
+        s.estado_nuevo,
+        s.observacion,
+        s.fecha,
+        CONCAT(
+            u.nombres,
+            ' ',
+            u.apellidos
+        ) AS usuario
+    FROM seguimiento_citas s
+    LEFT JOIN usuarios u
+        ON s.usuario_responsable = u.id_usuario
+    WHERE s.id_cita = ?
+    ORDER BY s.fecha DESC
+";
+
+$stmt = $conexion->prepare($sql);
+
+$stmt->bind_param(
+    "i",
+    $idCita
+);
+
+$stmt->execute();
+
+$resultado = $stmt->get_result();
+
+$seguimiento = [];
+
+while ($fila = $resultado->fetch_assoc()) {
+    $seguimiento[] = $fila;
+}
+
+$stmt->close();
+
+responder(
+    true,
+    "Seguimiento consultado.",
+    $seguimiento
+);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\verificar.php
+==============================
+<?php
+
+require_once "_helpers.php";
+
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    responder(false, "Método no permitido.", [], 405);
+}
+
+$documento = trim($_POST["documento"] ?? "");
+$codigo = trim($_POST["codigo"] ?? "");
+
+if ($documento === "" || $codigo === "") {
+    responder(false, "Documento y código son obligatorios.", [], 400);
+}
+
+$sql = "
+    SELECT
+        u.id_usuario,
+        u.verificado,
+        c.id_codigo,
+        c.codigo,
+        c.fecha_expiracion,
+        c.utilizado
+    FROM usuarios u
+    INNER JOIN codigos_verificacion c
+        ON u.id_usuario = c.id_usuario
+    WHERE u.documento = ?
+      AND c.codigo = ?
+      AND c.utilizado = 0
+    ORDER BY c.id_codigo DESC
+    LIMIT 1
+";
+
+$stmt = $conexion->prepare($sql);
+
+$stmt->bind_param(
+    "ss",
+    $documento,
+    $codigo
+);
+
+$stmt->execute();
+
+$resultado = $stmt->get_result();
+$fila = $resultado->fetch_assoc();
+
+$stmt->close();
+
+if (!$fila) {
+    responder(false, "Código incorrecto o ya utilizado.", [], 400);
+}
+
+if (strtotime($fila["fecha_expiracion"]) < time()) {
+    responder(false, "El código ha expirado.", [], 400);
+}
+
+$conexion->begin_transaction();
+
+try {
+
+    $stmt = $conexion->prepare(
+        "UPDATE usuarios
+         SET verificado = 1
+         WHERE id_usuario = ?"
+    );
+
+    $stmt->bind_param(
+        "i",
+        $fila["id_usuario"]
+    );
+
+    $stmt->execute();
+    $stmt->close();
+
+    $stmt = $conexion->prepare(
+        "UPDATE codigos_verificacion
+         SET utilizado = 1
+         WHERE id_codigo = ?"
+    );
+
+    $stmt->bind_param(
+        "i",
+        $fila["id_codigo"]
+    );
+
+    $stmt->execute();
+    $stmt->close();
+
+    registrarAuditoria(
+        $conexion,
+        "Verificación de cuenta",
+        "usuarios",
+        $fila["id_usuario"],
+        "Cuenta verificada correctamente."
+    );
+
+    $conexion->commit();
+
+    responder(
+        true,
+        "Cuenta verificada correctamente."
+    );
+
+} catch (Throwable $e) {
+
+    $conexion->rollback();
+
+    responder(
+        false,
+        "No fue posible verificar la cuenta.",
+        [],
+        500
+    );
+}
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\api\_helpers.php
+==============================
+<?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . "/../config/conexion.php";
+
+function responder($ok, $mensaje = "", $datos = [], $codigo = 200)
+{
+    http_response_code($codigo);
+
+    header("Content-Type: application/json; charset=utf-8");
+
+    echo json_encode([
+        "ok" => $ok,
+        "mensaje" => $mensaje,
+        "datos" => $datos
+    ], JSON_UNESCAPED_UNICODE);
+
+    exit;
+}
+
+function usuarioAutenticado()
+{
+    return isset($_SESSION["usuario"]);
+}
+
+function usuarioActual()
+{
+    return $_SESSION["usuario"] ?? null;
+}
+
+function exigirLogin()
+{
+    if (!usuarioAutenticado()) {
+        responder(false, "Debe iniciar sesión.", [], 401);
+    }
+}
+
+function tieneRol($roles)
+{
+    $usuario = usuarioActual();
+
+    if (!$usuario) {
+        return false;
+    }
+
+    if (!is_array($roles)) {
+        $roles = [$roles];
+    }
+
+    return in_array($usuario["rol"], $roles, true);
+}
+
+function exigirRol($roles)
+{
+    exigirLogin();
+
+    if (!tieneRol($roles)) {
+        responder(false, "No tiene permisos para realizar esta acción.", [], 403);
+    }
+}
+
+function registrarAuditoria(
+    $conexion,
+    $accion,
+    $tabla = null,
+    $registro = null,
+    $descripcion = null
+) {
+    $idUsuario = $_SESSION["usuario"]["id_usuario"] ?? null;
+
+    $stmt = $conexion->prepare(
+        "INSERT INTO auditoria
+        (id_usuario, accion, tabla_afectada, registro_afectado, descripcion)
+        VALUES (?, ?, ?, ?, ?)"
+    );
+
+    if (!$stmt) {
+        return;
+    }
+
+    $stmt->bind_param(
+        "issis",
+        $idUsuario,
+        $accion,
+        $tabla,
+        $registro,
+        $descripcion
+    );
+
+    $stmt->execute();
+    $stmt->close();
+}
+
+function registrarSeguimiento(
+    $conexion,
+    $idCita,
+    $estadoAnterior,
+    $estadoNuevo,
+    $observacion = ""
+) {
+    $idUsuario = $_SESSION["usuario"]["id_usuario"] ?? null;
+
+    $stmt = $conexion->prepare(
+        "INSERT INTO seguimiento_citas
+        (id_cita, estado_anterior, estado_nuevo, observacion, usuario_responsable)
+        VALUES (?, ?, ?, ?, ?)"
+    );
+
+    if (!$stmt) {
+        return;
+    }
+
+    $stmt->bind_param(
+        "isssi",
+        $idCita,
+        $estadoAnterior,
+        $estadoNuevo,
+        $observacion,
+        $idUsuario
+    );
+
+    $stmt->execute();
+    $stmt->close();
+}
+
+function crearNotificacion(
+    $conexion,
+    $idUsuario,
+    $idCita,
+    $titulo,
+    $mensaje
+) {
+    if (!$idUsuario) {
+        return;
+    }
+
+    $stmt = $conexion->prepare(
+        "INSERT INTO notificaciones
+        (id_usuario, id_cita, titulo, mensaje)
+        VALUES (?, ?, ?, ?)"
+    );
+
+    if (!$stmt) {
+        return;
+    }
+
+    $stmt->bind_param(
+        "iiss",
+        $idUsuario,
+        $idCita,
+        $titulo,
+        $mensaje
+    );
+
+    $stmt->execute();
+    $stmt->close();
+}
+
+function obtenerEstadoId($conexion, $nombre)
+{
+    $stmt = $conexion->prepare(
+        "SELECT id_estado
+         FROM estados_cita
+         WHERE nombre = ?
+         LIMIT 1"
+    );
+
+    $stmt->bind_param("s", $nombre);
+    $stmt->execute();
+
+    $resultado = $stmt->get_result();
+    $fila = $resultado->fetch_assoc();
+
+    $stmt->close();
+
+    return $fila["id_estado"] ?? null;
+}
+
+function obtenerEstadoNombre($conexion, $idEstado)
+{
+    $stmt = $conexion->prepare(
+        "SELECT nombre
+         FROM estados_cita
+         WHERE id_estado = ?
+         LIMIT 1"
+    );
+
+    $stmt->bind_param("i", $idEstado);
+    $stmt->execute();
+
+    $resultado = $stmt->get_result();
+    $fila = $resultado->fetch_assoc();
+
+    $stmt->close();
+
+    return $fila["nombre"] ?? "";
+}
+
+function notificarCita(
+    $conexion,
+    $idCita,
+    $titulo,
+    $mensaje
+) {
+    $sql = "
+        SELECT
+            a.id_usuario AS id_acudiente_usuario,
+            d.id_usuario AS id_docente_usuario
+        FROM citas c
+        INNER JOIN acudientes a
+            ON c.id_acudiente = a.id_acudiente
+        INNER JOIN docentes d
+            ON c.id_docente = d.id_docente
+        WHERE c.id_cita = ?
+        LIMIT 1
+    ";
+
+    $stmt = $conexion->prepare($sql);
+    $stmt->bind_param("i", $idCita);
+    $stmt->execute();
+
+    $resultado = $stmt->get_result();
+    $fila = $resultado->fetch_assoc();
+
+    $stmt->close();
+
+    if (!$fila) {
+        return;
+    }
+
+    crearNotificacion(
+        $conexion,
+        $fila["id_acudiente_usuario"],
+        $idCita,
+        $titulo,
+        $mensaje
+    );
+
+    crearNotificacion(
+        $conexion,
+        $fila["id_docente_usuario"],
+        $idCita,
+        $titulo,
+        $mensaje
+    );
+}
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\config\conexion.php
+==============================
+<?php
+
+$servidor = "localhost";
+$usuario = "root";
+$contrasena = "";
+$base_datos = "eduturnos";
+
+$conexion = new mysqli(
+    $servidor,
+    $usuario,
+    $contrasena,
+    $base_datos
+);
+
+if ($conexion->connect_error) {
+    die("Error de conexión: " . $conexion->connect_error);
+}
+
+$conexion->set_charset("utf8mb4");
+
+?>
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\css\estilos.css
+==============================
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+.topbar {
+    height: 65px;
+    background: #1565c0;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 25px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.usuario {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.usuario button {
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.layout {
+    display: flex;
+    min-height: calc(100vh - 65px);
+}
+
+.sidebar {
+    width: 230px;
+    background: white;
+    border-right: 1px solid #ddd;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar a {
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #333;
+    border-bottom: 1px solid #eee;
+}
+
+.sidebar a:hover {
+    background: #eaf2ff;
+}
+
+.contenido {
+    flex: 1;
+    padding: 30px;
+}
+
+.bienvenida {
+    margin: 10px 0 25px;
+    color: #666;
+}
+
+.estadisticas {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.tarjeta {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.tarjeta h2 {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.tarjeta p {
+    font-size: 32px;
+    font-weight: bold;
+    color: #1565c0;
+}
+
+.panel {
+    margin-top: 25px;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+@media (max-width: 800px) {
+
+    .sidebar {
+        width: 180px;
+    }
+
+    .estadisticas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .estadisticas {
+        grid-template-columns: 1fr;
+    }
+
+    .contenido {
+        padding: 15px;
+    }
+}
+
+/* ============================================
+   CLASE 3 - FORMULARIOS Y AUTENTICACIÓN
+   RESPONSABLE: JAIVER
+   ============================================ */
+
+.contenedor-formulario {
+    width: 90%;
+    max-width: 450px;
+    margin: 60px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.10);
+}
+
+.contenedor-formulario h1 {
+    text-align: center;
+    color: #1557a6;
+    margin-bottom: 10px;
+}
+
+.contenedor-formulario h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.contenedor-formulario p {
+    text-align: center;
+    color: #666;
+    line-height: 1.5;
+}
+
+.contenedor-formulario label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.contenedor-formulario input,
+.contenedor-formulario select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+.contenedor-formulario input:focus,
+.contenedor-formulario select:focus {
+    outline: none;
+    border-color: #1557a6;
+}
+
+.contenedor-formulario button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #1557a6;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.contenedor-formulario button:hover {
+    background: #0d4385;
+}
+
+.contenedor-formulario a {
+    display: block;
+    margin-top: 15px;
+    text-align: center;
+    color: #1557a6;
+    text-decoration: none;
+}
+
+.contenedor-formulario a:hover {
+    text-decoration: underline;
+}
+
+/* Mensajes */
+
+.mensaje {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+/* Tarjetas */
+
+.tarjeta-formulario {
+    background: white;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Diseño responsive */
+
+@media (max-width: 600px) {
+
+    .contenedor-formulario {
+        width: 85%;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    .contenedor-formulario h1 {
+        font-size: 24px;
+    }
+
+    .contenedor-formulario h2 {
+        font-size: 20px;
+    }
+
+    .contenedor-formulario input,
+    .contenedor-formulario select,
+    .contenedor-formulario button {
+        font-size: 14px;
+    }
+}
+
+.tabla-citas {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.tabla-citas th,
+.tabla-citas td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.estado {
+    padding: 5px 10px;
+    border-radius: 15px;
+}
+
+.estado-pendiente {
+    background: #fff3cd;
+}
+
+.estado-confirmada {
+    background: #d1ecf1;
+}
+
+.estado-realizada {
+    background: #d4edda;
+}
+
+.estado-cancelada {
+    background: #f8d7da;
+}
+
+.seguimiento {
+    max-width: 700px;
+    margin: 30px auto;
+}
+
+.seguimiento div {
+    padding: 20px;
+    margin-bottom: 10px;
+    border-left: 4px solid #1557a6;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.notificacion {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: white;
+}
+
+.tarjetas-reporte {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.tarjeta-reporte {
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* =========================================================
+   EDUTURNOS - AJUSTES GENERALES
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+.contenedor {
+    width: 92%;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+.contenedor-auth {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.tarjeta-auth {
+    width: 100%;
+    max-width: 430px;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.12);
+}
+
+.tarjeta-auth h1 {
+    text-align: center;
+    color: #1769aa;
+    margin-bottom: 5px;
+}
+
+.tarjeta-auth h2 {
+    text-align: center;
+    margin-top: 5px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+label {
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-family: Arial, sans-serif;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #1769aa;
+}
+
+button,
+.boton {
+    display: inline-block;
+    border: none;
+    background: #1769aa;
+    color: white;
+    padding: 11px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: 12px;
+}
+
+button:hover,
+.boton:hover {
+    opacity: .9;
+}
+
+#mensajeLogin,
+#mensajeRegistro,
+#mensajeVerificar,
+#mensajeCita {
+    margin-top: 15px;
+    padding: 10px;
+}
+
+.tabla-contenedor {
+    overflow-x: auto;
+    margin-top: 25px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background: #1769aa;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.tarjeta-notificacion {
+    background: white;
+    padding: 18px;
+    margin: 15px 0;
+    border-radius: 10px;
+    border-left: 5px solid #1769aa;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+@media (max-width: 600px) {
+
+    .contenedor {
+        width: 95%;
+    }
+
+    .tarjeta-auth {
+        padding: 20px;
+    }
+
+    th,
+    td {
+        font-size: 14px;
+    }
+}
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\js\app.js
+==============================
+// Botón para cerrar sesión
+document.getElementById("btnCerrarSesion").addEventListener("click", function () {
+    window.location.href = "index.html";
+});
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\js\autenticacion.js
+==============================
+document.addEventListener("DOMContentLoaded", () => {
+
+    const formLogin =
+        document.getElementById("formLogin");
+
+    const formRegistro =
+        document.getElementById("formRegistro");
+
+    const formVerificar =
+        document.getElementById("formVerificar");
+
+
+    if (formLogin) {
+
+        formLogin.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+                const datos =
+                    new FormData(formLogin);
+
+                const mensaje =
+                    document.getElementById(
+                        "mensajeLogin"
+                    );
+
+                mensaje.textContent =
+                    "Iniciando sesión...";
+
+                try {
+
+                    const respuesta =
+                        await fetch(
+                            "api/login.php",
+                            {
+                                method: "POST",
+                                body: datos
+                            }
+                        );
+
+                    const resultado =
+                        await respuesta.json();
+
+                    if (!resultado.ok) {
+
+                        mensaje.textContent =
+                            resultado.mensaje;
+
+                        return;
+                    }
+
+                    sessionStorage.setItem(
+                        "usuario",
+                        JSON.stringify(
+                            resultado.datos.usuario
+                        )
+                    );
+
+                    window.location.href =
+                        "dashboard.html";
+
+                } catch (error) {
+
+                    mensaje.textContent =
+                        "No fue posible conectarse con el servidor.";
+                }
+
+            }
+        );
+
+    }
+
+
+    if (formRegistro) {
+
+        formRegistro.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+                const datos =
+                    new FormData(formRegistro);
+
+                const mensaje =
+                    document.getElementById(
+                        "mensajeRegistro"
+                    );
+
+                mensaje.textContent =
+                    "Registrando usuario...";
+
+                try {
+
+                    const respuesta =
+                        await fetch(
+                            "api/registro.php",
+                            {
+                                method: "POST",
+                                body: datos
+                            }
+                        );
+
+                    const resultado =
+                        await respuesta.json();
+
+                    if (!resultado.ok) {
+
+                        mensaje.textContent =
+                            resultado.mensaje;
+
+                        return;
+                    }
+
+                    sessionStorage.setItem(
+                        "documentoVerificacion",
+                        resultado.datos.documento
+                    );
+
+                    alert(
+                        "Cuenta creada.\n\n" +
+                        "Código de desarrollo: " +
+                        resultado.datos.codigo_desarrollo
+                    );
+
+                    window.location.href =
+                        "verificar.html";
+
+                } catch (error) {
+
+                    mensaje.textContent =
+                        "No fue posible registrar la cuenta.";
+                }
+
+            }
+        );
+
+    }
+
+
+    if (formVerificar) {
+
+        formVerificar.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+                const datos =
+                    new FormData(formVerificar);
+
+                const mensaje =
+                    document.getElementById(
+                        "mensajeVerificar"
+                    );
+
+                mensaje.textContent =
+                    "Verificando...";
+
+                try {
+
+                    const respuesta =
+                        await fetch(
+                            "api/verificar.php",
+                            {
+                                method: "POST",
+                                body: datos
+                            }
+                        );
+
+                    const resultado =
+                        await respuesta.json();
+
+                    if (!resultado.ok) {
+
+                        mensaje.textContent =
+                            resultado.mensaje;
+
+                        return;
+                    }
+
+                    mensaje.textContent =
+                        "Cuenta verificada correctamente.";
+
+                    setTimeout(() => {
+
+                        window.location.href =
+                            "login.html";
+
+                    }, 1200);
+
+                } catch (error) {
+
+                    mensaje.textContent =
+                        "No fue posible verificar la cuenta.";
+                }
+
+            }
+        );
+
+    }
+
+});
+
+
+async function cerrarSesion() {
+
+    try {
+
+        await fetch(
+            "api/logout.php",
+            {
+                method: "POST"
+            }
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+    sessionStorage.clear();
+
+    window.location.href =
+        "login.html";
+}
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\js\citaciones.js
+==============================
+document.addEventListener("DOMContentLoaded", () => {
+
+    cargarCatalogos();
+
+    const formulario =
+        document.getElementById(
+            "formCrearCita"
+        );
+
+    if (formulario) {
+
+        formulario.addEventListener(
+            "submit",
+            crearCita
+        );
+    }
+
+});
+
+
+async function cargarCatalogos() {
+
+    await cargarCatalogo(
+        "estudiantes",
+        "id_estudiante",
+        estudiante => {
+
+            return (
+                estudiante.codigo_estudiantil +
+                " - " +
+                estudiante.nombres +
+                " " +
+                estudiante.apellidos
+            );
+
+        }
+    );
+
+
+    await cargarCatalogo(
+        "acudientes",
+        "id_acudiente",
+        acudiente => {
+
+            return (
+                acudiente.nombres +
+                " " +
+                acudiente.apellidos +
+                " - " +
+                acudiente.documento
+            );
+
+        }
+    );
+
+
+    await cargarCatalogo(
+        "docentes",
+        "id_docente",
+        docente => {
+
+            return (
+                docente.nombres +
+                " " +
+                docente.apellidos
+            );
+
+        }
+    );
+
+
+    await cargarCatalogo(
+        "motivos",
+        "id_motivo",
+        motivo => motivo.nombre
+    );
+
+}
+
+
+async function cargarCatalogo(
+    tipo,
+    elementoId,
+    texto
+) {
+
+    const select =
+        document.getElementById(
+            elementoId
+        );
+
+    if (!select) {
+        return;
+    }
+
+    try {
+
+        const respuesta =
+            await fetch(
+                `api/catalogos.php?tipo=${tipo}`
+            );
+
+        const resultado =
+            await respuesta.json();
+
+        if (!resultado.ok) {
+            return;
+        }
+
+        resultado.datos.forEach(item => {
+
+            const opcion =
+                document.createElement(
+                    "option"
+                );
+
+            opcion.value =
+                item[
+                    elementoId
+                ];
+
+            opcion.textContent =
+                texto(item);
+
+            select.appendChild(opcion);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Error cargando catálogo:",
+            error
+        );
+    }
+}
+
+
+async function crearCita(event) {
+
+    event.preventDefault();
+
+    const formulario =
+        event.target;
+
+    const datos =
+        new FormData(formulario);
+
+    const mensaje =
+        document.getElementById(
+            "mensajeCita"
+        );
+
+    mensaje.textContent =
+        "Creando citación...";
+
+    try {
+
+        const respuesta =
+            await fetch(
+                "api/crear_cita.php",
+                {
+                    method: "POST",
+                    body: datos
+                }
+            );
+
+        const resultado =
+            await respuesta.json();
+
+        mensaje.textContent =
+            resultado.mensaje;
+
+        if (resultado.ok) {
+
+            formulario.reset();
+
+        }
+
+    } catch (error) {
+
+        mensaje.textContent =
+            "No fue posible crear la citación.";
+    }
+}
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\php\config\conexion.php
+==============================
+<?php
+
+$host = "localhost";
+$usuario = "root";
+$contrasena = "";
+$base_datos = "eduturnos";
+
+$conexion = new mysqli(
+    $host,
+    $usuario,
+    $contrasena,
+    $base_datos
+);
+
+if ($conexion->connect_error) {
+    http_response_code(500);
+    die("Error de conexión con la base de datos.");
+}
+
+$conexion->set_charset("utf8mb4");
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\php\config\prueba_conexion.php
+==============================
+<?php
+
+require_once "conexion.php";
+
+echo "Conexión exitosa con EDUTURNOS.";
+
+?>
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\sql\autenticacion.sql
+==============================
+USE eduturnos;
+
+CREATE TABLE IF NOT EXISTS roles (
+    id_rol INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE,
+    estado ENUM('Activo','Inactivo') DEFAULT 'Activo'
+);
+
+CREATE TABLE IF NOT EXISTS usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    id_rol INT NOT NULL,
+    tipo_documento VARCHAR(10) NOT NULL,
+    documento VARCHAR(30) NOT NULL UNIQUE,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    correo VARCHAR(150) NOT NULL UNIQUE,
+    contrasena VARCHAR(255) NOT NULL,
+    estado ENUM('Pendiente','Activo','Inactivo') DEFAULT 'Pendiente',
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_rol)
+    REFERENCES roles(id_rol)
+);
+
+CREATE TABLE IF NOT EXISTS codigos_verificacion (
+    id_codigo INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    codigo VARCHAR(10) NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    utilizado BOOLEAN DEFAULT FALSE,
+
+    FOREIGN KEY (id_usuario)
+    REFERENCES usuarios(id_usuario)
+);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\sql\cambios-autenticacion.sql
+==============================
+USE eduturnos;
+
+-- =========================================================
+-- CAMBIOS DE AUTENTICACIÓN EDUTURNOS
+-- =========================================================
+
+-- Agregar tipo de documento al usuario
+ALTER TABLE usuarios
+ADD COLUMN tipo_documento VARCHAR(20) NULL AFTER id_rol;
+
+-- Relacionar acudiente con su usuario de acceso
+ALTER TABLE acudientes
+ADD COLUMN id_usuario INT NULL UNIQUE AFTER id_acudiente;
+
+ALTER TABLE acudientes
+ADD CONSTRAINT fk_acudiente_usuario
+FOREIGN KEY (id_usuario)
+REFERENCES usuarios(id_usuario)
+ON DELETE SET NULL
+ON UPDATE CASCADE;
+
+-- Índices para mejorar consultas
+CREATE INDEX idx_citas_fecha_hora
+ON citas(fecha, hora);
+
+CREATE INDEX idx_citas_estudiante
+ON citas(id_estudiante);
+
+CREATE INDEX idx_citas_docente
+ON citas(id_docente);
+
+CREATE INDEX idx_citas_acudiente
+ON citas(id_acudiente);
+
+CREATE INDEX idx_notificaciones_usuario
+ON notificaciones(id_usuario);
+
+CREATE INDEX idx_seguimiento_cita
+ON seguimiento_citas(id_cita);
+
+CREATE INDEX idx_codigos_usuario
+ON codigos_verificacion(id_usuario);
+
+-- Evitar códigos de verificación repetidos activos
+CREATE INDEX idx_codigo_verificacion
+ON codigos_verificacion(id_usuario, codigo, utilizado);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\sql\citaciones.sql
+==============================
+USE eduturnos;
+
+CREATE TABLE IF NOT EXISTS motivos (
+    id_motivo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    estado TINYINT(1) DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS estados_cita (
+    id_estado INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS citas (
+    id_cita INT AUTO_INCREMENT PRIMARY KEY,
+    id_estudiante INT NOT NULL,
+    id_acudiente INT NOT NULL,
+    id_docente INT NOT NULL,
+    id_motivo INT NOT NULL,
+    id_estado INT NOT NULL,
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    lugar VARCHAR(150),
+    observaciones TEXT,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_estudiante)
+        REFERENCES estudiantes(id_estudiante),
+
+    FOREIGN KEY (id_acudiente)
+        REFERENCES acudientes(id_acudiente),
+
+    FOREIGN KEY (id_docente)
+        REFERENCES docentes(id_docente),
+
+    FOREIGN KEY (id_motivo)
+        REFERENCES motivos(id_motivo),
+
+    FOREIGN KEY (id_estado)
+        REFERENCES estados_cita(id_estado)
+);
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\sql\eduturnos.sql
+==============================
+CREATE DATABASE IF NOT EXISTS eduturnos
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE eduturnos;
+
+CREATE TABLE roles (
+    id_rol INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE,
+    descripcion VARCHAR(255),
+    estado TINYINT(1) DEFAULT 1
+);
+
+CREATE TABLE permisos (
+    id_permiso INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    descripcion VARCHAR(255),
+    estado TINYINT(1) DEFAULT 1
+);
+
+CREATE TABLE rol_permiso (
+    id_rol INT NOT NULL,
+    id_permiso INT NOT NULL,
+
+    PRIMARY KEY (id_rol, id_permiso),
+
+    FOREIGN KEY (id_rol)
+        REFERENCES roles(id_rol),
+
+    FOREIGN KEY (id_permiso)
+        REFERENCES permisos(id_permiso)
+);
+
+CREATE TABLE instituciones (
+    id_institucion INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    nit VARCHAR(30),
+    estado TINYINT(1) DEFAULT 1
+);
+
+CREATE TABLE sedes (
+    id_sede INT AUTO_INCREMENT PRIMARY KEY,
+    id_institucion INT NOT NULL,
+    nombre VARCHAR(150) NOT NULL,
+    estado TINYINT(1) DEFAULT 1,
+
+    FOREIGN KEY (id_institucion)
+        REFERENCES instituciones(id_institucion)
+);
+
+CREATE TABLE jornadas (
+    id_jornada INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE,
+    estado TINYINT(1) DEFAULT 1
+);
+
+CREATE TABLE grados (
+    id_grado INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(30) NOT NULL,
+    estado TINYINT(1) DEFAULT 1
+);
+
+CREATE TABLE grupos (
+    id_grupo INT AUTO_INCREMENT PRIMARY KEY,
+    id_grado INT NOT NULL,
+    nombre VARCHAR(20) NOT NULL,
+    estado TINYINT(1) DEFAULT 1,
+
+    FOREIGN KEY (id_grado)
+        REFERENCES grados(id_grado)
+);
+
+CREATE TABLE periodos_academicos (
+    id_periodo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+    estado TINYINT(1) DEFAULT 1
+);
+
+CREATE TABLE usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    id_rol INT NOT NULL,
+    documento VARCHAR(30) NOT NULL UNIQUE,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    correo VARCHAR(150) UNIQUE,
+    telefono VARCHAR(30),
+    contrasena VARCHAR(255) NOT NULL,
+    verificado TINYINT(1) DEFAULT 0,
+    estado TINYINT(1) DEFAULT 1,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_rol)
+        REFERENCES roles(id_rol)
+);
+
+CREATE TABLE estudiantes (
+    id_estudiante INT AUTO_INCREMENT PRIMARY KEY,
+    codigo_estudiantil VARCHAR(30) NOT NULL UNIQUE,
+    documento VARCHAR(30) NOT NULL UNIQUE,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    id_sede INT NOT NULL,
+    id_jornada INT NOT NULL,
+    id_grado INT NOT NULL,
+    id_grupo INT NOT NULL,
+    id_periodo INT,
+    estado VARCHAR(30) DEFAULT 'Activo',
+
+    FOREIGN KEY (id_sede)
+        REFERENCES sedes(id_sede),
+
+    FOREIGN KEY (id_jornada)
+        REFERENCES jornadas(id_jornada),
+
+    FOREIGN KEY (id_grado)
+        REFERENCES grados(id_grado),
+
+    FOREIGN KEY (id_grupo)
+        REFERENCES grupos(id_grupo),
+
+    FOREIGN KEY (id_periodo)
+        REFERENCES periodos_academicos(id_periodo)
+);
+
+CREATE TABLE acudientes (
+    id_acudiente INT AUTO_INCREMENT PRIMARY KEY,
+    documento VARCHAR(30) NOT NULL UNIQUE,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    parentesco VARCHAR(50),
+    telefono VARCHAR(30),
+    correo VARCHAR(150),
+    direccion VARCHAR(200),
+    estado TINYINT(1) DEFAULT 1
+);
+
+CREATE TABLE estudiante_acudiente (
+    id_estudiante INT NOT NULL,
+    id_acudiente INT NOT NULL,
+    principal TINYINT(1) DEFAULT 0,
+
+    PRIMARY KEY (id_estudiante, id_acudiente),
+
+    FOREIGN KEY (id_estudiante)
+        REFERENCES estudiantes(id_estudiante),
+
+    FOREIGN KEY (id_acudiente)
+        REFERENCES acudientes(id_acudiente)
+);
+
+CREATE TABLE docentes (
+    id_docente INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL UNIQUE,
+    id_sede INT NOT NULL,
+    id_jornada INT NOT NULL,
+    area VARCHAR(100),
+    asignatura VARCHAR(100),
+    estado TINYINT(1) DEFAULT 1,
+
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuarios(id_usuario),
+
+    FOREIGN KEY (id_sede)
+        REFERENCES sedes(id_sede),
+
+    FOREIGN KEY (id_jornada)
+        REFERENCES jornadas(id_jornada)
+);
+
+CREATE TABLE asignaciones_docentes (
+    id_asignacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_docente INT NOT NULL,
+    id_grado INT NOT NULL,
+    id_grupo INT NOT NULL,
+    id_periodo INT,
+
+    FOREIGN KEY (id_docente)
+        REFERENCES docentes(id_docente),
+
+    FOREIGN KEY (id_grado)
+        REFERENCES grados(id_grado),
+
+    FOREIGN KEY (id_grupo)
+        REFERENCES grupos(id_grupo),
+
+    FOREIGN KEY (id_periodo)
+        REFERENCES periodos_academicos(id_periodo)
+);
+
+CREATE TABLE motivos (
+    id_motivo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    estado TINYINT(1) DEFAULT 1
+);
+
+CREATE TABLE estados_cita (
+    id_estado INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE citas (
+    id_cita INT AUTO_INCREMENT PRIMARY KEY,
+    id_estudiante INT NOT NULL,
+    id_acudiente INT NOT NULL,
+    id_docente INT NOT NULL,
+    id_motivo INT NOT NULL,
+    id_estado INT NOT NULL,
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    lugar VARCHAR(150),
+    observaciones TEXT,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_estudiante)
+        REFERENCES estudiantes(id_estudiante),
+
+    FOREIGN KEY (id_acudiente)
+        REFERENCES acudientes(id_acudiente),
+
+    FOREIGN KEY (id_docente)
+        REFERENCES docentes(id_docente),
+
+    FOREIGN KEY (id_motivo)
+        REFERENCES motivos(id_motivo),
+
+    FOREIGN KEY (id_estado)
+        REFERENCES estados_cita(id_estado)
+);
+
+CREATE TABLE seguimiento_citas (
+    id_seguimiento INT AUTO_INCREMENT PRIMARY KEY,
+    id_cita INT NOT NULL,
+    estado_anterior VARCHAR(50),
+    estado_nuevo VARCHAR(50),
+    observacion TEXT,
+    usuario_responsable INT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_cita)
+        REFERENCES citas(id_cita),
+
+    FOREIGN KEY (usuario_responsable)
+        REFERENCES usuarios(id_usuario)
+);
+
+CREATE TABLE justificaciones (
+    id_justificacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_cita INT NOT NULL,
+    descripcion TEXT NOT NULL,
+    estado VARCHAR(30) DEFAULT 'Pendiente',
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_cita)
+        REFERENCES citas(id_cita)
+);
+
+CREATE TABLE notificaciones (
+    id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_cita INT,
+    titulo VARCHAR(150) NOT NULL,
+    mensaje TEXT NOT NULL,
+    leida TINYINT(1) DEFAULT 0,
+    fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuarios(id_usuario),
+
+    FOREIGN KEY (id_cita)
+        REFERENCES citas(id_cita)
+);
+
+CREATE TABLE codigos_verificacion (
+    id_codigo INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    codigo VARCHAR(10) NOT NULL,
+    fecha_expiracion DATETIME NOT NULL,
+    utilizado TINYINT(1) DEFAULT 0,
+
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuarios(id_usuario)
+);
+
+CREATE TABLE auditoria (
+    id_auditoria INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    accion VARCHAR(100) NOT NULL,
+    tabla_afectada VARCHAR(100),
+    registro_afectado INT,
+    descripcion TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_usuario)
+        REFERENCES usuarios(id_usuario)
+);
+
+INSERT INTO roles (nombre, descripcion)
+VALUES
+('Super Admin', 'Administración global del sistema'),
+('Coordinador', 'Administración institucional'),
+('Docente', 'Gestión de citaciones propias'),
+('Acudiente', 'Consulta y gestión de sus citaciones'),
+('Estudiante', 'Consulta de citaciones'),
+('Invitado', 'Acceso público limitado');
+
+INSERT INTO jornadas (nombre)
+VALUES
+('Mañana'),
+('Tarde'),
+('Nocturna');
+
+INSERT INTO estados_cita (nombre)
+VALUES
+('Pendiente'),
+('Confirmada'),
+('Realizada'),
+('Cancelada'),
+('Reprogramada'),
+('No asistió'),
+('Justificada');
+
+INSERT INTO motivos (nombre)
+VALUES
+('Académico'),
+('Disciplinario'),
+('Asistencia'),
+('Convivencia'),
+('Orientación');
+
+INSERT INTO grados (nombre)
+VALUES
+('1°'),
+('2°'),
+('3°'),
+('4°'),
+('5°'),
+('6°'),
+('7°'),
+('8°'),
+('9°'),
+('10°'),
+('11°');
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\sql\pruebas-autenticacion.sql
+==============================
+USE eduturnos;
+
+-- Usuarios registrados
+SELECT
+    id_usuario,
+    documento,
+    nombres,
+    apellidos,
+    correo,
+    verificado,
+    estado
+FROM usuarios
+ORDER BY id_usuario DESC;
+
+-- Códigos de verificación
+SELECT
+    id_codigo,
+    id_usuario,
+    codigo,
+    fecha_expiracion,
+    utilizado
+FROM codigos_verificacion
+ORDER BY id_codigo DESC;
+
+-- Acudientes vinculados
+SELECT
+    a.id_acudiente,
+    a.id_usuario,
+    a.documento,
+    a.nombres,
+    a.apellidos
+FROM acudientes a
+ORDER BY a.id_acudiente DESC;
+
+-- Buscar documentos repetidos
+SELECT
+    documento,
+    COUNT(*) AS cantidad
+FROM usuarios
+GROUP BY documento
+HAVING COUNT(*) > 1;
+
+-- Buscar correos repetidos
+SELECT
+    correo,
+    COUNT(*) AS cantidad
+FROM usuarios
+WHERE correo IS NOT NULL
+GROUP BY correo
+HAVING COUNT(*) > 1;
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\sql\pruebas-citaciones.sql
+==============================
+USE eduturnos;
+
+-- ============================================
+-- PRUEBAS DEL MÓDULO DE CITACIONES - EDUTURNOS
+-- RESPONSABLE: SANDY
+-- ============================================
+
+-- 1. CREAR CITACIÓN
+INSERT INTO citas (
+    id_estudiante,
+    id_acudiente,
+    id_docente,
+    id_motivo,
+    id_estado,
+    fecha,
+    hora,
+    lugar,
+    observaciones
+)
+VALUES (
+    1,
+    1,
+    1,
+    1,
+    1,
+    '2026-09-15',
+    '08:00:00',
+    'Sala de reuniones',
+    'Citación de prueba'
+);
+
+SELECT *
+FROM citas
+WHERE id_estudiante = 1
+AND fecha = '2026-09-15'
+AND hora = '08:00:00';
+
+
+-- 2. CAMPOS VACÍOS
+INSERT INTO citas (
+    id_estudiante,
+    id_acudiente,
+    id_docente,
+    id_motivo,
+    id_estado,
+    fecha,
+    hora,
+    lugar,
+    observaciones
+)
+VALUES (
+    1,
+    1,
+    1,
+    1,
+    1,
+    NULL,
+    NULL,
+    NULL,
+    'Prueba de campos vacíos'
+);
+
+
+-- 3. FECHA INVÁLIDA
+INSERT INTO citas (
+    id_estudiante,
+    id_acudiente,
+    id_docente,
+    id_motivo,
+    id_estado,
+    fecha,
+    hora,
+    lugar,
+    observaciones
+)
+VALUES (
+    1,
+    1,
+    1,
+    1,
+    1,
+    '2026-02-30',
+    '09:00:00',
+    'Sala de reuniones',
+    'Prueba de fecha inválida'
+);
+
+
+-- 4. HORARIO OCUPADO
+INSERT INTO citas (
+    id_estudiante,
+    id_acudiente,
+    id_docente,
+    id_motivo,
+    id_estado,
+    fecha,
+    hora,
+    lugar,
+    observaciones
+)
+VALUES (
+    1,
+    1,
+    1,
+    1,
+    1,
+    '2026-09-15',
+    '08:00:00',
+    'Sala de reuniones',
+    'Prueba de horario ocupado'
+);
+
+
+-- 5. EDITAR CITACIÓN
+UPDATE citas
+SET fecha = '2026-09-16',
+    hora = '10:00:00',
+    lugar = 'Aula 10',
+    observaciones = 'Citación modificada'
+WHERE id_cita = 1;
+
+SELECT *
+FROM citas
+WHERE id_cita = 1;
+
+
+-- 6. CANCELAR CITACIÓN
+UPDATE citas
+SET id_estado = (
+    SELECT id_estado
+    FROM estados_cita
+    WHERE nombre = 'Cancelada'
+    LIMIT 1
+)
+WHERE id_cita = 1;
+
+SELECT *
+FROM citas
+WHERE id_cita = 1;
+
+
+-- 7. CONSULTAR CITACIONES
+SELECT
+    c.id_cita,
+    c.fecha,
+    c.hora,
+    c.lugar,
+    e.nombres AS estudiante,
+    a.nombres AS acudiente,
+    m.nombre AS motivo,
+    ec.nombre AS estado
+FROM citas c
+INNER JOIN estudiantes e
+    ON c.id_estudiante = e.id_estudiante
+INNER JOIN acudientes a
+    ON c.id_acudiente = a.id_acudiente
+INNER JOIN motivos m
+    ON c.id_motivo = m.id_motivo
+INNER JOIN estados_cita ec
+    ON c.id_estado = ec.id_estado
+ORDER BY c.fecha DESC, c.hora DESC;
+
+SELECT * FROM estudiantes;
+SELECT * FROM acudientes;
+SELECT * FROM docentes;
+SELECT * FROM motivos;
+SELECT * FROM estados_cita;
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\sql\pruebas-integracion.sql
+==============================
+USE eduturnos;
+
+-- ============================================
+-- PRUEBAS FINALES DE INTEGRACIÓN - EDUTURNOS
+-- RESPONSABLE: SANDY
+-- ============================================
+
+-- ============================================
+-- 1. AUTENTICACIÓN
+-- ============================================
+
+-- Registro
+SELECT *
+FROM usuarios;
+
+-- Verificación
+SELECT *
+FROM codigos_verificacion;
+
+-- Login
+SELECT id_usuario, id_rol, nombres, apellidos, correo, estado
+FROM usuarios
+WHERE estado = 'Activo';
+
+-- Dashboard
+SELECT id_usuario, id_rol, nombres, apellidos
+FROM usuarios
+WHERE estado = 'Activo';
+
+
+-- ============================================
+-- 2. CITACIONES
+-- ============================================
+
+-- Crear / consultar
+SELECT *
+FROM citas;
+
+-- Modificar
+SELECT id_cita, fecha, hora, lugar, observaciones
+FROM citas;
+
+-- Confirmar
+SELECT c.id_cita, e.nombre AS estado
+FROM citas c
+INNER JOIN estados_cita e
+    ON c.id_estado = e.id_estado
+WHERE e.nombre = 'Confirmada';
+
+-- Reprogramar
+SELECT id_cita, fecha, hora
+FROM citas
+ORDER BY fecha, hora;
+
+-- Cancelar
+SELECT c.id_cita, e.nombre AS estado
+FROM citas c
+INNER JOIN estados_cita e
+    ON c.id_estado = e.id_estado
+WHERE e.nombre = 'Cancelada';
+
+
+-- ============================================
+-- 3. SEGUIMIENTO
+-- ============================================
+
+-- Citación
+SELECT *
+FROM citas;
+
+-- Estado
+SELECT c.id_cita, e.nombre AS estado
+FROM citas c
+INNER JOIN estados_cita e
+    ON c.id_estado = e.id_estado;
+
+-- Notificación
+SELECT *
+FROM notificaciones;
+
+-- Historial
+SELECT *
+FROM seguimiento_citas
+ORDER BY fecha DESC;
+
+
+-- ============================================
+-- 4. REPORTES
+-- ============================================
+
+-- Base de datos / consulta
+SELECT *
+FROM citas;
+
+-- Filtro por estado
+SELECT c.id_cita, c.fecha, c.hora, e.nombre AS estado
+FROM citas c
+INNER JOIN estados_cita e
+    ON c.id_estado = e.id_estado
+WHERE e.nombre = 'Confirmada';
+
+-- Filtro por fecha
+SELECT *
+FROM citas
+WHERE fecha BETWEEN '2026-09-01' AND '2026-09-30'
+ORDER BY fecha, hora;
+
+-- Resultado
+SELECT COUNT(*) AS total_citaciones
+FROM citas;
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\sql\pruebas-sandy.sql
+==============================
+USE eduturnos;
+
+-- =========================================================
+-- PRUEBAS DE INTEGRIDAD EDUTURNOS
+-- =========================================================
+
+-- 1. Verificar roles
+SELECT *
+FROM roles;
+
+-- 2. Verificar usuarios
+SELECT
+    id_usuario,
+    documento,
+    nombres,
+    apellidos,
+    correo,
+    verificado,
+    estado
+FROM usuarios;
+
+-- 3. Verificar acudientes relacionados
+SELECT
+    a.id_acudiente,
+    a.documento,
+    a.nombres,
+    a.apellidos,
+    a.id_usuario
+FROM acudientes a;
+
+-- 4. Verificar estudiantes y acudientes
+SELECT
+    e.codigo_estudiantil,
+    CONCAT(e.nombres, ' ', e.apellidos) AS estudiante,
+    CONCAT(a.nombres, ' ', a.apellidos) AS acudiente
+FROM estudiante_acudiente ea
+INNER JOIN estudiantes e
+    ON ea.id_estudiante = e.id_estudiante
+INNER JOIN acudientes a
+    ON ea.id_acudiente = a.id_acudiente;
+
+-- 5. Verificar docentes
+SELECT
+    d.id_docente,
+    u.documento,
+    CONCAT(u.nombres, ' ', u.apellidos) AS docente
+FROM docentes d
+INNER JOIN usuarios u
+    ON d.id_usuario = u.id_usuario;
+
+-- 6. Verificar citas
+SELECT
+    c.id_cita,
+    c.fecha,
+    c.hora,
+    ec.nombre AS estado
+FROM citas c
+INNER JOIN estados_cita ec
+    ON c.id_estado = ec.id_estado
+ORDER BY c.fecha DESC;
+
+-- 7. Verificar seguimiento
+SELECT *
+FROM seguimiento_citas
+ORDER BY fecha DESC;
+
+-- 8. Verificar notificaciones
+SELECT *
+FROM notificaciones
+ORDER BY fecha_envio DESC;
+
+-- 9. Verificar auditoría
+SELECT *
+FROM auditoria
+ORDER BY fecha DESC;
+
+-- 10. Verificar citas duplicadas
+SELECT
+    fecha,
+    hora,
+    id_docente,
+    COUNT(*) AS cantidad
+FROM citas
+GROUP BY
+    fecha,
+    hora,
+    id_docente
+HAVING COUNT(*) > 1;
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\sql\reportes.sql
+==============================
+USE eduturnos;
+
+-- ============================================
+-- REPORTES SQL - EDUTURNOS
+-- RESPONSABLE: DÍAZ
+-- ============================================
+
+-- CITACIONES POR ESTADO
+SELECT
+    e.nombre AS estado,
+    COUNT(*) AS total
+FROM citas c
+INNER JOIN estados_cita e
+    ON c.id_estado = e.id_estado
+GROUP BY e.nombre;
+
+-- CITACIONES POR FECHA
+SELECT *
+FROM citas
+WHERE fecha BETWEEN '2026-09-01' AND '2026-09-30'
+ORDER BY fecha, hora;
+
+-- TOTAL DE CITACIONES
+SELECT COUNT(*) AS total_citaciones
+FROM citas;
+
+-- INASISTENCIAS
+SELECT COUNT(*) AS total_inasistencias
+FROM citas c
+INNER JOIN estados_cita e
+    ON c.id_estado = e.id_estado
+WHERE e.nombre = 'No asistió';
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\sql\seguimiento-notificaciones.sql
+==============================
+USE eduturnos;
+
+-- =========================================================
+-- SEGUIMIENTO Y NOTIFICACIONES
+-- Compatible con la estructura actual
+-- =========================================================
+
+SELECT *
+FROM seguimiento_citas
+ORDER BY fecha DESC;
+
+SELECT *
+FROM notificaciones
+ORDER BY fecha_envio DESC;
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\citaciones.html
+==============================
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Citaciones - EDUTURNOS</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+
+</head>
+
+<body>
+
+<main class="contenedor">
+
+    <h1>Citaciones</h1>
+
+    <a
+        href="crear-citacion.html"
+        class="boton"
+    >
+        Nueva citación
+    </a>
+
+    <div class="tabla-contenedor">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Estudiante</th>
+                    <th>Docente</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="tablaCitas">
+
+                <tr>
+                    <td colspan="6">
+                        Cargando...
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+<script>
+
+async function cargarCitas() {
+
+    const tabla =
+        document.getElementById(
+            "tablaCitas"
+        );
+
+    try {
+
+        const respuesta =
+            await fetch(
+                "api/listar_citas.php"
+            );
+
+        const resultado =
+            await respuesta.json();
+
+        if (!resultado.ok) {
+
+            tabla.innerHTML =
+                `<tr>
+                    <td colspan="6">
+                        ${resultado.mensaje}
+                    </td>
+                </tr>`;
+
+            return;
+        }
+
+        tabla.innerHTML = "";
+
+        resultado.datos.forEach(
+            cita => {
+
+                const fila =
+                    document.createElement(
+                        "tr"
+                    );
+
+                fila.innerHTML = `
+
+                    <td>
+                        ${cita.fecha}
+                    </td>
+
+                    <td>
+                        ${cita.hora}
+                    </td>
+
+                    <td>
+                        ${cita.estudiante_nombres}
+                        ${cita.estudiante_apellidos}
+                    </td>
+
+                    <td>
+                        ${cita.docente_nombres}
+                        ${cita.docente_apellidos}
+                    </td>
+
+                    <td>
+                        ${cita.motivo}
+                    </td>
+
+                    <td>
+                        ${cita.estado}
+                    </td>
+
+                `;
+
+                tabla.appendChild(fila);
+
+            }
+        );
+
+    } catch (error) {
+
+        tabla.innerHTML =
+            `<tr>
+                <td colspan="6">
+                    Error al consultar las citas.
+                </td>
+            </tr>`;
+    }
+}
+
+cargarCitas();
+
+</script>
+
+</body>
+
+</html>
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\crear-citacion.html
+==============================
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Crear citación - EDUTURNOS</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+
+</head>
+
+<body>
+
+<main class="contenedor">
+
+    <h1>Crear citación</h1>
+
+    <form id="formCrearCita">
+
+        <label>Estudiante</label>
+
+        <select
+            id="id_estudiante"
+            name="id_estudiante"
+            required
+        >
+
+            <option value="">
+                Seleccione estudiante
+            </option>
+
+        </select>
+
+
+        <label>Acudiente</label>
+
+        <select
+            id="id_acudiente"
+            name="id_acudiente"
+            required
+        >
+
+            <option value="">
+                Seleccione acudiente
+            </option>
+
+        </select>
+
+
+        <label>Docente</label>
+
+        <select
+            id="id_docente"
+            name="id_docente"
+            required
+        >
+
+            <option value="">
+                Seleccione docente
+            </option>
+
+        </select>
+
+
+        <label>Motivo</label>
+
+        <select
+            id="id_motivo"
+            name="id_motivo"
+            required
+        >
+
+            <option value="">
+                Seleccione motivo
+            </option>
+
+        </select>
+
+
+        <label>Fecha</label>
+
+        <input
+            type="date"
+            name="fecha"
+            required
+        >
+
+
+        <label>Hora</label>
+
+        <input
+            type="time"
+            name="hora"
+            required
+        >
+
+
+        <label>Lugar</label>
+
+        <input
+            type="text"
+            name="lugar"
+            maxlength="150"
+        >
+
+
+        <label>Observaciones</label>
+
+        <textarea
+            name="observaciones"
+            rows="4"
+        ></textarea>
+
+
+        <button type="submit">
+            Crear citación
+        </button>
+
+    </form>
+
+    <div id="mensajeCita"></div>
+
+</main>
+
+<script src="js/citaciones.js"></script>
+
+</body>
+
+</html>
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\dashboard.html
+==============================
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>EDUTURNOS - Dashboard</title>
+
+    <link rel="stylesheet"
+          href="css/estilos.css">
+</head>
+
+<body>
+
+    <!-- Encabezado principal -->
+    <header class="topbar">
+
+        <div class="logo">
+            EDUTURNOS
+        </div>
+
+        <div class="usuario">
+            <span>Usuario</span>
+
+            <button id="btnCerrarSesion">
+                Salir
+            </button>
+        </div>
+
+    </header>
+
+
+    <!-- Estructura principal -->
+    <div class="layout">
+
+        <!-- Menú lateral -->
+        <aside class="sidebar">
+
+            <nav>
+
+                <a href="dashboard.html">
+                    Inicio
+                </a>
+
+                <a href="#">
+                    Citaciones
+                </a>
+
+                <a href="#">
+                    Estudiantes
+                </a>
+
+                <a href="#">
+                    Acudientes
+                </a>
+
+                <a href="#">
+                    Docentes
+                </a>
+
+                <a href="#">
+                    Notificaciones
+                </a>
+
+                <a href="#">
+                    Reportes
+                </a>
+
+                <a href="#">
+                    Configuración
+                </a>
+
+            </nav>
+
+        </aside>
+
+
+        <!-- Contenido principal -->
+        <main class="contenido">
+
+            <h1>
+                Dashboard
+            </h1>
+
+            <p class="bienvenida">
+                Bienvenido a EDUTURNOS
+            </p>
+
+
+            <!-- Tarjetas de estadísticas -->
+            <section class="estadisticas">
+
+                <article class="tarjeta">
+
+                    <h2>
+                        Citas de hoy
+                    </h2>
+
+                    <p id="citasHoy">
+                        0
+                    </p>
+
+                </article>
+
+
+                <article class="tarjeta">
+
+                    <h2>
+                        Pendientes
+                    </h2>
+
+                    <p id="pendientes">
+                        0
+                    </p>
+
+                </article>
+
+
+                <article class="tarjeta">
+
+                    <h2>
+                        Confirmadas
+                    </h2>
+
+                    <p id="confirmadas">
+                        0
+                    </p>
+
+                </article>
+
+
+                <article class="tarjeta">
+
+                    <h2>
+                        Realizadas
+                    </h2>
+
+                    <p id="realizadas">
+                        0
+                    </p>
+
+                </article>
+
+            </section>
+
+
+            <!-- Próximas citaciones -->
+            <section class="panel">
+
+                <h2>
+                    Próximas citaciones
+                </h2>
+
+                <div id="listaCitaciones">
+
+                    <p>
+                        No hay citaciones registradas.
+                    </p>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- JavaScript -->
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\detalle-citacion.html
+==============================
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\editar-citacion.html
+==============================
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\index.html
+==============================
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EDUTURNOS - Inicio de sesión</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+    <div class="login">
+
+        <h1>EDUTURNOS</h1>
+
+        <h2>Inicio de sesión</h2>
+
+        <form action="php/login.php" method="POST">
+
+            <label>Correo</label>
+
+            <input type="email"
+                   name="correo"
+                   required>
+
+            <label>Contraseña</label>
+
+            <input type="password"
+                   name="contrasena"
+                   required>
+
+            <button type="submit">
+                Ingresar
+            </button>
+
+        </form>
+
+    </div>
+
+</body>
+</html>
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\login.html
+==============================
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EDUTURNOS - Iniciar sesión</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+    <main class="contenedor-auth">
+
+        <section class="tarjeta-auth">
+
+            <h1>EDUTURNOS</h1>
+
+            <h2>Iniciar sesión</h2>
+
+            <p>
+                Ingresa con tu documento y contraseña.
+            </p>
+
+            <form id="formLogin">
+
+                <label for="documento">
+                    Documento
+                </label>
+
+                <input
+                    type="text"
+                    id="documento"
+                    name="documento"
+                    required
+                >
+
+                <label for="contrasena">
+                    Contraseña
+                </label>
+
+                <input
+                    type="password"
+                    id="contrasena"
+                    name="contrasena"
+                    required
+                >
+
+                <button type="submit">
+                    Ingresar
+                </button>
+
+            </form>
+
+            <div id="mensajeLogin"></div>
+
+            <p>
+                ¿No tienes una cuenta?
+                <a href="registro.html">
+                    Registrarse
+                </a>
+            </p>
+
+        </section>
+
+    </main>
+
+    <script src="js/autenticacion.js"></script>
+
+</body>
+
+</html>
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\notificaciones.html
+==============================
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Notificaciones - EDUTURNOS</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+
+</head>
+
+<body>
+
+<main class="contenedor">
+
+    <h1>Notificaciones</h1>
+
+    <div id="listaNotificaciones">
+        Cargando...
+    </div>
+
+</main>
+
+<script>
+
+async function cargarNotificaciones() {
+
+    const contenedor =
+        document.getElementById(
+            "listaNotificaciones"
+        );
+
+    try {
+
+        const respuesta =
+            await fetch(
+                "api/notificaciones.php"
+            );
+
+        const resultado =
+            await respuesta.json();
+
+        if (!resultado.ok) {
+
+            contenedor.textContent =
+                resultado.mensaje;
+
+            return;
+        }
+
+        contenedor.innerHTML = "";
+
+        if (resultado.datos.length === 0) {
+
+            contenedor.innerHTML =
+                "<p>No tienes notificaciones.</p>";
+
+            return;
+        }
+
+        resultado.datos.forEach(
+            notificacion => {
+
+                const tarjeta =
+                    document.createElement(
+                        "article"
+                    );
+
+                tarjeta.className =
+                    "tarjeta-notificacion";
+
+                tarjeta.innerHTML = `
+                    <h3>
+                        ${notificacion.titulo}
+                    </h3>
+
+                    <p>
+                        ${notificacion.mensaje}
+                    </p>
+
+                    <small>
+                        ${notificacion.fecha_envio}
+                    </small>
+
+                    ${
+                        Number(
+                            notificacion.leida
+                        ) === 0
+                        ?
+                        `<button
+                            onclick="marcarLeida(
+                                ${notificacion.id_notificacion}
+                            )">
+                            Marcar como leída
+                        </button>`
+                        :
+                        "<span>Leída</span>"
+                    }
+                `;
+
+                contenedor.appendChild(
+                    tarjeta
+                );
+
+            }
+        );
+
+    } catch (error) {
+
+        contenedor.textContent =
+            "No fue posible cargar las notificaciones.";
+    }
+}
+
+
+async function marcarLeida(id) {
+
+    const datos =
+        new FormData();
+
+    datos.append(
+        "id_notificacion",
+        id
+    );
+
+    await fetch(
+        "api/notificaciones.php",
+        {
+            method: "POST",
+            body: datos
+        }
+    );
+
+    cargarNotificaciones();
+}
+
+
+cargarNotificaciones();
+
+</script>
+
+</body>
+
+</html>
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\registro.html
+==============================
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>EDUTURNOS - Registro</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+
+</head>
+
+<body>
+
+<main class="contenedor-auth">
+
+<section class="tarjeta-auth">
+
+    <h1>EDUTURNOS</h1>
+
+    <h2>Crear cuenta</h2>
+
+    <form id="formRegistro">
+
+        <label>Tipo de documento</label>
+
+        <select
+            name="tipo_documento"
+            required
+        >
+
+            <option value="">
+                Seleccione
+            </option>
+
+            <option value="CC">
+                Cédula de ciudadanía
+            </option>
+
+            <option value="TI">
+                Tarjeta de identidad
+            </option>
+
+            <option value="CE">
+                Cédula de extranjería
+            </option>
+
+        </select>
+
+
+        <label>Documento</label>
+
+        <input
+            type="text"
+            name="documento"
+            required
+        >
+
+
+        <label>Nombres</label>
+
+        <input
+            type="text"
+            name="nombres"
+            required
+        >
+
+
+        <label>Apellidos</label>
+
+        <input
+            type="text"
+            name="apellidos"
+            required
+        >
+
+
+        <label>Correo</label>
+
+        <input
+            type="email"
+            name="correo"
+            required
+        >
+
+
+        <label>Teléfono</label>
+
+        <input
+            type="text"
+            name="telefono"
+        >
+
+
+        <label>Contraseña</label>
+
+        <input
+            type="password"
+            name="contrasena"
+            required
+            minlength="6"
+        >
+
+
+        <label>Confirmar contraseña</label>
+
+        <input
+            type="password"
+            name="confirmar_contrasena"
+            required
+            minlength="6"
+        >
+
+
+        <button type="submit">
+            Registrarme
+        </button>
+
+    </form>
+
+    <div id="mensajeRegistro"></div>
+
+    <p>
+        ¿Ya tienes cuenta?
+        <a href="login.html">
+            Iniciar sesión
+        </a>
+    </p>
+
+</section>
+
+</main>
+
+<script src="js/autenticacion.js"></script>
+
+</body>
+
+</html>
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\reportes.html
+==============================
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Reportes - EDUTURNOS</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+
+</head>
+
+<body>
+
+<main class="contenedor">
+
+    <h1>Reportes de citaciones</h1>
+
+    <form id="formReporte">
+
+        <label>
+            Desde
+        </label>
+
+        <input
+            type="date"
+            name="desde"
+        >
+
+        <label>
+            Hasta
+        </label>
+
+        <input
+            type="date"
+            name="hasta"
+        >
+
+        <label>
+            Estado
+        </label>
+
+        <select name="estado">
+
+            <option value="">
+                Todos
+            </option>
+
+            <option>Pendiente</option>
+            <option>Confirmada</option>
+            <option>Realizada</option>
+            <option>Cancelada</option>
+            <option>Reprogramada</option>
+            <option>No asistió</option>
+            <option>Justificada</option>
+
+        </select>
+
+        <button type="submit">
+            Generar reporte
+        </button>
+
+    </form>
+
+    <section id="resumen"></section>
+
+    <div class="tabla-contenedor">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Estudiante</th>
+                    <th>Docente</th>
+                    <th>Acudiente</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="tablaReporte"></tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+<script>
+
+document
+    .getElementById("formReporte")
+    .addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+            const datos =
+                new FormData(this);
+
+            const parametros =
+                new URLSearchParams(datos);
+
+            const respuesta =
+                await fetch(
+                    "api/reportes.php?" +
+                    parametros.toString()
+                );
+
+            const resultado =
+                await respuesta.json();
+
+            if (!resultado.ok) {
+
+                alert(resultado.mensaje);
+
+                return;
+            }
+
+            const resumen =
+                resultado.datos.resumen;
+
+            document.getElementById(
+                "resumen"
+            ).innerHTML = `
+
+                <p>
+                    Total: ${resumen.total}
+                </p>
+
+                <p>
+                    Pendientes: ${resumen.pendientes}
+                </p>
+
+                <p>
+                    Confirmadas: ${resumen.confirmadas}
+                </p>
+
+                <p>
+                    Realizadas: ${resumen.realizadas}
+                </p>
+
+                <p>
+                    Canceladas: ${resumen.canceladas}
+                </p>
+
+                <p>
+                    Reprogramadas: ${resumen.reprogramadas}
+                </p>
+
+            `;
+
+            const tabla =
+                document.getElementById(
+                    "tablaReporte"
+                );
+
+            tabla.innerHTML = "";
+
+            resultado.datos.registros.forEach(
+                cita => {
+
+                    const fila =
+                        document.createElement(
+                            "tr"
+                        );
+
+                    fila.innerHTML = `
+
+                        <td>
+                            ${cita.fecha}
+                        </td>
+
+                        <td>
+                            ${cita.hora}
+                        </td>
+
+                        <td>
+                            ${cita.estudiante}
+                        </td>
+
+                        <td>
+                            ${cita.docente}
+                        </td>
+
+                        <td>
+                            ${cita.acudiente}
+                        </td>
+
+                        <td>
+                            ${cita.motivo}
+                        </td>
+
+                        <td>
+                            ${cita.estado}
+                        </td>
+
+                    `;
+
+                    tabla.appendChild(
+                        fila
+                    );
+                }
+            );
+
+        }
+    );
+
+</script>
+
+</body>
+
+</html>
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\seguimiento.html
+==============================
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>EDUTURNOS - Seguimiento</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+<main class="contenido">
+
+    <h1>Seguimiento de citación</h1>
+
+    <div class="seguimiento">
+
+        <div>
+            <strong>Creada</strong>
+            <p>La citación fue registrada.</p>
+        </div>
+
+        <div>
+            <strong>Pendiente</strong>
+            <p>Esperando confirmación del acudiente.</p>
+        </div>
+
+        <div>
+            <strong>Confirmada</strong>
+            <p>La citación fue confirmada.</p>
+        </div>
+
+        <div>
+            <strong>Realizada</strong>
+            <p>La reunión fue realizada.</p>
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>
+
+==============================
+ARCHIVO: C:\Users\Usuario\Desktop\Eduturnos\verificar.html
+==============================
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>EDUTURNOS - Verificación</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+
+</head>
+
+<body>
+
+<main class="contenedor-auth">
+
+<section class="tarjeta-auth">
+
+    <h1>EDUTURNOS</h1>
+
+    <h2>Verificar cuenta</h2>
+
+    <p>
+        Ingresa el documento y el código recibido.
+    </p>
+
+    <form id="formVerificar">
+
+        <label>
+            Documento
+        </label>
+
+        <input
+            type="text"
+            name="documento"
+            required
+        >
+
+        <label>
+            Código
+        </label>
+
+        <input
+            type="text"
+            name="codigo"
+            maxlength="6"
+            required
+        >
+
+        <button type="submit">
+            Verificar
+        </button>
+
+    </form>
+
+    <div id="mensajeVerificar"></div>
+
+    <p>
+        <a href="login.html">
+            Volver al inicio de sesión
+        </a>
+    </p>
+
+</section>
+
+</main>
+
+<script src="js/autenticacion.js"></script>
+
+</body>
+
+</html>
