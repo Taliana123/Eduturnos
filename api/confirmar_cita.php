@@ -1,34 +1,98 @@
 <?php
 
-session_start();
+require_once "_helpers.php";
 
-require_once "../config/conexion.php";
+exigirRol([
+    "Super Admin",
+    "Coordinador",
+    "Acudiente"
+]);
 
-if (!isset($_SESSION["usuario_id"])) {
-    die("Acceso no autorizado.");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    responder(false, "Método no permitido.", [], 405);
 }
 
-$id_cita = $_POST["id_cita"] ?? 0;
+$idCita = (int)($_POST["id_cita"] ?? 0);
 
-if (!$id_cita) {
-    die("Citación no válida.");
+if (!$idCita) {
+    responder(false, "Debe indicar la citación.", [], 400);
 }
 
-$sql = "UPDATE citas
-        SET id_estado = (
-            SELECT id_estado
-            FROM estados_cita
-            WHERE nombre = 'Confirmada'
-        )
-        WHERE id_cita = ?";
+$stmt = $conexion->prepare(
+    "SELECT
+        c.id_estado,
+        ec.nombre AS estado
+     FROM citas c
+     INNER JOIN estados_cita ec
+        ON c.id_estado = ec.id_estado
+     WHERE c.id_cita = ?
+     LIMIT 1"
+);
 
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("i", $id_cita);
+$stmt->bind_param("i", $idCita);
+$stmt->execute();
 
-if ($stmt->execute()) {
-    echo "Citación confirmada.";
-} else {
-    echo "No se pudo confirmar.";
+$cita = $stmt->get_result()->fetch_assoc();
+
+$stmt->close();
+
+if (!$cita) {
+    responder(false, "La citación no existe.", [], 404);
 }
 
-?>
+if ($cita["estado"] !== "Pendiente") {
+    responder(
+        false,
+        "Solo se pueden confirmar citas pendientes.",
+        [],
+        409
+    );
+}
+
+$idEstado = obtenerEstadoId(
+    $conexion,
+    "Confirmada"
+);
+
+$stmt = $conexion->prepare(
+    "UPDATE citas
+     SET id_estado = ?
+     WHERE id_cita = ?"
+);
+
+$stmt->bind_param(
+    "ii",
+    $idEstado,
+    $idCita
+);
+
+$stmt->execute();
+$stmt->close();
+
+registrarSeguimiento(
+    $conexion,
+    $idCita,
+    "Pendiente",
+    "Confirmada",
+    "Citación confirmada."
+);
+
+notificarCita(
+    $conexion,
+    $idCita,
+    "Citación confirmada",
+    "La citación ha sido confirmada."
+);
+
+registrarAuditoria(
+    $conexion,
+    "Confirmar citación",
+    "citas",
+    $idCita,
+    "Citación confirmada."
+);
+
+responder(
+    true,
+    "Citación confirmada correctamente."
+);

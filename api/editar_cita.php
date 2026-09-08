@@ -1,59 +1,119 @@
 <?php
 
-session_start();
+require_once "_helpers.php";
 
-require_once "../config/conexion.php";
+exigirRol([
+    "Super Admin",
+    "Coordinador",
+    "Docente"
+]);
 
-if (!isset($_SESSION["usuario_id"])) {
-    die("Acceso no autorizado.");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    responder(false, "Método no permitido.", [], 405);
 }
 
-$id_cita = $_POST["id_cita"] ?? "";
-$fecha = $_POST["fecha"] ?? "";
-$hora = $_POST["hora"] ?? "";
-$lugar = $_POST["lugar"] ?? "";
-$observaciones = $_POST["observaciones"] ?? "";
+$idCita = (int)($_POST["id_cita"] ?? 0);
+$fecha = trim($_POST["fecha"] ?? "");
+$hora = trim($_POST["hora"] ?? "");
+$lugar = trim($_POST["lugar"] ?? "");
+$observaciones = trim($_POST["observaciones"] ?? "");
 
-if (
-    $id_cita == "" ||
-    $fecha == "" ||
-    $hora == "" ||
-    $lugar == ""
-) {
-    die("Complete todos los campos obligatorios.");
+if (!$idCita || !$fecha || !$hora) {
+    responder(false, "Datos incompletos.", [], 400);
 }
 
-/* Obtener información anterior */
+if ($fecha < date("Y-m-d")) {
+    responder(false, "La fecha no puede ser anterior a hoy.", [], 400);
+}
 
-$sql = "SELECT ec.nombre AS estado_anterior
-        FROM citas c
-        INNER JOIN estados_cita ec
-            ON c.id_estado = ec.id_estado
-        WHERE c.id_cita = ?";
+$stmt = $conexion->prepare(
+    "SELECT
+        c.id_cita,
+        c.id_docente,
+        ec.nombre AS estado
+     FROM citas c
+     INNER JOIN estados_cita ec
+        ON c.id_estado = ec.id_estado
+     WHERE c.id_cita = ?
+     LIMIT 1"
+);
 
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("i", $id_cita);
+$stmt->bind_param("i", $idCita);
 $stmt->execute();
 
-$resultado = $stmt->get_result();
+$cita = $stmt->get_result()->fetch_assoc();
 
-if ($resultado->num_rows == 0) {
-    die("La citación no existe.");
+$stmt->close();
+
+if (!$cita) {
+    responder(false, "La citación no existe.", [], 404);
 }
 
-$cita = $resultado->fetch_assoc();
-$estadoAnterior = $cita["estado_anterior"];
+if (
+    in_array(
+        $cita["estado"],
+        ["Cancelada", "Realizada", "Justificada"],
+        true
+    )
+) {
+    responder(
+        false,
+        "Esta citación ya no puede ser modificada.",
+        [],
+        409
+    );
+}
 
-/* Actualizar */
+$stmt = $conexion->prepare(
+    "SELECT id_cita
+     FROM citas
+     WHERE fecha = ?
+       AND hora = ?
+       AND id_docente = ?
+       AND id_cita <> ?
+       AND id_estado IN (
+           SELECT id_estado
+           FROM estados_cita
+           WHERE nombre IN (
+               'Pendiente',
+               'Confirmada',
+               'Reprogramada'
+           )
+       )
+     LIMIT 1"
+);
 
-$sql = "UPDATE citas
-        SET fecha = ?,
-            hora = ?,
-            lugar = ?,
-            observaciones = ?
-        WHERE id_cita = ?";
+$stmt->bind_param(
+    "ssii",
+    $fecha,
+    $hora,
+    $cita["id_docente"],
+    $idCita
+);
 
-$stmt = $conexion->prepare($sql);
+$stmt->execute();
+
+if ($stmt->get_result()->num_rows > 0) {
+    $stmt->close();
+
+    responder(
+        false,
+        "Ese horario ya está ocupado.",
+        [],
+        409
+    );
+}
+
+$stmt->close();
+
+$stmt = $conexion->prepare(
+    "UPDATE citas
+     SET fecha = ?,
+         hora = ?,
+         lugar = ?,
+         observaciones = ?
+     WHERE id_cita = ?"
+);
 
 $stmt->bind_param(
     "ssssi",
@@ -61,42 +121,36 @@ $stmt->bind_param(
     $hora,
     $lugar,
     $observaciones,
-    $id_cita
+    $idCita
 );
 
-if ($stmt->execute()) {
+$stmt->execute();
+$stmt->close();
 
-    $sqlSeguimiento = "INSERT INTO seguimiento_citas
-    (
-        id_cita,
-        estado_anterior,
-        estado_nuevo,
-        observacion,
-        usuario_responsable
-    )
-    VALUES (?, ?, ?, ?, ?)";
+registrarSeguimiento(
+    $conexion,
+    $idCita,
+    $cita["estado"],
+    $cita["estado"],
+    "Citación modificada. Nueva fecha: $fecha $hora."
+);
 
-    $estadoNuevo = $estadoAnterior;
-    $observacion = "Citación modificada.";
+notificarCita(
+    $conexion,
+    $idCita,
+    "Citación modificada",
+    "La fecha u horario de una citación ha sido modificado."
+);
 
-    $stmtSeguimiento = $conexion->prepare($sqlSeguimiento);
+registrarAuditoria(
+    $conexion,
+    "Editar citación",
+    "citas",
+    $idCita,
+    "Se modificaron los datos de la citación."
+);
 
-    $stmtSeguimiento->bind_param(
-        "isssi",
-        $id_cita,
-        $estadoAnterior,
-        $estadoNuevo,
-        $observacion,
-        $_SESSION["usuario_id"]
-    );
-
-    $stmtSeguimiento->execute();
-
-    echo "Citación actualizada correctamente.";
-
-} else {
-
-    echo "No se pudo actualizar la citación.";
-}
-
-?>
+responder(
+    true,
+    "Citación actualizada correctamente."
+);
