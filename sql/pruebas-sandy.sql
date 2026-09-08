@@ -1,81 +1,88 @@
 USE eduturnos;
 
--- ============================================
--- DATOS DE PRUEBA - SANDY
--- ============================================
+-- =========================================================
+-- PRUEBAS DE INTEGRIDAD EDUTURNOS
+-- =========================================================
 
--- 1. Institución
-INSERT INTO instituciones (nombre, nit)
-VALUES
-('Institución Educativa José Joaquín Flórez Hernández', '900000000-0');
+-- 1. Verificar roles
+SELECT *
+FROM roles;
 
--- 2. Sedes
-INSERT INTO sedes (id_institucion, nombre)
-VALUES
-(1, 'Sede Principal'),
-(1, 'Picaleña'),
-(1, 'Bello Horizonte');
-
--- 3. Jornadas
-INSERT INTO jornadas (nombre)
-VALUES
-('Mañana'),
-('Tarde'),
-('Nocturna');
-
--- 4. Grupos de grado 10
-INSERT INTO grupos (id_grado, nombre)
-VALUES
-(10, '10-1'),
-(10, '10-2'),
-(10, '10-3'),
-(10, '10-4'),
-(10, '10-5'),
-(10, '10-6');
-
--- ============================================
--- CONSULTAS DE VERIFICACIÓN
--- ============================================
-
-SELECT * FROM instituciones;
-
-SELECT * FROM sedes;
-
-SELECT * FROM jornadas;
-
-SELECT * FROM grados;
-
-SELECT * FROM grupos;
-
-SELECT * FROM roles;
-
-SELECT * FROM estados_cita;
-
-SELECT * FROM motivos;
-
--- ============================================
--- VERIFICAR GRUPOS DEL GRADO 10
--- ============================================
-
+-- 2. Verificar usuarios
 SELECT
-    g.id_grupo,
-    gr.nombre AS grado,
-    g.nombre AS grupo
-FROM grupos g
-INNER JOIN grados gr
-    ON g.id_grado = gr.id_grado
-WHERE gr.nombre = '10°';
+    id_usuario,
+    documento,
+    nombres,
+    apellidos,
+    correo,
+    verificado,
+    estado
+FROM usuarios;
 
--- ============================================
--- VERIFICAR DUPLICADOS
--- ============================================
+-- 3. Verificar acudientes relacionados
+SELECT
+    a.id_acudiente,
+    a.documento,
+    a.nombres,
+    a.apellidos,
+    a.id_usuario
+FROM acudientes a;
 
-SELECT documento
-FROM usuarios
-GROUP BY documento
-HAVING COUNT(*) > 1;
+-- 4. Verificar estudiantes y acudientes
+SELECT
+    e.codigo_estudiantil,
+    CONCAT(e.nombres, ' ', e.apellidos) AS estudiante,
+    CONCAT(a.nombres, ' ', a.apellidos) AS acudiente
+FROM estudiante_acudiente ea
+INNER JOIN estudiantes e
+    ON ea.id_estudiante = e.id_estudiante
+INNER JOIN acudientes a
+    ON ea.id_acudiente = a.id_acudiente;
 
-SELECT codigo_estudiante
-FROM estudiantes
-GROUP BY codigo_estudiante
+-- 5. Verificar docentes
+SELECT
+    d.id_docente,
+    u.documento,
+    CONCAT(u.nombres, ' ', u.apellidos) AS docente
+FROM docentes d
+INNER JOIN usuarios u
+    ON d.id_usuario = u.id_usuario;
+
+-- 6. Verificar citas
+SELECT
+    c.id_cita,
+    c.fecha,
+    c.hora,
+    ec.nombre AS estado
+FROM citas c
+INNER JOIN estados_cita ec
+    ON c.id_estado = ec.id_estado
+ORDER BY c.fecha DESC;
+
+-- 7. Verificar seguimiento
+SELECT *
+FROM seguimiento_citas
+ORDER BY fecha DESC;
+
+-- 8. Verificar notificaciones
+SELECT *
+FROM notificaciones
+ORDER BY fecha_envio DESC;
+
+-- 9. Verificar auditoría
+SELECT *
+FROM auditoria
+ORDER BY fecha DESC;
+
+-- 10. Verificar citas duplicadas
+SELECT
+    fecha,
+    hora,
+    id_docente,
+    COUNT(*) AS cantidad
+FROM citas
+GROUP BY
+    fecha,
+    hora,
+    id_docente
 HAVING COUNT(*) > 1;
