@@ -333,3 +333,158 @@ body {
     text-align: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
+
+/* =========================================================
+   EDUTURNOS - AJUSTES GENERALES
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+.contenedor {
+    width: 92%;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+.contenedor-auth {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.tarjeta-auth {
+    width: 100%;
+    max-width: 430px;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.12);
+}
+
+.tarjeta-auth h1 {
+    text-align: center;
+    color: #1769aa;
+    margin-bottom: 5px;
+}
+
+.tarjeta-auth h2 {
+    text-align: center;
+    margin-top: 5px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+label {
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font-family: Arial, sans-serif;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #1769aa;
+}
+
+button,
+.boton {
+    display: inline-block;
+    border: none;
+    background: #1769aa;
+    color: white;
+    padding: 11px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: 12px;
+}
+
+button:hover,
+.boton:hover {
+    opacity: .9;
+}
+
+#mensajeLogin,
+#mensajeRegistro,
+#mensajeVerificar,
+#mensajeCita {
+    margin-top: 15px;
+    padding: 10px;
+}
+
+.tabla-contenedor {
+    overflow-x: auto;
+    margin-top: 25px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background: #1769aa;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.tarjeta-notificacion {
+    background: white;
+    padding: 18px;
+    margin: 15px 0;
+    border-radius: 10px;
+    border-left: 5px solid #1769aa;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+@media (max-width: 600px) {
+
+    .contenedor {
+        width: 95%;
+    }
+
+    .tarjeta-auth {
+        padding: 20px;
+    }
+
+    th,
+    td {
+        font-size: 14px;
+    }
+}
