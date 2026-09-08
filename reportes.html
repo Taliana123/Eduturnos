@@ -1,46 +1,226 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>EDUTURNOS - Reportes</title>
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Reportes - EDUTURNOS</title>
 
     <link rel="stylesheet" href="css/estilos.css">
+
 </head>
 
 <body>
 
-<main class="contenido">
+<main class="contenedor">
 
-    <h1>Reportes</h1>
+    <h1>Reportes de citaciones</h1>
 
-    <form action="api/reportes.php" method="GET">
+    <form id="formReporte">
 
-        <label>Fecha inicial</label>
-        <input type="date" name="fecha_inicio">
+        <label>
+            Desde
+        </label>
 
-        <label>Fecha final</label>
-        <input type="date" name="fecha_fin">
+        <input
+            type="date"
+            name="desde"
+        >
 
-        <label>Estado</label>
+        <label>
+            Hasta
+        </label>
+
+        <input
+            type="date"
+            name="hasta"
+        >
+
+        <label>
+            Estado
+        </label>
 
         <select name="estado">
-            <option value="">Todos</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Confirmada">Confirmada</option>
-            <option value="Realizada">Realizada</option>
-            <option value="Cancelada">Cancelada</option>
-            <option value="Reprogramada">Reprogramada</option>
+
+            <option value="">
+                Todos
+            </option>
+
+            <option>Pendiente</option>
+            <option>Confirmada</option>
+            <option>Realizada</option>
+            <option>Cancelada</option>
+            <option>Reprogramada</option>
+            <option>No asistió</option>
+            <option>Justificada</option>
+
         </select>
 
         <button type="submit">
-            Consultar reporte
+            Generar reporte
         </button>
 
     </form>
 
+    <section id="resumen"></section>
+
+    <div class="tabla-contenedor">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Estudiante</th>
+                    <th>Docente</th>
+                    <th>Acudiente</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="tablaReporte"></tbody>
+
+        </table>
+
+    </div>
+
 </main>
 
+<script>
+
+document
+    .getElementById("formReporte")
+    .addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+            const datos =
+                new FormData(this);
+
+            const parametros =
+                new URLSearchParams(datos);
+
+            const respuesta =
+                await fetch(
+                    "api/reportes.php?" +
+                    parametros.toString()
+                );
+
+            const resultado =
+                await respuesta.json();
+
+            if (!resultado.ok) {
+
+                alert(resultado.mensaje);
+
+                return;
+            }
+
+            const resumen =
+                resultado.datos.resumen;
+
+            document.getElementById(
+                "resumen"
+            ).innerHTML = `
+
+                <p>
+                    Total: ${resumen.total}
+                </p>
+
+                <p>
+                    Pendientes: ${resumen.pendientes}
+                </p>
+
+                <p>
+                    Confirmadas: ${resumen.confirmadas}
+                </p>
+
+                <p>
+                    Realizadas: ${resumen.realizadas}
+                </p>
+
+                <p>
+                    Canceladas: ${resumen.canceladas}
+                </p>
+
+                <p>
+                    Reprogramadas: ${resumen.reprogramadas}
+                </p>
+
+            `;
+
+            const tabla =
+                document.getElementById(
+                    "tablaReporte"
+                );
+
+            tabla.innerHTML = "";
+
+            resultado.datos.registros.forEach(
+                cita => {
+
+                    const fila =
+                        document.createElement(
+                            "tr"
+                        );
+
+                    fila.innerHTML = `
+
+                        <td>
+                            ${cita.fecha}
+                        </td>
+
+                        <td>
+                            ${cita.hora}
+                        </td>
+
+                        <td>
+                            ${cita.estudiante}
+                        </td>
+
+                        <td>
+                            ${cita.docente}
+                        </td>
+
+                        <td>
+                            ${cita.acudiente}
+                        </td>
+
+                        <td>
+                            ${cita.motivo}
+                        </td>
+
+                        <td>
+                            ${cita.estado}
+                        </td>
+
+                    `;
+
+                    tabla.appendChild(
+                        fila
+                    );
+                }
+            );
+
+        }
+    );
+
+</script>
+
 </body>
+
 </html>
