@@ -1,104 +1,105 @@
 <?php
 
-session_start();
+require_once "_helpers.php";
 
-require_once "../config/conexion.php";
+exigirRol([
+    "Super Admin",
+    "Coordinador",
+    "Docente",
+    "Acudiente"
+]);
 
-if (!isset($_SESSION["usuario_id"])) {
-    die("Acceso no autorizado.");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    responder(false, "Método no permitido.", [], 405);
 }
 
-$id_cita = $_POST["id_cita"] ?? "";
+$idCita = (int)($_POST["id_cita"] ?? 0);
 
-if ($id_cita == "") {
-    die("Citación no válida.");
+if (!$idCita) {
+    responder(false, "Debe indicar la citación.", [], 400);
 }
 
-/* Buscar estado actual */
+$stmt = $conexion->prepare(
+    "SELECT
+        c.id_estado,
+        ec.nombre AS estado
+     FROM citas c
+     INNER JOIN estados_cita ec
+        ON c.id_estado = ec.id_estado
+     WHERE c.id_cita = ?
+     LIMIT 1"
+);
 
-$sql = "SELECT
-            c.id_estado,
-            ec.nombre AS estado_actual
-        FROM citas c
-        INNER JOIN estados_cita ec
-            ON c.id_estado = ec.id_estado
-        WHERE c.id_cita = ?";
-
-$stmt = $conexion->prepare($sql);
-$stmt->bind_param("i", $id_cita);
+$stmt->bind_param("i", $idCita);
 $stmt->execute();
 
-$resultado = $stmt->get_result();
+$cita = $stmt->get_result()->fetch_assoc();
 
-if ($resultado->num_rows == 0) {
-    die("La citación no existe.");
+$stmt->close();
+
+if (!$cita) {
+    responder(false, "La citación no existe.", [], 404);
 }
 
-$cita = $resultado->fetch_assoc();
-
-$estadoAnterior = $cita["estado_actual"];
-
-/* Buscar estado Cancelada */
-
-$sql = "SELECT id_estado
-        FROM estados_cita
-        WHERE nombre = 'Cancelada'
-        LIMIT 1";
-
-$resultado = $conexion->query($sql);
-
-if ($resultado->num_rows == 0) {
-    die("No existe el estado Cancelada.");
+if (
+    in_array(
+        $cita["estado"],
+        ["Cancelada", "Realizada", "Justificada"],
+        true
+    )
+) {
+    responder(
+        false,
+        "La citación ya no puede cancelarse.",
+        [],
+        409
+    );
 }
 
-$estado = $resultado->fetch_assoc();
+$idEstado = obtenerEstadoId(
+    $conexion,
+    "Cancelada"
+);
 
-$id_estado_cancelada = $estado["id_estado"];
-
-/* Actualizar estado */
-
-$sql = "UPDATE citas
-        SET id_estado = ?
-        WHERE id_cita = ?";
-
-$stmt = $conexion->prepare($sql);
+$stmt = $conexion->prepare(
+    "UPDATE citas
+     SET id_estado = ?
+     WHERE id_cita = ?"
+);
 
 $stmt->bind_param(
     "ii",
-    $id_estado_cancelada,
-    $id_cita
+    $idEstado,
+    $idCita
 );
 
-if ($stmt->execute()) {
+$stmt->execute();
+$stmt->close();
 
-    /* Guardar historial */
+registrarSeguimiento(
+    $conexion,
+    $idCita,
+    $cita["estado"],
+    "Cancelada",
+    "Citación cancelada."
+);
 
-    $sqlSeguimiento = "INSERT INTO seguimiento_citas
-    (
-        id_cita,
-        estado_anterior,
-        estado_nuevo,
-        observacion,
-        usuario_responsable
-    )
-    VALUES (?, ?, 'Cancelada', 'Citación cancelada', ?)";
+notificarCita(
+    $conexion,
+    $idCita,
+    "Citación cancelada",
+    "La citación ha sido cancelada."
+);
 
-    $stmtSeguimiento = $conexion->prepare($sqlSeguimiento);
+registrarAuditoria(
+    $conexion,
+    "Cancelar citación",
+    "citas",
+    $idCita,
+    "Citación cancelada."
+);
 
-    $stmtSeguimiento->bind_param(
-        "isi",
-        $id_cita,
-        $estadoAnterior,
-        $_SESSION["usuario_id"]
-    );
-
-    $stmtSeguimiento->execute();
-
-    echo "Citación cancelada correctamente.";
-
-} else {
-
-    echo "No se pudo cancelar la citación.";
-}
-
-?>
+responder(
+    true,
+    "Citación cancelada correctamente."
+);
