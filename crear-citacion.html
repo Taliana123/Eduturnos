@@ -1,49 +1,136 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <title>EDUTURNOS - Crear citación</title>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Crear citación - EDUTURNOS</title>
+
     <link rel="stylesheet" href="css/estilos.css">
+
 </head>
 
 <body>
 
-<div class="contenedor-formulario">
+<main class="contenedor">
 
-    <h1>EDUTURNOS</h1>
-    <h2>Nueva citación</h2>
+    <h1>Crear citación</h1>
 
-    <form action="api/crear_cita.php" method="POST">
+    <form id="formCrearCita">
 
         <label>Estudiante</label>
-        <input type="text" name="estudiante" required>
+
+        <select
+            id="id_estudiante"
+            name="id_estudiante"
+            required
+        >
+
+            <option value="">
+                Seleccione estudiante
+            </option>
+
+        </select>
+
 
         <label>Acudiente</label>
-        <input type="text" name="acudiente" required>
 
-        <label>Docente responsable</label>
-        <input type="text" name="docente" required>
+        <select
+            id="id_acudiente"
+            name="id_acudiente"
+            required
+        >
+
+            <option value="">
+                Seleccione acudiente
+            </option>
+
+        </select>
+
+
+        <label>Docente</label>
+
+        <select
+            id="id_docente"
+            name="id_docente"
+            required
+        >
+
+            <option value="">
+                Seleccione docente
+            </option>
+
+        </select>
+
 
         <label>Motivo</label>
-        <textarea name="motivo" required></textarea>
+
+        <select
+            id="id_motivo"
+            name="id_motivo"
+            required
+        >
+
+            <option value="">
+                Seleccione motivo
+            </option>
+
+        </select>
+
 
         <label>Fecha</label>
-        <input type="date" name="fecha" required>
+
+        <input
+            type="date"
+            name="fecha"
+            required
+        >
+
 
         <label>Hora</label>
-        <input type="time" name="hora" required>
+
+        <input
+            type="time"
+            name="hora"
+            required
+        >
+
 
         <label>Lugar</label>
-        <input type="text" name="lugar" required>
+
+        <input
+            type="text"
+            name="lugar"
+            maxlength="150"
+        >
+
 
         <label>Observaciones</label>
-        <textarea name="observaciones"></textarea>
 
-        <button type="submit">Crear citación</button>
+        <textarea
+            name="observaciones"
+            rows="4"
+        ></textarea>
+
+
+        <button type="submit">
+            Crear citación
+        </button>
 
     </form>
 
-</div>
+    <div id="mensajeCita"></div>
+
+</main>
+
+<script src="js/citaciones.js"></script>
 
 </body>
+
 </html>
