@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Notificaciones - EDUTURNOS</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+
+</head>
+
+<body>
+
+<main class="contenedor">
+
+    <h1>Notificaciones</h1>
+
+    <div id="listaNotificaciones">
+        Cargando...
+    </div>
+
+</main>
+
+<script>
+
+async function cargarNotificaciones() {
+
+    const contenedor =
+        document.getElementById(
+            "listaNotificaciones"
+        );
+
+    try {
+
+        const respuesta =
+            await fetch(
+                "api/notificaciones.php"
+            );
+
+        const resultado =
+            await respuesta.json();
+
+        if (!resultado.ok) {
+
+            contenedor.textContent =
+                resultado.mensaje;
+
+            return;
+        }
+
+        contenedor.innerHTML = "";
+
+        if (resultado.datos.length === 0) {
+
+            contenedor.innerHTML =
+                "<p>No tienes notificaciones.</p>";
+
+            return;
+        }
+
+        resultado.datos.forEach(
+            notificacion => {
+
+                const tarjeta =
+                    document.createElement(
+                        "article"
+                    );
+
+                tarjeta.className =
+                    "tarjeta-notificacion";
+
+                tarjeta.innerHTML = `
+                    <h3>
+                        ${notificacion.titulo}
+                    </h3>
+
+                    <p>
+                        ${notificacion.mensaje}
+                    </p>
+
+                    <small>
+                        ${notificacion.fecha_envio}
+                    </small>
+
+                    ${
+                        Number(
+                            notificacion.leida
+                        ) === 0
+                        ?
+                        `<button
+                            onclick="marcarLeida(
+                                ${notificacion.id_notificacion}
+                            )">
+                            Marcar como leída
+                        </button>`
+                        :
+                        "<span>Leída</span>"
+                    }
+                `;
+
+                contenedor.appendChild(
+                    tarjeta
+                );
+
+            }
+        );
+
+    } catch (error) {
+
+        contenedor.textContent =
+            "No fue posible cargar las notificaciones.";
+    }
+}
+
+
+async function marcarLeida(id) {
+
+    const datos =
+        new FormData();
+
+    datos.append(
+        "id_notificacion",
+        id
+    );
+
+    await fetch(
+        "api/notificaciones.php",
+        {
+            method: "POST",
+            body: datos
+        }
+    );
+
+    cargarNotificaciones();
+}
+
+
+cargarNotificaciones();
+
+</script>
+
+</body>
+
+</html>
