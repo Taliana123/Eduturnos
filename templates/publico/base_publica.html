@@ -1,0 +1,391 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDUTURNOS · {{ titulo }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261013_mobile_v50" media="(max-width: 900px)">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #102a56;
+            background:
+                radial-gradient(circle at 85% 10%, rgba(96,165,250,.24), transparent 30%),
+                linear-gradient(135deg, #dbeafe 0%, #eff6ff 48%, #ffffff 100%);
+        }
+
+        .barra {
+            width: 100%;
+            padding: 22px 6vw;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+            background: rgba(255,255,255,.82);
+            border-bottom: 1px solid rgba(30,64,175,.10);
+            backdrop-filter: blur(16px);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .marca {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: #102a56;
+            text-decoration: none;
+            font-weight: 900;
+            letter-spacing: .04em;
+        }
+
+        .marca-icono {
+            width: 38px;
+            height: 38px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: #2563eb;
+            color: white;
+            font-weight: 900;
+        }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .menu a {
+            color: #42526b;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .menu a:hover {
+            color: #2563eb;
+        }
+
+        .menu .activo {
+            color: #2563eb;
+        }
+
+        .menu-dropdown {
+            position: relative;
+        }
+
+        .menu-desktop-links {
+            display: none;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .menu-dropdown-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 44px;
+            padding: 8px 12px;
+            border: 1px solid #d7e5f2;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #34556f;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .menu-dropdown-toggle::-webkit-details-marker {
+            display: none;
+        }
+
+        .menu-dropdown-toggle::marker {
+            content: "";
+        }
+
+        .menu-dropdown-toggle::after {
+            width: 7px;
+            height: 7px;
+            margin: 0 0 4px 2px;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            content: "";
+            transform: rotate(45deg);
+            transition: transform .15s ease;
+        }
+
+        .menu-dropdown[open] .menu-dropdown-toggle::after {
+            margin-bottom: 0;
+            transform: rotate(225deg);
+        }
+
+        .menu-dropdown-icon {
+            display: grid;
+            gap: 4px;
+        }
+
+        .menu-dropdown-icon span {
+            width: 16px;
+            height: 2px;
+            border-radius: 2px;
+            background: currentColor;
+        }
+
+        .menu-dropdown-links {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            z-index: 30;
+            display: none;
+            width: min(250px, calc(100vw - 36px));
+            gap: 4px;
+            padding: 8px;
+            border: 1px solid #dce8f2;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 14px 32px rgba(20, 62, 99, .18);
+        }
+
+        .menu-dropdown[open] .menu-dropdown-links {
+            display: grid;
+        }
+
+        .menu-dropdown-links a {
+            display: flex;
+            width: 100%;
+            min-height: 44px;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .menu-dropdown-links a:hover,
+        .menu-dropdown-links a:focus-visible {
+            background: #edf6fc;
+            outline: none;
+        }
+
+        @media (min-width: 901px) {
+            .menu-desktop-links {
+                display: flex;
+            }
+
+            .menu-dropdown {
+                display: none;
+            }
+        }
+
+        .login {
+            padding: 11px 18px;
+            border-radius: 12px;
+            background: #102a56;
+            color: white !important;
+        }
+
+        main {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 85px 6vw 100px;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(37,99,235,.10);
+            color: #1d4ed8;
+            font-size: .78rem;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            max-width: 850px;
+            margin: 22px 0 20px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(3rem, 7vw, 6.2rem);
+            line-height: .96;
+            letter-spacing: -.045em;
+            color: #102a56;
+        }
+
+        .intro {
+            max-width: 760px;
+            margin: 0 0 55px;
+            color: #42526b;
+            font-size: 1.18rem;
+            line-height: 1.8;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 22px;
+        }
+
+        .card {
+            padding: 30px;
+            border-radius: 26px;
+            background: rgba(255,255,255,.86);
+            border: 1px solid rgba(30,64,175,.11);
+            box-shadow: 0 18px 50px rgba(30,64,175,.10);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 24px 60px rgba(30,64,175,.15);
+        }
+
+        .numero {
+            color: #2563eb;
+            font-weight: 900;
+            letter-spacing: .08em;
+            font-size: .82rem;
+        }
+
+        .card h2 {
+            margin: 13px 0 10px;
+            color: #102a56;
+            font-size: 1.45rem;
+        }
+
+        .card p {
+            margin: 0;
+            color: #52627a;
+            line-height: 1.7;
+        }
+
+        .acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 13px;
+            margin-top: 45px;
+        }
+
+        .boton {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 21px;
+            border-radius: 13px;
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        .boton-principal {
+            background: #102a56;
+            color: white;
+        }
+
+        .boton-secundario {
+            background: white;
+            color: #102a56;
+            border: 1px solid rgba(30,64,175,.15);
+        }
+
+        footer {
+            padding: 28px 6vw;
+            text-align: center;
+            color: #66758c;
+            border-top: 1px solid rgba(30,64,175,.10);
+            background: rgba(255,255,255,.55);
+        }
+
+        @media (max-width: 720px) {
+            .barra {
+                align-items: center;
+                flex-direction: row;
+                padding: 12px 16px;
+                gap: 12px;
+            }
+
+            .menu {
+                width: auto;
+                flex: 0 0 auto;
+                margin-left: auto;
+                gap: 8px;
+            }
+
+            main {
+                padding-top: 55px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: clamp(2.7rem, 15vw, 4.5rem);
+            }
+        }
+    </style>
+</head>
+
+<body class="public-info-page">
+
+<header class="barra">
+    <a href="{{ url_for('inicio') }}" class="marca">
+        <img src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional" width="38" height="38" style="object-fit:contain;flex:0 0 38px;filter:none;border-radius:0">
+        <span>EDUTURNOS</span>
+    </a>
+
+    <nav class="menu" aria-label="Navegaci&oacute;n principal">
+        <div class="menu-desktop-links">
+            <a href="{{ url_for('como_funciona') }}" class="{% if request.endpoint == 'como_funciona' %}activo{% endif %}">C&oacute;mo funciona</a>
+            <a href="{{ url_for('beneficios') }}" class="{% if request.endpoint == 'beneficios' %}activo{% endif %}">Beneficios</a>
+            <a href="{{ url_for('institucion') }}" class="{% if request.endpoint == 'institucion' %}activo{% endif %}">Instituci&oacute;n</a>
+            <a href="{{ url_for('privacidad') }}" class="{% if request.endpoint == 'privacidad' %}activo{% endif %}">Privacidad</a>
+            <a href="{{ url_for('terminos') }}" class="{% if request.endpoint == 'terminos' %}activo{% endif %}">Condiciones</a>
+        </div>
+        <details class="menu-dropdown">
+            <summary class="menu-dropdown-toggle">
+                <span class="menu-dropdown-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+                <span>Men&uacute;</span>
+            </summary>
+            <div class="menu-dropdown-links">
+                <a href="{{ url_for('como_funciona') }}" class="{% if request.endpoint == 'como_funciona' %}activo{% endif %}">C&oacute;mo funciona</a>
+                <a href="{{ url_for('beneficios') }}" class="{% if request.endpoint == 'beneficios' %}activo{% endif %}">Beneficios</a>
+                <a href="{{ url_for('institucion') }}" class="{% if request.endpoint == 'institucion' %}activo{% endif %}">Instituci&oacute;n</a>
+                <a href="{{ url_for('privacidad') }}" class="{% if request.endpoint == 'privacidad' %}activo{% endif %}">Privacidad</a>
+                <a href="{{ url_for('terminos') }}" class="{% if request.endpoint == 'terminos' %}activo{% endif %}">Condiciones</a>
+            </div>
+        </details>
+        <a href="{{ url_for('auth.login') }}" class="login">
+            Iniciar sesión
+        </a>
+    </nav>
+</header>
+
+<main>
+    {{ contenido|safe }}
+
+    <div class="acciones">
+        <a href="{{ url_for('inicio') }}" class="boton boton-principal">
+            ← Volver al inicio
+        </a>
+    </div>
+</main>
+
+<footer>
+    <span>Sistema de gestión de citaciones escolares</span>
+    <span><a href="{{ url_for('privacidad') }}">Privacidad</a> · <a href="{{ url_for('terminos') }}">Condiciones</a></span>
+</footer>
+
+</body>
+</html>
+

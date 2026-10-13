@@ -1,0 +1,2083 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-page dashboard-rol-{{ usuario.rol_nombre|lower|replace(" ","-")|replace("/","-") }}">
+
+    <!-- =====================================================
+         ENCABEZADO
+         ===================================================== -->
+
+    <div class="dashboard-head">
+
+        <div class="dashboard-head-info">
+<div class="dashboard-role-art" aria-hidden="true">
+    {% if usuario.rol_nombre == 'Rector' %}
+        <div class="role-symbol role-rectoria">
+            <span></span><i></i><b></b>
+        </div>
+    {% elif usuario.rol_nombre == 'Estudiante' %}
+        <div class="role-symbol role-estudiante">
+            <span></span><i></i><b></b>
+        </div>
+    {% elif usuario.rol_nombre == 'Acudiente' %}
+        <div class="role-symbol role-acudiente">
+            <span></span><i></i><b></b>
+        </div>
+    {% elif usuario.rol_nombre == 'Docente' %}
+        <div class="role-symbol role-docente">
+            <span></span><i></i><b></b>
+        </div>
+    {% elif usuario.rol_nombre == 'Administrador / Coordinador' %}
+        <div class="role-symbol role-coordinador">
+            <span></span><i></i><b></b>
+        </div>
+    {% else %}
+        <div class="role-symbol role-default">
+            <span></span><i></i><b></b>
+        </div>
+    {% endif %}
+</div>
+
+            <span class="badge">
+                {{ usuario.rol_nombre }}
+            </span>
+
+            <h1>
+                Hola, {{ usuario.nombres }} {{ usuario.apellidos }}
+            </h1>
+
+            <p class="muted">
+                Información y accesos según tu rol institucional.
+            </p>
+
+        </div>
+
+        <div class="dashboard-head-action">
+
+            <a
+                class="boton boton-danger dashboard-logout"
+                href="{{ url_for('auth.logout') }}"
+            >
+                Cerrar sesión
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         INDICADORES
+         ===================================================== -->
+
+    <section class="dashboard-kpis">
+
+        <article class="dashboard-kpi">
+            <span>Total de citas</span>
+            <strong>{{ datos.total_citas }}</strong>
+        </article>
+
+        <article class="dashboard-kpi">
+            <span>Pendientes</span>
+            <strong>{{ datos.pendientes }}</strong>
+        </article>
+
+        <article class="dashboard-kpi">
+            <span>Confirmadas</span>
+            <strong>{{ datos.confirmadas }}</strong>
+        </article>
+
+        <article class="dashboard-kpi">
+            <span>Notificaciones sin leer</span>
+            <strong>{{ notificaciones_no_leidas }}</strong>
+        </article>
+
+    </section>
+
+
+    <!-- =====================================================
+         CONTENIDO
+         ===================================================== -->
+
+    <div class="dashboard-main">
+
+        <!-- ACCIONES -->
+        <section class="dashboard-card dashboard-actions-card">
+
+            <div class="dashboard-card-head">
+
+                <div>
+                    <span class="badge">Accesos</span>
+
+                    <h2>Acciones rápidas</h2>
+
+                    <p class="muted">
+                        Accede directamente a las funciones disponibles para tu rol.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-action-grid">
+
+                <!-- CITAS -->
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('citas.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Citas
+                        </span>
+                    </div>
+
+                    <h3>Citas</h3>
+
+                    <p>
+                        Consultar y gestionar citaciones.
+                    </p>
+
+                    <span class="dashboard-action-link">
+                        Ver citas →
+                    </span>
+
+                </a>
+
+
+                <!-- CALENDARIO -->
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('calendario.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Calendario
+                        </span>
+                    </div>
+
+                    <h3>Calendario</h3>
+
+                    <p>
+                        Revisar fechas y horarios.
+                    </p>
+
+                    <span class="dashboard-action-link">
+                        Abrir calendario →
+                    </span>
+
+                </a>
+
+
+                <!-- NOTIFICACIONES -->
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('notificaciones.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Avisos
+                        </span>
+                    </div>
+
+                    <h3>Notificaciones</h3>
+
+                    <p>
+                        Ver avisos y novedades del sistema.
+                    </p>
+
+                    {% if notificaciones_no_leidas > 0 %}
+
+                    <span class="dashboard-action-link">
+                        {{ notificaciones_no_leidas }} sin leer →
+                    </span>
+
+                    {% else %}
+
+                    <span class="dashboard-action-link">
+                        Ver notificaciones →
+                    </span>
+
+                    {% endif %}
+
+                </a>
+
+
+                <!-- SOLICITUDES -->
+
+                {% if usuario.rol_nombre in [
+                    'Docente',
+                    'Administrador / Coordinador',
+                    'Rector',
+                    'Super Admin'
+                ] %}
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('solicitudes.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Solicitudes
+                        </span>
+                    </div>
+
+                    <h3>Solicitudes</h3>
+
+                    <p>
+                        Gestionar reuniones y propuestas.
+                    </p>
+
+                    <span class="dashboard-action-link">
+                        Ver solicitudes →
+                    </span>
+
+                </a>
+
+                {% endif %}
+
+
+                <!-- REPORTES -->
+
+                {% if usuario.rol_nombre in [
+                    'Administrador / Coordinador',
+                    'Rector',
+                    'Super Admin'
+                ] %}
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('reportes.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Reportes
+                        </span>
+                    </div>
+
+                    <h3>Reportes</h3>
+
+                    <p>
+                        Consultar indicadores institucionales.
+                    </p>
+
+                    <span class="dashboard-action-link">
+                        Ver reportes →
+                    </span>
+
+                </a>
+
+                {% endif %}
+
+
+                <!-- JUSTIFICACIONES -->
+
+                {% if usuario.rol_nombre in [
+                    'Estudiante',
+                    'Acudiente'
+                ] %}
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('justificaciones.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Justificaciones
+                        </span>
+                    </div>
+
+                    <h3>Justificaciones</h3>
+
+                    <p>
+                        Consultar o presentar solicitudes.
+                    </p>
+
+                    <span class="dashboard-action-link">
+                        Ver justificaciones →
+                    </span>
+
+                </a>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- CUENTA -->
+
+        <section class="dashboard-card dashboard-account-card">
+
+            <div class="dashboard-card-head">
+
+                <div>
+                    <span class="badge">Cuenta</span>
+
+                    <h2>Mi cuenta</h2>
+                </div>
+
+            </div>
+
+            <p class="muted dashboard-account-text">
+                Mantén una contraseña personal segura y actualizada.
+            </p>
+
+            <div class="dashboard-account-action">
+
+                <a
+                    class="boton boton-full"
+                    href="{{ url_for('passwords.cambiar_password') }}"
+                >
+                    Cambiar contraseña
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</section>
+<!-- EDUTURNOS - ESPACIADO TITULOS DASHBOARD -->
+<!-- FIN EDUTURNOS - ESPACIADO TITULOS DASHBOARD -->
+
+
+
+<!-- EDUTURNOS_ACCESOS_ANIMADOS -->
+<!-- FIN EDUTURNOS_ACCESOS_ANIMADOS -->
+
+
+<style id="EDUTURNOS_DASHBOARD_VISUAL_COMPACTO_FINAL">
+
+/* =========================================================
+   EDUTURNOS
+   DASHBOARD COMPACTO
+   ========================================================= */
+
+.dashboard-page {
+    width: min(1160px, calc(100% - 44px));
+    margin: 0 auto;
+    padding: 28px 0 48px;
+    box-sizing: border-box;
+
+    color: #243b53;
+}
+
+/* =========================================================
+   CABECERA
+   ========================================================= */
+
+.dashboard-head {
+    position: relative;
+
+    min-height: 150px !important;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 28px;
+
+    margin-bottom: 18px;
+    padding: 24px 28px !important;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d9e7f2 !important;
+    border-radius: 22px !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f7fbff 100%
+        ) !important;
+
+    box-shadow:
+        0 8px 24px rgba(42, 91, 125, .07) !important;
+
+    color: #243b53 !important;
+
+    overflow: hidden;
+}
+
+.dashboard-head::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 18px;
+    bottom: 18px;
+
+    width: 5px;
+
+    border-radius: 0 5px 5px 0;
+
+    background: #2f7da8;
+}
+
+/* =========================================================
+   INFORMACIÓN DEL USUARIO
+   ========================================================= */
+
+.dashboard-head-info {
+
+    position: relative;
+    z-index: 2;
+
+    display: grid;
+
+    grid-template-columns: 76px minmax(0, 1fr);
+
+    grid-template-areas:
+        "art badge"
+        "art title"
+        "art text";
+
+    column-gap: 18px;
+    row-gap: 2px;
+
+    align-items: center;
+
+    min-width: 0;
+}
+
+.dashboard-role-art {
+
+    grid-area: art;
+
+    width: 76px;
+    height: 76px;
+
+    display: grid;
+    place-items: center;
+}
+
+/* =========================================================
+   DIBUJO / ILUSTRACIÓN DEL ROL
+   ========================================================= */
+
+.role-symbol {
+
+    position: relative;
+
+    width: 68px;
+    height: 68px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #eaf5fb,
+            #d7edf8
+        );
+
+    border: 1px solid #c8e0ee;
+
+    box-shadow:
+        0 7px 16px rgba(43, 112, 150, .10);
+
+    overflow: hidden;
+
+    animation: eduturnosRolFlota 3.8s ease-in-out infinite;
+}
+
+/* cabeza */
+
+.role-symbol::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 20px;
+    height: 20px;
+
+    left: 24px;
+    top: 12px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    border: 3px solid #2f7da8;
+
+    box-sizing: border-box;
+
+    box-shadow:
+        0 2px 0 rgba(47,125,168,.08);
+}
+
+/* cuerpo */
+
+.role-symbol::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 34px;
+    height: 23px;
+
+    left: 17px;
+    bottom: 12px;
+
+    border-radius: 12px 12px 8px 8px;
+
+    background: #2f7da8;
+
+    box-shadow:
+        inset 0 4px 0 rgba(255,255,255,.20);
+}
+
+/* detalles */
+
+.role-symbol span,
+.role-symbol i,
+.role-symbol b {
+
+    display: block;
+
+    position: absolute;
+
+    z-index: 3;
+
+    font-style: normal;
+}
+
+/* ojos */
+
+.role-symbol span::before,
+.role-symbol span::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 3px;
+    height: 3px;
+
+    top: 20px;
+
+    border-radius: 50%;
+
+    background: #243b53;
+}
+
+.role-symbol span::before {
+    left: 29px;
+}
+
+.role-symbol span::after {
+    left: 36px;
+}
+
+/* detalle inferior */
+
+.role-symbol i {
+
+    width: 10px;
+    height: 4px;
+
+    left: 29px;
+    bottom: 20px;
+
+    border-radius: 5px;
+
+    background: #f2b84b;
+}
+
+/* detalle superior */
+
+.role-symbol b {
+
+    width: 28px;
+    height: 4px;
+
+    left: 20px;
+    top: 7px;
+
+    border-radius: 5px;
+
+    background: #f2b84b;
+
+    opacity: .9;
+}
+
+@keyframes eduturnosRolFlota {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-3px) rotate(.5deg);
+    }
+}
+
+/* =========================================================
+   BADGE
+   ========================================================= */
+
+.dashboard-head .badge {
+
+    grid-area: badge;
+
+    width: fit-content;
+
+    margin: 0 0 2px;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    background: #eaf4fa !important;
+
+    border: 1px solid #d3e7f2;
+
+    color: #2f7da8 !important;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: .07em;
+
+    text-transform: uppercase;
+}
+
+/* =========================================================
+   SALUDO
+   ========================================================= */
+
+.dashboard-head h1 {
+
+    grid-area: title;
+
+    margin: 0 !important;
+
+    color: #213b52 !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size: clamp(28px, 3vw, 39px) !important;
+
+    line-height: 1.04 !important;
+
+    letter-spacing: -.025em;
+}
+
+.dashboard-head .muted {
+
+    grid-area: text;
+
+    margin: 3px 0 0 !important;
+
+    color: #718496 !important;
+
+    font-size: 12px !important;
+
+    line-height: 1.45;
+}
+
+/* =========================================================
+   CERRAR SESIÓN
+   ========================================================= */
+
+.dashboard-head-action {
+
+    position: relative;
+    z-index: 2;
+
+    flex: 0 0 auto;
+}
+
+.dashboard-logout {
+
+    min-width: 112px;
+    height: 38px;
+
+    display: inline-flex !important;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 15px !important;
+
+    border-radius: 10px !important;
+
+    border: 1px solid #d6e3ec !important;
+
+    background: #ffffff !important;
+
+    color: #2f6f94 !important;
+
+    box-shadow: 0 3px 10px rgba(35,80,110,.05) !important;
+
+    font-size: 11px !important;
+    font-weight: 800;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
+}
+
+.dashboard-logout:hover {
+
+    transform: translateY(-2px);
+
+    border-color: #a9cadc !important;
+
+    box-shadow:
+        0 7px 16px rgba(35,80,110,.10) !important;
+}
+
+/* =========================================================
+   INDICADORES
+   ========================================================= */
+
+.dashboard-kpis {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.dashboard-kpi {
+
+    position: relative;
+
+    min-height: 82px !important;
+
+    display: flex;
+
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 14px 17px !important;
+
+    box-sizing: border-box;
+
+    border: 1px solid #dce8f0 !important;
+
+    border-radius: 14px !important;
+
+    background: #ffffff !important;
+
+    box-shadow:
+        0 5px 16px rgba(37,87,119,.055) !important;
+
+    overflow: hidden;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.dashboard-kpi::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    top: 0;
+
+    height: 3px;
+
+    background: #4b91b8;
+}
+
+.dashboard-kpi:nth-child(2)::before,
+.dashboard-kpi:nth-child(4)::before {
+
+    background: #e8b653;
+}
+
+.dashboard-kpi:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 9px 20px rgba(37,87,119,.09) !important;
+}
+
+.dashboard-kpi span {
+
+    margin-bottom: 4px;
+
+    color: #718496 !important;
+
+    font-size: 10px !important;
+
+    font-weight: 700;
+}
+
+.dashboard-kpi strong {
+
+    color: #24445d !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size: 27px !important;
+
+    line-height: 1;
+}
+
+/* =========================================================
+   CONTENIDO
+   ========================================================= */
+
+.dashboard-main {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        235px;
+
+    gap: 18px;
+
+    align-items: start;
+}
+
+/* =========================================================
+   TARJETAS PRINCIPALES
+   ========================================================= */
+
+.dashboard-card {
+
+    box-sizing: border-box;
+
+    border: 1px solid #dce8f0 !important;
+
+    border-radius: 17px !important;
+
+    background: #ffffff !important;
+
+    box-shadow:
+        0 6px 19px rgba(37,87,119,.06) !important;
+}
+
+.dashboard-actions-card {
+
+    padding: 20px !important;
+}
+
+.dashboard-account-card {
+
+    padding: 20px !important;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+/* =========================================================
+   CABECERA DE SECCIÓN
+   ========================================================= */
+
+.dashboard-card-head {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    margin-bottom: 14px;
+}
+
+.dashboard-card-head .badge {
+
+    display: inline-flex;
+
+    width: fit-content;
+
+    margin-bottom: 5px;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    background: #edf6fb !important;
+
+    border: 1px solid #d9eaf3;
+
+    color: #2f7da8 !important;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: .07em;
+
+    text-transform: uppercase;
+}
+
+.dashboard-card h2 {
+
+    margin: 0 !important;
+
+    color: #24445d !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size: 23px !important;
+
+    line-height: 1.05 !important;
+}
+
+.dashboard-card-head .muted {
+
+    max-width: 520px;
+
+    margin: 5px 0 0 !important;
+
+    color: #7a8b9a !important;
+
+    font-size: 11px !important;
+
+    line-height: 1.45;
+}
+
+/* =========================================================
+   ACCIONES PEQUEÑAS
+   ========================================================= */
+
+.dashboard-action-grid {
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 10px !important;
+}
+
+.dashboard-action {
+
+    position: relative;
+
+    min-height: 112px !important;
+
+    padding: 13px 14px !important;
+
+    box-sizing: border-box;
+
+    display: flex !important;
+
+    flex-direction: column;
+
+    justify-content: flex-start;
+
+    overflow: hidden;
+
+    border: 1px solid #e0eaf1 !important;
+
+    border-radius: 13px !important;
+
+    background: #fbfdff !important;
+
+    box-shadow: none !important;
+
+    text-decoration: none !important;
+
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease,
+        box-shadow .2s ease;
+}
+
+.dashboard-action::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+
+    width: 3px;
+
+    border-radius: 0 4px 4px 0;
+
+    background: #4b91b8;
+}
+
+.dashboard-action:nth-child(even)::before {
+
+    background: #e8b653;
+}
+
+.dashboard-action:hover {
+
+    transform: translateY(-3px);
+
+    border-color: #c7dce9 !important;
+
+    background: #ffffff !important;
+
+    box-shadow:
+        0 8px 18px rgba(37,87,119,.09) !important;
+}
+
+.dashboard-action-top {
+
+    margin-bottom: 7px;
+
+    min-height: 22px;
+}
+
+.dashboard-action-icon {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 4px 7px;
+
+    border-radius: 7px;
+
+    background: #edf6fb;
+
+    color: #2f7da8;
+
+    font-size: 8px;
+
+    font-weight: 800;
+
+    letter-spacing: .03em;
+
+    text-transform: uppercase;
+}
+
+.dashboard-action:nth-child(even)
+.dashboard-action-icon {
+
+    background: #fff6df;
+
+    color: #a9761c;
+}
+
+.dashboard-action h3 {
+
+    margin: 0 !important;
+
+    color: #24445d !important;
+
+    font-family:
+        "Public Sans",
+        Arial,
+        sans-serif !important;
+
+    font-size: 13px !important;
+
+    font-weight: 800 !important;
+
+    line-height: 1.15 !important;
+}
+
+.dashboard-action p {
+
+    margin: 4px 0 0 !important;
+
+    color: #7a8b9a !important;
+
+    font-size: 9.5px !important;
+
+    line-height: 1.35 !important;
+}
+
+.dashboard-action-link {
+
+    margin-top: auto;
+
+    padding-top: 7px;
+
+    color: #2f7da8 !important;
+
+    font-size: 9.5px !important;
+
+    font-weight: 800;
+
+    text-decoration: none !important;
+}
+
+.dashboard-action:nth-child(even)
+.dashboard-action-link {
+
+    color: #a9761c !important;
+}
+
+/* =========================================================
+   MI CUENTA COMPACTA
+   ========================================================= */
+
+.dashboard-account-card {
+
+    min-height: 0 !important;
+}
+
+.dashboard-account-card .dashboard-card-head {
+
+    margin-bottom: 8px;
+}
+
+.dashboard-account-text {
+
+    margin: 0 !important;
+
+    color: #7a8b9a !important;
+
+    font-size: 10.5px !important;
+
+    line-height: 1.5;
+}
+
+.dashboard-account-action {
+
+    margin-top: 18px;
+
+    padding-top: 0;
+}
+
+.dashboard-account-action .boton-full {
+
+    width: 100%;
+
+    min-height: 39px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px !important;
+
+    background: #2f7da8 !important;
+
+    color: #ffffff !important;
+
+    font-size: 10.5px !important;
+
+    font-weight: 800;
+
+    box-shadow: none !important;
+
+    transition:
+        transform .2s ease,
+        background .2s ease;
+}
+
+.dashboard-account-action .boton-full:hover {
+
+    transform: translateY(-2px);
+
+    background: #286d94 !important;
+}
+
+/* =========================================================
+   ANIMACIONES
+   ========================================================= */
+
+.dashboard-head,
+.dashboard-kpi,
+.dashboard-card {
+
+    animation:
+        eduturnosDashboardEntrada
+        .42s
+        ease
+        both;
+}
+
+.dashboard-kpi:nth-child(2) {
+    animation-delay: .04s;
+}
+
+.dashboard-kpi:nth-child(3) {
+    animation-delay: .08s;
+}
+
+.dashboard-kpi:nth-child(4) {
+    animation-delay: .12s;
+}
+
+.dashboard-main {
+    animation-delay: .10s;
+}
+
+@keyframes eduturnosDashboardEntrada {
+
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+    .dashboard-main {
+
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-account-card {
+
+        max-width: none;
+    }
+
+    .dashboard-action-grid {
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+/* =========================================================
+   TABLET PEQUEÑA
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .dashboard-page {
+
+        width: calc(100% - 30px);
+
+        padding-top: 20px;
+    }
+
+    .dashboard-head {
+
+        padding: 22px !important;
+    }
+
+    .dashboard-kpis {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-action-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 560px) {
+
+    .dashboard-head {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 18px;
+    }
+
+    .dashboard-head-info {
+
+        grid-template-columns:
+            64px minmax(0, 1fr);
+
+        column-gap: 13px;
+    }
+
+    .dashboard-role-art {
+
+        width: 64px;
+        height: 64px;
+    }
+
+    .role-symbol {
+
+        width: 58px;
+        height: 58px;
+    }
+
+    .dashboard-head h1 {
+
+        font-size: 29px !important;
+    }
+
+    .dashboard-head-action {
+
+        width: 100%;
+    }
+
+    .dashboard-logout {
+
+        width: 100%;
+    }
+
+    .dashboard-kpis {
+
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-action-grid {
+
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* =========================================================
+   REDUCIR MOVIMIENTO
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .dashboard-head,
+    .dashboard-kpi,
+    .dashboard-card,
+    .dashboard-action,
+    .role-symbol {
+
+        animation: none !important;
+
+        transition: none !important;
+    }
+}
+
+</style>
+{% endblock %}
+
+<style id="EDUTURNOS_PLANTILLA_RECTOR_2026">
+
+/* =========================================================
+   EDUTURNOS
+   PLANTILLA MAESTRA — RECTORÍA
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector {
+
+    --rector-blue: #2f7da8;
+    --rector-blue-dark: #24445d;
+    --rector-blue-soft: #eaf5fb;
+    --rector-blue-pale: #f5f9fd;
+    --rector-amber: #f2b84b;
+    --rector-green: #4b9b77;
+    --rector-border: #d8e7f0;
+    --rector-text: #24445d;
+    --rector-muted: #668095;
+
+    color: var(--rector-text) !important;
+}
+
+
+/* =========================================================
+   FONDO GENERAL
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector {
+
+    background:
+        linear-gradient(
+            180deg,
+            #f5f9fd 0%,
+            #eef6fb 48%,
+            #f8fbfd 100%
+        ) !important;
+
+    border-radius: 20px !important;
+}
+
+
+/* =========================================================
+   ENCABEZADO DE RECTORÍA
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-head {
+
+    position: relative !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    min-height: 128px !important;
+
+    padding: 18px 22px !important;
+
+    margin-bottom: 16px !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f0f7fc 100%
+        ) !important;
+
+    border: 1px solid var(--rector-border) !important;
+
+    border-radius: 18px !important;
+
+    box-shadow:
+        0 8px 24px rgba(36,68,93,.07) !important;
+
+    overflow: hidden !important;
+}
+
+
+/* Línea institucional superior */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-head::before {
+
+    content: "" !important;
+
+    position: absolute !important;
+
+    left: 0 !important;
+
+    top: 0 !important;
+
+    width: 100% !important;
+
+    height: 4px !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            #2f7da8 0%,
+            #2f7da8 72%,
+            #f2b84b 72%,
+            #f2b84b 86%,
+            #4b9b77 86%,
+            #4b9b77 100%
+        ) !important;
+}
+
+
+/* =========================================================
+   ILUSTRACIÓN DEL ROL
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-role-art {
+
+    width: 76px !important;
+
+    height: 76px !important;
+
+    min-width: 76px !important;
+
+    margin-right: 18px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #ffffff 0%,
+            #eaf5fb 58%,
+            #d9edf7 100%
+        ) !important;
+
+    border: 1px solid #cfe3ee !important;
+
+    border-radius: 18px !important;
+
+    box-shadow:
+        0 7px 16px rgba(47,125,168,.10) !important;
+
+    flex-shrink: 0 !important;
+
+    animation:
+        rectorFloat 4s ease-in-out infinite !important;
+}
+
+
+/* Movimiento muy suave */
+
+@keyframes rectorFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+
+/* =========================================================
+   INFORMACIÓN DEL RECTOR
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-head-info {
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    flex: 1 !important;
+
+    min-width: 0 !important;
+}
+
+
+/* Badge Rector */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-head-info .badge {
+
+    background: #eaf5fb !important;
+
+    color: #2f7da8 !important;
+
+    border: 1px solid #cce2ee !important;
+
+    border-radius: 999px !important;
+
+    font-size: 10px !important;
+
+    font-weight: 700 !important;
+
+    letter-spacing: .04em !important;
+
+    padding: 5px 10px !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* Nombre */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-head-info h1 {
+
+    color: #24445d !important;
+
+    font-size: clamp(22px, 2.4vw, 31px) !important;
+
+    line-height: 1.08 !important;
+
+    margin: 5px 0 4px !important;
+
+    font-weight: 700 !important;
+}
+
+
+/* Descripción */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-head-info .muted {
+
+    color: #668095 !important;
+
+    font-size: 11px !important;
+
+    line-height: 1.4 !important;
+}
+
+
+/* =========================================================
+   BOTÓN CERRAR SESIÓN
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-head-action {
+
+    margin-left: 18px !important;
+
+    flex-shrink: 0 !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-logout {
+
+    border-radius: 10px !important;
+
+    padding: 9px 15px !important;
+
+    box-shadow:
+        0 5px 12px rgba(36,68,93,.10) !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-logout:hover {
+
+    transform: translateY(-2px) !important;
+
+    box-shadow:
+        0 9px 18px rgba(36,68,93,.16) !important;
+}
+
+
+/* =========================================================
+   ESTADÍSTICAS
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-kpis {
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(4, minmax(0,1fr)) !important;
+
+    gap: 12px !important;
+
+    margin-bottom: 16px !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-kpi {
+
+    min-height: 78px !important;
+
+    padding: 13px 15px !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff 0%,
+            #f5faff 100%
+        ) !important;
+
+    border: 1px solid #d8e7f0 !important;
+
+    border-radius: 14px !important;
+
+    box-shadow:
+        0 5px 14px rgba(36,68,93,.055) !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-kpi:hover {
+
+    transform: translateY(-2px) !important;
+
+    box-shadow:
+        0 9px 20px rgba(36,68,93,.10) !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-kpi strong {
+
+    color: #2f7da8 !important;
+
+    font-size: 24px !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-kpi span {
+
+    color: #668095 !important;
+
+    font-size: 10px !important;
+}
+
+
+/* =========================================================
+   CONTENEDORES
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-card {
+
+    background: #ffffff !important;
+
+    border: 1px solid #d8e7f0 !important;
+
+    border-radius: 16px !important;
+
+    box-shadow:
+        0 7px 20px rgba(36,68,93,.055) !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-card-head {
+
+    padding-bottom: 10px !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-card-head .badge {
+
+    background: #eaf5fb !important;
+
+    color: #2f7da8 !important;
+
+    border: 1px solid #cfe3ee !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-card-head h2 {
+
+    color: #24445d !important;
+}
+
+
+/* =========================================================
+   ACCIONES RÁPIDAS
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action-grid {
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0,1fr)) !important;
+
+    gap: 11px !important;
+}
+
+
+/* Tarjetas */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action {
+
+    min-height: 116px !important;
+
+    padding: 15px !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff 0%,
+            #f7fbfe 100%
+        ) !important;
+
+    border: 1px solid #d7e6ef !important;
+
+    border-radius: 14px !important;
+
+    box-shadow:
+        0 4px 12px rgba(36,68,93,.05) !important;
+
+    text-decoration: none !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action:hover {
+
+    transform: translateY(-3px) !important;
+
+    border-color: #b8d6e5 !important;
+
+    box-shadow:
+        0 10px 22px rgba(36,68,93,.10) !important;
+}
+
+
+/* =========================================================
+   ELIMINAR ETIQUETA REPETIDA
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action-top {
+
+    display: none !important;
+}
+
+
+/* =========================================================
+   TÍTULO DE CADA ACCIÓN
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action h3 {
+
+    color: #24445d !important;
+
+    font-size: 14px !important;
+
+    line-height: 1.2 !important;
+
+    margin: 0 0 5px !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action p {
+
+    color: #668095 !important;
+
+    font-size: 10px !important;
+
+    line-height: 1.4 !important;
+
+    margin: 0 !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action-link {
+
+    color: #2f7da8 !important;
+
+    font-size: 10px !important;
+
+    margin-top: auto !important;
+
+    padding-top: 8px !important;
+
+    font-weight: 700 !important;
+}
+
+
+/* =========================================================
+   COLORES DE ACENTO SEGÚN FUNCIÓN
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action:nth-child(1) {
+
+    border-top: 3px solid #2f7da8 !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action:nth-child(2) {
+
+    border-top: 3px solid #4b9b77 !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action:nth-child(3) {
+
+    border-top: 3px solid #f2b84b !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action:nth-child(4) {
+
+    border-top: 3px solid #2f7da8 !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-action:nth-child(5) {
+
+    border-top: 3px solid #4b9b77 !important;
+}
+
+
+/* =========================================================
+   MI CUENTA
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-account-card {
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff 0%,
+            #f5faff 100%
+        ) !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-account-text {
+
+    color: #668095 !important;
+
+    font-size: 10px !important;
+}
+
+
+/* =========================================================
+   BOTÓN CAMBIAR CONTRASEÑA
+   ========================================================= */
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-account-card .boton {
+
+    background: #2f7da8 !important;
+
+    color: #ffffff !important;
+
+    border-radius: 10px !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease !important;
+}
+
+
+html body #contenido .dashboard-page.dashboard-rol-rector
+.dashboard-account-card .boton:hover {
+
+    transform: translateY(-2px) !important;
+
+    box-shadow:
+        0 8px 17px rgba(47,125,168,.18) !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    html body #contenido .dashboard-page.dashboard-rol-rector
+    .dashboard-action-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0,1fr)) !important;
+    }
+
+    html body #contenido .dashboard-page.dashboard-rol-rector
+    .dashboard-kpis {
+
+        grid-template-columns:
+            repeat(2, minmax(0,1fr)) !important;
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    html body #contenido .dashboard-page.dashboard-rol-rector
+    .dashboard-head {
+
+        align-items: flex-start !important;
+
+        flex-wrap: wrap !important;
+    }
+
+    html body #contenido .dashboard-page.dashboard-rol-rector
+    .dashboard-head-info {
+
+        width: 100% !important;
+    }
+
+    html body #contenido .dashboard-page.dashboard-rol-rector
+    .dashboard-head-action {
+
+        margin: 10px 0 0 !important;
+    }
+
+    html body #contenido .dashboard-page.dashboard-rol-rector
+    .dashboard-kpis {
+
+        grid-template-columns:
+            repeat(2, minmax(0,1fr)) !important;
+    }
+
+    html body #contenido .dashboard-page.dashboard-rol-rector
+    .dashboard-action-grid {
+
+        grid-template-columns: 1fr !important;
+    }
+}
+
+
+@media (max-width: 430px) {
+
+    html body #contenido .dashboard-page.dashboard-rol-rector
+    .dashboard-kpis {
+
+        grid-template-columns: 1fr !important;
+    }
+
+    html body #contenido .dashboard-page.dashboard-rol-rector
+    .dashboard-role-art {
+
+        width: 62px !important;
+
+        height: 62px !important;
+
+        min-width: 62px !important;
+
+        margin-right: 12px !important;
+    }
+}
+
+</style>

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Mi cuenta · EDUTURNOS{% endblock %}
+{% block content %}
+<section class="cuenta-page">
+    <header class="page-head">
+        <div>
+            <a class="link-back" href="{{ url_for('auth.dashboard') }}">← Panel</a>
+            <h1>Mi cuenta</h1>
+            <p class="muted">Tu información y opciones según tu rol.</p>
+        </div>
+    </header>
+
+    <section class="cuenta-section" aria-labelledby="cuenta-personal-title">
+        <h2 id="cuenta-personal-title">Información personal</h2>
+        <dl>
+            <div><dt>Nombre</dt><dd>{{ usuario.nombres }} {{ usuario.apellidos }}</dd></div>
+            <div><dt>Rol</dt><dd>{{ usuario.rol_nombre }}</dd></div>
+            <div><dt>Documento</dt><dd>{{ usuario.documento }}</dd></div>
+            <div><dt>Correo</dt><dd>{{ perfil.correo or usuario.correo }}</dd></div>
+            {% if perfil.telefono %}<div><dt>Teléfono</dt><dd>{{ perfil.telefono }}</dd></div>{% endif %}
+            {% if perfil.direccion %}<div><dt>Dirección</dt><dd>{{ perfil.direccion }}{% if perfil.barrio %}, {{ perfil.barrio }}{% endif %}{% if perfil.municipio %}, {{ perfil.municipio }}{% endif %}</dd></div>{% endif %}
+            {% if perfil.sede %}<div><dt>Sede</dt><dd>{{ perfil.sede }}</dd></div>{% endif %}
+            {% if perfil.jornada %}<div><dt>Jornada</dt><dd>{{ perfil.jornada }}</dd></div>{% endif %}
+            {% if perfil.codigo_estudiantil %}<div><dt>Código estudiantil</dt><dd>{{ perfil.codigo_estudiantil }}</dd></div>{% endif %}
+            {% if perfil.grado %}<div><dt>Grado y grupo</dt><dd>{{ perfil.grado }}{% if perfil.grupo %}-{{ perfil.grupo }}{% endif %}</dd></div>{% endif %}
+            {% if perfil.area %}<div><dt>Área</dt><dd>{{ perfil.area }}</dd></div>{% endif %}
+            {% if perfil.asignatura %}<div><dt>Asignatura</dt><dd>{{ perfil.asignatura }}</dd></div>{% endif %}
+        </dl>
+    </section>
+
+    <section class="cuenta-section" aria-labelledby="cuenta-seguridad-title">
+        <h2 id="cuenta-seguridad-title">Seguridad</h2>
+        <p class="muted">Actualiza tu contraseña cuando lo necesites.</p>
+        <a class="boton" href="{{ url_for('passwords.cambiar_password') }}">Cambiar contraseña</a>
+    </section>
+
+    {% if puede_configurar %}
+    <section class="cuenta-section" aria-labelledby="cuenta-admin-title">
+        <h2 id="cuenta-admin-title">Configuración institucional</h2>
+        <p class="muted">Administra periodos, sedes y catálogos según tus permisos.</p>
+        <a class="boton secundario" href="{{ url_for('configuracion.index') }}">Abrir configuración</a>
+    </section>
+    {% endif %}
+
+    <section class="cuenta-section" aria-labelledby="cuenta-institucion-title">
+        <h2 id="cuenta-institucion-title">Información institucional</h2>
+        <p class="muted">Consulta los datos y ubicaciones de las sedes.</p>
+        <a class="boton secundario" href="{{ url_for('institucion') }}">Ver institución y sedes</a>
+    </section>
+
+    <section class="cuenta-section" aria-labelledby="cuenta-calendario-title">
+        <h2 id="cuenta-calendario-title">Calendarios conectados</h2>
+        <p class="muted">Conecta tu Google Calendar personal o revisa la agenda institucional.</p>
+        <a class="boton secundario" href="{{ url_for('integraciones_google.index') }}">Administrar calendarios</a>
+    </section>
+</section>
+<style>
+.cuenta-page{width:100%;max-width:1100px;margin:0 auto;padding:24px;border:1px solid #dce4eb;border-radius:8px;background:#fff;box-sizing:border-box;}
+.cuenta-page .page-head{margin-bottom:22px;}
+.cuenta-page .page-head h1{margin:8px 0;color:#172942;font-size:28px;}
+.cuenta-page .page-head .link-back{display:inline-flex;margin-bottom:8px;}
+.cuenta-section{padding:18px 0;margin:0;border:0;border-bottom:1px solid #e5ebf2;background:transparent;}
+.cuenta-section:last-child{border-bottom:0;}
+.cuenta-section h2{margin:0 0 12px;color:#172942;font-size:18px;}
+.cuenta-section p{margin:0 0 12px;}
+.cuenta-section dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;margin:0;}
+.cuenta-section dt{color:#66788a;font-size:12px;font-weight:700;}
+.cuenta-section dd{margin:4px 0 0;color:#20354a;overflow-wrap:anywhere;}
+@media(max-width:900px){.cuenta-page .page-head .link-back{display:none!important;}}
+@media(max-width:600px){.cuenta-page{padding-top:8px}.cuenta-section dl{grid-template-columns:1fr;gap:10px;}}
+</style>
+{% endblock %}

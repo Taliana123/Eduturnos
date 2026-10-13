@@ -1,0 +1,229 @@
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar #contenido form.form-grid {
+        align-items: end !important;
+        gap: 14px 18px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido form.form-grid > label {
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido form.stack-form {
+        gap: 12px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido form.stack-form > label {
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido form.form-grid input:not([type="checkbox"]):not([type="radio"]),
+    html body.has-desktop-sidebar #contenido form.form-grid select,
+    html body.has-desktop-sidebar #contenido form.form-grid textarea,
+    html body.has-desktop-sidebar #contenido form.stack-form input:not([type="checkbox"]):not([type="radio"]),
+    html body.has-desktop-sidebar #contenido form.stack-form select,
+    html body.has-desktop-sidebar #contenido form.stack-form textarea {
+        min-height: 40px !important;
+        height: auto !important;
+        padding: 8px 11px !important;
+        font-size: 14px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido form.form-grid textarea,
+    html body.has-desktop-sidebar #contenido form.stack-form textarea {
+        min-height: 76px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido form.form-grid .boton,
+    html body.has-desktop-sidebar #contenido form.stack-form .boton {
+        min-height: 38px !important;
+        padding: 8px 12px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido form.form-grid label:has(input[type="checkbox"]),
+    html body.has-desktop-sidebar #contenido form.stack-form label:has(input[type="checkbox"]) {
+        min-height: 40px !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 9px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido form.form-grid input[type="checkbox"],
+    html body.has-desktop-sidebar #contenido form.stack-form input[type="checkbox"] {
+        flex: 0 0 18px !important;
+        width: 18px !important;
+        min-width: 18px !important;
+        height: 18px !important;
+        min-height: 18px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        accent-color: var(--azul);
+    }
+
+    html body.has-desktop-sidebar #contenido h1 + form.panel.form-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        width: min(100%, 980px) !important;
+        margin: 0 auto 18px !important;
+        padding: 20px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido h1 + form.panel.form-grid > .full-field {
+        grid-column: 1 / -1;
+    }
+
+    html body.has-desktop-sidebar #contenido form.form-grid[action*="/relacionar"] {
+        grid-template-columns: minmax(280px, 2fr) minmax(170px, 1fr) auto auto !important;
+        gap: 12px 16px !important;
+        padding: 18px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido form.form-grid[action*="/relacionar"] label:has(input[type="checkbox"]) {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 8px !important;
+        white-space: nowrap;
+    }
+
+    html body.has-desktop-sidebar #contenido form.form-grid[action*="/relacionar"] > div {
+        align-self: end;
+    }
+
+    html body.has-desktop-sidebar #contenido form.form-grid[action*="/relacionar"] .boton {
+        width: auto !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .estudiantes-directorio-header .estudiantes-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: auto;
+        max-width: 65%;
+        margin: 0;
+    }
+
+    html body.has-desktop-sidebar #contenido .estudiantes-search input {
+        flex: 1 1 250px;
+        min-width: 180px;
+        width: auto;
+    }
+
+    html body.has-desktop-sidebar #contenido .estudiantes-search .boton {
+        flex: 0 0 auto;
+        width: auto;
+        min-height: 40px;
+        padding: 8px 12px;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 900px) {
+    html body #contenido .estudiantes-mobile-clear {
+        margin: 0 0 10px;
+        text-align: right;
+    }
+
+    html body #contenido form.form-grid[action*="/relacionar"] label:has(input[type="checkbox"]) {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+
+    html body #contenido form.form-grid[action*="/relacionar"] input[type="checkbox"] {
+        flex: 0 0 18px;
+        width: 18px;
+        min-width: 18px;
+        height: 18px;
+        min-height: 18px;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar #contenido h1 + .panel > form.form-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        align-items: end !important;
+        gap: 12px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido h1 + .panel > form.form-grid > .boton {
+        grid-column: 1 !important;
+        justify-self: start !important;
+        width: auto !important;
+        min-width: 170px !important;
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 900px) {
+    html body #contenido h1 + .panel > form.form-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        align-items: end !important;
+        gap: 10px !important;
+    }
+
+    html body #contenido h1 + .panel > form.form-grid > .boton {
+        grid-column: 1 !important;
+        justify-self: start !important;
+        width: auto !important;
+        min-width: 160px !important;
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 560px) {
+    html body #contenido h1 + .panel > form.form-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+
+html body.has-desktop-sidebar #contenido .panel:has(>form.form-grid:has(select[name="estudiante"]):has(select[name="grupo"])) {
+    width: min(100%, 980px) !important;
+    max-width: 980px !important;
+    margin: 0 auto 18px !important;
+    padding: 18px !important;
+    background: #fff !important;
+    border: 1px solid #dce4eb !important;
+    border-radius: 8px !important;
+}
+
+html body.has-desktop-sidebar #contenido .panel:has(>form.form-grid:has(select[name="estudiante"]):has(select[name="grupo"])) > form.form-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: end !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+}
+
+html body.has-desktop-sidebar #contenido .panel:has(>form.form-grid:has(select[name="estudiante"]):has(select[name="grupo"])) > form.form-grid .boton {
+    grid-column: 1 !important;
+    justify-self: start !important;
+    width: auto !important;
+    min-width: 170px !important;
+    max-width: 100% !important;
+}
+
+@media (max-width: 900px) {
+    html body #contenido .panel:has(>form.form-grid:has(select[name="estudiante"]):has(select[name="grupo"])) {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 14px !important;
+    }
+
+    html body #contenido .panel:has(>form.form-grid:has(select[name="estudiante"]):has(select[name="grupo"])) > form.form-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    html body #contenido .panel:has(>form.form-grid:has(select[name="estudiante"]):has(select[name="grupo"])) > form.form-grid .boton {
+        grid-column: 1 !important;
+        justify-self: start !important;
+    }
+}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Iniciar sesión | EDUTURNOS{% endblock %}
+{% block content %}
+<section class="formulario">
+  <div class="tarjeta form-card">
+    <div class="section-heading"><span class="badge">Acceso seguro</span><h1>Iniciar sesión</h1><p>El sistema determina tu rol desde la información institucional. No debes escogerlo.</p></div>
+    <form method="post" autocomplete="off" class="stack-form form-uniform">{{ csrf_field()|safe }}
+      <label>Documento o correo
+        <input name="identificador" required autofocus autocomplete="username" placeholder="Documento o correo electrónico">
+      </label>
+      <label>Contraseña
+        <input type="password" name="password" required autocomplete="current-password" placeholder="Tu contraseña">
+      </label>
+      <div class="personal-login">
+        <h3>Personal institucional</h3>
+        <p>Docentes, Coordinadores y Rectoría deben usar su correo <strong>@jjfh.edu.co</strong>, código de 6 dígitos, sede y jornada.</p>
+        <div class="form-grid">
+          <label>Código institucional
+            <input name="codigo_institucional" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="one-time-code">
+          </label>
+          <label>Sede institucional
+            <select name="sede_id" class="sede-select">
+<option value="" selected disabled hidden></option>
+
+{% for sede in sedes %}<option value="{{ sede.id }}">{{ sede.nombre }}</option>{% endfor %}
+            </select>
+            
+          </label>
+          <label>Jornada
+            <select name="jornada_id">
+<option value="" selected disabled hidden></option>
+
+{% for jornada in jornadas %}<option value="{{ jornada.id }}">{{ jornada.nombre }}</option>{% endfor %}
+            </select>
+          </label>
+        </div>
+      </div>
+      <button class="boton boton-full" type="submit">Ingresar</button>
+    </form>
+    <div class="form-links"><a href="{{ url_for('passwords.recuperar') }}">¿Olvidaste tu contraseña?</a><a href="{{ url_for('auth.registro') }}">Crear una cuenta</a></div>
+  </div>
+</section>
+{% endblock %}
+

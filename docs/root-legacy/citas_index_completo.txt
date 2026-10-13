@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Citas · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<section class="page-head">
+
+    <div>
+
+        <div class="page-navigation">
+            <a
+                class="link-back"
+                href="{{ request.referrer or url_for('auth.dashboard') }}"
+            >
+                ← Atrás
+            </a>
+        </div>
+
+        <h1>Citas</h1>
+
+        <p>
+            Consulta y administra las citaciones según tu rol.
+        </p>
+
+    </div>
+
+
+    {% if puede_crear %}
+
+    <a
+        class="boton"
+        href="{{ url_for('citas.nueva') }}"
+    >
+        + Nueva citación
+    </a>
+
+    {% endif %}
+
+</section>
+
+
+<div class="table-wrap">
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Estudiante</th>
+                <th>Docente</th>
+                <th>Acudiente</th>
+                <th>Motivo</th>
+                <th>Estado</th>
+                <th>Lugar</th>
+                <th>Acciones</th>
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for c in citas %}
+
+            <tr>
+
+                <td>{{ c.fecha }}</td>
+
+                <td>{{ c.hora }}</td>
+
+                <td>{{ c.estudiante }}</td>
+
+                <td>{{ c.docente }}</td>
+
+                <td>{{ c.acudiente }}</td>
+
+                <td>{{ c.motivo }}</td>
+
+                <td>
+                    <span class="badge">
+                        {{ c.estado }}
+                    </span>
+                </td>
+
+                <td>{{ c.lugar }}</td>
+
+
+                <td>
+
+                    {% if rol in [
+                        'Super Admin',
+                        'Rector',
+                        'Administrador / Coordinador',
+                        'Docente'
+                    ] %}
+
+                    <a
+                        href="{{ url_for(
+                            'seguimiento.registrar',
+                            id=c.id
+                        ) }}"
+                    >
+                        Seguimiento
+                    </a>
+
+                    {% endif %}
+
+
+                    {% if rol == 'Acudiente'
+                          and c.estado == 'Pendiente' %}
+
+                    <form
+                        method="post"
+                        action="{{ url_for(
+                            'citas.cambiar_estado',
+                            cita_id=c.id
+                        ) }}"
+                        class="inline-form"
+                    >
+
+                        {{ csrf_field()|safe }}
+
+                        <input
+                            type="hidden"
+                            name="estado"
+                            value="Confirmada"
+                        >
+
+                        <button type="submit">
+                            Confirmar
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+
+                <td colspan="9">
+                    No hay citas para mostrar.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

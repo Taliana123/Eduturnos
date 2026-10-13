@@ -1,0 +1,594 @@
+{% extends 'base.html' %}
+
+{% block title %}Notificaciones · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<section class="page-head">
+    <div>
+        <div class="page-navigation">
+            <a
+                class="link-back"
+                href="{{ request.referrer or url_for('auth.dashboard') }}"
+             style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">
+                ← Volver
+            </a>
+        </div>
+
+        <h1>Notificaciones</h1>
+        <p>Consulta los avisos y actualizaciones de tu cuenta.</p>
+    </div>
+
+    {% if avisos %}
+    <form method="post" action="{{ url_for('notificaciones.marcar_todas') }}">
+        {% if csrf_token is defined %}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% endif %}
+        <button type="submit" class="btn btn-secondary" style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">
+            Marcar todas como leídas
+        </button>
+    </form>
+    {% endif %}
+</section>
+
+<section class="content-card">
+
+    {% if avisos %}
+
+        <div class="notifications-list">
+
+            {% for aviso in avisos %}
+
+                <article class="notification-card {% if not aviso.leida %}notification-unread{% endif %}">
+
+                    <div class="notification-content">
+
+                        <div class="notification-header">
+                            <h2>{{ aviso.titulo }}</h2>
+
+                            {% if not aviso.leida %}
+                                <span class="notification-badge">
+                                    Nueva
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <p class="notification-message">
+                            {{ aviso.mensaje }}
+                        </p>
+
+                        <div class="notification-meta">
+                            <span>
+                                Tipo: {{ aviso.tipo }}
+                            </span>
+
+                            <span>
+                                {{ aviso.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    {% if not aviso.leida %}
+                        <form
+                            method="post"
+                            action="{{ url_for('notificaciones.marcar_leida', notificacion_id=aviso.id) }}"
+                        >
+                            {% if csrf_token is defined %}
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {% endif %}
+
+                            <button type="submit" class="btn btn-secondary" style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">
+                                Marcar como leída
+                            </button>
+                        </form>
+                    {% else %}
+                        <span class="notification-read">
+                            Leída
+                        </span>
+                    {% endif %}
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            <div class="empty-state-icon">🔔</div>
+
+            <h2>No tienes notificaciones</h2>
+
+            <p>
+                Cuando recibas una notificación aparecerá aquí.
+            </p>
+        </div>
+
+    {% endif %}
+
+</section>
+
+<style>
+    .notifications-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .notification-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 20px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        background: #ffffff;
+    }
+
+    .notification-unread {
+        border-left: 4px solid #2563eb;
+        background: #f8fbff;
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .notification-header h2 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .notification-badge {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: #2563eb;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .notification-message {
+        margin: 0 0 12px;
+        line-height: 1.5;
+        color: #374151;
+    }
+
+    .notification-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .notification-read {
+        color: #6b7280;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-state-icon {
+        font-size: 42px;
+        margin-bottom: 12px;
+    }
+
+    .empty-state h2 {
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: #6b7280;
+    }
+
+    @media (max-width: 700px) {
+        .notification-card {
+            flex-direction: column;
+        }
+    }
+</style>
+
+
+
+
+
+{% endblock %}
+
+<style id="EDUTURNOS_BOTONES_REALES_V6">
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a.btn,
+a[class*="boton"],
+a[class*="button"],
+a[class*="btn-"],
+a[role="button"],
+a.link-back,
+a.edc-back,
+.edc-header-actions a,
+.edc-header-actions button,
+.edc-buttons a,
+.edc-buttons button,
+.edc-month-toolbar a,
+.edc-month-toolbar button,
+.citas-actions a,
+.citas-actions button,
+.form-actions a,
+.form-actions button,
+.acciones a,
+.acciones button,
+.page-actions a,
+.page-actions button,
+.dashboard-actions a,
+.dashboard-actions button,
+.dashboard-card a.boton,
+.dashboard-card button,
+.quick-card a.boton,
+.quick-card button,
+.account-actions a.boton,
+.account-actions button {
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+    color: #ffffff !important;
+    border-color: #1769aa !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a.btn:hover,
+a[class*="boton"]:hover,
+a[class*="button"]:hover,
+a[class*="btn-"]:hover,
+a[role="button"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.edc-header-actions a:hover,
+.edc-header-actions button:hover,
+.edc-buttons a:hover,
+.edc-buttons button:hover,
+.edc-month-toolbar a:hover,
+.edc-month-toolbar button:hover,
+.citas-actions a:hover,
+.citas-actions button:hover,
+.form-actions a:hover,
+.form-actions button:hover,
+.acciones a:hover,
+.acciones button:hover,
+.page-actions a:hover,
+.page-actions button:hover,
+.dashboard-actions a:hover,
+.dashboard-actions button:hover,
+.dashboard-card a.boton:hover,
+.dashboard-card button:hover,
+.quick-card a.boton:hover,
+.quick-card button:hover,
+.account-actions a.boton:hover,
+.account-actions button:hover {
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+    color: #ffffff !important;
+    border-color: #145b91 !important;
+}
+
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a.btn *,
+a[role="button"] *,
+a.link-back *,
+a.edc-back *,
+.edc-header-actions a *,
+.edc-header-actions button *,
+.edc-buttons a *,
+.edc-buttons button *,
+.edc-month-toolbar a *,
+.edc-month-toolbar button *,
+.citas-actions a *,
+.citas-actions button *,
+.form-actions a *,
+.form-actions button *,
+.acciones a *,
+.acciones button *,
+.page-actions a *,
+.page-actions button *,
+.dashboard-actions a *,
+.dashboard-actions button *,
+.dashboard-card a.boton *,
+.dashboard-card button *,
+.quick-card a.boton *,
+.quick-card button *,
+.account-actions a.boton *,
+.account-actions button * {
+    color: #ffffff !important;
+}
+</style>
+
+<script id="EDUTURNOS_BOTONES_REALES_V6">
+(function() {
+    "use strict";
+
+    const azul = "#1769aa";
+    const hover = "#145b91";
+    const blanco = "#ffffff";
+
+    const selectores = [
+        "button",
+        "input[type='submit']",
+        "input[type='button']",
+        "input[type='reset']",
+
+        "a.boton",
+        "a.btn",
+        "a[class*='boton']",
+        "a[class*='button']",
+        "a[class*='btn-']",
+        "a[class*='accion']",
+        "a[class*='action']",
+        "a[role='button']",
+
+        "a.link-back",
+        "a.edc-back",
+
+        ".edc-header-actions a",
+        ".edc-header-actions button",
+
+        ".edc-buttons a",
+        ".edc-buttons button",
+
+        ".edc-month-toolbar a",
+        ".edc-month-toolbar button",
+
+        ".citas-actions a",
+        ".citas-actions button",
+
+        ".form-actions a",
+        ".form-actions button",
+
+        ".acciones a",
+        ".acciones button",
+
+        ".page-actions a",
+        ".page-actions button",
+
+        ".dashboard-actions a",
+        ".dashboard-actions button",
+
+        ".account-actions a",
+        ".account-actions button",
+
+        ".quick-card a.boton",
+        ".quick-card button",
+
+        ".dashboard-card a.boton",
+        ".dashboard-card button"
+    ].join(",");
+
+
+    function aplicar(elemento) {
+        if (!elemento) return;
+
+        elemento.style.setProperty(
+            "background",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "background-color",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "color",
+            blanco,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "border-color",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "text-decoration",
+            "none",
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "box-shadow",
+            "none",
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "opacity",
+            "1",
+            "important"
+        );
+
+        elemento.querySelectorAll("*").forEach(function(hijo) {
+            hijo.style.setProperty(
+                "color",
+                blanco,
+                "important"
+            );
+        });
+
+        if (!elemento.dataset.eduturnosBotonV6) {
+            elemento.dataset.eduturnosBotonV6 = "1";
+
+            elemento.addEventListener("mouseenter", function() {
+                elemento.style.setProperty(
+                    "background",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "background-color",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "border-color",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "color",
+                    blanco,
+                    "important"
+                );
+            });
+
+            elemento.addEventListener("mouseleave", function() {
+                elemento.style.setProperty(
+                    "background",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "background-color",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "border-color",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "color",
+                    blanco,
+                    "important"
+                );
+            });
+        }
+    }
+
+
+    function buscarBotonesPorTexto() {
+        document.querySelectorAll("a").forEach(function(a) {
+            const texto = (a.textContent || "")
+                .trim()
+                .toLowerCase();
+
+            const href = (a.getAttribute("href") || "")
+                .toLowerCase();
+
+            const palabras = [
+                "atrás",
+                "atras",
+                "nueva citación",
+                "nueva cita",
+                "ver citas",
+                "filtrar",
+                "limpiar",
+                "editar",
+                "eliminar",
+                "confirmar",
+                "cancelar",
+                "reprogramar",
+                "descargar",
+                "exportar",
+                "importar",
+                "guardar",
+                "enviar",
+                "volver",
+                "marcar",
+                "crear",
+                "solicitar"
+            ];
+
+            const coincideTexto = palabras.some(function(p) {
+                return texto === p || texto.includes(p);
+            });
+
+            const coincideRuta =
+                href.includes("/citas/") ||
+                href.includes("/calendario") ||
+                href.includes("/notificaciones/") ||
+                href.includes("/solicitudes/") ||
+                href.includes("/reportes/") ||
+                href.includes("/usuarios/") ||
+                href.includes("/auth/recuperar");
+
+            const contenedor = a.closest(
+                ".edc-header-actions," +
+                ".edc-buttons," +
+                ".edc-month-toolbar," +
+                ".citas-actions," +
+                ".form-actions," +
+                ".acciones," +
+                ".page-actions," +
+                ".dashboard-actions," +
+                ".dashboard-card," +
+                ".quick-card," +
+                ".account-actions"
+            );
+
+            if (coincideTexto || coincideRuta || contenedor) {
+                aplicar(a);
+            }
+        });
+    }
+
+
+    function ejecutar() {
+        document.querySelectorAll(selectores).forEach(aplicar);
+        buscarBotonesPorTexto();
+    }
+
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", ejecutar);
+    } else {
+        ejecutar();
+    }
+
+
+    const observador = new MutationObserver(function() {
+        ejecutar();
+    });
+
+    observador.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
+
+})();
+</script>
+

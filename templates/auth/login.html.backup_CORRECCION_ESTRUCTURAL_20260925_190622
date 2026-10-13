@@ -1,0 +1,713 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Iniciar sesión · EDUTURNOS</title>
+
+
+    
+
+
+
+<style id="eduturnos-login-campos-unico">
+
+/* =========================================================
+   EDUTURNOS - CAMPOS INSTITUCIONALES
+   ========================================================= */
+
+
+
+/* Cada columna */
+
+html body .login-page .personal-login .personal-field {
+    display: block !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Código */
+
+
+
+
+
+/* Sede */
+
+
+
+
+
+/* Jornada */
+
+
+
+
+
+/* Títulos */
+
+
+
+/* Opciones del select */
+
+
+
+/* En pantallas pequeñas */
+
+@media (max-width: 700px) {
+
+
+
+    html body .login-page .personal-login .personal-field,
+
+
+
+}
+
+
+
+
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+    <header class="eduturnos-header">
+
+        <div class="eduturnos-logo">
+            EDUTURNOS<span>.</span>
+        </div>
+
+    </header>
+
+
+    <main class="login-page">
+
+        <div class="login-shell">
+
+
+            <!-- =================================================
+                 DIBUJO ANIMADO
+                 ================================================= -->
+
+            <section class="login-visual">
+
+                <div class="login-illustration">
+
+                    <svg
+                class="login-illustration"
+                viewBox="0 0 460 350"
+                role="img"
+                aria-label="Ilustración animada de EDUTURNOS"
+                xmlns="http://www.w3.org/2000/svg">
+
+                <defs>
+
+                    
+
+                    <linearGradient id="edCompactBlue" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#3b91e4"/>
+                        <stop offset="100%" stop-color="#18599b"/>
+                    </linearGradient>
+
+                    <linearGradient id="edCompactAmber" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#6fa9d8"/>
+                        <stop offset="100%" stop-color="#367fbd"/>
+                    </linearGradient>
+
+                    <filter id="edCompactShadow" x="-30%" y="-30%" width="160%" height="170%">
+                        <feDropShadow
+                            dx="0"
+                            dy="10"
+                            stdDeviation="12"
+                            flood-color="#557899"
+                            flood-opacity=".16"/>
+                    </filter>
+
+                    <filter id="edCompactSoft" x="-30%" y="-30%" width="160%" height="170%">
+                        <feDropShadow
+                            dx="0"
+                            dy="5"
+                            stdDeviation="7"
+                            flood-color="#557899"
+                            flood-opacity=".11"/>
+                    </filter>
+
+                </defs>
+
+                <!-- Fondo compacto -->
+                <!-- Fondo SVG institucional eliminado -->
+
+                <circle
+                    cx="72"
+                    cy="72"
+                    r="35"
+                    fill="#ffffff"
+                    opacity=".7"/>
+
+                <circle
+                    cx="397"
+                    cy="88"
+                    r="45"
+                    fill="#ffffff"
+                    opacity=".55"/>
+
+                <circle
+                    cx="393"
+                    cy="278"
+                    r="30"
+                    fill="#d2e8fa"
+                    opacity=".72"/>
+
+                <!-- Pequeño detalle decorativo -->
+                <circle
+                    cx="57"
+                    cy="255"
+                    r="5"
+                    fill="#79afd8"/>
+
+                <circle
+                    cx="411"
+                    cy="224"
+                    r="4"
+                    fill="#438ac7"/>
+
+                <!-- PANEL PRINCIPAL EDUTURNOS -->
+                <g filter="url(#edCompactShadow)">
+
+                    <!-- tarjeta -->
+                    <rect
+                        x="108"
+                        y="78"
+                        width="244"
+                        height="178"
+                        rx="22"
+                        fill="transparent"/>
+
+                    <!-- encabezado -->
+                    <rect
+                        x="108"
+                        y="78"
+                        width="244"
+                        height="47"
+                        rx="22"
+                        fill="url(#edCompactBlue)"/>
+
+                    <rect
+                        x="108"
+                        y="103"
+                        width="244"
+                        height="22"
+                        fill="url(#edCompactBlue)"/>
+
+                    <!-- logo -->
+                    <circle
+                        cx="132"
+                        cy="101"
+                        r="11"
+                        fill="#6fa9d8"/>
+
+                    <path
+                        d="M127 101 L131 105 L138 97"
+                        fill="none"
+                        stroke="#ffffff"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                    <text
+                        x="151"
+                        y="106"
+                        font-family="Arial, sans-serif"
+                        font-size="16"
+                        font-weight="700"
+                        fill="#ffffff">
+                        EDUTURNOS
+                    </text>
+
+                    <!-- titulo -->
+                    <text
+                        x="131"
+                        y="151"
+                        font-family="Arial, sans-serif"
+                        font-size="11"
+                        font-weight="700"
+                        fill="#234563">
+                        Información escolar
+                    </text>
+
+                    <text
+                        x="131"
+                        y="166"
+                        font-family="Arial, sans-serif"
+                        font-size="8"
+                        fill="#7c8fa1">
+                        Todo organizado en un solo lugar
+                    </text>
+
+                    <!-- fila 1 -->
+                    <rect
+                        x="131"
+                        y="181"
+                        width="94"
+                        height="35"
+                        rx="10"
+                        fill="#f2f8fd"/>
+
+                    <circle
+                        cx="147"
+                        cy="198"
+                        r="9"
+                        fill="#d8ebfb"/>
+
+                    <path
+                        d="M143 198 L147 202 L153 194"
+                        fill="none"
+                        stroke="#2d79c1"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                    <rect
+                        x="162"
+                        y="192"
+                        width="48"
+                        height="5"
+                        rx="2.5"
+                        fill="#b9d1e4"/>
+
+                    <rect
+                        x="162"
+                        y="201"
+                        width="36"
+                        height="4"
+                        rx="2"
+                        fill="#d4e3ef"/>
+
+                    <!-- fila 2 -->
+                    <rect
+                        x="237"
+                        y="181"
+                        width="94"
+                        height="35"
+                        rx="10"
+                        fill="#fff8e8"/>
+
+                    <circle
+                        cx="253"
+                        cy="198"
+                        r="9"
+                        fill="#d9ebfa"/>
+
+                    <path
+                        d="M249 198 L253 202 L259 194"
+                        fill="none"
+                        stroke="#2878c2"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                    <rect
+                        x="268"
+                        y="192"
+                        width="47"
+                        height="5"
+                        rx="2.5"
+                        fill="#e2c883"/>
+
+                    <rect
+                        x="268"
+                        y="201"
+                        width="32"
+                        height="4"
+                        rx="2"
+                        fill="#eee0bc"/>
+
+                    <!-- botón visual -->
+                    <rect
+                        x="131"
+                        y="228"
+                        width="200"
+                        height="15"
+                        rx="7.5"
+                        fill="#edf5fc"/>
+
+                    <rect
+                        x="131"
+                        y="228"
+                        width="126"
+                        height="15"
+                        rx="7.5"
+                        fill="#2f6fae"/>
+
+                    <!-- brillo que pasa por la tarjeta -->
+                    <rect
+                        class="compact-sweep"
+                        x="165"
+                        y="78"
+                        width="10"
+                        height="178"
+                        rx="5"
+                        fill="transparent"
+                        opacity=".28"/>
+
+                </g>
+
+                <!-- LIBRO -->
+                <g
+                    class="compact-book"
+                    filter="url(#edCompactSoft)">
+
+                    <path
+                        d="M55 128 Q73 115 91 126 L91 168 Q73 157 55 168 Z"
+                        fill="#ffffff"/>
+
+                    <path
+                        d="M91 126 Q109 115 127 128 L127 168 Q109 157 91 168 Z"
+                        fill="#ffffff"/>
+
+                    <path
+                        d="M63 137 Q75 130 85 136"
+                        fill="none"
+                        stroke="#438ac7"
+                        stroke-width="3"
+                        stroke-linecap="round"/>
+
+                    <path
+                        d="M97 136 Q108 130 119 137"
+                        fill="none"
+                        stroke="#5d9bcf"
+                        stroke-width="3"
+                        stroke-linecap="round"/>
+
+                    <line
+                        x1="91"
+                        y1="126"
+                        x2="91"
+                        y2="168"
+                        stroke="#d7e2ec"
+                        stroke-width="2"/>
+
+                </g>
+
+                <!-- CAMPANA -->
+                <g
+                    class="compact-bell"
+                    filter="url(#edCompactSoft)">
+
+                    <circle
+                        cx="382"
+                        cy="142"
+                        r="32"
+                        fill="#ffffff"/>
+
+                    <path
+                        d="
+                        M370 150
+                        V137
+                        C370 129 375 123 382 123
+                        C389 123 394 129 394 137
+                        V150
+                        L399 154
+                        H365
+                        Z"
+                        fill="#2f6fae"/>
+
+                    <circle
+                        cx="382"
+                        cy="158"
+                        r="5"
+                        fill="#3d86c1"/>
+
+                </g>
+
+                <!-- CHECK ANIMADO -->
+                <g
+                    class="compact-check"
+                    filter="url(#edCompactSoft)">
+
+                    <circle
+                        cx="80"
+                        cy="226"
+                        r="23"
+                        fill="#ffffff"/>
+
+                    <circle
+                        cx="80"
+                        cy="226"
+                        r="15"
+                        fill="#e1f2ff"/>
+
+                    <path
+                        d="M72 226 L78 232 L90 218"
+                        fill="none"
+                        stroke="#2878c2"
+                        stroke-width="5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                </g>
+
+                <!-- PEQUEÑA ESTRELLA DECORATIVA -->
+                <path
+                    d="
+                    M362 235
+                    L367 245
+                    L378 247
+                    L370 255
+                    L372 266
+                    L362 261
+                    L352 266
+                    L354 255
+                    L346 247
+                    L357 245
+                    Z"
+                    fill="#6fa9d8"
+                    opacity=".86"/>
+
+            </svg>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 LOGIN
+                 ================================================= -->
+
+            <section class="login-card">
+
+
+                <div class="section-heading">
+
+                    <span class="badge">
+                        Acceso seguro
+                    </span>
+
+                    <h1>
+                        Iniciar sesión
+                    </h1>
+
+                    <p>
+                        El sistema determina tu rol desde la información institucional.
+                        No debes escogerlo.
+                    </p>
+
+                </div>
+
+
+                <!-- Mensajes Flask -->
+
+                {% with mensajes = get_flashed_messages(with_categories=true) %}
+
+                    {% if mensajes %}
+
+                        {% for categoria, mensaje in mensajes %}
+
+                            <div
+                                class="login-message {% if categoria in ['error','danger'] %}error{% else %}success{% endif %}"
+                            >
+                                {{ mensaje }}
+                            </div>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                {% endwith %}
+
+
+                <form
+                    method="post"
+                    autocomplete="off"
+                    class="stack-form"
+                >
+
+                    {{ csrf_field()|safe }}
+
+
+                    <!-- Documento -->
+
+                    <label>
+
+                        Documento o correo
+
+                        <input
+                            type="text"
+                            name="identificador"
+                            autocomplete="username"
+                            placeholder="Documento o correo"
+                        >
+
+                    </label>
+
+
+                    <!-- Contraseña -->
+
+                    <label>
+
+                        Contraseña
+
+                        <input
+                            type="password"
+                            name="password"
+                            autocomplete="current-password"
+                            placeholder="Contraseña"
+                        >
+
+                    </label>
+
+
+                    <!-- Personal institucional -->
+
+                    <div class="personal-login">
+<div class="eduturnos-institution-fields">
+
+    <label class="personal-field personal-field-code">
+        <span class="personal-field-title">Código institucional</span>
+        <input
+            type="text"
+            name="codigo_institucional"
+            inputmode="numeric"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            autocomplete="off">
+    </label>
+
+    <label class="personal-field personal-field-sede">
+        <span class="personal-field-title">Sede institucional</span>
+        <select name="sede_id">
+            {% for sede in sedes %}
+                <option value="{{ sede.id }}">{{ sede.nombre }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label class="personal-field personal-field-jornada">
+        <span class="personal-field-title">Jornada</span>
+        <select name="jornada_id">
+            {% for jornada in jornadas %}
+                <option value="{{ jornada.id }}">{{ jornada.nombre }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+</div>
+
+
+                        <h3>
+                            Personal institucional
+                        </h3>
+
+                        <p>
+                            Docentes, Coordinadores y Rectoría deben usar su correo
+                            <strong>@jjfh.edu.co</strong>, código de 6 dígitos,
+                            sede y jornada.
+                        </p>
+
+
+                        </div>
+
+
+                    <button
+                        class="boton-full"
+                        type="submit"
+                    >
+                        Ingresar
+                    </button>
+
+
+                </form>
+
+
+                <div class="form-links">
+
+                    <a
+                        href="{{ url_for('passwords.recuperar') }}"
+                    >
+                        ¿Olvidaste tu contraseña?
+                    </a>
+
+                    <a
+                        href="{{ url_for('auth.registro') }}"
+                    >
+                        Crear una cuenta
+                    </a>
+
+                </div>
+
+
+            </section>
+
+
+        </div>
+
+    </main></body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

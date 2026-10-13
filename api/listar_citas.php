@@ -66,47 +66,54 @@ switch ($usuario["rol"]) {
 
         break;
 
-    case "Acudiente":
+   case "Acudiente":
 
-        $stmt = $conexion->prepare(
-            "SELECT id_acudiente
-             FROM acudientes
-             WHERE id_usuario = ?
-             LIMIT 1"
+    $stmt = $conexion->prepare(
+        "SELECT id_acudiente
+         FROM acudientes
+         WHERE documento = ?
+         LIMIT 1"
+    );
+
+    if (!$stmt) {
+        responder(
+            false,
+            "Error al consultar el acudiente.",
+            [],
+            500
         );
+    }
 
-        $stmt->bind_param(
-            "i",
-            $usuario["id_usuario"]
+    $documentoUsuario = $usuario["documento"];
+
+    $stmt->bind_param(
+        "s",
+        $documentoUsuario
+    );
+
+    $stmt->execute();
+
+    $resultado = $stmt->get_result();
+
+    $fila = $resultado->fetch_assoc();
+
+    $stmt->close();
+
+    if (!$fila) {
+        responder(
+            true,
+            "No hay citas asociadas.",
+            []
         );
+    }
 
-        $stmt->execute();
+    $condiciones[] = "c.id_acudiente = ?";
 
-        $fila = $stmt->get_result()->fetch_assoc();
+    $parametros[] = $fila["id_acudiente"];
 
-        $stmt->close();
+    $tipos .= "i";
 
-        if (!$fila) {
-            responder(
-                true,
-                "No hay citas asociadas.",
-                []
-            );
-        }
-
-        $condiciones[] = "c.id_acudiente = ?";
-        $parametros[] = $fila["id_acudiente"];
-        $tipos .= "i";
-
-        break;
-
-    case "Estudiante":
-
-        $condiciones[] = "e.documento = ?";
-        $parametros[] = $usuario["documento"];
-        $tipos .= "s";
-
-        break;
+    break;
 }
 
 if (!empty($condiciones)) {
@@ -117,17 +124,22 @@ $sql .= " ORDER BY c.fecha DESC, c.hora DESC";
 
 $stmt = $conexion->prepare($sql);
 
+if (!$stmt) {
+    responder(false, "No se pudo preparar la consulta de citas.", [], 500);
+}
+
 if (!empty($parametros)) {
-    $stmt->bind_param(
-        $tipos,
-        ...$parametros
-    );
+    $referencias = [$tipos];
+
+    foreach ($parametros as $indice => $parametro) {
+        $referencias[] = &$parametros[$indice];
+    }
+
+    call_user_func_array([$stmt, "bind_param"], $referencias);
 }
 
 $stmt->execute();
-
 $resultado = $stmt->get_result();
-
 $citas = [];
 
 while ($fila = $resultado->fetch_assoc()) {
@@ -136,8 +148,4 @@ while ($fila = $resultado->fetch_assoc()) {
 
 $stmt->close();
 
-responder(
-    true,
-    "Citaciones consultadas.",
-    $citas
-);
+responder(true, "Citas encontradas.", $citas);

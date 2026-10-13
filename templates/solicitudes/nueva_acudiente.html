@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% from '_hora_cita.html' import selector_hora %}
+
+{% block title %}Solicitud docente a coordinación · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<div class="page-navigation">
+    <a class="link-back" href="{{ url_for('solicitudes.index') }}">← Atrás</a>
+</div>
+
+<section class="page-head">
+    <div>
+        <h1>Solicitud docente a coordinación</h1>
+        <p>Solicita a coordinación un espacio para una reunión o citación.</p>
+    </div>
+</section>
+
+<section class="tarjeta">
+    <form method="post" action="{{ url_for('solicitudes.nueva_docente') }}">
+
+        {{ csrf_field()|safe }}
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label for="estudiante_id">Estudiante</label>
+
+                <select
+                    id="estudiante_id"
+                    name="estudiante_id"
+                    required
+                >
+<option value="" selected disabled hidden></option>
+
+{% for estudiante in estudiantes %}
+                    <option value="{{ estudiante.id_estudiante }}">
+                        {{ estudiante.nombres }} {{ estudiante.apellidos }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="fecha_solicitada">Fecha solicitada</label>
+
+                <input
+                    type="date"
+                    id="fecha_solicitada"
+                    name="fecha_solicitada"
+                    min="{{ fecha_minima }}"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="hora_solicitada">Hora solicitada</label>
+
+                {{ selector_hora('hora_solicitada', 'hora_solicitada') }}
+            </div>
+
+            <div class="form-group">
+                <label for="motivo">Motivo</label>
+
+                <input
+                    type="text"
+                    id="motivo"
+                    name="motivo"
+                    placeholder="Motivo de la reunión o citación"
+                    maxlength="255"
+                    required
+                >
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+
+            <a
+                class="boton boton-secondary"
+                href="{{ url_for('solicitudes.index') }}">
+                Cancelar
+            </a>
+
+            <button
+                type="submit"
+                class="boton">
+                Enviar solicitud
+            </button>
+
+        </div>
+
+    </form>
+</section>
+
+
+
+
+
+{% endblock %}

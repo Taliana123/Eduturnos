@@ -1,0 +1,354 @@
+/* =================================================================
+   EDUTURNOS - LOGIN VISUAL FORZADO FINAL
+   ================================================================= */
+
+
+/* ================================================================
+   PERSONAL INSTITUCIONAL
+   ================================================================ */
+
+html body .login-page .personal-login {
+
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+
+    padding: 16px 18px 18px !important;
+}
+
+
+/* ================================================================
+   LOS TRES CAMPOS
+   MISMA DISTANCIA
+   UNA SOLA FILA
+   ================================================================ */
+
+html body .login-page
+.personal-login .form-grid,
+
+html body .login-page
+.personal-login .personal-fields-grid {
+
+    display: grid !important;
+
+    grid-template-columns:
+        94px
+        205px
+        80px !important;
+
+    column-gap: 8px !important;
+
+    row-gap: 0 !important;
+
+    width: 395px !important;
+
+    max-width: 100% !important;
+
+    margin: 0 auto !important;
+
+    padding: 0 !important;
+
+    justify-content: center !important;
+
+    align-items: end !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ================================================================
+   CADA COLUMNA
+   ================================================================ */
+
+html body .login-page
+.personal-login .personal-field {
+
+    width: auto !important;
+
+    min-width: 0 !important;
+
+    max-width: 100% !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ================================================================
+   TITULOS
+   ================================================================ */
+
+html body .login-page
+.personal-login .personal-field-title {
+
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 0 6px 0 !important;
+
+    padding: 0 !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+
+    line-height: 1.1 !important;
+}
+
+
+/* ================================================================
+   CUADROS
+   ================================================================ */
+
+html body .login-page
+.personal-login input[name="codigo_institucional"],
+
+html body .login-page
+.personal-login select[name="sede_id"],
+
+html body .login-page
+.personal-login select[name="jornada_id"] {
+
+    display: block !important;
+
+    height: 42px !important;
+
+    min-height: 42px !important;
+
+    box-sizing: border-box !important;
+
+    margin: 0 !important;
+}
+
+
+/* ================================================================
+   CODIGO
+   ================================================================ */
+
+html body .login-page
+.personal-login input[name="codigo_institucional"] {
+
+    width: 94px !important;
+
+    min-width: 94px !important;
+
+    max-width: 94px !important;
+
+    padding: 7px 8px !important;
+
+    background: #ffffff !important;
+
+    color: #273142 !important;
+}
+
+
+/* ================================================================
+   SEDE
+   ================================================================ */
+
+html body .login-page
+.personal-login select[name="sede_id"] {
+
+    width: 205px !important;
+
+    min-width: 205px !important;
+
+    max-width: 205px !important;
+
+    padding: 7px 8px !important;
+}
+
+
+/* ================================================================
+   JORNADA
+   ================================================================ */
+
+html body .login-page
+.personal-login select[name="jornada_id"] {
+
+    width: 80px !important;
+
+    min-width: 80px !important;
+
+    max-width: 80px !important;
+
+    padding: 7px 6px !important;
+}
+
+
+/* ================================================================
+   DOCUMENTO Y PASSWORD
+   ================================================================ */
+
+html body .login-page
+input[name="identificador"],
+
+html body .login-page
+input[name="password"] {
+
+    color: #273142 !important;
+
+    caret-color: #273142 !important;
+}
+
+html body .login-page
+label:has(input[name="identificador"]),
+
+html body .login-page
+label:has(input[name="password"]) {
+
+    color: #273142 !important;
+}
+
+
+/* ================================================================
+   NO DEBES ESCOGERLO
+   ================================================================ */
+
+html body .login-page
+.section-heading p,
+
+html body .login-page
+.section-heading p *,
+
+html body .login-page
+.section-heading strong {
+
+    border: 0 !important;
+
+    border-bottom: 0 !important;
+
+    text-decoration: none !important;
+
+    box-shadow: none !important;
+
+    background-image: none !important;
+}
+
+
+/* ================================================================
+   BOTON INGRESAR
+   ================================================================ */
+
+html body .login-page
+.boton-full {
+
+    min-height: 52px !important;
+
+    height: 52px !important;
+
+    padding: 14px 30px !important;
+
+    font-size: 15px !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ================================================================
+   DIBUJO
+   NO APAGAR SU ANIMACION
+   SOLO QUITAR FONDO
+   ================================================================ */
+
+html body .login-page svg,
+
+html body .login-page img,
+
+html body .login-page canvas {
+
+    background: transparent !important;
+
+    background-color: transparent !important;
+}
+
+
+/* ================================================================
+   CONTENEDORES DE LA ILUSTRACION
+   ================================================================ */
+
+html body .login-page
+.login-illustration,
+
+html body .login-page
+.illustration,
+
+html body .login-page
+.hero-illustration,
+
+html body .login-page
+.login-art,
+
+html body .login-page
+.drawing,
+
+html body .login-page
+.visual {
+
+    background: transparent !important;
+
+    background-color: transparent !important;
+
+    background-image: none !important;
+
+    box-shadow: none !important;
+}
+
+
+/* ================================================================
+   NO CAMBIAR APPEARANCE
+   SELECTS NATIVOS
+   ================================================================ */
+
+
+/* ================================================================
+   MOVIL
+   ================================================================ */
+
+@media (max-width: 700px) {
+
+    html body .login-page
+    .personal-login .form-grid,
+
+    html body .login-page
+    .personal-login .personal-fields-grid {
+
+        width: 100% !important;
+
+        grid-template-columns: 1fr !important;
+
+        column-gap: 0 !important;
+
+        gap: 10px !important;
+    }
+
+    html body .login-page
+    .personal-login .personal-field {
+
+        width: 100% !important;
+    }
+
+    html body .login-page
+    .personal-login input[name="codigo_institucional"],
+
+    html body .login-page
+    .personal-login select[name="sede_id"],
+
+    html body .login-page
+    .personal-login select[name="jornada_id"] {
+
+        width: 100% !important;
+
+        min-width: 0 !important;
+
+        max-width: 100% !important;
+    }
+}

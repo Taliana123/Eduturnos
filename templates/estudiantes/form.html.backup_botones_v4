@@ -1,0 +1,17 @@
+{% extends 'base.html' %}{% block content %}<h1>{{ 'Editar' if estudiante else 'Nuevo' }} estudiante</h1><form method="post" class="panel form-grid">{{ csrf_field()|safe }}
+<label>Código estudiantil<input name="codigo" value="{{ estudiante.codigo_estudiantil if estudiante else '' }}" required></label><label>Tipo documento<select name="tipo_documento">
+<option value="" selected disabled hidden></option>
+<option value="CC" {% if not estudiante or estudiante.tipo_documento=='CC' %}selected{% endif %}>Cédula de ciudadanía</option><option value="TI" {% if estudiante and estudiante.tipo_documento=='TI' %}selected{% endif %}>Tarjeta de identidad</option><option value="CE" {% if estudiante and estudiante.tipo_documento=='CE' %}selected{% endif %}>Cédula de extranjería</option></select></label><label>Documento<input name="documento" value="{{ estudiante.documento if estudiante else '' }}" required></label><label>Nombres<input name="nombres" value="{{ estudiante.nombres if estudiante else '' }}" required></label><label>Apellidos<input name="apellidos" value="{{ estudiante.apellidos if estudiante else '' }}" required></label><label>Curso<input name="curso" value="{{ estudiante.curso if estudiante else '' }}" placeholder="Ej. 11A"></label>
+<label>Sede<select name="sede" required>
+<option value="" selected disabled hidden></option>
+{% for s in catalogos.sedes %}<option value="{{ s.id }}" {% if estudiante and estudiante.id_sede==s.id %}selected{% endif %}>{{ s.nombre }}</option>{% endfor %}</select></label><label>Jornada<select name="jornada" required>
+<option value="" selected disabled hidden></option>
+{% for j in catalogos.jornadas %}<option value="{{ j.id }}" {% if estudiante and estudiante.id_jornada==j.id %}selected{% endif %}>{{ j.nombre }}</option>{% endfor %}</select></label><label>Grado<select name="grado">
+<option value="" selected disabled hidden></option>
+{% for g in catalogos.grados %}<option value="{{ g.id }}" {% if estudiante and estudiante.id_grado==g.id %}selected{% endif %}>{{ g.nombre }}</option>{% endfor %}</select></label><label>Grupo<select name="grupo">
+<option value="" selected disabled hidden></option>
+{% for g in catalogos.grupos %}<option value="{{ g.id }}" {% if estudiante and estudiante.id_grupo==g.id %}selected{% endif %}>{{ g.grado }} - {{ g.nombre }}</option>{% endfor %}</select></label><label>Periodo<select name="periodo" required>
+<option value="" selected disabled hidden></option>
+{% for p in catalogos.periodos %}<option value="{{ p.id }}" {% if estudiante and estudiante.id_periodo==p.id %}selected{% endif %}>{{ p.nombre }}</option>{% endfor %}</select></label>{% if estudiante %}<label>Estado<select name="estado">
+<option value="" selected disabled hidden></option>
+<option>Activo</option><option {% if estudiante.estado=='Retirado' %}selected{% endif %}>Retirado</option></select></label>{% endif %}<div class="full-field"><button class="boton">Guardar</button> <a class="boton secundario" href="{{ url_for('estudiantes.lista') }}">Cancelar</a></div></form>{% endblock %}

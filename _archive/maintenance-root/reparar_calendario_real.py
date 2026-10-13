@@ -1,0 +1,1440 @@
+from pathlib import Path
+import shutil
+
+BASE = Path(__file__).resolve().parent
+TEMPLATE = BASE / "templates" / "calendario" / "index.html"
+
+if not TEMPLATE.exists():
+    print("[ERROR] No existe:")
+    print(TEMPLATE)
+    raise SystemExit(1)
+
+BACKUP = TEMPLATE.with_name("index.html.backup_antes_calendario_real")
+shutil.copy2(TEMPLATE, BACKUP)
+
+contenido = r'''{% extends 'base.html' %}
+
+{% block title %}Calendario · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<style>
+.cal-wrap {
+    max-width: 1450px;
+    margin: 0 auto;
+}
+
+.cal-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.cal-top h1 {
+    margin: 8px 0 5px;
+}
+
+.cal-top p {
+    margin: 0;
+    opacity: .72;
+}
+
+.cal-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cal-tools {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.cal-tools input,
+.cal-tools select {
+    width: 100%;
+    min-height: 44px;
+    box-sizing: border-box;
+}
+
+.cal-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 7px 24px rgba(0,0,0,.08);
+    border: 1px solid rgba(0,0,0,.06);
+    overflow: hidden;
+}
+
+.cal-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 16px;
+    border-bottom: 1px solid #e8edf3;
+    flex-wrap: wrap;
+}
+
+.cal-toolbar-left,
+.cal-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cal-month-title {
+    min-width: 210px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.cal-btn {
+    border: 1px solid #d9e0e8;
+    background: #fff;
+    color: #243447;
+    border-radius: 9px;
+    min-height: 40px;
+    padding: 0 13px;
+    cursor: pointer;
+    font: inherit;
+}
+
+.cal-btn:hover {
+    background: #f4f7fa;
+}
+
+.cal-btn-primary {
+    background: #1f4f8f;
+    color: #fff;
+    border-color: #1f4f8f;
+}
+
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.cal-weekday {
+    text-align: center;
+    padding: 10px 5px;
+    background: #f7f9fc;
+    color: #667085;
+    font-size: .82rem;
+    font-weight: 700;
+    border-right: 1px solid #e8edf3;
+    border-bottom: 1px solid #e8edf3;
+}
+
+.cal-day {
+    min-height: 128px;
+    padding: 8px;
+    border-right: 1px solid #e8edf3;
+    border-bottom: 1px solid #e8edf3;
+    background: #fff;
+    cursor: pointer;
+    transition: background .15s ease;
+}
+
+.cal-day:hover {
+    background: #f8fbff;
+}
+
+.cal-day.other-month {
+    background: #fafbfc;
+    color: #a0a8b2;
+}
+
+.cal-day.today {
+    background: #eef5ff;
+}
+
+.cal-day-number {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: .86rem;
+    font-weight: 700;
+}
+
+.cal-day-number span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    min-height: 28px;
+    border-radius: 50%;
+}
+
+.cal-day.today .cal-day-number span {
+    background: #1f4f8f;
+    color: #fff;
+}
+
+.cal-event {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 4px 0;
+    padding: 5px 6px;
+    border-radius: 7px;
+    font-size: .74rem;
+    line-height: 1.25;
+    color: #18324c;
+    background: #e8f0fb;
+    border-left: 3px solid #1f4f8f;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cal-event.pendiente {
+    background: #fff5d9;
+    border-left-color: #d99a00;
+}
+
+.cal-event.confirmada,
+.cal-event.confirmado {
+    background: #e8f7ef;
+    border-left-color: #18845a;
+}
+
+.cal-event.cancelada,
+.cal-event.cancelado {
+    background: #fdeaea;
+    border-left-color: #bd3b3b;
+}
+
+.cal-event.reprogramada,
+.cal-event.reprogramado {
+    background: #eaf1ff;
+    border-left-color: #4777c7;
+}
+
+.cal-more {
+    font-size: .72rem;
+    color: #52657a;
+    padding: 2px 4px;
+}
+
+.cal-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(300px, .7fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.cal-list {
+    padding: 0 16px 10px;
+}
+
+.cal-list-title {
+    padding: 16px 0 8px;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.cal-row {
+    display: grid;
+    grid-template-columns: 100px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.cal-row:last-child {
+    border-bottom: 0;
+}
+
+.cal-row-date {
+    font-weight: 700;
+}
+
+.cal-row-info strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.cal-row-info span {
+    font-size: .84rem;
+    color: #667085;
+}
+
+.cal-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 5px 9px;
+    white-space: nowrap;
+    font-size: .75rem;
+    font-weight: 700;
+    background: #edf1f5;
+    color: #495565;
+}
+
+.cal-status.pendiente {
+    background: #fff5d9;
+    color: #876100;
+}
+
+.cal-status.confirmada,
+.cal-status.confirmado {
+    background: #e8f7ef;
+    color: #146c4b;
+}
+
+.cal-status.cancelada,
+.cal-status.cancelado {
+    background: #fdeaea;
+    color: #9d2d2d;
+}
+
+.cal-status.reprogramada,
+.cal-status.reprogramado {
+    background: #eaf1ff;
+    color: #285aa5;
+}
+
+.cal-empty {
+    text-align: center;
+    padding: 30px 15px;
+    color: #667085;
+}
+
+.cal-legend {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 14px 16px;
+    border-top: 1px solid #edf0f4;
+}
+
+.cal-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    color: #596576;
+}
+
+.cal-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #1f4f8f;
+}
+
+.cal-dot.pendiente { background: #d99a00; }
+.cal-dot.confirmada { background: #18845a; }
+.cal-dot.cancelada { background: #bd3b3b; }
+.cal-dot.reprogramada { background: #4777c7; }
+
+.cal-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(17,24,39,.56);
+    z-index: 10000;
+}
+
+.cal-modal.open {
+    display: flex;
+}
+
+.cal-modal-box {
+    width: min(700px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.22);
+}
+
+.cal-modal-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 20px 22px 14px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.cal-modal-head h2 {
+    margin: 6px 0 0;
+}
+
+.cal-close {
+    border: 0;
+    background: #f0f3f7;
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.cal-modal-body {
+    padding: 18px 22px 22px;
+}
+
+.cal-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 12px;
+}
+
+.cal-detail {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.cal-detail.full {
+    grid-column: 1 / -1;
+}
+
+.cal-detail small {
+    display: block;
+    color: #667085;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.cal-modal-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+    .cal-bottom {
+        grid-template-columns: 1fr;
+    }
+
+    .cal-day {
+        min-height: 100px;
+    }
+}
+
+@media (max-width: 700px) {
+    .cal-tools {
+        grid-template-columns: 1fr;
+    }
+
+    .cal-month-title {
+        min-width: 150px;
+    }
+
+    .cal-day {
+        min-height: 84px;
+        padding: 5px;
+    }
+
+    .cal-event {
+        font-size: .67rem;
+    }
+
+    .cal-row {
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+
+    .cal-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cal-detail.full {
+        grid-column: auto;
+    }
+
+    .cal-weekday {
+        font-size: .72rem;
+        padding: 8px 2px;
+    }
+}
+</style>
+
+<section class="cal-wrap">
+
+    <div class="cal-top">
+
+        <div>
+            <a
+                class="link-back"
+                href="{{ request.referrer or url_for('auth.dashboard') }}"
+            >
+                ← Atrás
+            </a>
+
+            <h1>Calendario</h1>
+            <p>Agenda real de tus citaciones registradas en EDUTURNOS.</p>
+        </div>
+
+        <div class="cal-actions">
+
+            <a
+                class="boton"
+                href="{{ url_for('citas.index') }}"
+            >
+                Ver citas
+            </a>
+
+            {% if usuario_sesion is defined and usuario_sesion %}
+                {% if usuario_sesion.rol_nombre in ['Docente', 'Administrador / Coordinador', 'Rector', 'Super Admin'] %}
+                    <a
+                        class="boton"
+                        href="{{ url_for('citas.nueva') }}"
+                    >
+                        + Nueva citación
+                    </a>
+                {% endif %}
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <div class="cal-tools">
+
+        <input
+            type="search"
+            id="calBusqueda"
+            placeholder="Buscar estudiante, docente, motivo o lugar..."
+            autocomplete="off"
+        >
+
+        <select id="calEstado">
+            <option value="">Todos los estados</option>
+
+            {% set estados = [] %}
+
+            {% for cita in citas %}
+                {% if cita.estado not in estados %}
+                    {% set _ = estados.append(cita.estado) %}
+                    <option value="{{ cita.estado }}">{{ cita.estado }}</option>
+                {% endif %}
+            {% endfor %}
+
+        </select>
+
+    </div>
+
+    <div class="cal-card">
+
+        <div class="cal-toolbar">
+
+            <div class="cal-toolbar-left">
+
+                <button
+                    type="button"
+                    class="cal-btn"
+                    id="calAnterior"
+                >
+                    ‹
+                </button>
+
+                <button
+                    type="button"
+                    class="cal-btn"
+                    id="calHoy"
+                >
+                    Hoy
+                </button>
+
+                <button
+                    type="button"
+                    class="cal-btn"
+                    id="calSiguiente"
+                >
+                    ›
+                </button>
+
+            </div>
+
+            <div
+                class="cal-month-title"
+                id="calTitulo"
+            ></div>
+
+            <div class="cal-toolbar-right">
+
+                <button
+                    type="button"
+                    class="cal-btn cal-btn-primary"
+                    id="calActualizar"
+                >
+                    Actualizar
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="cal-grid" id="calWeekdays">
+
+            <div class="cal-weekday">Lun</div>
+            <div class="cal-weekday">Mar</div>
+            <div class="cal-weekday">Mié</div>
+            <div class="cal-weekday">Jue</div>
+            <div class="cal-weekday">Vie</div>
+            <div class="cal-weekday">Sáb</div>
+            <div class="cal-weekday">Dom</div>
+
+        </div>
+
+        <div
+            class="cal-grid"
+            id="calDias"
+        ></div>
+
+        <div class="cal-legend">
+
+            <span>
+                <i class="cal-dot pendiente"></i>
+                Pendiente
+            </span>
+
+            <span>
+                <i class="cal-dot confirmada"></i>
+                Confirmada
+            </span>
+
+            <span>
+                <i class="cal-dot cancelada"></i>
+                Cancelada
+            </span>
+
+            <span>
+                <i class="cal-dot reprogramada"></i>
+                Reprogramada
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="cal-bottom">
+
+        <div class="cal-card">
+
+            <div class="cal-list">
+
+                <div class="cal-list-title">
+                    Próximas citas
+                </div>
+
+                <div id="calProximas"></div>
+
+            </div>
+
+        </div>
+
+        <div class="cal-card">
+
+            <div class="cal-list">
+
+                <div class="cal-list-title">
+                    Información
+                </div>
+
+                <div class="cal-empty">
+                    Haz clic en una fecha para consultar las citaciones de ese día.
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<div
+    class="cal-modal"
+    id="calModal"
+    aria-hidden="true"
+>
+
+    <div class="cal-modal-box">
+
+        <div class="cal-modal-head">
+
+            <div>
+                <span class="badge">Detalle de citación</span>
+                <h2 id="modalTitulo">Citación</h2>
+            </div>
+
+            <button
+                type="button"
+                class="cal-close"
+                id="modalCerrar"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="cal-modal-body">
+
+            <div class="cal-detail-grid">
+
+                <div class="cal-detail">
+                    <small>Fecha</small>
+                    <div id="modalFecha">—</div>
+                </div>
+
+                <div class="cal-detail">
+                    <small>Hora</small>
+                    <div id="modalHora">—</div>
+                </div>
+
+                <div class="cal-detail">
+                    <small>Estudiante</small>
+                    <div id="modalEstudiante">—</div>
+                </div>
+
+                <div class="cal-detail">
+                    <small>Docente</small>
+                    <div id="modalDocente">—</div>
+                </div>
+
+                <div class="cal-detail">
+                    <small>Acudiente</small>
+                    <div id="modalAcudiente">—</div>
+                </div>
+
+                <div class="cal-detail">
+                    <small>Motivo</small>
+                    <div id="modalMotivo">—</div>
+                </div>
+
+                <div class="cal-detail">
+                    <small>Lugar</small>
+                    <div id="modalLugar">—</div>
+                </div>
+
+                <div class="cal-detail">
+                    <small>Estado</small>
+                    <div id="modalEstado">—</div>
+                </div>
+
+                <div class="cal-detail full">
+                    <small>Observaciones</small>
+                    <div id="modalObservaciones">—</div>
+                </div>
+
+            </div>
+
+            <div class="cal-modal-actions">
+
+                <a
+                    class="boton"
+                    href="#"
+                    id="modalIcs"
+                >
+                    Descargar .ics
+                </a>
+
+                <button
+                    type="button"
+                    class="boton"
+                    id="modalCerrar2"
+                >
+                    Cerrar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const CITAS_EDUTURNOS = [
+{% for cita in citas %}
+    {
+        id: {{ cita.id|tojson }},
+        fecha: {{ (cita.fecha|string)|tojson }},
+        hora: {{ (cita.hora|string)|tojson }},
+        estudiante: {{ ((cita.estudiante_n or '') ~ ' ' ~ (cita.estudiante_a or ''))|trim|tojson }},
+        docente: {{ ((cita.docente_n or '') ~ ' ' ~ (cita.docente_a or ''))|trim|tojson }},
+        acudiente: {{ ((cita.acudiente_n or '') ~ ' ' ~ (cita.acudiente_a or ''))|trim|tojson }},
+        motivo: {{ (cita.motivo or '')|tojson }},
+        lugar: {{ (cita.lugar or '')|tojson }},
+        observaciones: {{ (cita.observaciones or '')|tojson }},
+        estado: {{ (cita.estado or '')|tojson }},
+        ics: {{ url_for('calendario.descargar_ics', cita_id=cita.id)|tojson }}
+    }{% if not loop.last %},{% endif %}
+{% endfor %}
+];
+
+let fechaCalendario = new Date();
+
+const nombresMeses = [
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre'
+];
+
+function normalizarFecha(valor) {
+    const texto = String(valor || '').slice(0, 10);
+    const partes = texto.split('-');
+
+    if (partes.length !== 3) {
+        return null;
+    }
+
+    const y = Number(partes[0]);
+    const m = Number(partes[1]);
+    const d = Number(partes[2]);
+
+    if (!y || !m || !d) {
+        return null;
+    }
+
+    return new Date(y, m - 1, d);
+}
+
+function fechaClave(date) {
+
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+
+    return y + '-' + m + '-' + d;
+}
+
+function formatoFecha(date) {
+
+    return date.toLocaleDateString(
+        'es-CO',
+        {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }
+    );
+}
+
+function claseEstado(estado) {
+
+    const texto = String(estado || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+
+    if (texto.includes('pend')) {
+        return 'pendiente';
+    }
+
+    if (texto.includes('confirm')) {
+        return 'confirmada';
+    }
+
+    if (texto.includes('cancel')) {
+        return 'cancelada';
+    }
+
+    if (texto.includes('reprogram')) {
+        return 'reprogramada';
+    }
+
+    return '';
+}
+
+function citaVisible(cita) {
+
+    const texto = document
+        .getElementById('calBusqueda')
+        .value
+        .trim()
+        .toLowerCase();
+
+    const estado = document
+        .getElementById('calEstado')
+        .value
+        .trim()
+        .toLowerCase();
+
+    const contenido = [
+        cita.estudiante,
+        cita.docente,
+        cita.acudiente,
+        cita.motivo,
+        cita.lugar,
+        cita.observaciones,
+        cita.estado
+    ]
+        .join(' ')
+        .toLowerCase();
+
+    const coincideTexto =
+        !texto || contenido.includes(texto);
+
+    const coincideEstado =
+        !estado ||
+        String(cita.estado || '').toLowerCase() === estado;
+
+    return coincideTexto && coincideEstado;
+}
+
+function citasFiltradas() {
+    return CITAS_EDUTURNOS.filter(citaVisible);
+}
+
+function agruparPorFecha(lista) {
+
+    const grupos = {};
+
+    lista.forEach(function(cita) {
+
+        if (!grupos[cita.fecha]) {
+            grupos[cita.fecha] = [];
+        }
+
+        grupos[cita.fecha].push(cita);
+
+    });
+
+    return grupos;
+}
+
+function crearEvento(cita) {
+
+    const boton = document.createElement('button');
+
+    boton.type = 'button';
+    boton.className = 'cal-event ' + claseEstado(cita.estado);
+
+    boton.textContent =
+        (cita.hora ? cita.hora.slice(0, 5) + ' · ' : '') +
+        (cita.motivo || 'Citación');
+
+    boton.title =
+        (cita.motivo || 'Citación') +
+        ' · ' +
+        (cita.hora || '') +
+        ' · ' +
+        (cita.estudiante || '');
+
+    boton.addEventListener('click', function(e) {
+
+        e.stopPropagation();
+        abrirModal(cita);
+
+    });
+
+    return boton;
+}
+
+function renderCalendario() {
+
+    const dias = document.getElementById('calDias');
+
+    dias.innerHTML = '';
+
+    const year = fechaCalendario.getFullYear();
+    const month = fechaCalendario.getMonth();
+
+    document.getElementById('calTitulo').textContent =
+        nombresMeses[month] + ' ' + year;
+
+    const primero = new Date(year, month, 1);
+
+    let inicio = primero.getDay();
+
+    if (inicio === 0) {
+        inicio = 7;
+    }
+
+    inicio -= 1;
+
+    const diasMes = new Date(year, month + 1, 0).getDate();
+    const diasAnterior = new Date(year, month, 0).getDate();
+
+    const agrupadas = agruparPorFecha(citasFiltradas());
+
+    const hoy = new Date();
+    const hoyClave = fechaClave(hoy);
+
+    for (let i = 0; i < 42; i++) {
+
+        const numero = i - inicio + 1;
+
+        let fecha;
+
+        if (numero <= 0) {
+            fecha = new Date(
+                year,
+                month - 1,
+                diasAnterior + numero
+            );
+        } else if (numero > diasMes) {
+            fecha = new Date(
+                year,
+                month + 1,
+                numero - diasMes
+            );
+        } else {
+            fecha = new Date(
+                year,
+                month,
+                numero
+            );
+        }
+
+        const clave = fechaClave(fecha);
+
+        const dia = document.createElement('div');
+        dia.className = 'cal-day';
+
+        if (fecha.getMonth() !== month) {
+            dia.classList.add('other-month');
+        }
+
+        if (clave === hoyClave) {
+            dia.classList.add('today');
+        }
+
+        const cabecera = document.createElement('div');
+        cabecera.className = 'cal-day-number';
+
+        const numeroSpan = document.createElement('span');
+        numeroSpan.textContent = fecha.getDate();
+
+        cabecera.appendChild(numeroSpan);
+        dia.appendChild(cabecera);
+
+        const citasDia = agrupadas[clave] || [];
+
+        const limite = 3;
+
+        citasDia.slice(0, limite).forEach(function(cita) {
+
+            dia.appendChild(
+                crearEvento(cita)
+            );
+
+        });
+
+        if (citasDia.length > limite) {
+
+            const mas = document.createElement('div');
+
+            mas.className = 'cal-more';
+
+            mas.textContent =
+                '+' +
+                (citasDia.length - limite) +
+                ' más';
+
+            dia.appendChild(mas);
+        }
+
+        dia.addEventListener('click', function() {
+
+            mostrarDia(fecha, citasDia);
+
+        });
+
+        dias.appendChild(dia);
+
+    }
+
+    renderProximas();
+
+}
+
+function renderProximas() {
+
+    const contenedor =
+        document.getElementById('calProximas');
+
+    contenedor.innerHTML = '';
+
+    const hoyClave = fechaClave(new Date());
+
+    const lista = citasFiltradas()
+        .filter(function(cita) {
+            return cita.fecha >= hoyClave;
+        })
+        .sort(function(a, b) {
+
+            return (
+                (a.fecha + ' ' + a.hora)
+                .localeCompare(
+                    b.fecha + ' ' + b.hora
+                )
+            );
+
+        })
+        .slice(0, 8);
+
+    if (!lista.length) {
+
+        contenedor.innerHTML =
+            '<div class="cal-empty">No hay citas que coincidan con los filtros.</div>';
+
+        return;
+    }
+
+    lista.forEach(function(cita) {
+
+        const fila = document.createElement('div');
+
+        fila.className = 'cal-row';
+
+        const fecha = normalizarFecha(cita.fecha);
+
+        const fechaTexto = fecha
+            ? fecha.toLocaleDateString(
+                'es-CO',
+                {
+                    day: '2-digit',
+                    month: '2-digit'
+                }
+            )
+            : cita.fecha;
+
+        fila.innerHTML = `
+            <div class="cal-row-date">
+                ${fechaTexto}
+                <br>
+                <small>${String(cita.hora || '').slice(0,5)}</small>
+            </div>
+
+            <div class="cal-row-info">
+                <strong>${escapeHtml(cita.motivo || 'Citación')}</strong>
+                <span>
+                    ${escapeHtml(cita.estudiante || '')}
+                    ${cita.lugar ? ' · ' + escapeHtml(cita.lugar) : ''}
+                </span>
+            </div>
+
+            <div>
+                <span class="cal-status ${claseEstado(cita.estado)}">
+                    ${escapeHtml(cita.estado || '')}
+                </span>
+            </div>
+        `;
+
+        fila.addEventListener('click', function() {
+            abrirModal(cita);
+        });
+
+        fila.style.cursor = 'pointer';
+
+        contenedor.appendChild(fila);
+
+    });
+
+}
+
+function mostrarDia(fecha, lista) {
+
+    if (!lista.length) {
+        return;
+    }
+
+    if (lista.length === 1) {
+
+        abrirModal(lista[0]);
+        return;
+
+    }
+
+    const contenedor =
+        document.getElementById('calProximas');
+
+    contenedor.innerHTML = '';
+
+    lista.forEach(function(cita) {
+
+        const fila = document.createElement('div');
+
+        fila.className = 'cal-row';
+
+        fila.innerHTML = `
+            <div class="cal-row-date">
+                ${escapeHtml(cita.hora || '')}
+            </div>
+
+            <div class="cal-row-info">
+                <strong>${escapeHtml(cita.motivo || 'Citación')}</strong>
+                <span>${escapeHtml(cita.estudiante || '')}</span>
+            </div>
+
+            <div>
+                <span class="cal-status ${claseEstado(cita.estado)}">
+                    ${escapeHtml(cita.estado || '')}
+                </span>
+            </div>
+        `;
+
+        fila.addEventListener('click', function() {
+            abrirModal(cita);
+        });
+
+        fila.style.cursor = 'pointer';
+
+        contenedor.appendChild(fila);
+
+    });
+
+}
+
+function abrirModal(cita) {
+
+    document.getElementById('modalTitulo').textContent =
+        cita.motivo || 'Citación';
+
+    const fecha = normalizarFecha(cita.fecha);
+
+    document.getElementById('modalFecha').textContent =
+        fecha ? formatoFecha(fecha) : cita.fecha;
+
+    document.getElementById('modalHora').textContent =
+        cita.hora || '—';
+
+    document.getElementById('modalEstudiante').textContent =
+        cita.estudiante || '—';
+
+    document.getElementById('modalDocente').textContent =
+        cita.docente || '—';
+
+    document.getElementById('modalAcudiente').textContent =
+        cita.acudiente || '—';
+
+    document.getElementById('modalMotivo').textContent =
+        cita.motivo || '—';
+
+    document.getElementById('modalLugar').textContent =
+        cita.lugar || '—';
+
+    document.getElementById('modalEstado').textContent =
+        cita.estado || '—';
+
+    document.getElementById('modalObservaciones').textContent =
+        cita.observaciones || '—';
+
+    document.getElementById('modalIcs').href =
+        cita.ics || '#';
+
+    document
+        .getElementById('calModal')
+        .classList
+        .add('open');
+
+    document
+        .getElementById('calModal')
+        .setAttribute('aria-hidden', 'false');
+
+}
+
+function cerrarModal() {
+
+    document
+        .getElementById('calModal')
+        .classList
+        .remove('open');
+
+    document
+        .getElementById('calModal')
+        .setAttribute('aria-hidden', 'true');
+
+}
+
+function escapeHtml(valor) {
+
+    return String(valor || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function() {
+
+        renderCalendario();
+
+        document
+            .getElementById('calAnterior')
+            .addEventListener(
+                'click',
+                function() {
+
+                    fechaCalendario.setMonth(
+                        fechaCalendario.getMonth() - 1
+                    );
+
+                    renderCalendario();
+
+                }
+            );
+
+        document
+            .getElementById('calSiguiente')
+            .addEventListener(
+                'click',
+                function() {
+
+                    fechaCalendario.setMonth(
+                        fechaCalendario.getMonth() + 1
+                    );
+
+                    renderCalendario();
+
+                }
+            );
+
+        document
+            .getElementById('calHoy')
+            .addEventListener(
+                'click',
+                function() {
+
+                    fechaCalendario = new Date();
+
+                    renderCalendario();
+
+                }
+            );
+
+        document
+            .getElementById('calActualizar')
+            .addEventListener(
+                'click',
+                function() {
+
+                    window.location.reload();
+
+                }
+            );
+
+        document
+            .getElementById('calBusqueda')
+            .addEventListener(
+                'input',
+                function() {
+
+                    renderCalendario();
+
+                }
+            );
+
+        document
+            .getElementById('calEstado')
+            .addEventListener(
+                'change',
+                function() {
+
+                    renderCalendario();
+
+                }
+            );
+
+        document
+            .getElementById('modalCerrar')
+            .addEventListener(
+                'click',
+                cerrarModal
+            );
+
+        document
+            .getElementById('modalCerrar2')
+            .addEventListener(
+                'click',
+                cerrarModal
+            );
+
+        document
+            .getElementById('calModal')
+            .addEventListener(
+                'click',
+                function(e) {
+
+                    if (e.target === this) {
+                        cerrarModal();
+                    }
+
+                }
+            );
+
+        document.addEventListener(
+            'keydown',
+            function(e) {
+
+                if (e.key === 'Escape') {
+                    cerrarModal();
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}
+'''
+
+TEMPLATE.write_text(contenido, encoding="utf-8")
+
+print()
+print("=" * 70)
+print("CALENDARIO REAL CORREGIDO")
+print("=" * 70)
+print()
+print("Backup:")
+print(BACKUP)
+print()
+print("Archivo actualizado:")
+print(TEMPLATE)
+print()
+print("Este calendario:")
+print("- usa directamente las citas reales enviadas por Flask")
+print("- muestra 42 dias")
+print("- permite anterior / siguiente")
+print("- permite volver a Hoy")
+print("- filtra por texto")
+print("- filtra por estado")
+print("- muestra las citas dentro de cada fecha")
+print("- permite abrir cada cita")
+print("- muestra estudiante, docente, acudiente, motivo, lugar y observaciones")
+print("- descarga el .ics")
+print("- muestra proximas citas")
+print("- no depende de FullCalendar")
+print("- no depende del archivo de idioma")
+print("- no modifica MySQL")
+print("- no modifica routes/calendario.py")
+print()

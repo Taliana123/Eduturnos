@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Historial de {{ estudiante }} · EDUTURNOS{% endblock %}
+{% block content %}
+<section class="student-history-page">
+    <header class="page-head">
+        <div>
+            <a class="link-back" href="{{ url_for('citas.index') }}">← Citas</a>
+            <h1>Historial del estudiante</h1>
+            <p>{{ estudiante }}</p>
+        </div>
+    </header>
+    {% if citas %}
+    <div class="student-history-list">
+        {% for cita in citas %}
+        {% set detalle = detalles.get(cita.id, {}) %}
+        <article class="student-history-entry">
+            <header>
+                <div><span class="badge">{{ cita.estado }}</span><h2>{{ cita.fecha }} · {{ cita.hora|hora_ampm }}</h2></div>
+                <span>{{ cita.motivo }}</span>
+            </header>
+            <dl>
+                <div><dt>Docente</dt><dd>{{ cita.docente }}</dd></div>
+                <div><dt>Acudiente</dt><dd>{{ cita.acudiente }}</dd></div>
+                <div><dt>Lugar</dt><dd>{{ cita.lugar or 'Sin lugar asignado' }}</dd></div>
+            </dl>
+            {% if cita.observaciones %}<section><h3>Observaciones de la cita</h3><p>{{ cita.observaciones }}</p></section>{% endif %}
+            {% if detalle.get('cierre') %}
+            <section class="student-history-closure">
+                <h3>Resultado de la reunión</h3>
+                <p><strong>Asistencia:</strong> {{ detalle.cierre.asistencia }}</p>
+                <p>{{ detalle.cierre.resultado }}</p>
+                <small>{{ detalle.cierre.autor }} · {{ detalle.cierre.fecha_cierre.strftime('%d/%m/%Y') }} {{ detalle.cierre.fecha_cierre|hora_ampm }}</small>
+                <p><a class="student-history-acta" href="{{ url_for('citas.acta_cita', cita_id=cita.id) }}">Descargar acta PDF</a></p>
+            </section>
+            {% endif %}
+            {% if detalle.get('cierre') %}
+            <section class="student-history-closure">
+                <h3>Resultado de la reunión</h3>
+                <p><strong>Asistencia:</strong> {{ detalle.cierre.asistencia }}</p>
+                <p>{{ detalle.cierre.resultado }}</p>
+                <small>{{ detalle.cierre.autor }} · {{ detalle.cierre.fecha_cierre.strftime('%d/%m/%Y') }} {{ detalle.cierre.fecha_cierre|hora_ampm }}</small>
+                <p><a class="student-history-acta" href="{{ url_for('citas.acta_cita', cita_id=cita.id) }}">Descargar acta PDF</a></p>
+            </section>
+            {% endif %}
+            {% if detalle.get('notas') %}
+            <section><h3>Notas y resultados</h3><ol>{% for nota in detalle.notas %}<li><p>{{ nota.observaciones or 'Sin observaciones' }}</p><small>{{ nota.asistencia }} · {{ nota.autor }} · {{ nota.fecha_seguimiento.strftime('%d/%m/%Y') }} {{ nota.fecha_seguimiento|hora_ampm }}</small></li>{% endfor %}</ol></section>
+            {% endif %}
+            {% if detalle.get('reprogramaciones') %}
+            <section><h3>Cambios de fecha</h3><ol>{% for cambio in detalle.reprogramaciones %}<li><p>{{ cambio.fecha_anterior }} {{ cambio.hora_anterior|hora_ampm }} → {{ cambio.fecha_nueva }} {{ cambio.hora_nueva|hora_ampm }}</p><small>{{ cambio.motivo }} · {{ cambio.autor }}</small></li>{% endfor %}</ol></section>
+            {% endif %}
+            {% if detalle.get('compromisos') %}
+            <section><h3>Compromisos</h3><ul>{% for compromiso in detalle.compromisos %}<li>{{ compromiso.descripcion }} · {{ compromiso.responsable }} · {{ compromiso.fecha_limite }} · {{ compromiso.estado }}</li>{% endfor %}</ul></section>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}<p>No hay historial disponible.</p>{% endif %}
+</section>
+<style>
+.student-history-page{width:100%;max-width:1000px;margin:0 auto;}
+.student-history-entry{margin:0 0 14px;padding:18px;border:1px solid #dce3ed;border-radius:10px;background:#fff;}
+.student-history-entry>header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.student-history-entry h2{margin:7px 0;font-size:18px;}
+.student-history-entry dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0;}
+.student-history-entry dt{color:#5f7895;font-size:12px;font-weight:700;}
+.student-history-entry dd{margin:3px 0 0;overflow-wrap:anywhere;}
+.student-history-entry section{padding-top:10px;border-top:1px solid #edf0f5;}
+.student-history-entry section h3{font-size:14px;}
+.student-history-entry section ol,.student-history-entry section ul{padding-left:18px;}
+@media(max-width:900px){.student-history-entry{padding:12px}.student-history-entry dl{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.student-history-entry>header{flex-direction:column}}
+</style>
+{% endblock %}

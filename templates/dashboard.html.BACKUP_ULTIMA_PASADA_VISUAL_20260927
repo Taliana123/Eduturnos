@@ -1,0 +1,1216 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-page">
+
+    <!-- =====================================================
+         ENCABEZADO
+         ===================================================== -->
+
+    <div class="dashboard-head">
+
+        <div class="dashboard-head-info">
+<div class="dashboard-role-art" aria-hidden="true">
+    {% if usuario.rol_nombre == 'Rector' %}
+        <div class="role-symbol role-rectoria">
+            <span></span><i></i><b></b>
+        </div>
+    {% elif usuario.rol_nombre == 'Estudiante' %}
+        <div class="role-symbol role-estudiante">
+            <span></span><i></i><b></b>
+        </div>
+    {% elif usuario.rol_nombre == 'Acudiente' %}
+        <div class="role-symbol role-acudiente">
+            <span></span><i></i><b></b>
+        </div>
+    {% elif usuario.rol_nombre == 'Docente' %}
+        <div class="role-symbol role-docente">
+            <span></span><i></i><b></b>
+        </div>
+    {% elif usuario.rol_nombre == 'Administrador / Coordinador' %}
+        <div class="role-symbol role-coordinador">
+            <span></span><i></i><b></b>
+        </div>
+    {% else %}
+        <div class="role-symbol role-default">
+            <span></span><i></i><b></b>
+        </div>
+    {% endif %}
+</div>
+
+            <span class="badge">
+                {{ usuario.rol_nombre }}
+            </span>
+
+            <h1>
+                Hola, {{ usuario.nombres }} {{ usuario.apellidos }}
+            </h1>
+
+            <p class="muted">
+                Información y accesos según tu rol institucional.
+            </p>
+
+        </div>
+
+        <div class="dashboard-head-action">
+
+            <a
+                class="boton boton-danger dashboard-logout"
+                href="{{ url_for('auth.logout') }}"
+            >
+                Cerrar sesión
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         INDICADORES
+         ===================================================== -->
+
+    <section class="dashboard-kpis">
+
+        <article class="dashboard-kpi">
+            <span>Total de citas</span>
+            <strong>{{ datos.total_citas }}</strong>
+        </article>
+
+        <article class="dashboard-kpi">
+            <span>Pendientes</span>
+            <strong>{{ datos.pendientes }}</strong>
+        </article>
+
+        <article class="dashboard-kpi">
+            <span>Confirmadas</span>
+            <strong>{{ datos.confirmadas }}</strong>
+        </article>
+
+        <article class="dashboard-kpi">
+            <span>Notificaciones sin leer</span>
+            <strong>{{ notificaciones_no_leidas }}</strong>
+        </article>
+
+    </section>
+
+
+    <!-- =====================================================
+         CONTENIDO
+         ===================================================== -->
+
+    <div class="dashboard-main">
+
+        <!-- ACCIONES -->
+        <section class="dashboard-card dashboard-actions-card">
+
+            <div class="dashboard-card-head">
+
+                <div>
+                    <span class="badge">Accesos</span>
+
+                    <h2>Acciones rápidas</h2>
+
+                    <p class="muted">
+                        Accede directamente a las funciones disponibles para tu rol.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-action-grid">
+
+                <!-- CITAS -->
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('citas.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Citas
+                        </span>
+                    </div>
+
+                    <h3>Citas</h3>
+
+                    <p>
+                        Consultar y gestionar citaciones.
+                    </p>
+
+                    <span class="dashboard-action-link">
+                        Ver citas →
+                    </span>
+
+                </a>
+
+
+                <!-- CALENDARIO -->
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('calendario.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Calendario
+                        </span>
+                    </div>
+
+                    <h3>Calendario</h3>
+
+                    <p>
+                        Revisar fechas y horarios.
+                    </p>
+
+                    <span class="dashboard-action-link">
+                        Abrir calendario →
+                    </span>
+
+                </a>
+
+
+                <!-- NOTIFICACIONES -->
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('notificaciones.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Avisos
+                        </span>
+                    </div>
+
+                    <h3>Notificaciones</h3>
+
+                    <p>
+                        Ver avisos y novedades del sistema.
+                    </p>
+
+                    {% if notificaciones_no_leidas > 0 %}
+
+                    <span class="dashboard-action-link">
+                        {{ notificaciones_no_leidas }} sin leer →
+                    </span>
+
+                    {% else %}
+
+                    <span class="dashboard-action-link">
+                        Ver notificaciones →
+                    </span>
+
+                    {% endif %}
+
+                </a>
+
+
+                <!-- SOLICITUDES -->
+
+                {% if usuario.rol_nombre in [
+                    'Docente',
+                    'Administrador / Coordinador',
+                    'Rector',
+                    'Super Admin'
+                ] %}
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('solicitudes.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Solicitudes
+                        </span>
+                    </div>
+
+                    <h3>Solicitudes</h3>
+
+                    <p>
+                        Gestionar reuniones y propuestas.
+                    </p>
+
+                    <span class="dashboard-action-link">
+                        Ver solicitudes →
+                    </span>
+
+                </a>
+
+                {% endif %}
+
+
+                <!-- REPORTES -->
+
+                {% if usuario.rol_nombre in [
+                    'Administrador / Coordinador',
+                    'Rector',
+                    'Super Admin'
+                ] %}
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('reportes.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Reportes
+                        </span>
+                    </div>
+
+                    <h3>Reportes</h3>
+
+                    <p>
+                        Consultar indicadores institucionales.
+                    </p>
+
+                    <span class="dashboard-action-link">
+                        Ver reportes →
+                    </span>
+
+                </a>
+
+                {% endif %}
+
+
+                <!-- JUSTIFICACIONES -->
+
+                {% if usuario.rol_nombre in [
+                    'Estudiante',
+                    'Acudiente'
+                ] %}
+
+                <a
+                    class="dashboard-action"
+                    href="{{ url_for('justificaciones.index') }}"
+                >
+
+                    <div class="dashboard-action-top">
+                        <span class="dashboard-action-icon">
+                            Justificaciones
+                        </span>
+                    </div>
+
+                    <h3>Justificaciones</h3>
+
+                    <p>
+                        Consultar o presentar solicitudes.
+                    </p>
+
+                    <span class="dashboard-action-link">
+                        Ver justificaciones →
+                    </span>
+
+                </a>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- CUENTA -->
+
+        <section class="dashboard-card dashboard-account-card">
+
+            <div class="dashboard-card-head">
+
+                <div>
+                    <span class="badge">Cuenta</span>
+
+                    <h2>Mi cuenta</h2>
+                </div>
+
+            </div>
+
+            <p class="muted dashboard-account-text">
+                Mantén una contraseña personal segura y actualizada.
+            </p>
+
+            <div class="dashboard-account-action">
+
+                <a
+                    class="boton boton-full"
+                    href="{{ url_for('passwords.cambiar_password') }}"
+                >
+                    Cambiar contraseña
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</section>
+<!-- EDUTURNOS - ESPACIADO TITULOS DASHBOARD -->
+<!-- FIN EDUTURNOS - ESPACIADO TITULOS DASHBOARD -->
+
+
+
+<!-- EDUTURNOS_ACCESOS_ANIMADOS -->
+<!-- FIN EDUTURNOS_ACCESOS_ANIMADOS -->
+
+
+<style id="EDUTURNOS_DASHBOARD_UNICO">
+
+/* =========================================================
+   EDUTURNOS — DASHBOARD VISUAL FINAL
+   Este bloque controla únicamente dashboard.html
+   ========================================================= */
+
+.dashboard-page,
+.dashboard-page * {
+    box-sizing: border-box;
+}
+
+.dashboard-page {
+    width: min(1180px, calc(100% - 48px)) !important;
+    max-width: 1180px !important;
+    margin: 0 auto !important;
+    padding: 42px 0 72px !important;
+    background:
+        radial-gradient(
+            circle at 92% 4%,
+            rgba(37, 99, 235, .08),
+            transparent 340px
+        ),
+        linear-gradient(
+            180deg,
+            #f7faff 0%,
+            #eef4fa 100%
+        ) !important;
+    color: #172942 !important;
+}
+
+
+/* =========================================================
+   CABECERA
+   ========================================================= */
+
+.dashboard-head {
+    position: relative !important;
+    isolation: isolate !important;
+    overflow: hidden !important;
+
+    min-height: 300px !important;
+    padding: 46px 50px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 40px !important;
+
+    border: 1px solid rgba(255,255,255,.16) !important;
+    border-radius: 32px !important;
+
+    background:
+        radial-gradient(
+            circle at 88% 18%,
+            rgba(242,184,75,.20),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 5% 110%,
+            rgba(54,151,205,.25),
+            transparent 34%
+        ),
+        linear-gradient(
+            135deg,
+            #14263e 0%,
+            #193954 48%,
+            #21668e 100%
+        ) !important;
+
+    box-shadow:
+        0 26px 60px rgba(20,38,62,.20),
+        0 4px 12px rgba(20,38,62,.10) !important;
+
+    animation:
+        dashboardEntrada .65s cubic-bezier(.2,.75,.25,1) both !important;
+}
+
+
+/* decoración editorial */
+
+.dashboard-head::before {
+    content: "" !important;
+    position: absolute !important;
+    width: 330px !important;
+    height: 330px !important;
+    right: -150px !important;
+    top: -170px !important;
+    border-radius: 50% !important;
+    border: 1px solid rgba(255,255,255,.12) !important;
+    box-shadow:
+        0 0 0 28px rgba(255,255,255,.025),
+        0 0 0 56px rgba(255,255,255,.018) !important;
+    pointer-events: none !important;
+}
+
+.dashboard-head::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 43% !important;
+    height: 4px !important;
+    background:
+        linear-gradient(
+            90deg,
+            #2f78ff,
+            #4e9dcc,
+            #f2b84b
+        ) !important;
+    pointer-events: none !important;
+}
+
+.dashboard-head-info {
+    position: relative !important;
+    z-index: 3 !important;
+    max-width: 650px !important;
+}
+
+.dashboard-head .badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 30px !important;
+    padding: 6px 12px !important;
+    margin-bottom: 18px !important;
+
+    border: 1px solid rgba(255,255,255,.18) !important;
+    border-radius: 999px !important;
+
+    background: rgba(255,255,255,.09) !important;
+    color: #f2c66d !important;
+
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: .10em !important;
+    text-transform: uppercase !important;
+}
+
+.dashboard-head h1 {
+    margin: 0 !important;
+    color: #ffffff !important;
+    font-family: "Source Serif 4", Georgia, serif !important;
+    font-size: clamp(38px, 4vw, 56px) !important;
+    font-weight: 600 !important;
+    line-height: .98 !important;
+    letter-spacing: -.025em !important;
+}
+
+.dashboard-head .muted {
+    max-width: 560px !important;
+    margin: 18px 0 0 !important;
+    color: rgba(238,246,255,.76) !important;
+    font-size: 15px !important;
+    line-height: 1.65 !important;
+}
+
+
+/* =========================================================
+   ILUSTRACIÓN ABSTRACTA DEL ROL
+   ========================================================= */
+
+.dashboard-role-art {
+    position: absolute !important;
+    z-index: 2 !important;
+    right: 72px !important;
+    top: 50% !important;
+
+    width: 188px !important;
+    height: 188px !important;
+
+    transform: translateY(-50%) !important;
+    pointer-events: none !important;
+}
+
+.role-symbol {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border: 1px solid rgba(255,255,255,.20) !important;
+    border-radius: 50% !important;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.13),
+            rgba(255,255,255,.025) 62%,
+            transparent 63%
+        ) !important;
+
+    box-shadow:
+        inset 0 0 0 14px rgba(255,255,255,.025),
+        0 0 0 1px rgba(255,255,255,.05) !important;
+
+    animation: roleRespira 5s ease-in-out infinite !important;
+}
+
+.role-symbol::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 17px !important;
+    border: 1px dashed rgba(242,184,75,.45) !important;
+    border-radius: 50% !important;
+    animation: roleGiro 18s linear infinite !important;
+}
+
+.role-symbol::after {
+    content: "" !important;
+    position: absolute !important;
+    width: 12px !important;
+    height: 12px !important;
+    top: 12px !important;
+    right: 40px !important;
+    border-radius: 50% !important;
+    background: #f2b84b !important;
+    box-shadow: 0 0 20px rgba(242,184,75,.55) !important;
+}
+
+
+/* piezas geométricas */
+
+.role-symbol span {
+    position: absolute !important;
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 18px !important;
+    background:
+        linear-gradient(
+            135deg,
+            #3c9bd0,
+            #2f78ff
+        ) !important;
+    transform: rotate(45deg) !important;
+    box-shadow:
+        0 15px 30px rgba(0,0,0,.18) !important;
+}
+
+.role-symbol i {
+    position: absolute !important;
+    z-index: 2 !important;
+    width: 34px !important;
+    height: 34px !important;
+    border: 5px solid #ffffff !important;
+    border-radius: 50% !important;
+    background: #f2b84b !important;
+    box-shadow:
+        0 8px 18px rgba(0,0,0,.18) !important;
+}
+
+.role-symbol b {
+    position: absolute !important;
+    z-index: 3 !important;
+    width: 9px !important;
+    height: 9px !important;
+    border-radius: 50% !important;
+    background: #172942 !important;
+}
+
+
+/* =========================================================
+   BOTÓN CERRAR SESIÓN
+   ========================================================= */
+
+.dashboard-head-action {
+    position: relative !important;
+    z-index: 4 !important;
+    align-self: flex-start !important;
+}
+
+.dashboard-logout {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-height: 44px !important;
+    padding: 0 18px !important;
+
+    border: 1px solid rgba(255,255,255,.20) !important;
+    border-radius: 12px !important;
+
+    background: rgba(255,255,255,.09) !important;
+    color: #ffffff !important;
+
+    font-size: 13px !important;
+    font-weight: 800 !important;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,.12) !important;
+    transition:
+        transform .22s ease,
+        background .22s ease,
+        box-shadow .22s ease !important;
+}
+
+.dashboard-logout:hover {
+    transform: translateY(-3px) !important;
+    background: rgba(255,255,255,.16) !important;
+    box-shadow: 0 13px 26px rgba(0,0,0,.18) !important;
+}
+
+
+/* =========================================================
+   KPIs
+   ========================================================= */
+
+.dashboard-kpis {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0,1fr)) !important;
+    gap: 16px !important;
+    margin: 24px 0 38px !important;
+}
+
+.dashboard-kpi {
+    position: relative !important;
+    overflow: hidden !important;
+
+    min-height: 116px !important;
+    padding: 23px 24px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+
+    border: 1px solid #dbe5ef !important;
+    border-radius: 19px !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.98),
+            rgba(246,250,255,.96)
+        ) !important;
+
+    box-shadow:
+        0 8px 24px rgba(23,41,66,.055) !important;
+
+    animation:
+        dashboardEntrada .55s ease both !important;
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease,
+        border-color .22s ease !important;
+}
+
+.dashboard-kpi::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 18px !important;
+    bottom: 18px !important;
+    width: 4px !important;
+    border-radius: 0 5px 5px 0 !important;
+    background:
+        linear-gradient(
+            180deg,
+            #2f78ff,
+            #4e9dcc,
+            #f2b84b
+        ) !important;
+}
+
+.dashboard-kpi:hover {
+    transform: translateY(-4px) !important;
+    border-color: #c4d7e8 !important;
+    box-shadow:
+        0 15px 32px rgba(23,41,66,.10) !important;
+}
+
+.dashboard-kpi span {
+    margin-bottom: 7px !important;
+    color: #718094 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: .02em !important;
+}
+
+.dashboard-kpi strong {
+    color: #172942 !important;
+    font-family: "Source Serif 4", Georgia, serif !important;
+    font-size: 34px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+}
+
+
+/* =========================================================
+   SECCIONES
+   ========================================================= */
+
+.dashboard-main {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 25px !important;
+}
+
+.dashboard-card {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.dashboard-card-head {
+    margin-bottom: 20px !important;
+}
+
+.dashboard-card-head .badge {
+    display: inline-block !important;
+    margin-bottom: 8px !important;
+    color: #1769aa !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: .11em !important;
+    text-transform: uppercase !important;
+}
+
+.dashboard-card-head h2 {
+    margin: 0 !important;
+    color: #172942 !important;
+    font-family: "Source Serif 4", Georgia, serif !important;
+    font-size: 34px !important;
+    font-weight: 600 !important;
+    line-height: 1.05 !important;
+}
+
+.dashboard-card-head .muted {
+    margin: 9px 0 0 !important;
+    color: #718094 !important;
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+}
+
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+.dashboard-action-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+    gap: 18px !important;
+    width: 100% !important;
+}
+
+.dashboard-action {
+    position: relative !important;
+    overflow: hidden !important;
+
+    min-width: 0 !important;
+    min-height: 220px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+
+    padding: 26px !important;
+
+    border: 1px solid #d8e3ed !important;
+    border-radius: 22px !important;
+
+    background: #ffffff !important;
+
+    box-shadow:
+        0 9px 28px rgba(23,41,66,.055) !important;
+
+    text-decoration: none !important;
+
+    transition:
+        transform .25s cubic-bezier(.2,.7,.2,1),
+        box-shadow .25s ease,
+        border-color .25s ease !important;
+
+    animation:
+        dashboardEntrada .55s ease both !important;
+}
+
+.dashboard-action::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 24px !important;
+    right: 24px !important;
+    top: 0 !important;
+    height: 3px !important;
+
+    border-radius: 0 0 8px 8px !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            #1769aa 0%,
+            #4e9dcc 55%,
+            #f2b84b 100%
+        ) !important;
+}
+
+.dashboard-action::after {
+    content: "" !important;
+    position: absolute !important;
+    right: -75px !important;
+    bottom: -75px !important;
+
+    width: 165px !important;
+    height: 165px !important;
+
+    border-radius: 50% !important;
+    background: rgba(23,105,170,.045) !important;
+
+    transition: transform .35s ease !important;
+}
+
+.dashboard-action:hover {
+    transform: translateY(-7px) !important;
+    border-color: #b8cee0 !important;
+
+    box-shadow:
+        0 20px 42px rgba(23,41,66,.12) !important;
+}
+
+.dashboard-action:hover::after {
+    transform: scale(1.35) !important;
+}
+
+.dashboard-action-icon {
+    position: relative !important;
+    z-index: 2 !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: fit-content !important;
+    min-height: 35px !important;
+
+    padding: 7px 12px !important;
+
+    border-radius: 10px !important;
+
+    background: #e9f3fb !important;
+    color: #1769aa !important;
+
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: .04em !important;
+}
+
+.dashboard-action h3 {
+    position: relative !important;
+    z-index: 2 !important;
+
+    margin: 20px 0 8px !important;
+
+    color: #172942 !important;
+
+    font-family: "Source Serif 4", Georgia, serif !important;
+    font-size: 25px !important;
+    font-weight: 600 !important;
+    line-height: 1.08 !important;
+}
+
+.dashboard-action p {
+    position: relative !important;
+    z-index: 2 !important;
+
+    flex: 1 !important;
+
+    margin: 0 !important;
+
+    color: #718094 !important;
+
+    font-size: 13.5px !important;
+    line-height: 1.58 !important;
+}
+
+.dashboard-action-link {
+    position: relative !important;
+    z-index: 2 !important;
+
+    display: inline-block !important;
+
+    margin-top: 20px !important;
+
+    color: #1769aa !important;
+
+    font-size: 13px !important;
+    font-weight: 800 !important;
+
+    transition:
+        transform .2s ease,
+        color .2s ease !important;
+}
+
+.dashboard-action:hover .dashboard-action-link {
+    color: #0d4f83 !important;
+    transform: translateX(4px) !important;
+}
+
+
+/* =========================================================
+   MI CUENTA
+   ========================================================= */
+
+.dashboard-account-card {
+    position: relative !important;
+    overflow: hidden !important;
+
+    padding: 30px !important;
+
+    border: 1px solid #d6e2ec !important;
+    border-radius: 23px !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #edf5fb 0%,
+            #f7fbff 55%,
+            #fff9ed 100%
+        ) !important;
+
+    box-shadow:
+        0 10px 30px rgba(23,41,66,.055) !important;
+}
+
+.dashboard-account-card::after {
+    content: "" !important;
+    position: absolute !important;
+    width: 190px !important;
+    height: 190px !important;
+    right: -85px !important;
+    top: -110px !important;
+    border-radius: 50% !important;
+    background: rgba(242,184,75,.12) !important;
+}
+
+.dashboard-account-text {
+    position: relative !important;
+    z-index: 2 !important;
+
+    max-width: 620px !important;
+    margin: 0 0 20px !important;
+
+    color: #63758a !important;
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+}
+
+.dashboard-account-action {
+    position: relative !important;
+    z-index: 3 !important;
+}
+
+.dashboard-account-action .boton-full {
+    display: inline-flex !important;
+    width: auto !important;
+    min-width: 205px !important;
+    min-height: 45px !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 12px !important;
+
+    background: #1769aa !important;
+    color: #ffffff !important;
+
+    font-weight: 800 !important;
+
+    box-shadow:
+        0 9px 20px rgba(23,105,170,.18) !important;
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease,
+        background .22s ease !important;
+}
+
+.dashboard-account-action .boton-full:hover {
+    transform: translateY(-3px) !important;
+    background: #145d95 !important;
+    box-shadow:
+        0 14px 26px rgba(23,105,170,.23) !important;
+}
+
+
+/* =========================================================
+   ANIMACIONES
+   ========================================================= */
+
+@keyframes dashboardEntrada {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes roleGiro {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes roleRespira {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.025);
+    }
+}
+
+.dashboard-action:nth-child(2) {
+    animation-delay: .05s !important;
+}
+
+.dashboard-action:nth-child(3) {
+    animation-delay: .10s !important;
+}
+
+.dashboard-action:nth-child(4) {
+    animation-delay: .15s !important;
+}
+
+.dashboard-action:nth-child(5) {
+    animation-delay: .20s !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+    .dashboard-role-art {
+        right: 38px !important;
+        width: 150px !important;
+        height: 150px !important;
+    }
+
+    .dashboard-head {
+        padding-right: 220px !important;
+    }
+
+    .dashboard-kpis {
+        grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+    }
+
+    .dashboard-action-grid {
+        grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .dashboard-page {
+        width: calc(100% - 28px) !important;
+        padding-top: 22px !important;
+        padding-bottom: 45px !important;
+    }
+
+    .dashboard-head {
+        min-height: 0 !important;
+        padding: 32px 26px 30px !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    .dashboard-head-info {
+        max-width: 100% !important;
+    }
+
+    .dashboard-head h1 {
+        font-size: 39px !important;
+    }
+
+    .dashboard-head-action {
+        align-self: flex-start !important;
+    }
+
+    .dashboard-role-art {
+        position: absolute !important;
+        right: -35px !important;
+        top: auto !important;
+        bottom: -40px !important;
+
+        width: 145px !important;
+        height: 145px !important;
+
+        transform: none !important;
+        opacity: .45 !important;
+    }
+
+    .dashboard-kpis {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        margin-top: 18px !important;
+    }
+
+    .dashboard-kpi {
+        min-height: 95px !important;
+    }
+
+    .dashboard-action-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .dashboard-action {
+        min-height: 195px !important;
+    }
+
+    .dashboard-card-head h2 {
+        font-size: 30px !important;
+    }
+
+    .dashboard-account-card {
+        padding: 25px !important;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .dashboard-head,
+    .dashboard-kpi,
+    .dashboard-action,
+    .dashboard-account-card,
+    .role-symbol {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .dashboard-action:hover,
+    .dashboard-kpi:hover,
+    .dashboard-logout:hover {
+        transform: none !important;
+    }
+}
+
+</style>
+{% endblock %}

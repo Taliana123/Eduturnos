@@ -1,0 +1,944 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}EDUTURNOS | Sistema de citaciones escolares{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   EDUTURNOS — PORTADA V4
+   Identidad editorial / tecnológica
+   ========================================================= */
+
+.ed-v4 {
+    --black: #101820;
+    --ink: #17232d;
+    --paper: #f3efe7;
+    --paper-2: #e9e3d8;
+    --white: #fffdf9;
+    --electric: #2864ff;
+    --coral: #e66b4e;
+    --muted: #68727b;
+    --line: rgba(23,35,45,.16);
+
+    margin: 0;
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    background: var(--paper);
+    color: var(--ink);
+    overflow: hidden;
+}
+
+/* ---------------- NAV SUPERIOR ---------------- */
+
+.ed-v4-nav {
+    width: min(1320px, calc(100% - 64px));
+    margin: 0 auto;
+    height: 82px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+}
+
+.ed-v4-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--black);
+    text-decoration: none;
+}
+
+.ed-v4-brand-mark {
+    width: 31px;
+    height: 31px;
+    display: grid;
+    place-items: center;
+    background: var(--black);
+    color: white;
+    font: 700 12px "Public Sans", sans-serif;
+}
+
+.ed-v4-brand-name {
+    font: 700 14px "Public Sans", sans-serif;
+    letter-spacing: .12em;
+}
+
+.ed-v4-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.ed-v4-nav-right span {
+    color: #68727b;
+    font: 600 11px "Public Sans", sans-serif;
+}
+
+.ed-v4-login {
+    color: var(--black);
+    text-decoration: none;
+    font: 700 12px "Public Sans", sans-serif;
+    border-bottom: 1px solid var(--black);
+    padding-bottom: 4px;
+}
+
+/* ---------------- HERO ---------------- */
+
+.ed-v4-hero {
+    width: min(1320px, calc(100% - 64px));
+    min-height: 690px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    align-items: center;
+    gap: 60px;
+    position: relative;
+}
+
+.ed-v4-left {
+    position: relative;
+    z-index: 2;
+    padding: 78px 0 95px;
+}
+
+.ed-v4-kicker {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 30px;
+    color: var(--electric);
+    font: 700 11px "Public Sans", sans-serif;
+    letter-spacing: .17em;
+    text-transform: uppercase;
+}
+
+.ed-v4-kicker::before {
+    content: "";
+    width: 42px;
+    height: 2px;
+    background: var(--electric);
+}
+
+.ed-v4-title {
+    margin: 0;
+    max-width: 780px;
+    color: var(--black);
+    font: 600 clamp(70px, 8.2vw, 124px)/.82 "Source Serif 4", Georgia, serif;
+    letter-spacing: -.065em;
+}
+
+.ed-v4-title .line {
+    display: block;
+}
+
+.ed-v4-title .blue {
+    color: var(--electric);
+    font-style: italic;
+}
+
+.ed-v4-description {
+    max-width: 490px;
+    margin: 42px 0 0 5px;
+    color: var(--muted);
+    font: 400 16px/1.75 "Public Sans", sans-serif;
+}
+
+.ed-v4-actions {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin: 34px 0 0 5px;
+}
+
+.ed-v4-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 48px;
+    padding: 0 20px;
+    background: var(--black);
+    color: white;
+    text-decoration: none;
+    font: 700 12px "Public Sans", sans-serif;
+    transition: transform .25s ease, background .25s ease;
+}
+
+.ed-v4-primary::after {
+    content: "↗";
+    font-size: 16px;
+    color: #73a0ff;
+}
+
+.ed-v4-primary:hover {
+    color: white;
+    background: var(--electric);
+    transform: translateY(-2px);
+}
+
+.ed-v4-secondary {
+    color: var(--black);
+    text-decoration: none;
+    font: 700 12px "Public Sans", sans-serif;
+    border-bottom: 1px solid var(--black);
+    padding-bottom: 5px;
+}
+
+.ed-v4-meta {
+    position: absolute;
+    left: 5px;
+    bottom: 31px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    color: #929991;
+    font: 600 9px "Public Sans", sans-serif;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+
+.ed-v4-meta-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--coral);
+    border-radius: 50%;
+}
+
+/* ---------------- PIEZA VISUAL ---------------- */
+
+.ed-v4-right {
+    position: relative;
+    min-height: 610px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ed-v4-number {
+    position: absolute;
+    right: 0;
+    top: 55px;
+    color: rgba(23,35,45,.07);
+    font: 700 230px/.7 "Public Sans", sans-serif;
+    letter-spacing: -.09em;
+    user-select: none;
+}
+
+.ed-v4-paper {
+    position: relative;
+    width: min(510px, 100%);
+    background: var(--white);
+    padding: 31px;
+    box-shadow: 25px 35px 65px rgba(23,35,45,.16);
+    transform: rotate(2.3deg);
+    z-index: 2;
+}
+
+.ed-v4-paper::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 8px;
+    height: 100%;
+    background: var(--electric);
+}
+
+.ed-v4-paper-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 21px;
+    border-bottom: 1px solid var(--line);
+}
+
+.ed-v4-paper-label {
+    color: var(--muted);
+    font: 700 9px "Public Sans", sans-serif;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.ed-v4-paper-status {
+    padding: 6px 9px;
+    background: #e6f3e8;
+    color: #267440;
+    font: 700 8px "Public Sans", sans-serif;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.ed-v4-paper h2 {
+    margin: 32px 0 10px;
+    color: var(--black);
+    font: 600 39px/.98 "Source Serif 4", Georgia, serif;
+    letter-spacing: -.04em;
+}
+
+.ed-v4-paper-sub {
+    margin: 0 0 32px;
+    color: var(--muted);
+    font: 400 12px/1.6 "Public Sans", sans-serif;
+}
+
+.ed-v4-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--line);
+}
+
+.ed-v4-detail {
+    padding: 17px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.ed-v4-detail:nth-child(odd) {
+    margin-right: 22px;
+    border-right: 1px solid var(--line);
+}
+
+.ed-v4-detail-label {
+    display: block;
+    margin-bottom: 7px;
+    color: #929991;
+    font: 700 8px "Public Sans", sans-serif;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.ed-v4-detail-value {
+    color: var(--black);
+    font: 700 12px "Public Sans", sans-serif;
+}
+
+.ed-v4-paper-bottom {
+    margin-top: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ed-v4-calendar-mark {
+    width: 54px;
+    height: 54px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--black);
+}
+
+.ed-v4-calendar-mark strong {
+    display: block;
+    color: var(--black);
+    font: 700 20px "Public Sans", sans-serif;
+    line-height: 1;
+}
+
+.ed-v4-calendar-mark small {
+    color: var(--electric);
+    font: 700 7px "Public Sans", sans-serif;
+}
+
+.ed-v4-sign {
+    text-align: right;
+}
+
+.ed-v4-sign strong {
+    display: block;
+    color: var(--black);
+    font: 600 italic 17px "Source Serif 4", Georgia, serif;
+}
+
+.ed-v4-sign span {
+    color: #929991;
+    font: 600 7px "Public Sans", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+/* ELEMENTO DETRÁS */
+
+.ed-v4-orange {
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    right: 5px;
+    bottom: 67px;
+    background: var(--coral);
+    z-index: 1;
+}
+
+.ed-v4-blue-block {
+    position: absolute;
+    width: 105px;
+    height: 105px;
+    left: 12px;
+    top: 115px;
+    background: var(--electric);
+    z-index: 0;
+}
+
+/* ---------------- FRASE CENTRAL ---------------- */
+
+.ed-v4-statement {
+    background: var(--black);
+    color: white;
+}
+
+.ed-v4-statement-inner {
+    width: min(1320px, calc(100% - 64px));
+    min-height: 390px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: .7fr 1.3fr;
+    align-items: center;
+    gap: 70px;
+}
+
+.ed-v4-statement-label {
+    color: #73a0ff;
+    font: 700 10px "Public Sans", sans-serif;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.ed-v4-statement h2 {
+    max-width: 850px;
+    margin: 0;
+    font: 500 clamp(38px, 5vw, 69px)/1.03 "Source Serif 4", Georgia, serif;
+    letter-spacing: -.045em;
+}
+
+.ed-v4-statement h2 em {
+    color: #73a0ff;
+    font-style: italic;
+}
+
+/* ---------------- SERVICIOS ---------------- */
+
+.ed-v4-services {
+    width: min(1320px, calc(100% - 64px));
+    margin: 0 auto;
+    padding: 105px 0 115px;
+}
+
+.ed-v4-services-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 40px;
+    margin-bottom: 54px;
+}
+
+.ed-v4-services-head h2 {
+    max-width: 600px;
+    margin: 0;
+    color: var(--black);
+    font: 600 clamp(40px, 5vw, 65px)/.98 "Source Serif 4", Georgia, serif;
+    letter-spacing: -.05em;
+}
+
+.ed-v4-services-head p {
+    max-width: 300px;
+    margin: 0 0 4px;
+    color: var(--muted);
+    font: 400 13px/1.7 "Public Sans", sans-serif;
+}
+
+.ed-v4-service-list {
+    border-top: 1px solid var(--black);
+}
+
+.ed-v4-service {
+    min-height: 125px;
+    display: grid;
+    grid-template-columns: 80px 1fr 1.2fr 35px;
+    align-items: center;
+    gap: 30px;
+    border-bottom: 1px solid var(--line);
+    transition: padding .3s ease, background .3s ease;
+}
+
+.ed-v4-service:hover {
+    padding-left: 15px;
+    background: rgba(255,255,255,.5);
+}
+
+.ed-v4-service-number {
+    color: #98a19c;
+    font: 700 11px "Public Sans", sans-serif;
+}
+
+.ed-v4-service h3 {
+    margin: 0;
+    color: var(--black);
+    font: 700 20px "Public Sans", sans-serif;
+}
+
+.ed-v4-service p {
+    margin: 0;
+    color: var(--muted);
+    font: 400 12px/1.6 "Public Sans", sans-serif;
+}
+
+.ed-v4-arrow {
+    color: var(--electric);
+    font: 400 24px "Public Sans", sans-serif;
+}
+
+/* ---------------- FINAL ---------------- */
+
+.ed-v4-final {
+    background: var(--paper-2);
+}
+
+.ed-v4-final-inner {
+    width: min(1320px, calc(100% - 64px));
+    min-height: 320px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 50px;
+}
+
+.ed-v4-final h2 {
+    max-width: 730px;
+    margin: 0;
+    color: var(--black);
+    font: 600 clamp(40px, 5vw, 68px)/.98 "Source Serif 4", Georgia, serif;
+    letter-spacing: -.05em;
+}
+
+.ed-v4-final h2 span {
+    color: var(--electric);
+    font-style: italic;
+}
+
+.ed-v4-final-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 52px;
+    padding: 0 22px;
+    flex-shrink: 0;
+    background: var(--black);
+    color: white;
+    text-decoration: none;
+    font: 700 11px "Public Sans", sans-serif;
+}
+
+.ed-v4-final-button:hover {
+    color: white;
+    background: var(--electric);
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+
+@media (max-width: 1000px) {
+
+    .ed-v4-hero {
+        grid-template-columns: 1fr;
+        padding-bottom: 70px;
+    }
+
+    .ed-v4-left {
+        padding-bottom: 30px;
+    }
+
+    .ed-v4-right {
+        min-height: 550px;
+    }
+
+    .ed-v4-paper {
+        width: min(560px, 90%);
+    }
+
+    .ed-v4-statement-inner {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        padding: 70px 0;
+    }
+
+    .ed-v4-services-head {
+        display: block;
+    }
+
+    .ed-v4-services-head p {
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .ed-v4-nav,
+    .ed-v4-hero,
+    .ed-v4-statement-inner,
+    .ed-v4-services,
+    .ed-v4-final-inner {
+        width: calc(100% - 34px);
+    }
+
+    .ed-v4-nav {
+        height: 68px;
+    }
+
+    .ed-v4-nav-right span {
+        display: none;
+    }
+
+    .ed-v4-left {
+        padding-top: 55px;
+    }
+
+    .ed-v4-title {
+        font-size: clamp(60px, 18vw, 92px);
+    }
+
+    .ed-v4-description {
+        margin-top: 30px;
+        font-size: 14px;
+    }
+
+    .ed-v4-actions {
+        flex-wrap: wrap;
+    }
+
+    .ed-v4-right {
+        min-height: 500px;
+    }
+
+    .ed-v4-paper {
+        padding: 24px;
+        transform: rotate(0);
+    }
+
+    .ed-v4-paper h2 {
+        font-size: 31px;
+    }
+
+    .ed-v4-blue-block {
+        left: -5px;
+        top: 70px;
+        width: 70px;
+        height: 70px;
+    }
+
+    .ed-v4-orange {
+        right: -4px;
+        bottom: 60px;
+        width: 120px;
+        height: 120px;
+    }
+
+    .ed-v4-number {
+        font-size: 150px;
+    }
+
+    .ed-v4-service {
+        min-height: 150px;
+        grid-template-columns: 40px 1fr 25px;
+        gap: 12px;
+    }
+
+    .ed-v4-service p {
+        grid-column: 2 / 3;
+        grid-row: 2;
+    }
+
+    .ed-v4-service h3 {
+        font-size: 17px;
+    }
+
+    .ed-v4-final-inner {
+        display: block;
+        padding: 65px 0;
+    }
+
+    .ed-v4-final-button {
+        margin-top: 30px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ed-v4-primary,
+    .ed-v4-service {
+        transition: none;
+    }
+}
+</style>
+
+
+<div class="ed-v4">
+
+    <nav class="ed-v4-nav">
+
+        <a href="{{ url_for('inicio') }}" class="ed-v4-brand">
+            <span class="ed-v4-brand-mark">E</span>
+            <span class="ed-v4-brand-name">EDUTURNOS</span>
+        </a>
+
+        <div class="ed-v4-nav-right">
+            <span>SISTEMA DE CITACIONES ESCOLARES</span>
+
+            <a href="{{ url_for('auth.login') }}"
+               class="ed-v4-login">
+                Iniciar sesión
+            </a>
+        </div>
+
+    </nav>
+
+
+    <section class="ed-v4-hero">
+
+        <div class="ed-v4-left">
+
+            <div class="ed-v4-kicker">
+                Comunidad educativa conectada
+            </div>
+
+            <h1 class="ed-v4-title">
+                <span>Cada</span>
+                <span class="blue">encuentro.</span>
+                <span>Importa.</span>
+            </h1>
+
+            <p class="ed-v4-description">
+                EDUTURNOS reúne en un solo espacio las citaciones,
+                horarios, seguimiento y notificaciones que mantienen
+                conectada a la comunidad educativa.
+            </p>
+
+            <div class="ed-v4-actions">
+
+                <a href="{{ url_for('auth.login') }}"
+                   class="ed-v4-primary">
+                    Entrar a EDUTURNOS
+                </a>
+
+                <a href="{{ url_for('auth.registro') }}"
+                   class="ed-v4-secondary">
+                    Crear una cuenta
+                </a>
+
+            </div>
+
+            <div class="ed-v4-meta">
+                <span>Estudiantes</span>
+                <span class="ed-v4-meta-dot"></span>
+                <span>Acudientes</span>
+                <span class="ed-v4-meta-dot"></span>
+                <span>Docentes</span>
+                <span class="ed-v4-meta-dot"></span>
+                <span>Institución</span>
+            </div>
+
+        </div>
+
+
+        <div class="ed-v4-right">
+
+            <div class="ed-v4-number">01</div>
+
+            <div class="ed-v4-blue-block"></div>
+
+            <div class="ed-v4-orange"></div>
+
+            <article class="ed-v4-paper">
+
+                <div class="ed-v4-paper-top">
+
+                    <span class="ed-v4-paper-label">
+                        Citación escolar
+                    </span>
+
+                    <span class="ed-v4-paper-status">
+                        Confirmada
+                    </span>
+
+                </div>
+
+                <h2>
+                    Seguimiento
+                    académico
+                </h2>
+
+                <p class="ed-v4-paper-sub">
+                    Una reunión organizada para conversar,
+                    acompañar y dar seguimiento al proceso educativo.
+                </p>
+
+                <div class="ed-v4-details">
+
+                    <div class="ed-v4-detail">
+                        <span class="ed-v4-detail-label">Fecha</span>
+                        <span class="ed-v4-detail-value">24 septiembre 2026</span>
+                    </div>
+
+                    <div class="ed-v4-detail">
+                        <span class="ed-v4-detail-label">Hora</span>
+                        <span class="ed-v4-detail-value">08:00 a. m.</span>
+                    </div>
+
+                    <div class="ed-v4-detail">
+                        <span class="ed-v4-detail-label">Lugar</span>
+                        <span class="ed-v4-detail-value">Sala de reuniones</span>
+                    </div>
+
+                    <div class="ed-v4-detail">
+                        <span class="ed-v4-detail-label">Motivo</span>
+                        <span class="ed-v4-detail-value">Seguimiento</span>
+                    </div>
+
+                </div>
+
+                <div class="ed-v4-paper-bottom">
+
+                    <div class="ed-v4-calendar-mark">
+                        <div>
+                            <strong>24</strong>
+                            <small>SEP</small>
+                        </div>
+                    </div>
+
+                    <div class="ed-v4-sign">
+                        <strong>EDUTURNOS</strong>
+                        <span>Sistema de citaciones escolares</span>
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <section class="ed-v4-statement">
+
+        <div class="ed-v4-statement-inner">
+
+            <div class="ed-v4-statement-label">
+                Una plataforma
+            </div>
+
+            <h2>
+                Menos tiempo buscando información.
+                <em>Más tiempo para acompañar.</em>
+            </h2>
+
+        </div>
+
+    </section>
+
+
+    <section class="ed-v4-services">
+
+        <div class="ed-v4-services-head">
+
+            <h2>
+                Todo lo necesario.
+                En un solo lugar.
+            </h2>
+
+            <p>
+                Una experiencia conectada para gestionar
+                el ciclo completo de cada citación escolar.
+            </p>
+
+        </div>
+
+
+        <div class="ed-v4-service-list">
+
+            <article class="ed-v4-service">
+
+                <span class="ed-v4-service-number">01</span>
+
+                <h3>Citaciones</h3>
+
+                <p>
+                    Crea, confirma, consulta y administra
+                    las reuniones de la institución.
+                </p>
+
+                <span class="ed-v4-arrow">↗</span>
+
+            </article>
+
+
+            <article class="ed-v4-service">
+
+                <span class="ed-v4-service-number">02</span>
+
+                <h3>Calendario</h3>
+
+                <p>
+                    Visualiza horarios y organiza las
+                    actividades sin perder de vista cada encuentro.
+                </p>
+
+                <span class="ed-v4-arrow">↗</span>
+
+            </article>
+
+
+            <article class="ed-v4-service">
+
+                <span class="ed-v4-service-number">03</span>
+
+                <h3>Seguimiento</h3>
+
+                <p>
+                    Conserva el historial y registra
+                    lo ocurrido después de cada citación.
+                </p>
+
+                <span class="ed-v4-arrow">↗</span>
+
+            </article>
+
+
+            <article class="ed-v4-service">
+
+                <span class="ed-v4-service-number">04</span>
+
+                <h3>Notificaciones</h3>
+
+                <p>
+                    Mantén informadas a las personas
+                    correspondientes antes y después de cada cita.
+                </p>
+
+                <span class="ed-v4-arrow">↗</span>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <section class="ed-v4-final">
+
+        <div class="ed-v4-final-inner">
+
+            <h2>
+                Organizar una citación también es
+                <span>cuidar el encuentro.</span>
+            </h2>
+
+            <a href="{{ url_for('auth.registro') }}"
+               class="ed-v4-final-button">
+                Crear cuenta
+                <span>↗</span>
+            </a>
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

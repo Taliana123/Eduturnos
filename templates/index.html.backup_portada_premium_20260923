@@ -1,0 +1,568 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}EDUTURNOS | Sistema de citaciones escolares{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   EDUTURNOS - PORTADA V2
+   Diseño institucional limpio
+   ========================================================= */
+
+.ed-home {
+    min-height: calc(100vh - 72px);
+    margin: -32px -24px -40px;
+    background: #F4F7FB;
+    color: #172033;
+    font-family: "Public Sans", sans-serif;
+}
+
+/* HERO */
+
+.ed-hero {
+    position: relative;
+    overflow: hidden;
+    background: #071B33;
+    color: #fff;
+}
+
+.ed-hero-inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr);
+    align-items: center;
+    gap: 70px;
+    max-width: 1180px;
+    min-height: 610px;
+    margin: 0 auto;
+    padding: 78px 35px;
+}
+
+.ed-hero::after {
+    content: "";
+    position: absolute;
+    right: -180px;
+    top: -230px;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    border: 1px solid rgba(115,172,255,.13);
+    box-shadow:
+        0 0 0 90px rgba(115,172,255,.025),
+        0 0 0 180px rgba(115,172,255,.018);
+}
+
+.ed-kicker {
+    margin: 0 0 18px;
+    color: #8FC1FF;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.ed-hero h1 {
+    max-width: 720px;
+    margin: 0;
+    color: #fff;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: clamp(3.5rem, 7vw, 6.8rem);
+    font-weight: 600;
+    letter-spacing: -.055em;
+    line-height: .92;
+}
+
+.ed-hero h1 em {
+    display: block;
+    color: #73ACFF;
+    font-style: normal;
+}
+
+.ed-line {
+    width: 72px;
+    height: 4px;
+    margin: 27px 0 24px;
+    border-radius: 10px;
+    background: #D6A52C;
+}
+
+.ed-lead {
+    max-width: 610px;
+    margin: 0;
+    color: #C5D5E6;
+    font-size: 1.06rem;
+    line-height: 1.75;
+}
+
+.ed-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.ed-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 22px;
+    border-radius: 9px;
+    text-decoration: none;
+    font-size: .9rem;
+    font-weight: 700;
+    transition: .25s ease;
+}
+
+.ed-btn-primary {
+    background: #4D91F5;
+    color: #fff;
+}
+
+.ed-btn-primary:hover {
+    background: #73ACFF;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,.2);
+}
+
+.ed-btn-outline {
+    border: 1px solid rgba(255,255,255,.28);
+    color: #fff;
+    background: transparent;
+}
+
+.ed-btn-outline:hover {
+    border-color: #73ACFF;
+    background: rgba(115,172,255,.08);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* VISUAL DERECHO */
+
+.ed-preview {
+    position: relative;
+    z-index: 3;
+}
+
+.ed-preview-window {
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 18px;
+    background: #F7F9FC;
+    box-shadow: 0 30px 70px rgba(0,0,0,.28);
+}
+
+.ed-preview-top {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 44px;
+    padding: 0 17px;
+    background: #E9EEF5;
+}
+
+.ed-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #AAB8C8;
+}
+
+.ed-preview-body {
+    padding: 25px;
+    color: #172033;
+}
+
+.ed-preview-label {
+    margin-bottom: 6px;
+    color: #64748B;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.ed-preview-title {
+    margin-bottom: 24px;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.55rem;
+    font-weight: 600;
+}
+
+.ed-preview-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.ed-preview-item {
+    padding: 15px;
+    border: 1px solid #DCE5F0;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.ed-preview-item small {
+    display: block;
+    margin-bottom: 5px;
+    color: #64748B;
+    font-size: .68rem;
+}
+
+.ed-preview-item strong {
+    color: #12395F;
+    font-size: .87rem;
+}
+
+.ed-status {
+    display: inline-flex;
+    margin-top: 9px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: #E8F5EE;
+    color: #198754;
+    font-size: .68rem;
+    font-weight: 700;
+}
+
+/* SECCIÓN INFERIOR */
+
+.ed-info {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 62px 35px 70px;
+}
+
+.ed-info-head {
+    max-width: 650px;
+    margin-bottom: 34px;
+}
+
+.ed-info-kicker {
+    margin-bottom: 9px;
+    color: #4D91F5;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+
+.ed-info h2 {
+    margin: 0;
+    color: #12395F;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -.025em;
+}
+
+.ed-info-head p {
+    margin: 13px 0 0;
+    color: #64748B;
+    line-height: 1.7;
+}
+
+.ed-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.ed-feature {
+    padding: 25px 24px;
+    border-top: 3px solid #4D91F5;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 8px 25px rgba(18,57,95,.07);
+}
+
+.ed-feature-number {
+    display: block;
+    margin-bottom: 20px;
+    color: #D6A52C;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+}
+
+.ed-feature h3 {
+    margin: 0 0 8px;
+    color: #12395F;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.45rem;
+}
+
+.ed-feature p {
+    margin: 0;
+    color: #64748B;
+    font-size: .9rem;
+    line-height: 1.65;
+}
+
+/* PIE */
+
+.ed-footer {
+    border-top: 1px solid #DCE5F0;
+    padding: 22px 35px;
+    color: #64748B;
+    font-size: .76rem;
+    text-align: center;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 850px) {
+
+    .ed-hero-inner {
+        grid-template-columns: 1fr;
+        gap: 45px;
+        min-height: auto;
+        padding: 65px 28px;
+    }
+
+    .ed-preview {
+        max-width: 560px;
+    }
+
+    .ed-features {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+
+    .ed-home {
+        margin: -20px -14px -30px;
+    }
+
+    .ed-hero-inner {
+        padding: 50px 22px;
+    }
+
+    .ed-hero h1 {
+        font-size: clamp(3rem, 17vw, 4.5rem);
+    }
+
+    .ed-buttons {
+        flex-direction: column;
+    }
+
+    .ed-btn {
+        width: 100%;
+    }
+
+    .ed-preview-row {
+        grid-template-columns: 1fr;
+    }
+
+    .ed-info {
+        padding: 50px 22px 60px;
+    }
+
+    .ed-footer {
+        padding: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .ed-btn {
+        transition: none;
+    }
+}
+</style>
+
+<section class="ed-home">
+
+    <div class="ed-hero">
+
+        <div class="ed-hero-inner">
+
+            <div>
+
+                <p class="ed-kicker">
+                    Sistema de citaciones escolares
+                </p>
+
+                <h1>
+                    EDUTURNOS
+                    <em>Cada citación,</em>
+                    en su lugar.
+                </h1>
+
+                <div class="ed-line"></div>
+
+                <p class="ed-lead">
+                    Organiza, confirma y consulta las citaciones
+                    escolares desde un solo lugar, conectando
+                    estudiantes, acudientes, docentes y directivos.
+                </p>
+
+                <div class="ed-buttons">
+
+                    <a
+                        class="ed-btn ed-btn-primary"
+                        href="{{ url_for('auth.login') }}"
+                    >
+                        Iniciar sesión
+                    </a>
+
+                    <a
+                        class="ed-btn ed-btn-outline"
+                        href="{{ url_for('auth.registro') }}"
+                    >
+                        Crear una cuenta
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="ed-preview">
+
+                <div class="ed-preview-window">
+
+                    <div class="ed-preview-top">
+                        <span class="ed-dot"></span>
+                        <span class="ed-dot"></span>
+                        <span class="ed-dot"></span>
+                    </div>
+
+                    <div class="ed-preview-body">
+
+                        <div class="ed-preview-label">
+                            Gestión institucional
+                        </div>
+
+                        <div class="ed-preview-title">
+                            Una citación, todo organizado.
+                        </div>
+
+                        <div class="ed-preview-row">
+
+                            <div class="ed-preview-item">
+                                <small>Calendario</small>
+                                <strong>Horario disponible</strong>
+                            </div>
+
+                            <div class="ed-preview-item">
+                                <small>Estado</small>
+                                <strong>Confirmada</strong>
+                                <span class="ed-status">Registrada</span>
+                            </div>
+
+                        </div>
+
+                        <div class="ed-preview-row">
+
+                            <div class="ed-preview-item">
+                                <small>Seguimiento</small>
+                                <strong>Información centralizada</strong>
+                            </div>
+
+                            <div class="ed-preview-item">
+                                <small>Notificaciones</small>
+                                <strong>Recordatorios</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <section class="ed-info">
+
+        <div class="ed-info-head">
+
+            <div class="ed-info-kicker">
+                Todo en un mismo sistema
+            </div>
+
+            <h2>
+                Pensado para la comunidad educativa.
+            </h2>
+
+            <p>
+                EDUTURNOS centraliza las citaciones y su seguimiento
+                para que cada persona consulte únicamente la
+                información que le corresponde.
+            </p>
+
+        </div>
+
+        <div class="ed-features">
+
+            <article class="ed-feature">
+
+                <span class="ed-feature-number">
+                    01 · CITACIONES
+                </span>
+
+                <h3>
+                    Agenda sin cruces
+                </h3>
+
+                <p>
+                    Organiza fechas, horas, estudiantes,
+                    docentes y motivos en un solo proceso.
+                </p>
+
+            </article>
+
+            <article class="ed-feature">
+
+                <span class="ed-feature-number">
+                    02 · MULTIUSUARIO
+                </span>
+
+                <h3>
+                    Todos conectados
+                </h3>
+
+                <p>
+                    Estudiantes, acudientes, docentes y
+                    directivos trabajan sobre la misma información.
+                </p>
+
+            </article>
+
+            <article class="ed-feature">
+
+                <span class="ed-feature-number">
+                    03 · SEGUIMIENTO
+                </span>
+
+                <h3>
+                    Información a tiempo
+                </h3>
+
+                <p>
+                    Notificaciones, estados, calendario e
+                    historial acompañan cada citación.
+                </p>
+
+            </article>
+
+        </div>
+
+    </section>
+
+    <div class="ed-footer">
+        EDUTURNOS · Sistema de gestión de citaciones escolares
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}{% block title %}Justificaciones · EDUTURNOS{% endblock %}{% block content %}<div class="page-head"><div><h1>Justificaciones</h1><p class="muted">Solicitudes y resoluciones relacionadas con citaciones.</p></div></div><div class="table-wrap"><table><thead><tr><th>Cita</th><th>Fecha</th><th>Estudiante</th><th>Motivo</th><th>Estado</th>{% if rol in ['Super Admin','Rector','Administrador / Coordinador'] %}<th>Acción</th>{% endif %}</tr></thead><tbody>{% for j in justificaciones %}<tr><td>#{{ j.id_cita }}</td><td>{{ j.fecha }}</td><td>{{ j.estudiante }}</td><td>{{ j.motivo }}</td><td><span class="badge">{{ j.estado }}</span></td>{% if rol in ['Super Admin','Rector','Administrador / Coordinador'] and j.estado == 'Pendiente' %}<td><form method="post" action="{{ url_for('justificaciones.resolver', justificacion_id=j.id) }}" class="inline-form">{{ csrf_field()|safe }}<button name="estado" value="Aceptada">Aceptar</button><button name="estado" value="Rechazada">Rechazar</button></form></td>{% endif %}</tr>{% else %}<tr><td colspan="6">No hay solicitudes.</td></tr>{% endfor %}</tbody></table></div>
+
+<style id="EDUTURNOS_BOTONES_V4">
+/* =========================================================
+   EDUTURNOS
+   SOLO BOTONES
+   Mismo azul y letra que "+ Nueva citación" de Citas
+   ========================================================= */
+
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a[class*="boton"],
+a.btn,
+a[class*="btn-"],
+a.link-back,
+a.edc-back,
+.boton,
+.btn,
+[class*="boton-"],
+[class*="btn-"],
+.link-back,
+.edc-back {
+
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+
+    color: #ffffff !important;
+
+    border-color: #1769aa !important;
+
+    text-decoration: none !important;
+}
+
+/* Texto dentro de botones */
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a[class*="boton"] *,
+a.btn *,
+a[class*="btn-"] *,
+.link-back *,
+.edc-back * {
+    color: #ffffff !important;
+}
+
+/* Hover */
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a[class*="boton"]:hover,
+a.btn:hover,
+a[class*="btn-"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.boton:hover,
+.btn:hover,
+[class*="boton-"]:hover,
+[class*="btn-"]:hover,
+.link-back:hover,
+.edc-back:hover {
+
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+
+    color: #ffffff !important;
+
+    border-color: #145b91 !important;
+
+    text-decoration: none !important;
+}
+
+/* Elementos hijos durante hover */
+button:hover *,
+a.boton:hover *,
+a[class*="boton"]:hover *,
+a.btn:hover *,
+a[class*="btn-"]:hover *,
+.link-back:hover *,
+.edc-back:hover * {
+    color: #ffffff !important;
+}
+</style>
+
+{% endblock %}

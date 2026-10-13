@@ -1,0 +1,123 @@
+/* ===============================================================
+   EDUTURNOS - LOGIN MASTER DEFINITIVO
+   =============================================================== */
+
+html body .personal-login {
+    width:100% !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+    padding-left:10px !important;
+    padding-right:10px !important;
+}
+
+html body .personal-login .personal-fields-grid,
+html body .personal-login .form-grid {
+    display:grid !important;
+    grid-template-columns:96px 220px 82px !important;
+    column-gap:7px !important;
+    row-gap:0 !important;
+    width:405px !important;
+    max-width:100% !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    justify-content:center !important;
+    align-items:end !important;
+    box-sizing:border-box !important;
+}
+
+html body .personal-login .personal-field {
+    width:auto !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    margin:0 !important;
+    box-sizing:border-box !important;
+}
+
+html body .personal-login .personal-field-title {
+    display:block !important;
+    width:100% !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    line-height:1.15 !important;
+    margin-bottom:5px !important;
+}
+
+html body .personal-login input[name="codigo_institucional"] {
+    width:96px !important;
+    min-width:96px !important;
+    max-width:96px !important;
+    box-sizing:border-box !important;
+    margin:0 !important;
+    background:#ffffff !important;
+}
+
+html body .personal-login select[name="sede_id"] {
+    width:220px !important;
+    min-width:220px !important;
+    max-width:220px !important;
+    box-sizing:border-box !important;
+    margin:0 !important;
+}
+
+html body .personal-login select[name="jornada_id"] {
+    width:82px !important;
+    min-width:82px !important;
+    max-width:82px !important;
+    box-sizing:border-box !important;
+    margin:0 !important;
+}
+
+html body input[name="identificador"],
+html body input[name="password"] {
+    color:#273142 !important;
+    caret-color:#273142 !important;
+}
+
+html body .section-heading p,
+html body .section-heading p *,
+html body .section-heading strong {
+    border:0 !important;
+    border-bottom:0 !important;
+    text-decoration:none !important;
+    box-shadow:none !important;
+    background-image:none !important;
+}
+
+html body .section-heading::before,
+html body .section-heading::after {
+    content:none !important;
+    display:none !important;
+}
+
+html body .login-page svg,
+html body .login-page svg * {
+    animation:none !important;
+    animation-name:none !important;
+    animation-duration:0s !important;
+    animation-delay:0s !important;
+}
+
+html body .login-page .boton-full {
+    min-height:52px !important;
+    padding:14px 30px !important;
+    font-size:15px !important;
+}
+
+@media (max-width:700px) {
+
+    html body .personal-login .personal-fields-grid,
+    html body .personal-login .form-grid {
+        width:100% !important;
+        grid-template-columns:1fr !important;
+        gap:10px !important;
+    }
+
+    html body .personal-login input[name="codigo_institucional"],
+    html body .personal-login select[name="sede_id"],
+    html body .personal-login select[name="jornada_id"] {
+        width:100% !important;
+        min-width:0 !important;
+        max-width:100% !important;
+    }
+}

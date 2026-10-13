@@ -1,0 +1,845 @@
+
+
+        grid.style.setProperty(
+            'display',
+            'grid',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'grid-template-columns',
+            '90px minmax(215px, 1fr) 85px',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'gap',
+            '10px',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'width',
+            '100%',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'max-width',
+            '415px',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'margin-left',
+            'auto',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'margin-right',
+            'auto',
+            'important'
+        );
+
+        var codigo = document.querySelector(
+            '.login-page input[name="codigo_institucional"]'
+        );
+
+        var sede = document.querySelector(
+            '.login-page select[name="sede_id"]'
+        );
+
+        var jornada = document.querySelector(
+            '.login-page select[name="jornada_id"]'
+        );
+
+        if (codigo) {
+            codigo.style.setProperty(
+                'width',
+                '90px',
+                'important'
+            );
+
+            codigo.style.setProperty(
+                'min-width',
+                '90px',
+                'important'
+            );
+
+            codigo.style.setProperty(
+                'max-width',
+                '90px',
+                'important'
+            );
+        }
+
+===== PERSONAL FIELDS =====
+
+html body .login-page .personal-login .personal-field-code input {
+    display: block !important;
+    width: 112px !important;
+    min-width: 112px !important;
+    max-width: 112px !important;
+    box-sizing: border-box !important;
+    color: #344255 !important;
+}
+
+
+html body .login-page .personal-login .personal-field-sede select {
+    display: block !important;
+    width: 100% !important;
+    min-width: 300px !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    color: #344255 !important;
+    white-space: nowrap !important;
+}
+
+
+html body .login-page .personal-login .personal-field-jornada select {
+    display: block !important;
+    width: 92px !important;
+    min-width: 92px !important;
+    max-width: 92px !important;
+    box-sizing: border-box !important;
+    color: #344255 !important;
+    white-space: nowrap !important;
+}
+
+
+
+</style>
+
+</head>
+
+
+<body>
+
+    <header class="eduturnos-header">
+
+        <div class="eduturnos-logo">
+            EDUTURNOS<span>.</span>
+        </div>
+
+    </header>
+
+
+    <main class="login-page">
+
+        <div class="login-shell">
+
+
+            <!-- =================================================
+                 DIBUJO ANIMADO
+                 ================================================= -->
+
+            <section class="login-visual">
+
+                <div class="login-illustration">
+
+                    <svg
+                class="login-illustration"
+                viewBox="0 0 460 350"
+                role="img"
+                aria-label="Ilustración animada de EDUTURNOS"
+                xmlns="http://www.w3.org/2000/svg">
+
+                <defs>
+
+                    <linearGradient id="edCompactBg" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#e8f4ff"/>
+                        <stop offset="100%" stop-color="#f7fbff"/>
+                    </linearGradient>
+
+                    <linearGradient id="edCompactBlue" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#3b91e4"/>
+                        <stop offset="100%" stop-color="#18599b"/>
+                    </linearGradient>
+
+                    <linearGradient id="edCompactAmber" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#6fa9d8"/>
+                        <stop offset="100%" stop-color="#367fbd"/>
+                    </linearGradient>
+
+                    <filter id="edCompactShadow" x="-30%" y="-30%" width="160%" height="170%">
+                        <feDropShadow
+                            dx="0"
+                            dy="10"
+                            stdDeviation="12"
+                            flood-color="#557899"
+                            flood-opacity=".16"/>
+                    </filter>
+
+                    <filter id="edCompactSoft" x="-30%" y="-30%" width="160%" height="170%">
+                        <feDropShadow
+                            dx="0"
+                            dy="5"
+                            stdDeviation="7"
+                            flood-color="#557899"
+                            flood-opacity=".11"/>
+                    </filter>
+
+                </defs>
+
+                <!-- Fondo compacto -->
+                <rect
+                    x="18"
+                    y="18"
+                    width="424"
+                    height="314"
+                    rx="38"
+                    fill="url(#edCompactBg)"/>
+
+                <circle
+                    cx="72"
+                    cy="72"
+                    r="35"
+                    fill="#ffffff"
+                    opacity=".7"/>
+
+                <circle
+                    cx="397"
+                    cy="88"
+                    r="45"
+                    fill="#ffffff"
+                    opacity=".55"/>
+
+                <circle
+                    cx="393"
+                    cy="278"
+                    r="30"
+                    fill="#d2e8fa"
+                    opacity=".72"/>
+
+                <!-- Pequeño detalle decorativo -->
+                <circle
+                    cx="57"
+                    cy="255"
+                    r="5"
+                    fill="#79afd8"/>
+
+                <circle
+                    cx="411"
+                    cy="224"
+                    r="4"
+                    fill="#438ac7"/>
+
+                <!-- PANEL PRINCIPAL EDUTURNOS -->
+                <g filter="url(#edCompactShadow)">
+
+                    <!-- tarjeta -->
+                    <rect
+                        x="108"
+                        y="78"
+                        width="244"
+                        height="178"
+                        rx="22"
+                        fill="transparent"/>
+
+                    <!-- encabezado -->
+                    <rect
+                        x="108"
+                        y="78"
+                        width="244"
+                        height="47"
+                        rx="22"
+                        fill="url(#edCompactBlue)"/>
+
+                    <rect
+                        x="108"
+                        y="103"
+                        width="244"
+                        height="22"
+                        fill="url(#edCompactBlue)"/>
+
+                    <!-- logo -->
+                    <circle
+                        cx="132"
+                        cy="101"
+                        r="11"
+                        fill="#6fa9d8"/>
+
+                    <path
+                        d="M127 101 L131 105 L138 97"
+                        fill="none"
+                        stroke="#ffffff"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                    <text
+                        x="151"
+                        y="106"
+                        font-family="Arial, sans-serif"
+                        font-size="16"
+                        font-weight="700"
+                        fill="#ffffff">
+                        EDUTURNOS
+                    </text>
+
+                    <!-- titulo -->
+                    <text
+                        x="131"
+                        y="151"
+                        font-family="Arial, sans-serif"
+                        font-size="11"
+                        font-weight="700"
+                        fill="#234563">
+                        Información escolar
+                    </text>
+
+                    <text
+                        x="131"
+                        y="166"
+                        font-family="Arial, sans-serif"
+                        font-size="8"
+                        fill="#7c8fa1">
+                        Todo organizado en un solo lugar
+                    </text>
+
+                    <!-- fila 1 -->
+                    <rect
+                        x="131"
+                        y="181"
+                        width="94"
+                        height="35"
+                        rx="10"
+                        fill="#f2f8fd"/>
+
+                    <circle
+                        cx="147"
+                        cy="198"
+                        r="9"
+                        fill="#d8ebfb"/>
+
+                    <path
+                        d="M143 198 L147 202 L153 194"
+                        fill="none"
+                        stroke="#2d79c1"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                    <rect
+                        x="162"
+                        y="192"
+                        width="48"
+                        height="5"
+                        rx="2.5"
+                        fill="#b9d1e4"/>
+
+                    <rect
+                        x="162"
+                        y="201"
+                        width="36"
+                        height="4"
+                        rx="2"
+                        fill="#d4e3ef"/>
+
+                    <!-- fila 2 -->
+                    <rect
+                        x="237"
+                        y="181"
+                        width="94"
+                        height="35"
+                        rx="10"
+                        fill="#fff8e8"/>
+
+                    <circle
+                        cx="253"
+                        cy="198"
+                        r="9"
+                        fill="#d9ebfa"/>
+
+                    <path
+                        d="M249 198 L253 202 L259 194"
+                        fill="none"
+                        stroke="#2878c2"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                    <rect
+                        x="268"
+                        y="192"
+                        width="47"
+                        height="5"
+                        rx="2.5"
+                        fill="#e2c883"/>
+
+                    <rect
+                        x="268"
+                        y="201"
+                        width="32"
+                        height="4"
+                        rx="2"
+                        fill="#eee0bc"/>
+
+                    <!-- botón visual -->
+                    <rect
+                        x="131"
+                        y="228"
+                        width="200"
+                        height="15"
+                        rx="7.5"
+                        fill="#edf5fc"/>
+
+                    <rect
+                        x="131"
+                        y="228"
+                        width="126"
+                        height="15"
+                        rx="7.5"
+                        fill="#2f6fae"/>
+
+                    <!-- brillo que pasa por la tarjeta -->
+                    <rect
+                        class="compact-sweep"
+                        x="165"
+                        y="78"
+                        width="10"
+                        height="178"
+                        rx="5"
+                        fill="transparent"
+                        opacity=".28"/>
+
+                </g>
+
+                <!-- LIBRO -->
+                <g
+                    class="compact-book"
+                    filter="url(#edCompactSoft)">
+
+                    <path
+                        d="M55 128 Q73 115 91 126 L91 168 Q73 157 55 168 Z"
+                        fill="#ffffff"/>
+
+                    <path
+                        d="M91 126 Q109 115 127 128 L127 168 Q109 157 91 168 Z"
+                        fill="#ffffff"/>
+
+                    <path
+                        d="M63 137 Q75 130 85 136"
+                        fill="none"
+                        stroke="#438ac7"
+                        stroke-width="3"
+                        stroke-linecap="round"/>
+
+                    <path
+                        d="M97 136 Q108 130 119 137"
+                        fill="none"
+                        stroke="#5d9bcf"
+                        stroke-width="3"
+                        stroke-linecap="round"/>
+
+                    <line
+                        x1="91"
+                        y1="126"
+                        x2="91"
+                        y2="168"
+                        stroke="#d7e2ec"
+                        stroke-width="2"/>
+
+                </g>
+
+                <!-- CAMPANA -->
+                <g
+                    class="compact-bell"
+                    filter="url(#edCompactSoft)">
+
+                    <circle
+                        cx="382"
+                        cy="142"
+                        r="32"
+                        fill="#ffffff"/>
+
+                    <path
+                        d="
+                        M370 150
+                        V137
+                        C370 129 375 123 382 123
+                        C389 123 394 129 394 137
+                        V150
+                        L399 154
+                        H365
+                        Z"
+                        fill="#2f6fae"/>
+
+                    <circle
+                        cx="382"
+                        cy="158"
+                        r="5"
+                        fill="#3d86c1"/>
+
+                </g>
+
+                <!-- CHECK ANIMADO -->
+                <g
+                    class="compact-check"
+                    filter="url(#edCompactSoft)">
+
+                    <circle
+                        cx="80"
+                        cy="226"
+                        r="23"
+                        fill="#ffffff"/>
+
+                    <circle
+                        cx="80"
+                        cy="226"
+                        r="15"
+                        fill="#e1f2ff"/>
+
+                    <path
+                        d="M72 226 L78 232 L90 218"
+                        fill="none"
+                        stroke="#2878c2"
+                        stroke-width="5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                </g>
+
+                <!-- PEQUEÑA ESTRELLA DECORATIVA -->
+                <path
+                    d="
+                    M362 235
+                    L367 245
+                    L378 247
+                    L370 255
+                    L372 266
+                    L362 261
+                    L352 266
+                    L354 255
+                    L346 247
+                    L357 245
+                    Z"
+                    fill="#6fa9d8"
+                    opacity=".86"/>
+
+            </svg>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 LOGIN
+                 ================================================= -->
+
+            <section class="login-card">
+
+
+                <div class="section-heading">
+
+                    <span class="badge">
+                        Acceso seguro
+                    </span>
+
+                    <h1>
+                        Iniciar sesión
+                    </h1>
+
+                    <p>
+                        El sistema determina tu rol desde la información institucional.
+                        No debes escogerlo.
+                    </p>
+
+                </div>
+
+
+                <!-- Mensajes Flask -->
+
+                
+
+                    
+
+                
+
+
+                <form
+                    method="post"
+                    autocomplete="off"
+                    class="stack-form"
+                >
+
+                    <input type="hidden" name="csrf_token" value="8QTjAYQSjOAOUMeX7RIsLr_UHi897StPZFSf_AXUV1s">
+
+
+                    <!-- Documento -->
+
+                    <label>
+
+                        Documento o correo
+
+                        <input
+                            type="text"
+                            name="identificador"
+                            autocomplete="username"
+                            placeholder="Documento o correo"
+                        >
+
+                    </label>
+
+
+                    <!-- Contraseña -->
+
+                    <label>
+
+                        Contraseña
+
+                        <input
+                            type="password"
+                            name="password"
+                            autocomplete="current-password"
+                            placeholder="Contraseña"
+                        >
+
+                    </label>
+
+
+                    <!-- Personal institucional -->
+
+                    <div class="personal-login">
+
+                        <h3>
+                            Personal institucional
+                        </h3>
+
+                        <p>
+                            Docentes, Coordinadores y Rectoría deben usar su correo
+                            <strong>@jjfh.edu.co</strong>, código de 6 dígitos,
+                            sede y jornada.
+                        </p>
+
+
+                        <div class="personal-fields-grid">
+
+
+                            <!-- Código -->
+
+                            <label class="personal-field personal-field-code">
+
+                                <span class="personal-field-title">
+                                    Código institucional
+                                </span>
+
+                                <input
+                                    type="text"
+                                    name="codigo_institucional"
+                                    inputmode="numeric"
+                                    maxlength="6"
+                                    pattern="[0-9]{6}
+
+
+
+        var grid = document.querySelector(
+            '.login-page .personal-login .personal-fields-grid'
+        );
+
+        if (!grid) {
+            return;
+        }
+
+
+
+
+
+
+
+
+
+/* El label no debe ocupar la columna de Sede */
+
+<style id="eduturnos-login-campos-definitivo">
+
+/*
+ EDUTURNOS
+ ÚNICA REGLA VISUAL DEFINITIVA
+ PARA LOS CAMPOS INSTITUCIONALES.
+
+ NO MODIFICA LOS SELECT NI SUS OPCIONES.
+*/
+
+/* CONTENEDOR */
+
+html body .personal-fields-grid {
+    display: grid !important;
+
+    grid-template-columns:
+        120px
+        minmax(300px, 1fr)
+        100px !important;
+
+    gap: 0 16px !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    align-items: end !important;
+}
+
+
+
+
+/* CAMPOS */
+
+html body .personal-fields-grid > .personal-field {
+    display: block !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+
+
+/* CÓDIGO */
+
+html body .personal-fields-grid > .personal-field-code {
+    grid-column: 1 !important;
+
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+}
+
+
+
+
+/* SEDE */
+
+html body .personal-fields-grid > .personal-field-sede {
+    grid-column: 2 !important;
+
+    width: auto !important;
+    min-width: 300px !important;
+    max-width: none !important;
+}
+
+
+
+
+/* JORNADA */
+
+html body .personal-fields-grid > .personal-field-jornada {
+    grid-column: 3 !important;
+
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
+
+
+
+
+/* TITULOS */
+
+html body .personal-fields-grid .personal-field-title {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    margin: 0 0 6px 0 !important;
+    padding: 0 !important;
+
+    white-space: nowrap !important;
+    text-align: left !important;
+
+    box-sizing: border-box !important;
+}
+
+
+
+
+/* INPUT CÓDIGO */
+
+html body .personal-fields-grid
+.personal-field-code input {
+    display: block !important;
+
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+
+    box-sizing: border-box !important;
+}
+
+
+
+
+/* SELECT SEDE */
+
+html body .personal-fields-grid
+.personal-field-sede select {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 300px !important;
+    max-width: 100% !important;
+
+    box-sizing: border-box !important;
+}
+
+
+
+
+/* SELECT JORNADA */
+
+html body .personal-fields-grid
+.personal-field-jornada select {
+    display: block !important;
+
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+
+    box-sizing: border-box !important;
+}
+
+
+
+    html body .personal-fields-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px 0 !important;
+    }
+
+
+
+    html body .personal-fields-grid > .personal-field-code,
+    html body .personal-fields-grid > .personal-field-sede,
+    html body .personal-fields-grid > .personal-field-jornada {
+        grid-column: 1 !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+    }
+
+
+
+    html body .personal-fields-grid
+    .personal-field-code input,
+    html body .personal-fields-grid
+    .personal-field-sede select,
+    html body .personal-fields-grid
+    .personal-field-jornada select {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }

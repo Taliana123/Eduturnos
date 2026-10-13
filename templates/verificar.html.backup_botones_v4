@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block contenido %}
+<div class="tarjeta formulario">
+    <h1>Verificar cuenta</h1>
+    <p>Escribe el código de verificación generado por el sistema.</p>
+    {% if codigo %}<div class="codigo">Código de desarrollo: {{ codigo }}</div>{% endif %}
+    <form method="post">{{ csrf_field()|safe }}
+        <label>Código<input name="codigo" maxlength="6" required></label>
+        <button class="boton" type="submit">Verificar</button>
+    </form>
+</div>
+{% endblock %}

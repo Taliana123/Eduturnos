@@ -1,0 +1,28 @@
+{
+	"name": "EDUTURNOS",
+	"short_name": "EDUTURNOS",
+	"description": "Gestión institucional de citaciones escolares",
+	"lang": "es-CO",
+	"id": "/",
+	"start_url": "/",
+	"scope": "/",
+	"display": "standalone",
+	"orientation": "any",
+	"background_color": "#f4f7fb",
+	"theme_color": "#172942",
+	"categories": ["education", "productivity"],
+	"icons": [
+		{
+			"src": "/static/icons/eduturnos-192.svg",
+			"sizes": "192x192",
+			"type": "image/svg+xml",
+			"purpose": "any maskable"
+		},
+		{
+			"src": "/static/icons/eduturnos-512.svg",
+			"sizes": "512x512",
+			"type": "image/svg+xml",
+			"purpose": "any maskable"
+		}
+	]
+}

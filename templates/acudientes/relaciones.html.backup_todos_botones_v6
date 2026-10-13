@@ -1,0 +1,93 @@
+{% extends 'base.html' %}{% block content %}<h1>Estudiantes de {{ acudiente.nombres }} {{ acudiente.apellidos }}</h1><div class="panel"><form method="post" action="{{ url_for('acudientes.relacionar',id=acudiente.id_acudiente) }}" class="form-grid">{{ csrf_field()|safe }}<label>Estudiante<select name="estudiante" required>
+<option value="" selected disabled hidden></option>
+{% for e in todos %}<option value="{{ e.id_estudiante }}">{{ e.apellidos }} {{ e.nombres }} · {{ e.documento }}</option>{% endfor %}</select></label><label>Parentesco<input name="parentesco" required></label><label><input type="checkbox" name="principal"> Principal</label><div><button class="boton">Relacionar</button></div></form></div><div class="table-wrap"><table><tr><th>Estudiante</th><th>Parentesco</th><th>Principal</th></tr>{% for e in estudiantes %}<tr><td>{{ e.nombres }} {{ e.apellidos }}</td><td>{{ e.parentesco }}</td><td>{{ 'Sí' if e.principal else 'No' }}</td></tr>{% else %}<tr><td colspan="3">No hay relaciones.</td></tr>{% endfor %}</table></div>
+
+<style id="EDUTURNOS_BOTONES_V4">
+/* =========================================================
+   EDUTURNOS
+   SOLO BOTONES
+   Mismo azul y letra que "+ Nueva citación" de Citas
+   ========================================================= */
+
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a[class*="boton"],
+a.btn,
+a[class*="btn-"],
+a.link-back,
+a.edc-back,
+.boton,
+.btn,
+[class*="boton-"],
+[class*="btn-"],
+.link-back,
+.edc-back {
+
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+
+    color: #ffffff !important;
+
+    border-color: #1769aa !important;
+
+    text-decoration: none !important;
+}
+
+/* Texto dentro de botones */
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a[class*="boton"] *,
+a.btn *,
+a[class*="btn-"] *,
+.link-back *,
+.edc-back * {
+    color: #ffffff !important;
+}
+
+/* Hover */
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a[class*="boton"]:hover,
+a.btn:hover,
+a[class*="btn-"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.boton:hover,
+.btn:hover,
+[class*="boton-"]:hover,
+[class*="btn-"]:hover,
+.link-back:hover,
+.edc-back:hover {
+
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+
+    color: #ffffff !important;
+
+    border-color: #145b91 !important;
+
+    text-decoration: none !important;
+}
+
+/* Elementos hijos durante hover */
+button:hover *,
+a.boton:hover *,
+a[class*="boton"]:hover *,
+a.btn:hover *,
+a[class*="btn-"]:hover *,
+.link-back:hover *,
+.edc-back:hover * {
+    color: #ffffff !important;
+}
+</style>
+
+{% endblock %}

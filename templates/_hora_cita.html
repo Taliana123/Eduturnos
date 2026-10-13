@@ -1,0 +1,10 @@
+{% macro selector_hora(nombre, id=none) -%}
+<select name="{{ nombre }}"{% if id %} id="{{ id }}"{% endif %} required>
+    <option value="" selected disabled>Selecciona la hora</option>
+    {% for jornada, opciones in horarios_citas.items() %}
+    <optgroup label="{{ jornada }}">
+        {% for valor, etiqueta in opciones %}<option value="{{ valor }}">{{ etiqueta }}</option>{% endfor %}
+    </optgroup>
+    {% endfor %}
+</select>
+{%- endmacro %}

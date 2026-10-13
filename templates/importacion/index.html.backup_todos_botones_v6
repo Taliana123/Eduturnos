@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Importación · EDUTURNOS{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <a class="link-back" href="{{ url_for('configuracion.index') }}">← Configuración</a>
+    <h1>Importación institucional</h1>
+    <p>Carga estudiantes y acudientes desde CSV o XLSX. Los duplicados se rechazan y se informa la fila con error.</p>
+  </div>
+</section>
+<div class="grid equal-cards">
+  <section class="tarjeta feature-card">
+    <h2>Estudiantes</h2>
+    <p>Columnas: codigo_estudiantil, tipo_documento, documento, nombres, apellidos, curso, sede, jornada, periodo, grado, grupo.</p>
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('importacion.estudiantes') }}" class="stack-form form-uniform">
+      {{ csrf_field()|safe }}
+      <label>Archivo CSV o XLSX<input type="file" name="archivo" accept=".csv,.xlsx" required></label>
+      <button class="boton" type="submit">Importar estudiantes</button>
+    </form>
+  </section>
+  <section class="tarjeta feature-card">
+    <h2>Acudientes</h2>
+    <p>Columnas: tipo_documento, documento, nombres, apellidos, telefono, correo, direccion, barrio, municipio.</p>
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('importacion.acudientes') }}" class="stack-form form-uniform">
+      {{ csrf_field()|safe }}
+      <label>Archivo CSV o XLSX<input type="file" name="archivo" accept=".csv,.xlsx" required></label>
+      <button class="boton" type="submit">Importar acudientes</button>
+    </form>
+  </section>
+</div>
+
+
+<style id="EDUTURNOS_BOTONES_V4">
+/* =========================================================
+   EDUTURNOS
+   SOLO BOTONES
+   Mismo azul y letra que "+ Nueva citación" de Citas
+   ========================================================= */
+
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a[class*="boton"],
+a.btn,
+a[class*="btn-"],
+a.link-back,
+a.edc-back,
+.boton,
+.btn,
+[class*="boton-"],
+[class*="btn-"],
+.link-back,
+.edc-back {
+
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+
+    color: #ffffff !important;
+
+    border-color: #1769aa !important;
+
+    text-decoration: none !important;
+}
+
+/* Texto dentro de botones */
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a[class*="boton"] *,
+a.btn *,
+a[class*="btn-"] *,
+.link-back *,
+.edc-back * {
+    color: #ffffff !important;
+}
+
+/* Hover */
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a[class*="boton"]:hover,
+a.btn:hover,
+a[class*="btn-"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.boton:hover,
+.btn:hover,
+[class*="boton-"]:hover,
+[class*="btn-"]:hover,
+.link-back:hover,
+.edc-back:hover {
+
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+
+    color: #ffffff !important;
+
+    border-color: #145b91 !important;
+
+    text-decoration: none !important;
+}
+
+/* Elementos hijos durante hover */
+button:hover *,
+a.boton:hover *,
+a[class*="boton"]:hover *,
+a.btn:hover *,
+a[class*="btn-"]:hover *,
+.link-back:hover *,
+.edc-back:hover * {
+    color: #ffffff !important;
+}
+</style>
+
+{% endblock %}

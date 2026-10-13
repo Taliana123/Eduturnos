@@ -1,0 +1,274 @@
+EDUTURNOS - AUDITORIA FUNCIONAL
+Fecha: 2026-09-21 14:48:02
+Proyecto: D:\edu_Final
+
+============================================================
+1. ARCHIVOS PRINCIPALES
+============================================================
+OK       app.py (10171 bytes)
+OK       config.py (2469 bytes)
+OK       routes\auth.py (81684 bytes)
+OK       routes\citas.py (27353 bytes)
+OK       routes\citaciones.py (455 bytes)
+OK       routes\notificaciones.py (1573 bytes)
+OK       routes\helpers.py (2120 bytes)
+OK       routes\calendario.py (16075 bytes)
+OK       routes\solicitudes.py (16991 bytes)
+OK       routes\justificaciones.py (4806 bytes)
+OK       routes\reportes.py (5582 bytes)
+OK       routes\passwords.py (10508 bytes)
+OK       templates\dashboard.html (17091 bytes)
+OK       templates\auth\login.html (7255 bytes)
+OK       templates\auth\registro.html (19303 bytes)
+OK       templates\auth\registro_portal.html (30921 bytes)
+OK       templates\citas\index.html (9356 bytes)
+OK       templates\citas\nueva.html (7117 bytes)
+OK       templates\notificaciones\index.html (12760 bytes)
+OK       templates\calendario\index.html (59648 bytes)
+OK       templates\solicitudes\index.html (17499 bytes)
+OK       templates\justificaciones\index.html (6478 bytes)
+OK       templates\reportes\index.html (8676 bytes)
+OK       tools\enviar_recordatorios.py (13173 bytes)
+OK       .env (114 bytes)
+OK       requirements.txt (129 bytes)
+
+============================================================
+2. APP Y BLUEPRINTS
+============================================================
+OK       Blueprint detectado: auth
+REVISAR  Blueprint no detectado claramente: citas
+REVISAR  Blueprint no detectado claramente: citaciones
+REVISAR  Blueprint no detectado claramente: notificaciones
+REVISAR  Blueprint no detectado claramente: calendario
+REVISAR  Blueprint no detectado claramente: solicitudes
+REVISAR  Blueprint no detectado claramente: justificaciones
+REVISAR  Blueprint no detectado claramente: reportes
+REVISAR  Blueprint no detectado claramente: passwords
+
+============================================================
+3. AUTENTICACION
+============================================================
+OK       Login
+OK       Registro
+OK       Dashboard
+OK       Logout GET
+OK       Logout POST
+OK       Password hash
+OK       Sesiones
+OK       Verificacion
+OK       Intentos fallidos
+OK       Bloqueo
+OK       Roles
+OK       Sedes
+OK       Jornadas
+OK       Codigo institucional
+OK       Correo institucional
+
+============================================================
+4. RECUPERACION DE CONTRASEÑA
+============================================================
+OK       Ruta recuperar
+OK       Ruta codigo
+OK       Nueva contraseña
+OK       tokens_recuperacion
+FALTA/REVISAR  codigos_verificacion
+OK       Expiracion
+OK       Correo SMTP
+
+============================================================
+5. CITAS
+============================================================
+OK       Listado
+OK       Crear cita
+OK       Fecha
+OK       Hora
+OK       Estudiante
+OK       Acudiente
+OK       Docente
+OK       Motivo
+OK       Estado
+OK       Periodo
+OK       Lugar
+OK       Observaciones
+OK       Usuario creador
+OK       Duplicados
+OK       Fecha pasada
+OK       Cambio estado
+OK       Notificacion
+
+============================================================
+6. NOTIFICACIONES
+============================================================
+OK       Listado
+OK       Marcar una
+OK       Marcar todas
+OK       No leidas
+OK       Crear notificacion en citas
+OK       Estudiante
+OK       Acudiente
+OK       Docente
+OK       Creador
+
+============================================================
+7. RECORDATORIOS 24H / 2H
+============================================================
+OK       Archivo independiente
+OK       24 horas
+OK       2 horas
+OK       recordatorio_24h_enviado
+OK       recordatorio_2h_enviado
+OK       Notificaciones
+FALTA/REVISAR  Correo
+
+============================================================
+8. DASHBOARD
+============================================================
+OK       Total citas
+OK       Confirmadas
+OK       Notificaciones
+OK       Calendario
+OK       Citas
+OK       Solicitudes
+OK       Justificaciones
+OK       Reportes
+OK       Cambiar contraseña
+OK       Mi cuenta
+
+============================================================
+9. CALENDARIO
+============================================================
+OK       Ruta calendario
+OK       Citas reales
+OK       Fecha
+OK       Hora
+OK       Boton Hoy
+FALTA/REVISAR  FullCalendar
+
+============================================================
+10. SOLICITUDES
+============================================================
+OK       Ruta solicitudes
+OK       Crear
+OK       Guardar
+OK       Estado
+OK       Aceptar/Rechazar
+FALTA/REVISAR  Notificaciones
+
+============================================================
+11. REPORTES
+============================================================
+OK       Ruta reportes
+OK       Consultas SQL
+OK       Citas
+FALTA/REVISAR  Sedes
+OK       Estados
+OK       Excel
+OK       PDF
+
+============================================================
+12. COMPATIBILIDAD CON NUEVA BASE DE DATOS
+============================================================
+REFERENCIA  id_usuario
+REFERENCIA  id_rol
+REFERENCIA  password_hash
+REFERENCIA  verificado
+REFERENCIA  intentos_fallidos
+REFERENCIA  bloqueado_hasta
+REFERENCIA  id_sede
+REFERENCIA  id_jornada
+REFERENCIA  codigo_institucional_hash
+REFERENCIA  recordatorio_24h_enviado
+REFERENCIA  recordatorio_2h_enviado
+REFERENCIA  tokens_recuperacion
+REFERENCIA  codigos_acceso
+REFERENCIA  directorio_institucional
+
+============================================================
+13. ENDPOINTS url_for
+============================================================
+REFERENCIADO  acudientes.editar
+REFERENCIADO  acudientes.lista
+REFERENCIADO  acudientes.nuevo
+REFERENCIADO  acudientes.relacionar
+REFERENCIADO  acudientes.relaciones
+REFERENCIADO  auth.dashboard
+REFERENCIADO  auth.login
+REFERENCIADO  auth.logout
+REFERENCIADO  auth.registro
+REFERENCIADO  auth.registro_portal
+REFERENCIADO  calendario.descargar_ics
+REFERENCIADO  calendario.index
+REFERENCIADO  citaciones.cambiar_estado
+REFERENCIADO  citaciones.lista
+REFERENCIADO  citaciones.nueva
+REFERENCIADO  citas.cambiar_estado
+REFERENCIADO  citas.index
+REFERENCIADO  citas.nueva
+REFERENCIADO  configuracion.activar_periodo
+REFERENCIADO  configuracion.arquitectura
+REFERENCIADO  configuracion.auditoria_view
+REFERENCIADO  configuracion.cerrar_periodo
+REFERENCIADO  configuracion.guardar_estado
+REFERENCIADO  configuracion.guardar_grado
+REFERENCIADO  configuracion.guardar_grupo
+REFERENCIADO  configuracion.guardar_institucion
+REFERENCIADO  configuracion.guardar_jornada
+REFERENCIADO  configuracion.guardar_motivo
+REFERENCIADO  configuracion.guardar_sede
+REFERENCIADO  configuracion.index
+REFERENCIADO  configuracion.nuevo_periodo
+REFERENCIADO  configuracion.toggle_estado
+REFERENCIADO  configuracion.toggle_grado
+REFERENCIADO  configuracion.toggle_grupo
+REFERENCIADO  configuracion.toggle_jornada
+REFERENCIADO  configuracion.toggle_motivo
+REFERENCIADO  configuracion.toggle_sede
+REFERENCIADO  docentes.asignaciones
+REFERENCIADO  docentes.editar
+REFERENCIADO  docentes.lista
+REFERENCIADO  docentes.nuevo
+REFERENCIADO  estudiantes.editar
+REFERENCIADO  estudiantes.lista
+REFERENCIADO  estudiantes.nuevo
+REFERENCIADO  importacion.acudientes
+REFERENCIADO  importacion.estudiantes
+REFERENCIADO  inicio
+REFERENCIADO  justificaciones.index
+REFERENCIADO  justificaciones.resolver
+REFERENCIADO  notificaciones.index
+REFERENCIADO  notificaciones.marcar_leida
+REFERENCIADO  notificaciones.marcar_todas
+REFERENCIADO  passwords.cambiar_password
+REFERENCIADO  passwords.recuperar
+REFERENCIADO  reportes.exportar_csv
+REFERENCIADO  reportes.exportar_pdf
+REFERENCIADO  reportes.exportar_xlsx
+REFERENCIADO  reportes.index
+REFERENCIADO  seguimiento.lista
+REFERENCIADO  seguimiento.registrar
+REFERENCIADO  solicitudes.index
+REFERENCIADO  solicitudes.nueva_acudiente
+REFERENCIADO  solicitudes.nueva_docente
+REFERENCIADO  solicitudes.resolver
+REFERENCIADO  static
+
+============================================================
+14. IMPORTACION DE LA APLICACION
+============================================================
+OK       app.py se puede importar
+IMPORT_APP_OK
+
+
+============================================================
+15. RESUMEN
+============================================================
+
+Esta auditoria NO modifico:
+- MySQL
+- tablas
+- datos
+- .env
+- codigo fuente
+
+Informe:
+D:\edu_Final\AUDITORIA_EDUTURNOS_20260921_144802.txt

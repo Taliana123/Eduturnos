@@ -1,0 +1,3762 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#165dca"><meta name="description" content="EDUTURNOS: gestión institucional de citaciones escolares">
+<link rel="manifest" href="{{ url_for('static',filename='manifest.webmanifest') }}"><title>{% block title %}EDUTURNOS{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static',filename='css/estilos.css') }}?v=20260925_152240">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@500;600;700&display=swap">
+
+
+<!-- EDUTURNOS_ESTILO_FIJO -->
+
+<style id="eduturnos-estilo-fijo">
+
+/* =========================================================
+   EDUTURNOS - ESTILO VISUAL FIJO
+   ========================================================= */
+
+/* Todo calcula sus tamaños correctamente */
+#contenido,
+#contenido *,
+#contenido *::before,
+#contenido *::after {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   TARJETAS Y FORMULARIOS
+   ========================================================= */
+
+#contenido .formulario {
+    width: 100% !important;
+    padding: 20px 0 !important;
+}
+
+#contenido .form-card,
+#contenido .tarjeta {
+    width: 100% !important;
+    max-width: 850px !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    padding: 30px !important;
+
+    border-radius: 14px !important;
+}
+
+/* =========================================================
+   ENCABEZADO
+   ========================================================= */
+
+#contenido .section-heading {
+    width: 100% !important;
+
+    margin: 0 0 26px 0 !important;
+
+    padding: 0 !important;
+}
+
+#contenido .section-heading .badge {
+    display: inline-block !important;
+    margin-bottom: 10px !important;
+}
+
+#contenido .section-heading h1 {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 0 10px 0 !important;
+
+    line-height: 1.2 !important;
+}
+
+#contenido .section-heading p {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 !important;
+
+    line-height: 1.55 !important;
+}
+
+/* =========================================================
+   FORMULARIO PRINCIPAL
+   ========================================================= */
+
+#contenido form.stack-form,
+#contenido form.form-uniform {
+    width: 100% !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    gap: 20px !important;
+
+    margin: 0 !important;
+}
+
+/* =========================================================
+   CADA CAMPO
+   ========================================================= */
+
+#contenido form.stack-form > label,
+#contenido form.form-uniform > label {
+    width: 100% !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: stretch !important;
+
+    justify-content: flex-start !important;
+
+    gap: 7px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    line-height: 1.3 !important;
+
+    font-size: 14px !important;
+}
+
+/* =========================================================
+   CAMPOS DE TEXTO
+   ========================================================= */
+
+#contenido form.stack-form input:not([type="checkbox"]):not([type="radio"]),
+#contenido form.stack-form select,
+#contenido form.stack-form textarea,
+
+#contenido form.form-uniform input:not([type="checkbox"]):not([type="radio"]),
+#contenido form.form-uniform select,
+#contenido form.form-uniform textarea {
+
+    display: block !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    min-height: 46px !important;
+
+    margin: 0 !important;
+
+    padding: 11px 14px !important;
+
+    border-radius: 9px !important;
+
+    font-size: 15px !important;
+
+    font-weight: 400 !important;
+
+    line-height: 1.3 !important;
+}
+
+/* =========================================================
+   PERSONAL INSTITUCIONAL
+   ========================================================= */
+
+#contenido .personal-login {
+    width: 100% !important;
+
+    margin: 4px 0 0 0 !important;
+
+    padding: 22px !important;
+
+    border: 1px solid #dbe3ee !important;
+
+    border-radius: 12px !important;
+
+    background: #f8fafc !important;
+}
+
+#contenido .personal-login h3 {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 0 8px 0 !important;
+
+    padding: 0 !important;
+
+    line-height: 1.2 !important;
+}
+
+#contenido .personal-login > p {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 0 22px 0 !important;
+
+    line-height: 1.55 !important;
+}
+
+/* =========================================================
+   LOS TRES CAMPOS:
+   CÓDIGO | SEDE | JORNADA
+   ========================================================= */
+
+#contenido .personal-login .form-grid {
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+
+    column-gap: 20px !important;
+
+    row-gap: 20px !important;
+
+    width: 100% !important;
+
+    align-items: start !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+}
+
+#contenido .personal-login .form-grid > label {
+
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: stretch !important;
+
+    justify-content: flex-start !important;
+
+    gap: 7px !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    line-height: 1.3 !important;
+
+    font-size: 14px !important;
+
+    font-weight: 600 !important;
+}
+
+/* =========================================================
+   TÍTULOS DE CÓDIGO / SEDE / JORNADA
+   ========================================================= */
+
+#contenido .personal-login .form-grid > label:first-child,
+#contenido .personal-login .form-grid > label:nth-child(2),
+#contenido .personal-login .form-grid > label:nth-child(3) {
+
+    align-self: start !important;
+}
+
+/* =========================================================
+   QUITAR EL PEQUEÑO TEXTO DE APOYO DEL TÍTULO
+   ========================================================= */
+
+#contenido .personal-login label small {
+    display: none !important;
+}
+
+/* =========================================================
+   CAMPOS DE PERSONAL INSTITUCIONAL
+   ========================================================= */
+
+#contenido .personal-login input,
+#contenido .personal-login select {
+
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    min-height: 46px !important;
+
+    margin: 0 !important;
+
+    padding: 11px 14px !important;
+
+    background: #ffffff !important;
+
+    border-radius: 9px !important;
+
+    font-size: 15px !important;
+
+    font-weight: 400 !important;
+
+    line-height: 1.3 !important;
+}
+
+/* =========================================================
+   LISTAS
+   ========================================================= */
+
+#contenido select {
+    font-weight: 400 !important;
+}
+
+#contenido select option {
+    font-weight: 400 !important;
+}
+
+/* =========================================================
+   BOTÓN
+   ========================================================= */
+
+#contenido form.stack-form > button,
+#contenido form.form-uniform > button {
+
+    width: 100% !important;
+
+    min-height: 48px !important;
+
+    margin: 2px 0 0 0 !important;
+
+    padding: 12px 18px !important;
+
+    border-radius: 9px !important;
+
+    font-size: 15px !important;
+
+    font-weight: 600 !important;
+}
+
+/* =========================================================
+   ENLACES
+   ========================================================= */
+
+#contenido .form-links {
+
+    display: flex !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
+    flex-wrap: wrap !important;
+
+    gap: 18px !important;
+
+    width: 100% !important;
+
+    margin-top: 20px !important;
+}
+
+#contenido .form-links a {
+    line-height: 1.4 !important;
+}
+
+/* =========================================================
+   OTROS FORMULARIOS DEL SITIO
+   ========================================================= */
+
+#contenido form:not(.inline-form) label {
+
+    line-height: 1.3 !important;
+}
+
+#contenido form:not(.inline-form) {
+
+    max-width: 100% !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    #contenido .personal-login .form-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 600px) {
+
+    #contenido .form-card,
+    #contenido .tarjeta {
+
+        padding: 20px !important;
+    }
+
+    #contenido .personal-login {
+
+        padding: 18px !important;
+    }
+
+    #contenido .personal-login .form-grid {
+
+        grid-template-columns: 1fr !important;
+
+        gap: 16px !important;
+    }
+
+    #contenido .form-links {
+
+        flex-direction: column !important;
+
+        gap: 10px !important;
+    }
+}
+
+/* =========================================================
+   FIN ESTILO FIJO
+   ========================================================= */
+
+</style>
+<!-- FIN EDUTURNOS_ESTILO_FIJO -->
+
+
+
+<!-- EDUTURNOS_AJUSTE_SEDE_COMPLETA -->
+<!-- FIN EDUTURNOS_AJUSTE_SEDE_COMPLETA -->
+
+
+
+<!-- EDUTURNOS_PERSONAL_ORGANIZADO -->
+<style id="eduturnos-personal-organizado">
+
+/* =========================================================
+   PERSONAL INSTITUCIONAL - ORGANIZACIÓN DEFINITIVA
+   ========================================================= */
+
+/* Tarjeta principal */
+#contenido .formulario .form-card {
+    width: 100% !important;
+    max-width: 1050px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* Bloque completo de Personal institucional */
+#contenido .personal-login {
+    display: block !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin: 0 !important;
+    padding: 24px !important;
+
+    box-sizing: border-box !important;
+
+    border: 1px solid #d7e0ea !important;
+    border-radius: 12px !important;
+
+    background: #f8fafc !important;
+
+    overflow: visible !important;
+}
+
+/* Título */
+#contenido .personal-login h3 {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 0 8px 0 !important;
+    padding: 0 !important;
+
+    line-height: 1.25 !important;
+}
+
+/* Texto explicativo */
+#contenido .personal-login > p {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 0 22px 0 !important;
+    padding: 0 !important;
+
+    line-height: 1.5 !important;
+}
+
+/* =========================================================
+   CÓDIGO | SEDE | JORNADA
+   ========================================================= */
+
+#contenido .personal-login .form-grid {
+    display: grid !important;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1.35fr)
+        minmax(0, 1fr) !important;
+
+    gap: 18px !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    align-items: start !important;
+}
+
+/* Cada campo */
+#contenido .personal-login .form-grid > label {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: stretch !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    gap: 7px !important;
+
+    box-sizing: border-box !important;
+
+    font-size: 14px !important;
+    font-weight: 600 !important;
+
+    line-height: 1.35 !important;
+}
+
+/* Cuadros */
+#contenido .personal-login .form-grid input,
+#contenido .personal-login .form-grid select {
+    display: block !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 46px !important;
+
+    margin: 0 !important;
+
+    padding: 11px 13px !important;
+
+    box-sizing: border-box !important;
+
+    border-radius: 9px !important;
+
+    font-size: 14px !important;
+    font-weight: 400 !important;
+
+    line-height: 1.25 !important;
+
+    background: #ffffff !important;
+}
+
+/* Sede: más espacio para nombres largos */
+#contenido .personal-login .form-grid > label:nth-child(2) select {
+    font-size: 13px !important;
+}
+
+/* Jornada queda siempre dentro de su columna */
+#contenido .personal-login .form-grid > label:nth-child(3) {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+/* Evitar que el texto provoque desbordamiento */
+#contenido .personal-login .form-grid > label:nth-child(2) select,
+#contenido .personal-login .form-grid > label:nth-child(3) select {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+/* El código también permanece dentro */
+#contenido .personal-login .form-grid > label:nth-child(1) {
+    min-width: 0 !important;
+}
+
+/* =========================================================
+   BOTÓN
+   ========================================================= */
+
+#contenido .personal-login + * {
+    box-sizing: border-box !important;
+}
+
+/* =========================================================
+   PANTALLAS MEDIANAS
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    #contenido .formulario .form-card {
+        max-width: 100% !important;
+    }
+
+    #contenido .personal-login .form-grid {
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1.4fr)
+            minmax(0, 1fr) !important;
+
+        gap: 14px !important;
+    }
+
+    #contenido .personal-login .form-grid > label:nth-child(2) select {
+        font-size: 12px !important;
+    }
+}
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    #contenido .personal-login {
+        padding: 18px !important;
+    }
+
+    #contenido .personal-login .form-grid {
+        grid-template-columns: 1fr !important;
+
+        gap: 16px !important;
+    }
+
+    #contenido .personal-login .form-grid > label:nth-child(2) select {
+        font-size: 14px !important;
+    }
+}
+
+</style>
+<!-- FIN EDUTURNOS_PERSONAL_ORGANIZADO -->
+
+
+
+<!-- EDUTURNOS_ENLACES_LOGIN -->
+
+<style id="eduturnos-enlaces-login">
+
+/* =========================================================
+   ENLACES INFERIORES DEL LOGIN
+   ========================================================= */
+
+#contenido .form-links {
+    width: 100% !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: space-between !important;
+
+    gap: 20px !important;
+
+    margin-top: 20px !important;
+
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+#contenido .form-links a {
+    display: inline-block !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-size: 14px !important;
+    font-weight: 400 !important;
+
+    line-height: 1.4 !important;
+
+    white-space: nowrap !important;
+}
+
+#contenido .form-links a:first-child {
+    text-align: left !important;
+}
+
+#contenido .form-links a:last-child {
+    text-align: right !important;
+}
+
+@media (max-width: 600px) {
+
+    #contenido .form-links {
+        flex-direction: column !important;
+
+        align-items: stretch !important;
+
+        gap: 10px !important;
+    }
+
+    #contenido .form-links a:first-child,
+    #contenido .form-links a:last-child {
+        text-align: center !important;
+    }
+}
+
+</style>
+
+<!-- FIN EDUTURNOS_ENLACES_LOGIN -->
+
+
+
+<!-- EDUTURNOS_CITAS_ESTILO_V2 -->
+
+<style id="eduturnos-citas-estilo-v2">
+
+/* =========================================================
+   EDUTURNOS - ACCESOS DEL DASHBOARD
+   ========================================================= */
+
+.dashboard-action-grid {
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr)) !important;
+
+    gap: 16px !important;
+
+    align-items: stretch !important;
+
+    width: 100% !important;
+}
+
+.dashboard-action,
+.quick-card {
+    position: relative !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+
+    min-width: 0 !important;
+
+    min-height: 185px !important;
+
+    padding: 20px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #dbe3ec !important;
+
+    border-radius: 14px !important;
+
+    text-decoration: none !important;
+
+    box-shadow:
+        0 3px 10px rgba(15, 23, 42, 0.05) !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease !important;
+}
+
+.dashboard-action:hover,
+.quick-card:hover {
+    transform: translateY(-3px) !important;
+
+    border-color: #bfdbfe !important;
+
+    box-shadow:
+        0 10px 22px rgba(15, 23, 42, 0.09) !important;
+}
+
+.dashboard-action-top,
+.quick-card .quick-icon {
+    margin-bottom: 14px !important;
+}
+
+.dashboard-action-icon,
+.quick-card .quick-icon {
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    width: fit-content !important;
+
+    padding: 7px 11px !important;
+
+    border-radius: 8px !important;
+
+    background: #eaf2ff !important;
+
+    color: #2563eb !important;
+
+    font-size: 12px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1.1 !important;
+}
+
+.dashboard-action h3,
+.quick-card strong {
+    display: block !important;
+
+    margin: 0 0 8px 0 !important;
+
+    color: #0f172a !important;
+
+    font-size: 18px !important;
+
+    font-weight: 700 !important;
+
+    line-height: 1.25 !important;
+}
+
+.dashboard-action p,
+.quick-card > span:not(.quick-icon) {
+    flex: 1 !important;
+
+    margin: 0 !important;
+
+    color: #64748b !important;
+
+    font-size: 13.5px !important;
+
+    line-height: 1.5 !important;
+}
+
+.dashboard-action-link,
+.quick-card small {
+    display: block !important;
+
+    margin-top: 16px !important;
+
+    color: #2563eb !important;
+
+    font-size: 13px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1.3 !important;
+}
+
+
+/* =========================================================
+   PAGINAS INTERNAS
+   ========================================================= */
+
+#contenido .page-head {
+    width: 100% !important;
+
+    display: flex !important;
+
+    justify-content: space-between !important;
+
+    align-items: flex-start !important;
+
+    gap: 22px !important;
+
+    margin: 0 0 24px 0 !important;
+
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+#contenido .page-head > div:first-child {
+    min-width: 0 !important;
+}
+
+#contenido .page-navigation {
+    margin-bottom: 12px !important;
+}
+
+#contenido .page-head h1 {
+    margin: 0 0 8px 0 !important;
+
+    color: #0f172a !important;
+
+    font-size: 30px !important;
+
+    line-height: 1.2 !important;
+}
+
+#contenido .page-head p {
+    margin: 0 !important;
+
+    color: #64748b !important;
+
+    line-height: 1.55 !important;
+}
+
+#contenido .page-head .link-back {
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    text-decoration: none !important;
+
+    font-size: 14px !important;
+
+    font-weight: 500 !important;
+}
+
+#contenido .page-head .link-back:hover {
+    text-decoration: underline !important;
+}
+
+
+/* =========================================================
+   BOTÓN NUEVA CITACIÓN
+   ========================================================= */
+
+#contenido .page-head .boton,
+#contenido .page-head a[class*="boton"] {
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-height: 44px !important;
+
+    padding: 10px 16px !important;
+
+    border-radius: 9px !important;
+
+    text-decoration: none !important;
+
+    white-space: nowrap !important;
+
+    font-size: 14px !important;
+
+    font-weight: 600 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   CONTENEDOR DE TABLAS
+   ========================================================= */
+
+#contenido table {
+    width: 100% !important;
+
+    border-collapse: separate !important;
+
+    border-spacing: 0 !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #dbe3ec !important;
+
+    border-radius: 12px !important;
+
+    overflow: hidden !important;
+
+    box-shadow:
+        0 3px 10px rgba(15, 23, 42, 0.05) !important;
+}
+
+
+/* Encabezado */
+#contenido table thead th {
+    padding: 13px 14px !important;
+
+    background: #f1f5f9 !important;
+
+    border-bottom: 1px solid #dbe3ec !important;
+
+    color: #334155 !important;
+
+    font-size: 12px !important;
+
+    font-weight: 700 !important;
+
+    line-height: 1.3 !important;
+
+    text-align: left !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* Celdas */
+#contenido table tbody td {
+    padding: 13px 14px !important;
+
+    border-bottom: 1px solid #edf2f7 !important;
+
+    color: #334155 !important;
+
+    font-size: 13.5px !important;
+
+    line-height: 1.4 !important;
+
+    vertical-align: middle !important;
+}
+
+#contenido table tbody tr:last-child td {
+    border-bottom: 0 !important;
+}
+
+#contenido table tbody tr:hover td {
+    background: #f8fafc !important;
+}
+
+
+/* =========================================================
+   TABLA DE CITAS
+   ========================================================= */
+
+#contenido table th:first-child,
+#contenido table td:first-child {
+    white-space: nowrap !important;
+}
+
+#contenido table th:last-child,
+#contenido table td:last-child {
+    text-align: center !important;
+}
+
+
+/* =========================================================
+   MENSAJE "NO HAY CITAS"
+   ========================================================= */
+
+#contenido table tbody td[colspan] {
+    padding: 38px 20px !important;
+
+    text-align: center !important;
+
+    color: #64748b !important;
+
+    font-size: 14px !important;
+
+    line-height: 1.5 !important;
+}
+
+
+/* =========================================================
+   BOTONES DENTRO DE TABLAS
+   ========================================================= */
+
+#contenido table .boton,
+#contenido table a[class*="boton"],
+#contenido table button {
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    min-height: 34px !important;
+
+    padding: 7px 11px !important;
+
+    margin: 2px !important;
+
+    border-radius: 7px !important;
+
+    font-size: 12px !important;
+
+    line-height: 1.2 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   TARJETAS GENERALES DE PAGINAS
+   ========================================================= */
+
+#contenido .page-card,
+#contenido .table-card,
+#contenido .tabla-card,
+#contenido .contenido-card {
+    width: 100% !important;
+
+    box-sizing: border-box !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #dbe3ec !important;
+
+    border-radius: 14px !important;
+
+    box-shadow:
+        0 3px 10px rgba(15, 23, 42, 0.05) !important;
+
+    overflow-x: auto !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .dashboard-action-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 750px) {
+
+    #contenido .page-head {
+        flex-direction: column !important;
+
+        align-items: stretch !important;
+    }
+
+    #contenido .page-head > div:last-child {
+        width: 100% !important;
+    }
+
+    #contenido .page-head .boton,
+    #contenido .page-head a[class*="boton"] {
+        width: 100% !important;
+    }
+
+    #contenido table {
+        min-width: 900px !important;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .dashboard-action-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dashboard-action,
+    .quick-card {
+        min-height: 0 !important;
+    }
+}
+
+</style>
+
+<!-- FIN EDUTURNOS_CITAS_ESTILO_V2 -->
+
+
+
+<!-- EDUTURNOS_CITAS_INTERNO_ELEGANTE -->
+
+<style id="eduturnos-citas-interno-elegante">
+
+/* =========================================================
+   CITAS - DISEÑO INTERNO ELEGANTE
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   ENCABEZADO DE LA PÁGINA DE CITAS
+   --------------------------------------------------------- */
+
+#contenido .page-head:has(a[href*="/citas/nueva"]) {
+    position: relative !important;
+
+    padding: 4px 4px 22px 4px !important;
+
+    margin-bottom: 24px !important;
+
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+.page-navigation {
+    margin-bottom: 14px !important;
+}
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+.page-navigation .link-back {
+    display: inline-flex !important;
+
+    align-items: center !important;
+    gap: 6px !important;
+
+    color: #64748b !important;
+
+    font-size: 13px !important;
+    font-weight: 500 !important;
+
+    text-decoration: none !important;
+}
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+.page-navigation .link-back:hover {
+    color: #2563eb !important;
+}
+
+/* Título */
+#contenido .page-head:has(a[href*="/citas/nueva"]) h1 {
+    position: relative !important;
+
+    margin: 0 0 10px 0 !important;
+    padding: 0 0 0 34px !important;
+
+    color: #0f172a !important;
+
+    font-size: 31px !important;
+    font-weight: 750 !important;
+
+    line-height: 1.15 !important;
+}
+
+/* Pequeño detalle visual delante del título */
+#contenido .page-head:has(a[href*="/citas/nueva"]) h1::before {
+    content: "✓";
+
+    position: absolute;
+
+    left: 0;
+    top: 1px;
+
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: #eaf2ff;
+
+    color: #2563eb;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+/* Descripción */
+#contenido .page-head:has(a[href*="/citas/nueva"]) p {
+    margin: 0 !important;
+    padding-left: 34px !important;
+
+    max-width: 720px !important;
+
+    color: #64748b !important;
+
+    font-size: 14px !important;
+
+    line-height: 1.55 !important;
+}
+
+/* ---------------------------------------------------------
+   BOTÓN NUEVA CITACIÓN
+   --------------------------------------------------------- */
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+a[href*="/citas/nueva"] {
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-height: 46px !important;
+
+    padding: 11px 17px !important;
+
+    border-radius: 10px !important;
+
+    font-size: 14px !important;
+    font-weight: 700 !important;
+
+    text-decoration: none !important;
+
+    box-shadow:
+        0 5px 12px rgba(37, 99, 235, 0.14) !important;
+
+    transition:
+        box-shadow 0.2s ease,
+        transform 0.2s ease !important;
+}
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+a[href*="/citas/nueva"]:hover {
+    transform: translateY(-1px) !important;
+
+    box-shadow:
+        0 8px 18px rgba(37, 99, 235, 0.18) !important;
+}
+
+
+/* ---------------------------------------------------------
+   ZONA DE LA TABLA
+   --------------------------------------------------------- */
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table {
+    margin-top: 2px !important;
+}
+
+
+/* ---------------------------------------------------------
+   TABLA PRINCIPAL
+   --------------------------------------------------------- */
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table {
+
+    border: 1px solid #dbe4ee !important;
+
+    border-radius: 14px !important;
+
+    overflow: hidden !important;
+
+    background: #ffffff !important;
+
+    box-shadow:
+        0 7px 20px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* ---------------------------------------------------------
+   ENCABEZADO DE TABLA
+   --------------------------------------------------------- */
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table thead th {
+
+    position: relative !important;
+
+    padding: 14px 13px !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            #f8fafc 0%,
+            #f1f5f9 100%
+        ) !important;
+
+    border-bottom: 1px solid #dbe4ee !important;
+
+    color: #334155 !important;
+
+    font-size: 12px !important;
+
+    font-weight: 750 !important;
+
+    letter-spacing: 0.01em !important;
+
+    text-align: left !important;
+
+    white-space: nowrap !important;
+}
+
+/* Línea inferior decorativa */
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table thead th:first-child {
+    box-shadow:
+        inset 3px 0 0 #2563eb !important;
+}
+
+
+/* ---------------------------------------------------------
+   FILAS
+   --------------------------------------------------------- */
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table tbody tr {
+
+    transition:
+        background-color 0.18s ease !important;
+}
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table tbody tr:hover {
+
+    background: #f8fbff !important;
+}
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table tbody td {
+
+    padding: 14px 13px !important;
+
+    border-bottom: 1px solid #edf2f7 !important;
+
+    color: #334155 !important;
+
+    font-size: 13.5px !important;
+
+    line-height: 1.4 !important;
+
+    vertical-align: middle !important;
+}
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table tbody tr:last-child td {
+
+    border-bottom: 0 !important;
+}
+
+
+/* ---------------------------------------------------------
+   MENSAJE CUANDO NO HAY CITAS
+   --------------------------------------------------------- */
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table tbody td[colspan] {
+
+    padding: 55px 24px !important;
+
+    text-align: center !important;
+
+    color: #64748b !important;
+
+    font-size: 14px !important;
+
+    line-height: 1.6 !important;
+
+    background: #fbfdff !important;
+}
+
+/* Detalle visual */
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table tbody td[colspan]::before {
+
+    content: "✓";
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    margin: 0 auto 12px;
+
+    border-radius: 50%;
+
+    background: #eef6ff;
+
+    color: #2563eb;
+
+    font-size: 18px;
+
+    font-weight: 700;
+}
+
+
+/* ---------------------------------------------------------
+   BOTONES DENTRO DE LA TABLA
+   --------------------------------------------------------- */
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table .boton,
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table a[class*="boton"],
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table button {
+
+    min-height: 34px !important;
+
+    padding: 7px 10px !important;
+
+    border-radius: 7px !important;
+
+    font-size: 12px !important;
+
+    font-weight: 600 !important;
+
+    margin: 2px !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* ---------------------------------------------------------
+   ESTADOS
+   --------------------------------------------------------- */
+
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table .estado,
+#contenido .page-head:has(a[href*="/citas/nueva"])
+~ table .badge {
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    min-height: 27px !important;
+
+    padding: 5px 9px !important;
+
+    border-radius: 999px !important;
+
+    font-size: 11px !important;
+
+    font-weight: 700 !important;
+
+    line-height: 1 !important;
+}
+
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+
+@media (max-width: 850px) {
+
+    #contenido .page-head:has(a[href*="/citas/nueva"]) {
+
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    #contenido .page-head:has(a[href*="/citas/nueva"])
+    a[href*="/citas/nueva"] {
+
+        width: 100% !important;
+    }
+
+    #contenido .page-head:has(a[href*="/citas/nueva"]) h1 {
+        font-size: 27px !important;
+    }
+
+    #contenido .page-head:has(a[href*="/citas/nueva"]) p {
+        padding-left: 0 !important;
+    }
+
+    #contenido .page-head:has(a[href*="/citas/nueva"]) h1::before {
+        display: none;
+    }
+
+    #contenido .page-head:has(a[href*="/citas/nueva"])
+    ~ table {
+
+        display: block !important;
+
+        overflow-x: auto !important;
+
+        white-space: nowrap !important;
+    }
+}
+
+</style>
+
+<!-- FIN EDUTURNOS_CITAS_INTERNO_ELEGANTE -->
+
+
+
+
+
+
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+<style id="EDUTURNOS_BASE_VISUAL_OVERRIDE">
+
+/* Dashboard sin animacion heredada */
+html body .ed-dashboard,
+html body .ed-dashboard * {
+    animation:none !important;
+    animation-name:none !important;
+    transition:none !important;
+    transform:none !important;
+}
+
+html body .ed-dashboard::before,
+html body .ed-dashboard::after,
+html body .ed-dashboard *::before,
+html body .ed-dashboard *::after {
+    animation:none !important;
+    transition:none !important;
+}
+
+</style>
+<style id="EDUTURNOS_DASHBOARD_NO_ANIMATION">
+
+/* ============================================================
+   DASHBOARD RESTAURADO
+   DESACTIVAR SOLAMENTE LOS EFECTOS ANIMADOS
+   ============================================================ */
+
+html body .ed-dashboard,
+html body .ed-dashboard * {
+    animation:none !important;
+    animation-name:none !important;
+    animation-duration:0s !important;
+    animation-delay:0s !important;
+    animation-iteration-count:1 !important;
+    transition:none !important;
+    transform:none !important;
+}
+
+html body .ed-dashboard::before,
+html body .ed-dashboard::after,
+html body .ed-dashboard *::before,
+html body .ed-dashboard *::after {
+    animation:none !important;
+    transition:none !important;
+    transform:none !important;
+}
+
+/* No hover animado */
+html body .ed-dashboard *:hover {
+    animation:none !important;
+}
+
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/eduturnos_visual_final.css') }}?v=20260925_153152">
+
+
+
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/eduturnos_final_real.css') }}"?v=20260925_154031>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/eduturnos_login_master.css') }}"?v=20260925_155442>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/eduturnos_login_final_absolute.css') }}"?v=20260925_161058>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/eduturnos_login_visual_unico.css') }}"?v=20260925_161927>
+
+
+<style id="eduturnos-login-base-control">
+
+html body .login-page .personal-login .personal-fields-grid {
+    grid-template-columns: 112px minmax(300px, 1fr) 92px !important;
+    column-gap: 14px !important;
+}
+
+html body .login-page .personal-login .personal-field-code {
+    width: 112px !important;
+    min-width: 112px !important;
+    max-width: 112px !important;
+}
+
+html body .login-page .personal-login .personal-field-sede {
+    min-width: 300px !important;
+}
+
+html body .login-page .personal-login .personal-field-jornada {
+    width: 92px !important;
+    min-width: 92px !important;
+    max-width: 92px !important;
+}
+
+html body .login-page .login-illustration {
+    background: transparent !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+
+</style>
+
+<style id="eduturnos-header-global-definitivo">
+
+header.eduturnos-header {
+    width: 100% !important;
+    height: 76px !important;
+    min-height: 76px !important;
+
+    margin: 0 !important;
+    padding: 0 46px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    box-sizing: border-box !important;
+
+    background: #172942 !important;
+
+    border: 0 !important;
+    outline: 0 !important;
+
+    box-shadow: 0 4px 18px rgba(15,32,55,.16) !important;
+
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+header.eduturnos-header .eduturnos-logo {
+    display: flex !important;
+    align-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-family: "Public Sans","Segoe UI",Arial,sans-serif !important;
+    font-size: 26px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    letter-spacing: .02em !important;
+
+    color: #ffffff !important;
+
+    background: transparent !important;
+
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+header.eduturnos-header .eduturnos-logo span {
+    color: #eab64a !important;
+    margin-left: 2px !important;
+}
+
+</style>
+
+<style id="eduturnos-recuperar-definitivo">
+
+/* =========================================================
+   RECUPERAR ACCESO - PAGINA DEFINITIVA
+   ========================================================= */
+
+body.eduturnos-app-body {
+    margin: 0 !important;
+}
+
+.eduturnos-recuperar-page {
+    width: 100% !important;
+    min-height: calc(100vh - 76px) !important;
+
+    margin: 0 !important;
+    padding: 32px 24px 48px !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            #f4f7fa 0%,
+            #edf2f6 100%
+        ) !important;
+}
+
+.eduturnos-recuperar-final-box {
+    width: min(900px, 100%) !important;
+    min-height: 410px !important;
+
+    margin: 0 !important;
+    padding: 34px 46px !important;
+
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    align-items: center !important;
+
+    gap: 44px !important;
+
+    box-sizing: border-box !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid rgba(24,50,75,.08) !important;
+    border-radius: 18px !important;
+
+    box-shadow:
+        0 16px 38px rgba(25,48,75,.10) !important;
+
+    overflow: visible !important;
+}
+
+/* ---------------------------------------------------------
+   CABECERA DE RECUPERAR
+   --------------------------------------------------------- */
+
+.eduturnos-recuperar__header {
+    margin: 0 0 22px !important;
+}
+
+.eduturnos-recuperar__header h1 {
+    margin: 0 !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size: 30px !important;
+    line-height: 1.1 !important;
+
+    font-weight: 700 !important;
+
+    color: #172942 !important;
+}
+
+.eduturnos-recuperar__header p {
+    margin: 10px 0 0 !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+
+    color: #5f6b78 !important;
+}
+
+/* ---------------------------------------------------------
+   CAMPO CORREO
+   --------------------------------------------------------- */
+
+.eduturnos-recuperar__field {
+    margin: 0 0 22px !important;
+}
+
+.eduturnos-recuperar__field label {
+    display: block !important;
+
+    margin: 0 0 12px !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 14px !important;
+    font-weight: 600 !important;
+
+    color: #202938 !important;
+}
+
+.eduturnos-recuperar__field input {
+    width: 100% !important;
+    height: 46px !important;
+
+    box-sizing: border-box !important;
+
+    padding: 0 14px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #cbd5df !important;
+    border-radius: 9px !important;
+
+    color: #202938 !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 14px !important;
+
+    outline: none !important;
+}
+
+.eduturnos-recuperar__field input:focus {
+    border-color: #2875c7 !important;
+
+    box-shadow:
+        0 0 0 3px rgba(40,117,199,.12) !important;
+}
+
+/* ---------------------------------------------------------
+   BOTON
+   --------------------------------------------------------- */
+
+.eduturnos-recuperar__button {
+    width: 100% !important;
+    min-height: 44px !important;
+
+    border: 0 !important;
+    border-radius: 9px !important;
+
+    background: #2875c7 !important;
+
+    color: #ffffff !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 14px !important;
+    font-weight: 700 !important;
+
+    cursor: pointer !important;
+}
+
+.eduturnos-recuperar__button:hover {
+    background: #2369b2 !important;
+}
+
+/* ---------------------------------------------------------
+   ENLACE VOLVER
+   --------------------------------------------------------- */
+
+.eduturnos-recuperar__back {
+    display: inline-flex !important;
+
+    margin: 0 0 20px !important;
+
+    color: #2875c7 !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 13px !important;
+    font-weight: 600 !important;
+
+    text-decoration: none !important;
+}
+
+.eduturnos-recuperar__back:hover {
+    text-decoration: underline !important;
+}
+
+/* ---------------------------------------------------------
+   PIE
+   --------------------------------------------------------- */
+
+.eduturnos-recuperar__footer {
+    margin: 18px 0 0 !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+
+    color: #74808c !important;
+}
+
+/* ---------------------------------------------------------
+   MENSAJES
+   --------------------------------------------------------- */
+
+.eduturnos-recuperar__messages {
+    margin: 0 0 18px !important;
+}
+
+.eduturnos-recuperar__message {
+    padding: 10px 12px !important;
+
+    border-radius: 8px !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 13px !important;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+
+@media (max-width: 760px) {
+
+    .eduturnos-recuperar-page {
+        padding: 24px 16px 40px !important;
+    }
+
+    .eduturnos-recuperar-final-box {
+        grid-template-columns: 1fr !important;
+
+        gap: 28px !important;
+
+        padding: 30px 26px !important;
+    }
+}
+
+@media (max-width: 560px) {
+
+    header.eduturnos-header {
+        padding: 0 22px !important;
+    }
+
+    .eduturnos-recuperar-page {
+        padding: 18px 12px 30px !important;
+    }
+
+    .eduturnos-recuperar-final-box {
+        padding: 26px 20px !important;
+        border-radius: 14px !important;
+    }
+
+    .eduturnos-recuperar__header h1 {
+        font-size: 27px !important;
+    }
+}
+
+</style>
+
+<style id="EDUTURNOS_HEADER_AZUL_OSCURO_FINAL">
+header.eduturnos-header {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 76px !important;
+    min-height: 76px !important;
+
+    margin: 0 !important;
+    padding: 0 46px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    box-sizing: border-box !important;
+
+    background: #172942 !important;
+
+    border: 0 !important;
+    outline: 0 !important;
+
+    box-shadow: 0 4px 18px rgba(15,32,55,.16) !important;
+
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+header.eduturnos-header .eduturnos-logo {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    color: #ffffff !important;
+    background: transparent !important;
+
+    border: 0 !important;
+    box-shadow: none !important;
+
+    font-family: "Public Sans","Segoe UI",Arial,sans-serif !important;
+    font-size: 26px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    letter-spacing: .02em !important;
+}
+
+header.eduturnos-header .eduturnos-logo span {
+    color: #eab64a !important;
+    margin-left: 2px !important;
+}
+</style>
+<style id="EDUTURNOS_HEADER_AZUL_PRIMERO">
+/* HEADER AZUL: PRIMER ELEMENTO VISUAL */
+header.eduturnos-header {
+    width: 100% !important;
+    min-height: 76px !important;
+    height: 76px !important;
+    padding: 0 46px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    background: #172942 !important;
+
+    border: 0 !important;
+    border-top: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+    border-left: 0 !important;
+
+    outline: 0 !important;
+
+    box-shadow: 0 4px 18px rgba(15,32,55,.16) !important;
+
+    margin: 0 !important;
+
+    box-sizing: border-box !important;
+
+    position: relative !important;
+    z-index: 1000 !important;
+}
+
+header.eduturnos-header .eduturnos-logo {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #ffffff !important;
+
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<header class="eduturnos-header" style="
+    width:100%;
+    min-height:76px;
+    height:76px;
+    padding:0 46px;
+    display:flex;
+    align-items:center;
+    background:#172942;
+    border:0;
+    border-top:0;
+    border-right:0;
+    border-bottom:0;
+    border-left:0;
+    outline:0;
+    box-shadow:0 4px 18px rgba(15,32,55,.16);
+    margin:0;
+    box-sizing:border-box;
+">
+
+    <div class="eduturnos-logo" style="
+    display:flex;
+    align-items:center;
+    margin:0;
+    padding:0;
+    font-family:'Public Sans','Segoe UI',Arial,sans-serif;
+    font-size:26px;
+    font-weight:800;
+    line-height:1;
+    letter-spacing:.02em;
+    color:#ffffff;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+">
+    EDUTURNOS<span style="color:#eab64a; margin-left:2px;">.</span>
+</div>
+
+</header>
+
+<main class="contenedor" id="contenido">{% with mensajes=get_flashed_messages(with_categories=true) %}{% for categoria,mensaje in mensajes %}<div class="alerta {{ categoria }}">{{ mensaje }}</div>{% endfor %}{% endwith %}{% block content %}{% endblock %}</main>
+
+<!-- EDUTURNOS_VISUAL_FINAL_REAL -->
+
+<style id="EDUTURNOS_VISUAL_FINAL_REAL">
+
+/* =========================================================
+   EDUTURNOS — SISTEMA VISUAL FINAL
+   Capa final sobre la estructura REAL de la aplicación.
+   SOLO VISUAL.
+   ========================================================= */
+
+:root{
+    --ed-ink:#101c2c;
+    --ed-ink-2:#17283d;
+    --ed-blue:#2563eb;
+    --ed-blue-dark:#1749a5;
+    --ed-blue-soft:#eaf2ff;
+    --ed-amber:#eab64a;
+    --ed-amber-dark:#8a6418;
+
+    --ed-bg:#eef2f6;
+    --ed-surface:#ffffff;
+    --ed-surface-2:#f7f9fc;
+
+    --ed-text:#172235;
+    --ed-muted:#64748b;
+    --ed-border:#dbe3ec;
+
+    --ed-success:#23835a;
+    --ed-danger:#c74646;
+
+    --ed-radius-sm:10px;
+    --ed-radius-md:16px;
+    --ed-radius-lg:22px;
+
+    --ed-shadow-sm:0 5px 18px rgba(16,28,44,.055);
+    --ed-shadow-md:0 14px 34px rgba(16,28,44,.09);
+    --ed-shadow-lg:0 24px 55px rgba(16,28,44,.13);
+}
+
+
+/* =========================================================
+   BASE
+   ========================================================= */
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    margin:0 !important;
+    background:
+        radial-gradient(
+            circle at 15% 0%,
+            rgba(37,99,235,.055),
+            transparent 30%
+        ),
+        linear-gradient(
+            180deg,
+            #f4f7fa 0%,
+            #edf2f6 100%
+        ) !important;
+
+    color:var(--ed-text) !important;
+}
+
+
+/* =========================================================
+   ENCABEZADO REAL DE EDUTURNOS
+   ========================================================= */
+
+.barra{
+    position:sticky !important;
+    top:0 !important;
+    z-index:1000 !important;
+
+    min-height:72px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+
+    gap:28px !important;
+
+    padding:0 34px !important;
+
+    background:
+        linear-gradient(
+            110deg,
+            #101c2c 0%,
+            #17283d 58%,
+            #1d3654 100%
+        ) !important;
+
+    border-bottom:0 !important;
+
+    box-shadow:none !important;
+    border-top:0 !important;
+}
+
+
+/* Marca */
+
+.barra .logo,
+.logo{
+    position:relative !important;
+
+    display:inline-flex !important;
+    align-items:center !important;
+
+    color:#ffffff !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size:25px !important;
+    font-weight:700 !important;
+
+    letter-spacing:-.025em !important;
+
+    text-decoration:none !important;
+}
+
+.barra .logo::after,
+.logo::after{
+    content:"" !important;
+
+    width:7px !important;
+    height:7px !important;
+
+    margin-left:7px !important;
+
+    border-radius:50% !important;
+
+    background:var(--ed-amber) !important;
+
+    box-shadow:0 0 0 4px rgba(234,182,74,.12) !important;
+}
+
+
+/* Navegación */
+
+.nav-principal{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+
+    gap:6px !important;
+
+    flex-wrap:wrap !important;
+}
+
+.nav-principal a,
+.nav-principal .nav-button{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    min-height:40px !important;
+
+    padding:8px 13px !important;
+
+    border:1px solid transparent !important;
+    border-radius:10px !important;
+
+    background:transparent !important;
+
+    color:#dbe5f0 !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        sans-serif !important;
+
+    font-size:13px !important;
+    font-weight:650 !important;
+
+    text-decoration:none !important;
+
+    cursor:pointer !important;
+
+    transition:
+        background .18s ease,
+        color .18s ease,
+        transform .18s ease,
+        border-color .18s ease !important;
+}
+
+.nav-principal a:hover,
+.nav-principal .nav-button:hover{
+    color:#ffffff !important;
+
+    background:rgba(255,255,255,.085) !important;
+
+    border-color:rgba(255,255,255,.10) !important;
+
+    transform:translateY(-1px) !important;
+}
+
+.nav-principal .nav-button{
+    font:inherit !important;
+}
+
+
+/* =========================================================
+   CONTENEDOR GENERAL
+   ========================================================= */
+
+.contenedor{
+    width:min(1240px, calc(100% - 48px)) !important;
+
+    margin:0 auto !important;
+
+    padding:42px 0 70px !important;
+}
+
+
+/* =========================================================
+   TIPOGRAFÍA
+   ========================================================= */
+
+.contenedor h1,
+.contenedor h2,
+.contenedor h3,
+.contenedor h4{
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    letter-spacing:-.025em !important;
+
+    color:var(--ed-ink) !important;
+}
+
+.contenedor p,
+.contenedor label,
+.contenedor input,
+.contenedor select,
+.contenedor textarea,
+.contenedor button,
+.contenedor table{
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        sans-serif !important;
+}
+
+
+/* =========================================================
+   DASHBOARD REAL
+   ========================================================= */
+
+#contenido .ed-dashboard{
+    width:100% !important;
+    max-width:1180px !important;
+
+    margin:0 auto 30px !important;
+}
+
+
+/* Bienvenida */
+
+#contenido .ed-welcome{
+    position:relative !important;
+    overflow:hidden !important;
+
+    display:flex !important;
+
+    min-height:205px !important;
+
+    margin-bottom:22px !important;
+    padding:34px 36px !important;
+
+    background:
+        radial-gradient(
+            circle at 85% 15%,
+            rgba(234,182,74,.18),
+            transparent 28%
+        ),
+        linear-gradient(
+            125deg,
+            #101c2c 0%,
+            #182b42 60%,
+            #203e61 100%
+        ) !important;
+
+    border:1px solid rgba(255,255,255,.08) !important;
+
+    border-radius:var(--ed-radius-lg) !important;
+
+    box-shadow:var(--ed-shadow-lg) !important;
+}
+
+#contenido .ed-welcome::after{
+    content:"" !important;
+
+    position:absolute !important;
+    right:-80px !important;
+    bottom:-100px !important;
+
+    width:270px !important;
+    height:270px !important;
+
+    border:1px solid rgba(234,182,74,.15) !important;
+
+    border-radius:50% !important;
+}
+
+#contenido .ed-welcome h1{
+    color:#ffffff !important;
+
+    font-size:clamp(30px,4vw,46px) !important;
+
+    line-height:1.05 !important;
+}
+
+#contenido .ed-welcome p{
+    max-width:620px !important;
+
+    color:#cbd6e3 !important;
+
+    font-size:14px !important;
+    line-height:1.65 !important;
+}
+
+#contenido .ed-welcome .badge{
+    background:var(--ed-amber) !important;
+    color:#392b0f !important;
+
+    border-radius:999px !important;
+
+    padding:6px 11px !important;
+
+    font-size:11px !important;
+    font-weight:800 !important;
+
+    text-transform:uppercase !important;
+    letter-spacing:.055em !important;
+}
+
+
+/* =========================================================
+   KPI
+   ========================================================= */
+
+#contenido .ed-kpis{
+    gap:14px !important;
+
+    margin-bottom:24px !important;
+}
+
+#contenido .ed-kpi{
+    position:relative !important;
+
+    overflow:hidden !important;
+
+    background:rgba(255,255,255,.94) !important;
+
+    border:1px solid var(--ed-border) !important;
+
+    border-radius:var(--ed-radius-md) !important;
+
+    box-shadow:var(--ed-shadow-sm) !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease !important;
+}
+
+#contenido .ed-kpi:hover{
+    transform:translateY(-3px) !important;
+
+    box-shadow:var(--ed-shadow-md) !important;
+
+    border-color:#c8d6e6 !important;
+}
+
+#contenido .ed-kpi-label{
+    color:var(--ed-muted) !important;
+}
+
+#contenido .ed-kpi-value{
+    color:var(--ed-ink) !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size:34px !important;
+}
+
+#contenido .ed-kpi-note{
+    color:#7a8797 !important;
+}
+
+
+/* =========================================================
+   SECCIONES
+   ========================================================= */
+
+#contenido .ed-section{
+    background:rgba(255,255,255,.96) !important;
+
+    border:1px solid var(--ed-border) !important;
+
+    border-radius:var(--ed-radius-lg) !important;
+
+    box-shadow:var(--ed-shadow-sm) !important;
+
+    padding:30px !important;
+
+    margin-bottom:24px !important;
+}
+
+#contenido .ed-section-head{
+    margin-bottom:22px !important;
+}
+
+#contenido .ed-section-head h2{
+    color:var(--ed-ink) !important;
+
+    font-size:27px !important;
+}
+
+#contenido .ed-section-head p{
+    color:var(--ed-muted) !important;
+}
+
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+#contenido .ed-action{
+    position:relative !important;
+    overflow:hidden !important;
+
+    min-height:150px !important;
+
+    padding:21px !important;
+
+    background:#ffffff !important;
+
+    border:1px solid var(--ed-border) !important;
+
+    border-radius:var(--ed-radius-md) !important;
+
+    box-shadow:none !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease !important;
+}
+
+#contenido .ed-action::before{
+    content:"" !important;
+
+    position:absolute !important;
+
+    left:0 !important;
+    top:0 !important;
+
+    width:3px !important;
+    height:100% !important;
+
+    background:var(--ed-amber) !important;
+
+    transform:scaleY(0) !important;
+    transform-origin:bottom !important;
+
+    transition:transform .18s ease !important;
+}
+
+#contenido .ed-action:hover{
+    background:#ffffff !important;
+
+    border-color:#cbd8e7 !important;
+
+    transform:translateY(-4px) !important;
+
+    box-shadow:var(--ed-shadow-md) !important;
+}
+
+#contenido .ed-action:hover::before{
+    transform:scaleY(1) !important;
+}
+
+#contenido .ed-action-icon{
+    background:var(--ed-blue-soft) !important;
+    color:var(--ed-blue-dark) !important;
+
+    border-radius:12px !important;
+}
+
+#contenido .ed-action-title{
+    color:var(--ed-ink) !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size:20px !important;
+}
+
+#contenido .ed-action-text{
+    color:var(--ed-muted) !important;
+}
+
+#contenido .ed-action-link{
+    color:var(--ed-blue) !important;
+}
+
+
+/* =========================================================
+   CUENTA
+   ========================================================= */
+
+#contenido .ed-account{
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc,
+            #eef4fa
+        ) !important;
+
+    border:1px solid var(--ed-border) !important;
+
+    border-radius:var(--ed-radius-lg) !important;
+
+    box-shadow:none !important;
+}
+
+#contenido .ed-account h2{
+    color:var(--ed-ink) !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+}
+
+
+/* =========================================================
+   BOTONES GENERALES
+   ========================================================= */
+
+#contenido .boton,
+#contenido button.boton,
+#contenido input[type="submit"].boton{
+    border-radius:11px !important;
+
+    min-height:43px !important;
+
+    padding:10px 17px !important;
+
+    border:1px solid transparent !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1749a5
+        ) !important;
+
+    color:#ffffff !important;
+
+    font-weight:750 !important;
+
+    box-shadow:
+        0 7px 16px rgba(37,99,235,.18) !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        filter .18s ease !important;
+}
+
+#contenido .boton:hover,
+#contenido button.boton:hover,
+#contenido input[type="submit"].boton:hover{
+    transform:translateY(-2px) !important;
+
+    filter:brightness(1.05) !important;
+
+    box-shadow:
+        0 11px 23px rgba(37,99,235,.24) !important;
+}
+
+
+/* =========================================================
+   BOTONES SECUNDARIOS / LOGOUT
+   ========================================================= */
+
+#contenido .ed-logout{
+    background:#ffffff !important;
+
+    color:var(--ed-ink) !important;
+
+    border:1px solid rgba(255,255,255,.24) !important;
+
+    box-shadow:none !important;
+}
+
+#contenido .ed-logout:hover{
+    background:#f5f8fb !important;
+
+    color:var(--ed-blue-dark) !important;
+}
+
+
+/* =========================================================
+   FORMULARIOS
+   ========================================================= */
+
+#contenido form:not(.inline-form){
+    color:var(--ed-text);
+}
+
+#contenido label{
+    color:#334155 !important;
+
+    font-size:13px !important;
+    font-weight:700 !important;
+}
+
+#contenido input:not([type="hidden"]):not([type="submit"]),
+#contenido select,
+#contenido textarea{
+    width:100% !important;
+
+    min-height:44px !important;
+
+    box-sizing:border-box !important;
+
+    padding:10px 12px !important;
+
+    background:#ffffff !important;
+
+    color:var(--ed-text) !important;
+
+    border:1px solid #cfd9e5 !important;
+
+    border-radius:10px !important;
+
+    outline:none !important;
+
+    transition:
+        border-color .16s ease,
+        box-shadow .16s ease,
+        background .16s ease !important;
+}
+
+#contenido textarea{
+    min-height:110px !important;
+    resize:vertical !important;
+}
+
+#contenido input:not([type="hidden"]):focus,
+#contenido select:focus,
+#contenido textarea:focus{
+    background:#ffffff !important;
+
+    border-color:#6c98e8 !important;
+
+    box-shadow:
+        0 0 0 4px rgba(37,99,235,.10) !important;
+}
+
+
+/* =========================================================
+   TABLAS
+   ========================================================= */
+
+#contenido table{
+    border:1px solid var(--ed-border) !important;
+
+    border-radius:var(--ed-radius-md) !important;
+
+    box-shadow:var(--ed-shadow-sm) !important;
+
+    background:#ffffff !important;
+}
+
+#contenido table thead th{
+    background:#17283d !important;
+
+    color:#ffffff !important;
+
+    border-bottom:0 !important;
+
+    font-size:11px !important;
+
+    text-transform:uppercase !important;
+
+    letter-spacing:.045em !important;
+}
+
+#contenido table tbody td{
+    color:#334155 !important;
+
+    border-bottom:1px solid #edf1f5 !important;
+}
+
+#contenido table tbody tr:hover td{
+    background:#f7faff !important;
+}
+
+
+/* =========================================================
+   CARDS INTERNAS
+   ========================================================= */
+
+#contenido .page-card,
+#contenido .table-card,
+#contenido .tabla-card,
+#contenido .contenido-card{
+    background:#ffffff !important;
+
+    border:1px solid var(--ed-border) !important;
+
+    border-radius:var(--ed-radius-lg) !important;
+
+    box-shadow:var(--ed-shadow-sm) !important;
+}
+
+
+/* =========================================================
+   ENCABEZADOS DE PÁGINAS INTERNAS
+   ========================================================= */
+
+#contenido .page-head{
+    margin-bottom:28px !important;
+}
+
+#contenido .page-head h1{
+    color:var(--ed-ink) !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size:34px !important;
+
+    letter-spacing:-.03em !important;
+}
+
+#contenido .page-head p{
+    color:var(--ed-muted) !important;
+}
+
+
+/* =========================================================
+   ALERTAS
+   ========================================================= */
+
+#contenido .alerta{
+    border-radius:12px !important;
+
+    border:1px solid var(--ed-border) !important;
+
+    box-shadow:var(--ed-shadow-sm) !important;
+}
+
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+#contenido .badge{
+    border-radius:999px !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        sans-serif !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media(max-width:900px){
+
+    .barra{
+        padding:12px 20px !important;
+
+        align-items:flex-start !important;
+
+        flex-wrap:wrap !important;
+    }
+
+    .nav-principal{
+        width:100% !important;
+
+        justify-content:flex-start !important;
+    }
+
+    .contenedor{
+        width:min(100% - 30px, 1180px) !important;
+
+        padding-top:28px !important;
+    }
+
+    #contenido .ed-welcome{
+        padding:27px !important;
+    }
+}
+
+@media(max-width:680px){
+
+    .barra{
+        padding:13px 15px !important;
+    }
+
+    .barra .logo{
+        font-size:22px !important;
+    }
+
+    .nav-principal{
+        gap:4px !important;
+    }
+
+    .nav-principal a,
+    .nav-principal .nav-button{
+        min-height:36px !important;
+
+        padding:7px 9px !important;
+
+        font-size:12px !important;
+    }
+
+    .contenedor{
+        width:calc(100% - 22px) !important;
+
+        padding-top:20px !important;
+    }
+
+    #contenido .ed-section{
+        padding:21px !important;
+    }
+
+    #contenido .ed-welcome{
+        padding:24px 21px !important;
+    }
+
+    #contenido .ed-welcome h1{
+        font-size:31px !important;
+    }
+
+    #contenido .page-head h1{
+        font-size:29px !important;
+    }
+}
+
+</style>
+
+<!-- FIN EDUTURNOS_VISUAL_FINAL_REAL -->
+
+<script id="eduturnos-definitivo-js">
+(function () {
+    "use strict";
+
+    function arreglarTexto(texto) {
+
+        var cambios = {
+            "\u00C3\u00A1": "\u00E1",
+            "\u00C3\u00A9": "\u00E9",
+            "\u00C3\u00AD": "\u00ED",
+            "\u00C3\u00B3": "\u00F3",
+            "\u00C3\u00BA": "\u00FA",
+            "\u00C3\u00B1": "\u00F1",
+            "\u00C3\u0081": "\u00C1",
+            "\u00C3\u0089": "\u00C9",
+            "\u00C3\u008D": "\u00CD",
+            "\u00C3\u0093": "\u00D3",
+            "\u00C3\u009A": "\u00DA",
+            "\u00C3\u0091": "\u00D1",
+            "\u00C2\u00B7": "\u00B7",
+            "\u00C2\u00A0": " ",
+            "\u00E2\u0086\u0092": "\u2192",
+            "\u00E2\u0086\u0090": "\u2190",
+            "\u00E2\u0080\u00B9": "\u2039",
+            "\u00E2\u0080\u00BA": "\u203A"
+        };
+
+        Object.keys(cambios).forEach(function (malo) {
+            texto = texto.split(malo).join(cambios[malo]);
+        });
+
+        return texto;
+    }
+
+    function corregirTextoPagina() {
+
+        if (!document.body) {
+            return;
+        }
+
+        var walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            null
+        );
+
+        var nodos = [];
+        var nodo;
+
+        while ((nodo = walker.nextNode())) {
+            nodos.push(nodo);
+        }
+
+        nodos.forEach(function (n) {
+
+            var nuevo = arreglarTexto(n.nodeValue);
+
+            if (nuevo !== n.nodeValue) {
+                n.nodeValue = nuevo;
+            }
+        });
+    }
+
+    function nombreMes(numero) {
+
+        var meses = [
+            "enero",
+            "febrero",
+            "marzo",
+            "abril",
+            "mayo",
+            "junio",
+            "julio",
+            "agosto",
+            "septiembre",
+            "octubre",
+            "noviembre",
+            "diciembre"
+        ];
+
+        return meses[numero - 1] || "septiembre";
+    }
+
+    function obtenerFechaCalendario() {
+
+        var url = new URL(window.location.href);
+
+        var mes =
+            parseInt(url.searchParams.get("mes"), 10) ||
+            parseInt(url.searchParams.get("month"), 10);
+
+        var ano =
+            parseInt(url.searchParams.get("anio"), 10) ||
+            parseInt(url.searchParams.get("ano"), 10) ||
+            parseInt(url.searchParams.get("year"), 10);
+
+        if (!mes || mes < 1 || mes > 12) {
+            mes = 9;
+        }
+
+        if (!ano || ano < 2000 || ano > 2100) {
+            ano = 2026;
+        }
+
+        return {
+            mes: mes,
+            ano: ano
+        };
+    }
+
+    function arreglarCalendario() {
+        // La barra del calendario se controla directamente desde
+        // templates/calendario/index.html para conservar su estructura.
+        return;
+    }
+
+    function arreglarNotificaciones() {
+
+        var elementos = Array.prototype.slice.call(
+            document.querySelectorAll(
+                "button, input[type='submit'], input[type='button'], a"
+            )
+        );
+
+        elementos.forEach(function (el) {
+
+            var texto =
+                (el.textContent || el.value || "")
+                .trim()
+                .toLowerCase();
+
+            if (
+                texto.indexOf("marcar todas como") >= 0 ||
+                texto.indexOf("marcar todo como") >= 0
+            ) {
+
+                el.classList.add(
+                    "eduturnos-final-read"
+                );
+
+                var padre = el.parentElement;
+
+                if (padre) {
+
+                    padre.classList.add(
+                        "eduturnos-final-read-wrap"
+                    );
+                }
+            }
+        });
+    }
+
+    function arreglarSolicitudes() {
+
+        var elementos = Array.prototype.slice.call(
+            document.querySelectorAll("a, button")
+        );
+
+        elementos.forEach(function (el) {
+
+            var texto =
+                (el.textContent || "")
+                .trim()
+                .toLowerCase();
+
+            if (
+                texto.indexOf("solicitar seguimiento") >= 0
+            ) {
+
+                el.classList.add(
+                    "eduturnos-final-follow-up"
+                );
+            }
+        });
+    }
+
+    function iniciar() {
+
+        corregirTextoPagina();
+        arreglarCalendario();
+        arreglarNotificaciones();
+        arreglarSolicitudes();
+
+        setTimeout(function () {
+
+            corregirTextoPagina();
+            arreglarCalendario();
+            arreglarNotificaciones();
+            arreglarSolicitudes();
+
+        }, 300);
+    }
+
+    if (document.readyState === "loading") {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            iniciar
+        );
+
+    } else {
+
+        iniciar();
+    }
+
+})();
+</script>
+
+<script id="EDUTURNOS_ANIMACION_GLOBAL_20260923">
+(function () {
+
+    function activarTarjetas() {
+
+        var tarjetas = document.querySelectorAll(
+            ".tarjeta"
+        );
+
+        if (!tarjetas.length) {
+            return;
+        }
+
+        tarjetas.forEach(function (tarjeta) {
+
+            tarjeta.classList.remove(
+                "eduturnos-visible"
+            );
+
+        });
+
+        if (!("IntersectionObserver" in window)) {
+
+            tarjetas.forEach(function (tarjeta) {
+                tarjeta.classList.add(
+                    "eduturnos-visible"
+                );
+            });
+
+            return;
+        }
+
+        var observador =
+            new IntersectionObserver(
+                function (entradas) {
+
+                    entradas.forEach(
+                        function (entrada) {
+
+                            if (
+                                entrada.isIntersecting
+                            ) {
+
+                                entrada.target.classList.add(
+                                    "eduturnos-visible"
+                                );
+
+                                observador.unobserve(
+                                    entrada.target
+                                );
+                            }
+                        }
+                    );
+
+                },
+                {
+                    threshold: .15
+                }
+            );
+
+        tarjetas.forEach(function (tarjeta) {
+            observador.observe(tarjeta);
+        });
+    }
+
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            activarTarjetas
+        );
+
+    } else {
+
+        activarTarjetas();
+
+    }
+
+})();
+</script>
+
+
+<!-- EDUTURNOS_TEMA_DASHBOARD_ULTIMA_CAPA_2026 -->
+
+<style id="EDUTURNOS_TEMA_DASHBOARD_ULTIMA_CAPA_2026">
+
+/* =========================================================
+   EDUTURNOS
+   CAPA VISUAL FINAL DEL DASHBOARD
+   NO MODIFICA FUNCIONALIDAD
+   ========================================================= */
+
+#contenido .ed-dashboard {
+    width: 100% !important;
+    max-width: 1280px !important;
+    margin: 0 auto 36px auto !important;
+    padding: 0 8px !important;
+    color: #172033 !important;
+}
+
+/* =========================================================
+   BIENVENIDA
+   ========================================================= */
+
+#contenido .ed-dashboard .ed-welcome {
+    position: relative !important;
+    overflow: hidden !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    min-height: 220px !important;
+
+    padding: 38px 42px !important;
+    margin: 0 0 26px 0 !important;
+
+    border-radius: 28px !important;
+    border: 1px solid rgba(37, 99, 235, .18) !important;
+
+    background:
+        radial-gradient(
+            circle at 85% 15%,
+            rgba(255, 193, 7, .28),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 10% 100%,
+            rgba(255, 255, 255, .22),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #2563eb 0%,
+            #3182ce 48%,
+            #5fa8e8 100%
+        ) !important;
+
+    color: #ffffff !important;
+
+    box-shadow:
+        0 22px 50px rgba(37, 99, 235, .20) !important;
+}
+
+/* brillo decorativo */
+
+#contenido .ed-dashboard .ed-welcome::after {
+    content: "" !important;
+    position: absolute !important;
+
+    width: 280px !important;
+    height: 280px !important;
+
+    right: -110px !important;
+    top: -120px !important;
+
+    border-radius: 50% !important;
+
+    background: rgba(255,255,255,.10) !important;
+
+    pointer-events: none !important;
+}
+
+/* =========================================================
+   TEXTOS DE BIENVENIDA
+   ========================================================= */
+
+#contenido .ed-dashboard .ed-welcome,
+#contenido .ed-dashboard .ed-welcome * {
+    box-sizing: border-box !important;
+}
+
+#contenido .ed-dashboard .ed-welcome h1,
+#contenido .ed-dashboard .ed-welcome h2,
+#contenido .ed-dashboard .ed-welcome .ed-welcome-title {
+    color: #ffffff !important;
+    margin-bottom: 10px !important;
+}
+
+#contenido .ed-dashboard .ed-welcome p,
+#contenido .ed-dashboard .ed-welcome .ed-welcome-text {
+    color: rgba(255,255,255,.88) !important;
+}
+
+#contenido .ed-dashboard .ed-welcome-main {
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+/* =========================================================
+   BOTÓN CERRAR SESIÓN
+   ========================================================= */
+
+#contenido .ed-dashboard .ed-logout {
+    position: relative !important;
+    z-index: 5 !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 11px 18px !important;
+
+    border-radius: 12px !important;
+
+    background: rgba(255,255,255,.15) !important;
+    color: #ffffff !important;
+
+    border: 1px solid rgba(255,255,255,.35) !important;
+
+    text-decoration: none !important;
+
+    transition:
+        transform .18s ease,
+        background .18s ease,
+        box-shadow .18s ease !important;
+}
+
+#contenido .ed-dashboard .ed-logout:hover {
+    transform: translateY(-2px) !important;
+    background: rgba(255,255,255,.24) !important;
+    box-shadow: 0 10px 22px rgba(0,0,0,.12) !important;
+}
+
+/* =========================================================
+   KPI
+   ========================================================= */
+
+#contenido .ed-dashboard .ed-kpis {
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr)) !important;
+
+    gap: 18px !important;
+
+    margin-bottom: 28px !important;
+}
+
+#contenido .ed-dashboard .ed-kpi {
+    position: relative !important;
+
+    min-height: 135px !important;
+
+    padding: 22px !important;
+
+    border-radius: 20px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #dbe7f5 !important;
+
+    box-shadow:
+        0 10px 28px rgba(30,64,175,.08) !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease !important;
+}
+
+#contenido .ed-dashboard .ed-kpi:hover {
+    transform: translateY(-3px) !important;
+
+    box-shadow:
+        0 16px 34px rgba(30,64,175,.13) !important;
+}
+
+#contenido .ed-dashboard .ed-kpi-label {
+    color: #64748b !important;
+    font-size: .82rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .06em !important;
+}
+
+#contenido .ed-dashboard .ed-kpi-value {
+    margin-top: 8px !important;
+
+    color: #1d4ed8 !important;
+
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+}
+
+#contenido .ed-dashboard .ed-kpi-note {
+    color: #64748b !important;
+}
+
+/* =========================================================
+   SECCIONES
+   ========================================================= */
+
+#contenido .ed-dashboard .ed-section {
+    background: #ffffff !important;
+
+    border: 1px solid #dbe7f5 !important;
+
+    border-radius: 24px !important;
+
+    padding: 26px !important;
+
+    margin-bottom: 24px !important;
+
+    box-shadow:
+        0 12px 32px rgba(30,64,175,.07) !important;
+}
+
+#contenido .ed-dashboard .ed-section-head {
+    margin-bottom: 20px !important;
+}
+
+#contenido .ed-dashboard .ed-section-head h2,
+#contenido .ed-dashboard .ed-section-head h3 {
+    color: #172033 !important;
+}
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+#contenido .ed-dashboard .ed-actions {
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 16px !important;
+}
+
+#contenido .ed-dashboard .ed-action {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+
+    padding: 20px !important;
+
+    border-radius: 18px !important;
+
+    background: #f8fbff !important;
+
+    border: 1px solid #dce9f7 !important;
+
+    text-decoration: none !important;
+
+    transition:
+        transform .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease,
+        background .18s ease !important;
+}
+
+#contenido .ed-dashboard .ed-action:hover {
+    transform: translateY(-3px) !important;
+
+    background: #ffffff !important;
+
+    border-color: #93c5fd !important;
+
+    box-shadow:
+        0 12px 28px rgba(37,99,235,.12) !important;
+}
+
+#contenido .ed-dashboard .ed-action-icon {
+    flex: 0 0 48px !important;
+
+    width: 48px !important;
+    height: 48px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 14px !important;
+
+    background: #eaf3ff !important;
+
+    color: #2563eb !important;
+}
+
+#contenido .ed-dashboard .ed-action-title {
+    color: #172033 !important;
+
+    font-weight: 800 !important;
+}
+
+#contenido .ed-dashboard .ed-action-text {
+    color: #64748b !important;
+}
+
+#contenido .ed-dashboard .ed-action-link {
+    color: #2563eb !important;
+
+    font-weight: 700 !important;
+}
+
+/* =========================================================
+   CUENTA
+   ========================================================= */
+
+#contenido .ed-dashboard .ed-account {
+    background: #f8fbff !important;
+
+    border: 1px solid #dbe7f5 !important;
+
+    border-radius: 20px !important;
+
+    padding: 24px !important;
+}
+
+/* =========================================================
+   BOTONES GENERALES DEL DASHBOARD
+   ========================================================= */
+
+#contenido .ed-dashboard .boton {
+    border-radius: 12px !important;
+
+    border: 0 !important;
+
+    background: #2563eb !important;
+
+    color: #ffffff !important;
+
+    box-shadow:
+        0 8px 18px rgba(37,99,235,.18) !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease !important;
+}
+
+#contenido .ed-dashboard .boton:hover {
+    transform: translateY(-2px) !important;
+
+    box-shadow:
+        0 12px 24px rgba(37,99,235,.25) !important;
+}
+
+/* =========================================================
+   FONDO GENERAL DEL CONTENIDO
+   ========================================================= */
+
+#contenido {
+    background:
+        linear-gradient(
+            180deg,
+            #f5f9ff 0%,
+            #eef5fc 48%,
+            #f8fbff 100%
+        ) !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    #contenido .ed-dashboard .ed-kpis {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #contenido .ed-dashboard .ed-actions {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 700px) {
+
+    #contenido .ed-dashboard {
+        padding: 0 12px !important;
+    }
+
+    #contenido .ed-dashboard .ed-welcome {
+        padding: 28px 24px !important;
+        min-height: 190px !important;
+    }
+
+    #contenido .ed-dashboard .ed-kpis {
+        grid-template-columns: 1fr !important;
+    }
+
+    #contenido .ed-dashboard .ed-actions {
+        grid-template-columns: 1fr !important;
+    }
+
+    #contenido .ed-dashboard .ed-section {
+        padding: 20px !important;
+        border-radius: 20px !important;
+    }
+}
+
+</style>
+
+<!-- FIN EDUTURNOS_TEMA_DASHBOARD_ULTIMA_CAPA_2026 -->
+
+
+
+</body></html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,681 @@
+.configuracion-page .institucion-form {
+    max-width: 960px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+    gap: 14px 16px;
+}
+
+.configuracion-page form.form-grid,
+.configuracion-page form.stack-form {
+    max-width: 960px;
+}
+
+.configuracion-page .institucion-form > label {
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+}
+
+.configuracion-page .institucion-form .institution-name {
+    grid-column: span 2;
+}
+
+.configuracion-page .institucion-form .institution-name input {
+    min-height: 42px;
+    padding: 10px 14px;
+}
+
+.configuracion-page .institution-actions {
+    align-self: end;
+    margin: 0;
+}
+
+.configuracion-page .institution-city input,
+.configuracion-page .institution-department input {
+    width: 100%;
+    padding-inline: 14px;
+}
+
+.configuracion-page .table-wrap input:not([type="hidden"]),
+.configuracion-page .table-wrap select {
+    min-height: 38px;
+    max-width: 230px;
+    min-width: 110px;
+    padding: 8px 10px;
+}
+
+.configuracion-page .admin-catalog-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
+    margin: 14px 0 18px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--borde);
+    scrollbar-width: thin;
+}
+
+.configuracion-page .admin-catalog-tabs button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.configuracion-page .configuracion-catalogos {
+    display: contents;
+}
+
+.configuracion-page .panel[hidden] {
+    display: none !important;
+}
+
+.configuracion-page .motivo-form {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(110px, 140px) auto !important;
+    align-items: end !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 8px 0 !important;
+    border: 0 !important;
+}
+
+.configuracion-page .motivo-form label {
+    min-width: 0;
+    margin: 0;
+}
+
+.configuracion-page .motivo-form label input,
+.configuracion-page .motivo-form label select {
+    min-height: 38px;
+    height: 38px;
+    padding: 8px 10px;
+}
+
+.configuracion-page .motivo-form .acciones {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+}
+
+.configuracion-page .motivo-edit-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(100px, 130px) auto;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 5px 0;
+    border: 0;
+}
+
+.configuracion-page .motivo-edit-form > input,
+.configuracion-page .motivo-edit-form > select {
+    min-width: 0;
+    min-height: 38px;
+    height: 38px;
+    padding: 8px 10px;
+}
+
+.configuracion-page .motivo-edit-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.configuracion-page .motivo-edit-actions .boton {
+    min-height: 36px;
+    padding: 7px 9px;
+    white-space: nowrap;
+}
+
+.configuracion-page .catalogo-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.configuracion-page .catalogo-form-actions .boton {
+    width: auto !important;
+    max-width: none !important;
+}
+
+@media (max-width: 900px) {
+    .configuracion-page .motivo-form {
+        grid-template-columns: minmax(0, 1fr) minmax(100px, 130px) !important;
+    }
+
+    .configuracion-page .motivo-form .acciones,
+    .configuracion-page .motivo-form > button {
+        grid-column: 1 / -1;
+    }
+
+    .configuracion-page .motivo-edit-form {
+        grid-template-columns: minmax(0, 1fr) minmax(100px, 130px);
+    }
+
+    .configuracion-page .motivo-edit-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+}
+
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.catalogo-form {
+        max-width: 960px !important;
+    }
+}
+
+.configuracion-page .configuracion-catalogos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+}
+
+.configuracion-page .configuracion-catalogos > .panel {
+    min-width: 0;
+}
+
+.configuracion-page .state-form {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) minmax(170px, 210px) auto;
+    align-items: end;
+    gap: 10px;
+    margin: 0;
+}
+
+.configuracion-page .state-form-new {
+    max-width: 960px;
+}
+
+.configuracion-page .state-form input:not([type="hidden"]),
+.configuracion-page .state-form select {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 42px;
+    height: 42px;
+    padding: 9px 12px;
+    box-sizing: border-box;
+}
+
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .state-form input:not([type="hidden"]),
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .state-form select {
+        field-sizing: fixed;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+}
+
+.configuracion-page .state-form label {
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+}
+
+.configuracion-page .state-form input,
+.configuracion-page .state-form select {
+    min-height: 44px;
+    padding: 10px 14px;
+}
+
+.configuracion-page .state-list {
+    display: grid;
+    gap: 0;
+    margin-top: 14px;
+    border-top: 1px solid var(--borde);
+}
+
+.configuracion-page .state-form-row {
+    grid-template-columns: minmax(260px, 1fr) minmax(170px, 210px) auto;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--borde);
+}
+
+.configuracion-page .state-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.configuracion-page .state-actions .boton {
+    white-space: nowrap;
+}
+
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.form-grid,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.stack-form {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        width: 100% !important;
+        align-items: end;
+        gap: 14px 16px;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.form-grid > label,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.stack-form > label {
+        width: auto !important;
+        max-width: none !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.form-grid input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.form-grid select,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.form-grid textarea,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.stack-form input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.stack-form select,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.stack-form textarea {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.form-grid > .full-field,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.stack-form > .full-field,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institution-name,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institution-address {
+        grid-column: 1 / -1 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .motivo-form > label.full-field {
+        grid-column: 2 / -1 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .motivo-form > label.full-field:nth-of-type(1) {
+        grid-column: 1 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .form-actions {
+        align-self: end !important;
+        margin: 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .form-actions .boton,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.stack-form > .boton {
+        width: auto !important;
+    }
+
+    .administracion-page .configuracion-catalogos form.catalogo-edit-form {
+        display: grid;
+        grid-template-columns: minmax(110px, 1fr) minmax(100px, .8fr) auto auto;
+        align-items: end;
+        gap: 8px;
+        margin-top: 12px !important;
+    }
+
+    .administracion-page .configuracion-catalogos form.catalogo-edit-form > input:not([type="hidden"]),
+    .administracion-page .configuracion-catalogos form.catalogo-edit-form > select {
+        min-width: 0;
+        min-height: 40px;
+        margin: 0;
+    }
+
+    .administracion-page .configuracion-catalogos form.catalogo-edit-form .boton {
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 900px) {
+    .configuracion-page .institucion-form {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        align-items: end;
+    }
+
+    .configuracion-page .institucion-form .institution-name {
+        grid-column: 1 / -1 !important;
+    }
+
+    .configuracion-page .institucion-form .institution-city input,
+    .configuracion-page .institucion-form .institution-department input {
+        max-width: 100% !important;
+    }
+
+    .configuracion-page .institution-actions {
+        grid-column: 1 / -1;
+    }
+
+    .configuracion-page .configuracion-catalogos {
+        grid-template-columns: 1fr !important;
+    }
+
+    .configuracion-page .state-form {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(150px, .65fr) !important;
+        gap: 10px !important;
+    }
+
+    .configuracion-page .state-form-new .state-name {
+        grid-column: 1 / -1;
+    }
+
+    .configuracion-page .state-form-row .state-name-control {
+        grid-column: 1 / -1;
+    }
+
+    .configuracion-page .state-form-new .state-status {
+        grid-column: 1;
+    }
+
+    .configuracion-page .state-form-new .catalogo-form-actions {
+        grid-column: 2;
+        align-self: end;
+    }
+
+    .configuracion-page .state-actions {
+        align-self: end;
+        justify-content: flex-start;
+    }
+
+    .configuracion-page .state-actions .boton,
+    .configuracion-page .state-add {
+        width: auto !important;
+        max-width: none !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .configuracion-page .institucion-form {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .configuracion-page .institucion-form > label,
+    .configuracion-page .institution-actions {
+        grid-column: 1 / -1 !important;
+    }
+
+    .configuracion-page .state-form {
+        grid-template-columns: minmax(0, 1fr) minmax(135px, .7fr) !important;
+    }
+
+    .configuracion-page .state-form-new .state-status {
+        grid-column: 1;
+    }
+
+    .configuracion-page .state-form-new .catalogo-form-actions {
+        grid-column: 2;
+        align-self: end;
+        gap: 5px;
+    }
+
+    .configuracion-page .state-form-row .state-status-control {
+        grid-column: 1;
+    }
+
+    .configuracion-page .state-actions {
+        grid-column: 2;
+        gap: 5px;
+    }
+
+    .configuracion-page .state-actions .boton {
+        padding-inline: 8px;
+        font-size: 11px;
+    }
+}
+
+.configuracion-page .panel {
+    background: #fff;
+    border: 1px solid #dce4eb;
+    border-radius: 8px;
+}
+
+.configuracion-page .panel + .panel,
+.configuracion-page .panel + .configuracion-catalogos,
+.configuracion-page .configuracion-catalogos + .panel {
+    margin-top: 12px;
+}
+
+.configuracion-page .table-wrap {
+    margin-top: 8px;
+}
+
+.configuracion-page .catalogo-edit-form input[name="nombre"],
+.configuracion-page .motivo-edit-form > input[name="nombre"],
+.configuracion-page .state-form-row .state-name-control {
+    font-size: 13px;
+}
+
+.administracion-page .configuracion-page {
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+}
+
+.administracion-page .configuracion-page > .panel {
+    padding: 18px !important;
+    margin-bottom: 14px !important;
+}
+
+.configuracion-page .catalogo-edit-form {
+    grid-template-columns: minmax(0, max-content) minmax(110px, 140px) max-content max-content !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 6px !important;
+}
+
+.configuracion-page .catalogo-edit-form input[name="nombre"],
+.configuracion-page .motivo-edit-form > input[name="nombre"],
+.configuracion-page .state-form-row .state-name-control {
+    field-sizing: content;
+    width: auto !important;
+    min-width: 8ch !important;
+    max-width: min(40ch, 100%) !important;
+    padding-inline: 5px !important;
+}
+
+.configuracion-page .motivo-edit-form {
+    grid-template-columns: minmax(0, max-content) minmax(110px, 130px) max-content !important;
+    gap: 6px !important;
+    padding: 3px 0 !important;
+}
+
+.configuracion-page .state-form,
+.configuracion-page .state-form-row {
+    grid-template-columns: minmax(0, max-content) minmax(120px, 150px) max-content !important;
+    gap: 6px !important;
+}
+
+.configuracion-page .config-row-actions,
+.configuracion-page .config-state-actions,
+.configuracion-page .motivo-edit-actions,
+.configuracion-page .state-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 5px !important;
+    margin: 0 !important;
+}
+
+.configuracion-page .config-row-actions > form,
+.configuracion-page .config-state-actions > form {
+    display: contents !important;
+    margin: 0 !important;
+}
+
+.configuracion-page .config-state-actions .boton {
+    min-height: 34px !important;
+    padding: 6px 9px !important;
+    white-space: nowrap !important;
+}
+
+.configuracion-page .config-state-actions .boton:disabled {
+    opacity: .45 !important;
+    cursor: not-allowed !important;
+}
+
+.configuracion-page .table-wrap td {
+    vertical-align: middle !important;
+}
+
+.configuracion-page .institucion-form .institution-name input,
+.configuracion-page form[action*="/periodo/nuevo"] input[name="nombre"] {
+    field-sizing: content;
+    width: fit-content !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding-inline: 5px !important;
+}
+
+@media (max-width: 900px) {
+    .configuracion-page .catalogo-edit-form,
+    .configuracion-page .motivo-edit-form,
+    .configuracion-page .state-form,
+    .configuracion-page .state-form-row {
+        grid-template-columns: minmax(0, 1fr) auto !important;
+    }
+
+    .configuracion-page .catalogo-edit-form input[name="nombre"],
+    .configuracion-page .motivo-edit-form > input[name="nombre"],
+    .configuracion-page .state-form-row .state-name-control {
+        grid-column: 1 !important;
+        max-width: 100% !important;
+    }
+
+    .configuracion-page .catalogo-edit-form > select,
+    .configuracion-page .motivo-edit-form > select,
+    .configuracion-page .state-form-row .state-status-control {
+        grid-column: 2 !important;
+    }
+
+    .configuracion-page .catalogo-edit-form .config-state-actions,
+    .configuracion-page .motivo-edit-actions,
+    .configuracion-page .state-actions {
+        grid-column: 1 / -1 !important;
+    }
+
+    .configuracion-page .config-row-actions {
+        align-items: flex-start !important;
+        flex-direction: column !important;
+    }
+}
+
+.administracion-page .configuracion-page {
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+}
+
+.administracion-page .configuracion-page > .panel {
+    padding: 18px !important;
+}
+
+.configuracion-page .catalogo-edit-form {
+    grid-template-columns: minmax(0, max-content) minmax(110px, 140px) max-content max-content !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 6px !important;
+}
+
+.configuracion-page .catalogo-edit-form input[name="nombre"] {
+    field-sizing: content;
+    width: auto !important;
+    min-width: 8ch !important;
+    max-width: min(40ch, 100%) !important;
+    padding-inline: 5px !important;
+}
+
+.configuracion-page .motivo-edit-form {
+    grid-template-columns: minmax(0, max-content) minmax(110px, 130px) max-content !important;
+    gap: 6px !important;
+    padding: 3px 0 !important;
+}
+
+.configuracion-page .motivo-edit-form > input[name="nombre"] {
+    field-sizing: content;
+    width: auto !important;
+    min-width: 8ch !important;
+    max-width: min(40ch, 100%) !important;
+    padding-inline: 5px !important;
+}
+
+.configuracion-page .state-form-row {
+    grid-template-columns: minmax(0, max-content) minmax(120px, 150px) max-content !important;
+    gap: 6px !important;
+    padding: 5px 0 !important;
+}
+
+.configuracion-page .state-form-row .state-name-control {
+    field-sizing: content;
+    width: auto !important;
+    min-width: 8ch !important;
+    max-width: min(34ch, 100%) !important;
+    padding-inline: 5px !important;
+}
+
+.config-row-actions,
+.config-state-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 5px !important;
+}
+
+.config-row-actions > form,
+.config-state-actions > form {
+    display: contents !important;
+    margin: 0 !important;
+}
+
+.config-state-actions .boton {
+    min-height: 34px !important;
+    padding: 6px 9px !important;
+    white-space: nowrap !important;
+}
+
+.config-state-actions .boton:disabled {
+    opacity: .45 !important;
+    cursor: not-allowed !important;
+}
+
+.configuracion-page .table-wrap td {
+    vertical-align: middle !important;
+}
+
+@media (max-width: 900px) {
+    .configuracion-page .catalogo-edit-form,
+    .configuracion-page .motivo-edit-form,
+    .configuracion-page .state-form-row {
+        grid-template-columns: minmax(0, 1fr) auto !important;
+    }
+
+    .configuracion-page .catalogo-edit-form input[name="nombre"],
+    .configuracion-page .motivo-edit-form > input[name="nombre"],
+    .configuracion-page .state-form-row .state-name-control {
+        grid-column: 1 !important;
+        max-width: 100% !important;
+    }
+
+    .configuracion-page .catalogo-edit-form > select,
+    .configuracion-page .motivo-edit-form > select,
+    .configuracion-page .state-form-row .state-status-control {
+        grid-column: 2 !important;
+    }
+
+    .configuracion-page .catalogo-edit-form .config-state-actions,
+    .configuracion-page .motivo-edit-actions,
+    .configuracion-page .state-actions {
+        grid-column: 1 / -1 !important;
+    }
+
+    .config-row-actions {
+        align-items: flex-start !important;
+        flex-direction: column !important;
+    }
+}
+
+html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form .institution-name > input,
+html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form[action*="/periodo/nuevo"] .full-field > input[name="nombre"] {
+    field-sizing: content !important;
+    width: fit-content !important;
+    inline-size: fit-content !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding-inline: 5px !important;
+    align-self: flex-start !important;
+}

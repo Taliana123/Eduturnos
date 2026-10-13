@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<div class="tarjeta"><h1>Arquitectura EDUTURNOS</h1><p>Flask → blueprints por módulo → capa de acceso MySQL → base de datos institucional.</p><p>El rol de la cuenta se obtiene de MySQL y los accesos sensibles se restringen en backend.</p></div>{% endblock %}

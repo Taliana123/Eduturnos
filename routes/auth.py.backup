@@ -1,0 +1,2156 @@
+# ============================================================
+# AUTH - EDUTURNOS
+# ============================================================
+
+from datetime import datetime
+import time
+import hashlib
+
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session,
+    flash,
+)
+
+from werkzeug.security import (
+    generate_password_hash,
+    check_password_hash,
+)
+
+from database.db import consultar, ejecutar
+
+from roles import (
+    PORTALES,
+    SEDES_INSTITUCIONALES,
+    es_correo_institucional,
+    es_codigo_institucional_valido,
+    validar_codigo_sede,
+    obtener_sede,
+)
+
+from routes.helpers import usuario_actual
+
+
+auth_bp = Blueprint("auth", __name__)
+
+MAX_INTENTOS = 5
+BLOQUEO_MINUTOS = 15
+
+
+# ============================================================
+# FUNCIONES AUXILIARES
+# ============================================================
+
+def _sedes():
+    try:
+        filas = consultar(
+            """
+            SELECT
+                id,
+                nombre,
+                direccion
+            FROM sedes
+            WHERE estado = 1
+            ORDER BY id
+            """
+        )
+
+        if filas:
+            return [
+                {
+                    "id": int(fila["id"]),
+                    "nombre": fila["nombre"],
+                    "direccion": fila.get("direccion") or "",
+                }
+                for fila in filas
+            ]
+
+    except Exception as exc:
+        print(
+            "ERROR OBTENIENDO SEDES:",
+            repr(exc),
+            flush=True,
+        )
+
+    return [
+        {
+            "id": sede[0],
+            "nombre": sede[1],
+            "direccion": sede[2],
+        }
+        for sede in SEDES_INSTITUCIONALES
+    ]
+
+
+def _jornadas():
+    try:
+        filas = consultar(
+            """
+            SELECT
+                id,
+                nombre
+            FROM jornadas
+            WHERE estado = 1
+            ORDER BY id
+            """
+        )
+
+        if filas:
+            return [
+                {
+                    "id": int(fila["id"]),
+                    "nombre": fila["nombre"],
+                }
+                for fila in filas
+            ]
+
+    except Exception as exc:
+        print(
+            "ERROR OBTENIENDO JORNADAS:",
+            repr(exc),
+            flush=True,
+        )
+
+    return [
+        {
+            "id": 1,
+            "nombre": "Mañana",
+        },
+        {
+            "id": 2,
+            "nombre": "Tarde",
+        },
+        {
+            "id": 3,
+            "nombre": "Noche",
+        },
+    ]
+
+
+def _mostrar_registro(
+    portal,
+    info,
+    sedes,
+    jornadas,
+):
+    return render_template(
+        "auth/registro_portal.html",
+        portal=portal,
+        info=info,
+        sedes=sedes,
+        jornadas=jornadas,
+    )
+
+
+def _mostrar_login():
+    return render_template(
+        "auth/login.html",
+        sedes=_sedes(),
+        jornadas=_jornadas(),
+    )
+
+
+def _correo(valor):
+    return (valor or "").strip().lower()
+
+
+def _rol_id(nombre):
+    fila = consultar(
+        """
+        SELECT id
+        FROM roles
+        WHERE nombre = %s
+        LIMIT 1
+        """,
+        (nombre,),
+        uno=True,
+    )
+
+    if fila:
+        return fila["id"]
+
+    return None
+
+
+# ============================================================
+# CONTROL DE INTENTOS
+# ============================================================
+
+def _asegurar_control_acceso():
+    try:
+        ejecutar(
+            """
+            CREATE TABLE IF NOT EXISTS control_acceso (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                clave_hash CHAR(64) NOT NULL UNIQUE,
+                intentos INT NOT NULL DEFAULT 0,
+                bloqueado_hasta DATETIME NULL,
+                fecha_actualizacion DATETIME NOT NULL
+                    DEFAULT CURRENT_TIMESTAMP
+                    ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_control_bloqueo (
+                    bloqueado_hasta
+                )
+            ) ENGINE=InnoDB
+            """
+        )
+
+        return True
+
+    except Exception as exc:
+        print(
+            "ERROR CREANDO control_acceso:",
+            repr(exc),
+            flush=True,
+        )
+        return False
+
+
+def _registrar_intento_fallido(clave_hash):
+    try:
+        if not _asegurar_control_acceso():
+            return
+
+        ejecutar(
+            """
+            INSERT INTO control_acceso
+            (
+                clave_hash,
+                intentos,
+                bloqueado_hasta
+            )
+            VALUES
+            (
+                %s,
+                1,
+                NULL
+            )
+            ON DUPLICATE KEY UPDATE
+                intentos = intentos + 1,
+                fecha_actualizacion = NOW()
+            """,
+            (clave_hash,),
+        )
+
+        fila = consultar(
+            """
+            SELECT intentos
+            FROM control_acceso
+            WHERE clave_hash = %s
+            LIMIT 1
+            """,
+            (clave_hash,),
+            uno=True,
+        )
+
+        if fila:
+            intentos = int(
+                fila.get("intentos") or 0
+            )
+
+            if intentos >= MAX_INTENTOS:
+                ejecutar(
+                    """
+                    UPDATE control_acceso
+                    SET bloqueado_hasta =
+                        DATE_ADD(
+                            NOW(),
+                            INTERVAL %s MINUTE
+                        )
+                    WHERE clave_hash = %s
+                    """,
+                    (
+                        BLOQUEO_MINUTOS,
+                        clave_hash,
+                    ),
+                )
+
+    except Exception as exc:
+        print(
+            "ERROR REGISTRANDO INTENTO:",
+            repr(exc),
+            flush=True,
+        )
+
+
+def _limpiar_intentos(clave_hash):
+    try:
+        if _asegurar_control_acceso():
+            ejecutar(
+                """
+                DELETE FROM control_acceso
+                WHERE clave_hash = %s
+                """,
+                (clave_hash,),
+            )
+
+    except Exception as exc:
+        print(
+            "ERROR LIMPIANDO INTENTOS:",
+            repr(exc),
+            flush=True,
+        )
+
+
+# ============================================================
+# BUSCAR USUARIO
+# ============================================================
+
+def _buscar_usuario(identificador):
+    valor = (identificador or "").strip()
+    correo = _correo(valor)
+
+    return consultar(
+        """
+        SELECT
+            u.*,
+            r.nombre AS rol_nombre
+        FROM usuarios u
+        JOIN roles r
+            ON r.id = u.id_rol
+        WHERE
+            u.documento = %s
+            OR LOWER(TRIM(u.correo)) = %s
+        LIMIT 1
+        """,
+        (
+            valor,
+            correo,
+        ),
+        uno=True,
+    )
+
+
+# ============================================================
+# VALIDAR PERSONAL INSTITUCIONAL
+# ============================================================
+
+def _perfil_personal(
+    portal,
+    tipo_documento,
+    documento,
+    nombres,
+    apellidos,
+    correo,
+    sede_id,
+    jornada_id,
+    codigo,
+):
+    """
+    Valida los datos del personal institucional.
+
+    Docente, coordinador y rector pueden crear
+    su cuenta directamente utilizando:
+
+    - Documento
+    - Nombres
+    - Apellidos
+    - Correo institucional
+    - Sede
+    - Jornada
+    - Código institucional
+    """
+
+    if portal not in PORTALES:
+        return None
+
+    info = PORTALES[portal]
+    rol = info["rol"]
+
+    tipo_documento = (
+        tipo_documento or "CC"
+    ).strip().upper()
+
+    documento = (
+        documento or ""
+    ).strip()
+
+    nombres = (
+        nombres or ""
+    ).strip()
+
+    apellidos = (
+        apellidos or ""
+    ).strip()
+
+    correo = (
+        correo or ""
+    ).strip().lower()
+
+    codigo = (
+        codigo or ""
+    ).strip()
+
+    # --------------------------------------------------------
+    # IDENTIFICACIÓN
+    # --------------------------------------------------------
+
+    if tipo_documento not in (
+        "CC",
+        "TI",
+        "CE",
+    ):
+        return None
+
+    if not documento:
+        return None
+
+    if not nombres:
+        return None
+
+    if not apellidos:
+        return None
+
+    # --------------------------------------------------------
+    # CORREO INSTITUCIONAL
+    # --------------------------------------------------------
+
+    if not es_correo_institucional(correo):
+        return None
+
+    # --------------------------------------------------------
+    # SEDE
+    # --------------------------------------------------------
+
+    try:
+        sede_id = int(sede_id)
+    except (TypeError, ValueError):
+        return None
+
+    sede = obtener_sede(sede_id)
+
+    if not sede:
+        return None
+
+    # --------------------------------------------------------
+    # JORNADA
+    # --------------------------------------------------------
+
+    try:
+        jornada_id = int(jornada_id)
+    except (TypeError, ValueError):
+        return None
+
+    jornada = consultar(
+        """
+        SELECT
+            id,
+            nombre
+        FROM jornadas
+        WHERE
+            id = %s
+            AND estado = 1
+        LIMIT 1
+        """,
+        (jornada_id,),
+        uno=True,
+    )
+
+    if not jornada:
+        return None
+
+    # --------------------------------------------------------
+    # CÓDIGO DE SEDE
+    # --------------------------------------------------------
+
+    if not es_codigo_institucional_valido(codigo):
+        return None
+
+    if not validar_codigo_sede(
+        sede_id,
+        codigo,
+    ):
+        return None
+
+    # --------------------------------------------------------
+    # COMPROBAR CUENTA EXISTENTE
+    # --------------------------------------------------------
+
+    existente = consultar(
+        """
+        SELECT
+            id_usuario
+        FROM usuarios
+        WHERE
+            documento = %s
+            OR LOWER(TRIM(correo)) = %s
+        LIMIT 1
+        """,
+        (
+            documento,
+            correo,
+        ),
+        uno=True,
+    )
+
+    if existente:
+        return None
+
+    # --------------------------------------------------------
+    # PERFIL NUEVO
+    # --------------------------------------------------------
+
+    return {
+        "id": None,
+        "id_usuario": None,
+        "tipo_documento": tipo_documento,
+        "documento": documento,
+        "nombres": nombres,
+        "apellidos": apellidos,
+        "correo_institucional": correo,
+        "id_sede": sede_id,
+        "id_jornada": jornada_id,
+        "sede_nombre": sede["nombre"],
+        "sede_direccion": sede["direccion"],
+        "jornada_nombre": jornada["nombre"],
+        "codigo_institucional": codigo,
+        "rol_nombre": rol,
+    }
+
+
+# ============================================================
+# RELACIONAR USUARIO CON PERFIL
+# ============================================================
+
+def _relacionar(
+    usuario_id,
+    rol,
+    perfil,
+):
+
+    # ========================================================
+    # ESTUDIANTE
+    # ========================================================
+
+    if rol == "Estudiante":
+
+        if "id_estudiante" not in perfil:
+            raise ValueError(
+                "El perfil de estudiante no contiene "
+                "id_estudiante."
+            )
+
+        ejecutar(
+            """
+            UPDATE estudiantes
+            SET id_usuario = %s
+            WHERE id_estudiante = %s
+            """,
+            (
+                usuario_id,
+                perfil["id_estudiante"],
+            ),
+        )
+
+        return
+
+    # ========================================================
+    # ACUDIENTE
+    # ========================================================
+
+    if rol == "Acudiente":
+
+        if "id_acudiente" not in perfil:
+            raise ValueError(
+                "El perfil de acudiente no contiene "
+                "id_acudiente."
+            )
+
+        ejecutar(
+            """
+            UPDATE acudientes
+            SET id_usuario = %s
+            WHERE id_acudiente = %s
+            """,
+            (
+                usuario_id,
+                perfil["id_acudiente"],
+            ),
+        )
+
+        return
+
+    # ========================================================
+    # DOCENTE
+    # ========================================================
+
+    if rol == "Docente":
+
+        docente = consultar(
+            """
+            SELECT
+                id_docente
+            FROM docentes
+            WHERE documento = %s
+            LIMIT 1
+            """,
+            (
+                perfil["documento"],
+            ),
+            uno=True,
+        )
+
+        if docente:
+
+            ejecutar(
+                """
+                UPDATE docentes
+                SET
+                    id_usuario = %s,
+                    tipo_documento = %s,
+                    nombres = %s,
+                    apellidos = %s,
+                    correo_institucional = %s,
+                    id_sede = %s,
+                    id_jornada = %s,
+                    estado = 1
+                WHERE id_docente = %s
+                """,
+                (
+                    usuario_id,
+                    perfil["tipo_documento"],
+                    perfil["nombres"],
+                    perfil["apellidos"],
+                    perfil["correo_institucional"],
+                    perfil["id_sede"],
+                    perfil["id_jornada"],
+                    docente["id_docente"],
+                ),
+            )
+
+        else:
+
+            ejecutar(
+                """
+                INSERT INTO docentes
+                (
+                    id_usuario,
+                    tipo_documento,
+                    documento,
+                    nombres,
+                    apellidos,
+                    correo_institucional,
+                    telefono,
+                    id_sede,
+                    id_jornada,
+                    estado
+                )
+                VALUES
+                (
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    NULL,
+                    %s,
+                    %s,
+                    1
+                )
+                """,
+                (
+                    usuario_id,
+                    perfil["tipo_documento"],
+                    perfil["documento"],
+                    perfil["nombres"],
+                    perfil["apellidos"],
+                    perfil["correo_institucional"],
+                    perfil["id_sede"],
+                    perfil["id_jornada"],
+                ),
+            )
+
+        _crear_directorio_personal(
+            usuario_id,
+            rol,
+            perfil,
+        )
+
+        return
+
+    # ========================================================
+    # COORDINADOR
+    # ========================================================
+
+    if rol == "Administrador / Coordinador":
+
+        _crear_directorio_personal(
+            usuario_id,
+            rol,
+            perfil,
+        )
+
+        return
+
+    # ========================================================
+    # RECTOR
+    # ========================================================
+
+    if rol == "Rector":
+
+        _crear_directorio_personal(
+            usuario_id,
+            rol,
+            perfil,
+        )
+
+        return
+
+    raise ValueError(
+        f"Rol no soportado: {rol}"
+    )
+
+
+# ============================================================
+# CREAR / ACTUALIZAR DIRECTORIO DEL PERSONAL
+# ============================================================
+
+def _crear_directorio_personal(
+    usuario_id,
+    rol,
+    perfil,
+):
+
+    rol_id = _rol_id(rol)
+
+    if not rol_id:
+        raise ValueError(
+            f"No existe el rol '{rol}' "
+            "en la tabla roles."
+        )
+
+    # --------------------------------------------------------
+    # COMPROBAR NUEVAMENTE EL CÓDIGO
+    # --------------------------------------------------------
+
+    if not validar_codigo_sede(
+        perfil["id_sede"],
+        perfil["codigo_institucional"],
+    ):
+        raise ValueError(
+            "El código institucional no corresponde "
+            "a la sede seleccionada."
+        )
+
+    # --------------------------------------------------------
+    # HASH DEL CÓDIGO
+    # --------------------------------------------------------
+
+    codigo_hash = generate_password_hash(
+        perfil["codigo_institucional"]
+    )
+
+    # --------------------------------------------------------
+    # BUSCAR DIRECTORIO EXISTENTE
+    # --------------------------------------------------------
+
+    directorio = consultar(
+        """
+        SELECT
+            id
+        FROM directorio_institucional
+        WHERE
+            documento = %s
+            OR LOWER(TRIM(correo_institucional)) = %s
+        LIMIT 1
+        """,
+        (
+            perfil["documento"],
+            perfil["correo_institucional"].lower(),
+        ),
+        uno=True,
+    )
+
+    # --------------------------------------------------------
+    # ACTUALIZAR
+    # --------------------------------------------------------
+
+    if directorio:
+
+        ejecutar(
+            """
+            UPDATE directorio_institucional
+            SET
+                id_usuario = %s,
+                id_rol = %s,
+                tipo_documento = %s,
+                nombres = %s,
+                apellidos = %s,
+                correo_institucional = %s,
+                id_sede = %s,
+                id_jornada = %s,
+                codigo_institucional_hash = %s,
+                estado = 1,
+                fecha_vinculacion = NOW()
+            WHERE id = %s
+            """,
+            (
+                usuario_id,
+                rol_id,
+                perfil["tipo_documento"],
+                perfil["nombres"],
+                perfil["apellidos"],
+                perfil["correo_institucional"],
+                perfil["id_sede"],
+                perfil["id_jornada"],
+                codigo_hash,
+                directorio["id"],
+            ),
+        )
+
+        return
+
+    # --------------------------------------------------------
+    # CREAR NUEVO
+    # --------------------------------------------------------
+
+    ejecutar(
+        """
+        INSERT INTO directorio_institucional
+        (
+            id_usuario,
+            id_rol,
+            tipo_documento,
+            documento,
+            nombres,
+            apellidos,
+            correo_institucional,
+            id_sede,
+            id_jornada,
+            codigo_institucional_hash,
+            estado,
+            fecha_vinculacion
+        )
+        VALUES
+        (
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            1,
+            NOW()
+        )
+        """,
+        (
+            usuario_id,
+            rol_id,
+            perfil["tipo_documento"],
+            perfil["documento"],
+            perfil["nombres"],
+            perfil["apellidos"],
+            perfil["correo_institucional"],
+            perfil["id_sede"],
+            perfil["id_jornada"],
+            codigo_hash,
+        ),
+    )
+
+
+# ============================================================
+# LOGIN
+# ============================================================
+
+@auth_bp.route(
+    "/login",
+    methods=["GET", "POST"],
+)
+def login():
+
+    if request.method == "GET":
+        return _mostrar_login()
+
+    identificador = request.form.get(
+        "identificador",
+        "",
+    ).strip()
+
+    password = request.form.get(
+        "password",
+        "",
+    )
+
+    codigo = request.form.get(
+        "codigo_institucional",
+        "",
+    ).strip()
+
+    sede_id = request.form.get(
+        "sede_id",
+        "",
+    ).strip()
+
+    jornada_id = request.form.get(
+        "jornada_id",
+        "",
+    ).strip()
+
+    # ========================================================
+    # CONTROL DE VELOCIDAD
+    # ========================================================
+
+    rate_key = hashlib.sha256(
+        (
+            identificador.lower()
+            + "|"
+            + (
+                request.remote_addr
+                or "unknown"
+            )
+        ).encode("utf-8")
+    ).hexdigest()
+
+    try:
+
+        _asegurar_control_acceso()
+
+        limite = consultar(
+            """
+            SELECT *
+            FROM control_acceso
+            WHERE
+                clave_hash = %s
+                AND bloqueado_hasta > NOW()
+            LIMIT 1
+            """,
+            (
+                rate_key,
+            ),
+            uno=True,
+        )
+
+    except Exception as exc:
+
+        print(
+            "ERROR CONTROL ACCESO:",
+            repr(exc),
+            flush=True,
+        )
+
+        limite = None
+
+    if limite:
+
+        flash(
+            "Demasiados intentos. "
+            "Espera unos minutos antes de volver a intentarlo.",
+            "error",
+        )
+
+        return _mostrar_login()
+
+    # ========================================================
+    # BUSCAR USUARIO
+    # ========================================================
+
+    usuario = _buscar_usuario(
+        identificador
+    )
+
+    if not usuario:
+
+        _registrar_intento_fallido(
+            rate_key
+        )
+
+        flash(
+            "Credenciales incorrectas.",
+            "error",
+        )
+
+        return _mostrar_login()
+
+    # ========================================================
+    # CUENTA BLOQUEADA
+    # ========================================================
+
+    bloqueado = usuario.get(
+        "bloqueado_hasta"
+    )
+
+    if bloqueado and bloqueado > datetime.now():
+
+        flash(
+            "La cuenta está temporalmente bloqueada.",
+            "error",
+        )
+
+        return _mostrar_login()
+
+    # ========================================================
+    # VALIDAR CONTRASEÑA
+    # ========================================================
+
+    password_hash = usuario.get(
+        "password_hash",
+        "",
+    )
+
+    try:
+
+        password_correcta = check_password_hash(
+            password_hash,
+            password,
+        )
+
+    except Exception as exc:
+
+        print(
+            "ERROR VALIDANDO CONTRASEÑA:",
+            repr(exc),
+            flush=True,
+        )
+
+        password_correcta = False
+
+    if not password_correcta:
+
+        _registrar_intento_fallido(
+            rate_key
+        )
+
+        intentos = (
+            int(
+                usuario.get(
+                    "intentos_fallidos"
+                )
+                or 0
+            )
+            + 1
+        )
+
+        if intentos >= MAX_INTENTOS:
+
+            ejecutar(
+                """
+                UPDATE usuarios
+                SET
+                    intentos_fallidos = %s,
+                    bloqueado_hasta =
+                        DATE_ADD(
+                            NOW(),
+                            INTERVAL %s MINUTE
+                        )
+                WHERE id_usuario = %s
+                """,
+                (
+                    intentos,
+                    BLOQUEO_MINUTOS,
+                    usuario["id_usuario"],
+                ),
+            )
+
+            flash(
+                "Demasiados intentos. "
+                "La cuenta quedó bloqueada durante 15 minutos.",
+                "error",
+            )
+
+        else:
+
+            ejecutar(
+                """
+                UPDATE usuarios
+                SET intentos_fallidos = %s
+                WHERE id_usuario = %s
+                """,
+                (
+                    intentos,
+                    usuario["id_usuario"],
+                ),
+            )
+
+            flash(
+                "Credenciales incorrectas.",
+                "error",
+            )
+
+        return _mostrar_login()
+
+    # ========================================================
+    # ESTADO DE LA CUENTA
+    # ========================================================
+
+    if not usuario.get("estado"):
+
+        flash(
+            "La cuenta está inactiva.",
+            "error",
+        )
+
+        return _mostrar_login()
+
+    rol = usuario.get(
+        "rol_nombre"
+    )
+
+    # ========================================================
+    # VALIDACIÓN EXTRA PARA PERSONAL
+    # ========================================================
+
+    if rol in (
+        "Docente",
+        "Administrador / Coordinador",
+        "Rector",
+    ):
+
+        if not es_correo_institucional(
+            usuario.get("correo", "")
+        ):
+
+            flash(
+                "El personal debe ingresar con "
+                "su correo institucional @jjfh.edu.co.",
+                "error",
+            )
+
+            return _mostrar_login()
+
+        if not sede_id.isdigit():
+
+            flash(
+                "Selecciona una sede válida.",
+                "error",
+            )
+
+            return _mostrar_login()
+
+        if not jornada_id.isdigit():
+
+            flash(
+                "Selecciona una jornada válida.",
+                "error",
+            )
+
+            return _mostrar_login()
+
+        if not es_codigo_institucional_valido(
+            codigo
+        ):
+
+            flash(
+                "El código institucional debe "
+                "tener exactamente 6 dígitos.",
+                "error",
+            )
+
+            return _mostrar_login()
+
+        perfil = consultar(
+            """
+            SELECT *
+            FROM directorio_institucional
+            WHERE
+                id_usuario = %s
+                AND id_sede = %s
+                AND id_jornada = %s
+                AND estado = 1
+            LIMIT 1
+            """,
+            (
+                usuario["id_usuario"],
+                int(sede_id),
+                int(jornada_id),
+            ),
+            uno=True,
+        )
+
+        if not perfil:
+
+            flash(
+                "La sede o jornada no corresponden "
+                "a tu cuenta.",
+                "error",
+            )
+
+            return _mostrar_login()
+
+        codigo_hash = perfil.get(
+            "codigo_institucional_hash"
+        )
+
+        try:
+
+            codigo_correcto = (
+                bool(codigo_hash)
+                and check_password_hash(
+                    codigo_hash,
+                    codigo,
+                )
+            )
+
+        except Exception as exc:
+
+            print(
+                "ERROR VALIDANDO CÓDIGO EN LOGIN:",
+                repr(exc),
+                flush=True,
+            )
+
+            codigo_correcto = False
+
+        if not codigo_correcto:
+
+            flash(
+                "El código institucional no es correcto.",
+                "error",
+            )
+
+            return _mostrar_login()
+
+    # ========================================================
+    # ACCESO CORRECTO
+    # ========================================================
+
+    ejecutar(
+        """
+        UPDATE usuarios
+        SET
+            intentos_fallidos = 0,
+            bloqueado_hasta = NULL,
+            ultimo_acceso = NOW()
+        WHERE id_usuario = %s
+        """,
+        (
+            usuario["id_usuario"],
+        ),
+    )
+
+    _limpiar_intentos(
+        rate_key
+    )
+
+    session.clear()
+    session.permanent = True
+
+    session["usuario_id"] = (
+        usuario["id_usuario"]
+    )
+
+    session["creado_en"] = time.time()
+
+    return redirect(
+        url_for("auth.dashboard")
+    )
+
+
+# ============================================================
+# REGISTRO
+# ============================================================
+
+@auth_bp.route("/registro")
+def registro():
+
+    return render_template(
+        "auth/registro.html",
+        portales=PORTALES,
+    )
+
+
+# ============================================================
+# REGISTRO POR PORTAL
+# ============================================================
+
+@auth_bp.route(
+    "/registro/<portal>",
+    methods=["GET", "POST"],
+)
+def registro_portal(portal):
+
+    info = PORTALES.get(portal)
+
+    if not info:
+
+        flash(
+            "Tipo de cuenta no válido.",
+            "error",
+        )
+
+        return redirect(
+            url_for("auth.registro")
+        )
+
+    sedes = _sedes()
+    jornadas = _jornadas()
+
+    # ========================================================
+    # MOSTRAR FORMULARIO
+    # ========================================================
+
+    if request.method == "GET":
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
+    # ========================================================
+    # DATOS DEL FORMULARIO
+    # ========================================================
+
+    tipo_documento = request.form.get(
+        "tipo_documento",
+        "CC",
+    ).strip().upper() or "CC"
+
+    documento = request.form.get(
+        "documento",
+        "",
+    ).strip()
+
+    nombres = request.form.get(
+        "nombres",
+        "",
+    ).strip()
+
+    apellidos = request.form.get(
+        "apellidos",
+        "",
+    ).strip()
+
+    correo = _correo(
+        request.form.get(
+            "correo",
+            "",
+        )
+    )
+
+    telefono = request.form.get(
+        "telefono",
+        "",
+    ).strip()
+
+    password = request.form.get(
+        "password",
+        "",
+    )
+
+    curso = request.form.get(
+        "curso",
+        "",
+    ).strip()
+
+    sede_id = request.form.get(
+        "sede_id",
+        "",
+    ).strip()
+
+    jornada_id = request.form.get(
+        "jornada_id",
+        "",
+    ).strip()
+
+    codigo = request.form.get(
+        "codigo_institucional",
+        "",
+    ).strip()
+
+    # ========================================================
+    # VALIDACIONES GENERALES
+    # ========================================================
+
+    if tipo_documento not in (
+        "CC",
+        "TI",
+        "CE",
+    ):
+
+        flash(
+            "Selecciona un tipo de documento válido.",
+            "error",
+        )
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
+    if not documento:
+
+        flash(
+            "Escribe el número de documento.",
+            "error",
+        )
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
+    if not nombres:
+
+        flash(
+            "Escribe los nombres.",
+            "error",
+        )
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
+    if not apellidos:
+
+        flash(
+            "Escribe los apellidos.",
+            "error",
+        )
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
+    if not correo:
+
+        flash(
+            "Escribe un correo electrónico.",
+            "error",
+        )
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
+    if len(password) < 12:
+
+        flash(
+            "La contraseña debe tener mínimo "
+            "12 caracteres.",
+            "error",
+        )
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
+    # ========================================================
+    # PERSONAL INSTITUCIONAL
+    # ========================================================
+
+    if info.get("requiere_codigo"):
+
+        if not es_correo_institucional(correo):
+
+            flash(
+                "Para este tipo de cuenta debes utilizar "
+                "un correo terminado en @jjfh.edu.co.",
+                "error",
+            )
+
+            return _mostrar_registro(
+                portal,
+                info,
+                sedes,
+                jornadas,
+            )
+
+        if not sede_id.isdigit():
+
+            flash(
+                "Selecciona una sede institucional.",
+                "error",
+            )
+
+            return _mostrar_registro(
+                portal,
+                info,
+                sedes,
+                jornadas,
+            )
+
+        if not jornada_id.isdigit():
+
+            flash(
+                "Selecciona una jornada.",
+                "error",
+            )
+
+            return _mostrar_registro(
+                portal,
+                info,
+                sedes,
+                jornadas,
+            )
+
+        if not es_codigo_institucional_valido(
+            codigo
+        ):
+
+            flash(
+                "El código institucional debe "
+                "tener exactamente 6 dígitos.",
+                "error",
+            )
+
+            return _mostrar_registro(
+                portal,
+                info,
+                sedes,
+                jornadas,
+            )
+
+        if not validar_codigo_sede(
+            int(sede_id),
+            codigo,
+        ):
+
+            flash(
+                "El código institucional no corresponde "
+                "a la sede seleccionada.",
+                "error",
+            )
+
+            return _mostrar_registro(
+                portal,
+                info,
+                sedes,
+                jornadas,
+            )
+
+    # ========================================================
+    # PROCESAR REGISTRO
+    # ========================================================
+
+    try:
+
+        perfil = None
+
+        # ====================================================
+        # ESTUDIANTE
+        # ====================================================
+
+        if portal == "estudiante":
+
+            perfil = consultar(
+                """
+                SELECT *
+                FROM estudiantes
+                WHERE
+                    documento = %s
+                    AND estado = 'Activo'
+                    AND LOWER(TRIM(nombres))
+                        = LOWER(TRIM(%s))
+                    AND LOWER(TRIM(apellidos))
+                        = LOWER(TRIM(%s))
+                LIMIT 1
+                """,
+                (
+                    documento,
+                    nombres,
+                    apellidos,
+                ),
+                uno=True,
+            )
+
+            if perfil and curso:
+
+                curso_bd = str(
+                    perfil.get("curso") or ""
+                ).strip()
+
+                if (
+                    curso_bd
+                    and curso_bd.lower()
+                    != curso.lower()
+                ):
+                    perfil = None
+
+            if perfil and jornada_id:
+
+                jornada_bd = str(
+                    perfil.get("id_jornada") or ""
+                )
+
+                if jornada_bd != str(
+                    jornada_id
+                ):
+                    perfil = None
+
+        # ====================================================
+        # ACUDIENTE
+        # ====================================================
+
+        elif portal == "acudiente":
+
+            perfil = consultar(
+                """
+                SELECT *
+                FROM acudientes
+                WHERE
+                    documento = %s
+                    AND estado = 1
+                    AND LOWER(TRIM(nombres))
+                        = LOWER(TRIM(%s))
+                    AND LOWER(TRIM(apellidos))
+                        = LOWER(TRIM(%s))
+                    AND
+                    (
+                        correo IS NULL
+                        OR correo = ''
+                        OR LOWER(TRIM(correo))
+                            = LOWER(TRIM(%s))
+                    )
+                LIMIT 1
+                """,
+                (
+                    documento,
+                    nombres,
+                    apellidos,
+                    correo,
+                ),
+                uno=True,
+            )
+
+        # ====================================================
+        # DOCENTE / COORDINADOR / RECTOR
+        # ====================================================
+
+        else:
+
+            try:
+
+                perfil = _perfil_personal(
+                    portal,
+                    tipo_documento,
+                    documento,
+                    nombres,
+                    apellidos,
+                    correo,
+                    int(sede_id),
+                    int(jornada_id),
+                    codigo,
+                )
+
+            except Exception as exc:
+
+                print(
+                    "ERROR VALIDANDO PERSONAL:",
+                    repr(exc),
+                    flush=True,
+                )
+
+                perfil = None
+
+        # ====================================================
+        # VALIDACIÓN DEL PERFIL
+        # ====================================================
+
+        if not perfil:
+
+            if info.get("requiere_codigo"):
+
+                flash(
+                    "No fue posible validar los datos. "
+                    "Revisa documento, nombres, apellidos, "
+                    "correo institucional, sede, jornada "
+                    "y código de sede.",
+                    "error",
+                )
+
+            else:
+
+                flash(
+                    "No pudimos validar tus datos con "
+                    "el registro institucional. "
+                    "Revisa que los datos coincidan.",
+                    "error",
+                )
+
+            return _mostrar_registro(
+                portal,
+                info,
+                sedes,
+                jornadas,
+            )
+
+        # ====================================================
+        # OBTENER ROL
+        # ====================================================
+
+        rol = info.get("rol")
+        rol_id = _rol_id(rol)
+
+        if not rol_id:
+
+            flash(
+                "El rol seleccionado no está configurado "
+                "en la base de datos.",
+                "error",
+            )
+
+            return _mostrar_registro(
+                portal,
+                info,
+                sedes,
+                jornadas,
+            )
+
+        # ====================================================
+        # COMPROBAR CUENTA EXISTENTE
+        # ====================================================
+
+        existente = consultar(
+            """
+            SELECT *
+            FROM usuarios
+            WHERE
+                documento = %s
+                OR LOWER(TRIM(correo))
+                    = LOWER(TRIM(%s))
+            LIMIT 1
+            """,
+            (
+                documento,
+                correo,
+            ),
+            uno=True,
+        )
+
+        if existente:
+
+            flash(
+                "Ya existe una cuenta con ese documento "
+                "o correo. Inicia sesión.",
+                "error",
+            )
+
+            return redirect(
+                url_for("auth.login")
+            )
+
+        # ====================================================
+        # GENERAR HASH DE CONTRASEÑA
+        # ====================================================
+
+        password_hash = generate_password_hash(
+            password
+        )
+
+        # ====================================================
+        # CREAR USUARIO
+        # ====================================================
+
+        ejecutar(
+            """
+            INSERT INTO usuarios
+            (
+                id_rol,
+                tipo_documento,
+                documento,
+                nombres,
+                apellidos,
+                correo,
+                telefono,
+                password_hash,
+                verificado,
+                estado,
+                intentos_fallidos,
+                bloqueado_hasta
+            )
+            VALUES
+            (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                1,
+                1,
+                0,
+                NULL
+            )
+            """,
+            (
+                rol_id,
+                tipo_documento,
+                documento,
+                nombres,
+                apellidos,
+                correo,
+                telefono or None,
+                password_hash,
+            ),
+        )
+
+        # ====================================================
+        # OBTENER ID DEL USUARIO
+        # ====================================================
+
+        nuevo_usuario = consultar(
+            """
+            SELECT
+                id_usuario
+            FROM usuarios
+            WHERE documento = %s
+            LIMIT 1
+            """,
+            (
+                documento,
+            ),
+            uno=True,
+        )
+
+        if not nuevo_usuario:
+
+            flash(
+                "La cuenta fue creada, pero no se pudo "
+                "obtener su identificador.",
+                "error",
+            )
+
+            return _mostrar_registro(
+                portal,
+                info,
+                sedes,
+                jornadas,
+            )
+
+        usuario_id = nuevo_usuario[
+            "id_usuario"
+        ]
+
+        # ====================================================
+        # RELACIONAR CON EL PERFIL
+        # ====================================================
+
+        _relacionar(
+            usuario_id,
+            rol,
+            perfil,
+        )
+
+        # ====================================================
+        # REGISTRO COMPLETADO
+        # ====================================================
+
+        flash(
+            "Registro completado correctamente. "
+            "Ya puedes iniciar sesión.",
+            "success",
+        )
+
+        return redirect(
+            url_for("auth.login")
+        )
+
+    except Exception as exc:
+
+        mensaje_error = (
+            f"{type(exc).__name__}: {str(exc)}"
+        )
+
+        print(
+            "ERROR EN REGISTRO EDUTURNOS:",
+            mensaje_error,
+            flush=True,
+        )
+
+        flash(
+            f"ERROR REAL: {mensaje_error}",
+            "error",
+        )
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
+
+# ============================================================
+# DASHBOARD
+# ============================================================
+
+@auth_bp.route("/dashboard")
+def dashboard():
+
+    usuario = usuario_actual()
+
+    if not usuario:
+
+        flash(
+            "Debes iniciar sesión.",
+            "error",
+        )
+
+        return redirect(
+            url_for("auth.login")
+        )
+
+    try:
+
+        id_usuario = usuario["id_usuario"]
+        rol = usuario["rol_nombre"]
+
+        # ====================================================
+        # DETERMINAR CITAS VISIBLES
+        # ====================================================
+
+        if rol == "Docente":
+
+            condicion = """
+                c.id_docente IN (
+                    SELECT
+                        d.id_docente
+                    FROM docentes d
+                    WHERE
+                        d.id_usuario = %s
+                )
+            """
+
+            parametros = (
+                id_usuario,
+            )
+
+        elif rol == "Estudiante":
+
+            condicion = """
+                c.id_estudiante IN (
+                    SELECT
+                        e.id_estudiante
+                    FROM estudiantes e
+                    WHERE
+                        e.id_usuario = %s
+                )
+            """
+
+            parametros = (
+                id_usuario,
+            )
+
+        elif rol == "Acudiente":
+
+            condicion = """
+                c.id_acudiente IN (
+                    SELECT
+                        a.id_acudiente
+                    FROM acudientes a
+                    WHERE
+                        a.id_usuario = %s
+                )
+            """
+
+            parametros = (
+                id_usuario,
+            )
+
+        elif rol in (
+            "Administrador / Coordinador",
+            "Rector",
+            "Super Admin",
+        ):
+
+            condicion = "1 = 1"
+            parametros = ()
+
+        else:
+
+            condicion = "1 = 0"
+            parametros = ()
+
+        # ====================================================
+        # TOTAL DE CITAS
+        # ====================================================
+
+        fila_total = consultar(
+            f"""
+            SELECT
+                COUNT(*) AS total
+            FROM citas c
+            WHERE {condicion}
+            """,
+            parametros,
+            uno=True,
+        )
+
+        total_citas = int(
+            fila_total["total"]
+            if fila_total
+            else 0
+        )
+
+        # ====================================================
+        # CITAS PENDIENTES
+        # ====================================================
+
+        fila_pendientes = consultar(
+            f"""
+            SELECT
+                COUNT(*) AS total
+            FROM citas c
+            INNER JOIN estados_cita ec
+                ON ec.id = c.id_estado
+            WHERE
+                {condicion}
+                AND LOWER(
+                    TRIM(ec.nombre)
+                ) = 'pendiente'
+            """,
+            parametros,
+            uno=True,
+        )
+
+        pendientes = int(
+            fila_pendientes["total"]
+            if fila_pendientes
+            else 0
+        )
+
+        # ====================================================
+        # CITAS CONFIRMADAS
+        # ====================================================
+
+        fila_confirmadas = consultar(
+            f"""
+            SELECT
+                COUNT(*) AS total
+            FROM citas c
+            INNER JOIN estados_cita ec
+                ON ec.id = c.id_estado
+            WHERE
+                {condicion}
+                AND LOWER(
+                    TRIM(ec.nombre)
+                ) = 'confirmada'
+            """,
+            parametros,
+            uno=True,
+        )
+
+        confirmadas = int(
+            fila_confirmadas["total"]
+            if fila_confirmadas
+            else 0
+        )
+
+        # ====================================================
+        # DATOS DEL DASHBOARD
+        # ====================================================
+
+        datos = {
+            "total_citas": total_citas,
+            "pendientes": pendientes,
+            "confirmadas": confirmadas,
+        }
+
+        # ====================================================
+        # NOTIFICACIONES
+        # ====================================================
+
+        fila_notificaciones = consultar(
+            """
+            SELECT
+                COUNT(*) AS total
+            FROM notificaciones
+            WHERE
+                id_usuario = %s
+                AND (
+                    leida = 0
+                    OR leida IS NULL
+                )
+            """,
+            (
+                id_usuario,
+            ),
+            uno=True,
+        )
+
+        notificaciones_no_leidas = int(
+            fila_notificaciones["total"]
+            if fila_notificaciones
+            else 0
+        )
+
+        # ====================================================
+        # RENDER
+        # ====================================================
+
+        return render_template(
+            "dashboard.html",
+            usuario=usuario,
+            datos=datos,
+            notificaciones_no_leidas=(
+                notificaciones_no_leidas
+            ),
+        )
+
+    except Exception as exc:
+
+        print(
+            "ERROR CARGANDO DASHBOARD:",
+            repr(exc),
+            flush=True,
+        )
+
+        datos = {
+            "total_citas": 0,
+            "pendientes": 0,
+            "confirmadas": 0,
+        }
+
+        notificaciones_no_leidas = 0
+
+        flash(
+            "El dashboard se abrió, pero algunos "
+            "indicadores no pudieron cargarse.",
+            "error",
+        )
+
+        return render_template(
+            "dashboard.html",
+            usuario=usuario,
+            datos=datos,
+            notificaciones_no_leidas=(
+                notificaciones_no_leidas
+            ),
+        )
+
+
+# ============================================================
+# CERRAR SESIÓN
+# ============================================================
+
+@auth_bp.route("/logout")
+def logout():
+
+    session.clear()
+
+    flash(
+        "Sesión cerrada correctamente.",
+        "success",
+    )
+
+    return redirect(
+        url_for("auth.login")
+    )

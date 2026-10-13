@@ -1,0 +1,889 @@
+/* EDUTURNOS mobile layer: mobile-only adjustments, desktop untouched. */
+:root {
+    --mobile-gutter: 14px;
+    --mobile-card-padding: 16px;
+}
+
+@media (max-width: 900px) {
+    html,
+    body {
+        max-width: 100%;
+        width: 100%;
+        overflow-x: clip;
+    }
+
+    body {
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    #contenido,
+    #contenido > *,
+    .dashboard-page,
+    .page-shell,
+    .contenedor,
+    .contenido-principal,
+    .formulario,
+    .form-card,
+    .tarjeta,
+    .tabla-wrapper,
+    .registros-grid,
+    .section-heading,
+    .page-heading,
+    .hero,
+    .hero-interior,
+    .registro-contenedor,
+    .registro-layout {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    #contenido {
+        padding: 10px var(--mobile-gutter) 24px !important;
+    }
+
+    #contenido > * {
+        max-width: 100% !important;
+        overflow-wrap: anywhere;
+    }
+
+    .topbar,
+    .header-principal,
+    .site-header,
+    .barra,
+    .eduturnos-header {
+        min-height: 56px !important;
+        padding: 10px var(--mobile-gutter) !important;
+        box-sizing: border-box !important;
+    }
+
+    .topbar .nav-links,
+    .header-principal nav,
+    .site-header nav,
+    .barra nav,
+    .nav {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .barra nav a,
+    .barra nav button,
+    .nav a,
+    .logout-form button,
+    .boton,
+    button,
+    input,
+    select,
+    textarea {
+        min-height: 44px;
+    }
+
+    .dashboard-page,
+    .page-shell {
+        padding: 0 !important;
+    }
+
+    .dashboard-page .dashboard-head {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 12px 0 !important;
+    }
+
+    .dashboard-page .dashboard-head-info,
+    .dashboard-page .dashboard-head-action,
+    .dashboard-page .dashboard-kpi,
+    .dashboard-page .dashboard-card,
+    .dashboard-page .dashboard-action,
+    .dashboard-page .dashboard-action-grid > * {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .dashboard-page .dashboard-left-art,
+    .dashboard-page .dashboard-role-art,
+    .dashboard-page .dashboard-dibujo {
+        display: block !important;
+        width: min(42vw, 180px) !important;
+        max-width: 180px !important;
+        height: auto !important;
+        margin: 0 auto 10px !important;
+        flex: 0 0 auto !important;
+        opacity: 1 !important;
+    }
+
+    .dashboard-page .dashboard-head-info h1,
+    .dashboard-page .dashboard-head-info .muted,
+    .dashboard-page .dashboard-card h2,
+    .dashboard-page .dashboard-card h3,
+    .section-heading h1,
+    .page-heading h1,
+    h1 {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-wrap: anywhere;
+    }
+
+    .dashboard-page .dashboard-head-info h1,
+    .section-heading h1,
+    .page-heading h1,
+    h1 {
+        font-size: clamp(24px, 7vw, 32px) !important;
+        line-height: 1.12 !important;
+        letter-spacing: -0.02em !important;
+        margin: 8px 0 !important;
+    }
+
+    .dashboard-page .dashboard-head-info .muted,
+    .dashboard-page .dashboard-card p,
+    .section-heading p,
+    .page-heading p,
+    p,
+    .hero-texto,
+    .hero p,
+    .paso p,
+    .beneficio p {
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+    }
+
+    .dashboard-page .dashboard-kpis,
+    .dashboard-page .dashboard-action-grid,
+    .dashboard-page .dashboard-main,
+    .dashboard-page .dashboard-card,
+    .quick-actions,
+    .acciones-rapidas,
+    .form-grid,
+    .cards-grid,
+    .grid,
+    .actions,
+    .toolbar,
+    .filtros {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .dashboard-page .dashboard-kpi {
+        min-height: 82px !important;
+        padding: 16px !important;
+    }
+
+    .dashboard-page .dashboard-kpi strong {
+        font-size: clamp(22px, 6vw, 28px) !important;
+        line-height: 1 !important;
+    }
+
+    .dashboard-page .dashboard-card,
+    .dashboard-page .dashboard-action,
+    .tarjeta,
+    .panel,
+    .form-card,
+    .quick-card {
+        padding: var(--mobile-card-padding) !important;
+    }
+
+    .dashboard-page .dashboard-action {
+        min-height: 52px !important;
+    }
+
+    .dashboard-page .dashboard-logout,
+    .dashboard-page .dashboard-action-link,
+    .dashboard-page .dashboard-action h3,
+    .dashboard-page .dashboard-action p,
+    .dashboard-page .dashboard-head-action a,
+    .dashboard-page .dashboard-head-action button {
+        font-size: 13px !important;
+    }
+
+    form,
+    .formulario form,
+    .stack-form,
+    .form-uniform {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 14px !important;
+    }
+
+    input,
+    select,
+    textarea,
+    button,
+    .boton,
+    a.boton {
+        width: 100% !important;
+        max-width: 100% !important;
+        font-size: 16px !important;
+        box-sizing: border-box !important;
+    }
+
+    input,
+    select,
+    textarea {
+        min-height: 46px !important;
+        padding: 11px 12px !important;
+    }
+
+    .boton,
+    button,
+    a.boton {
+        padding: 0 16px !important;
+        min-height: 46px !important;
+    }
+
+    .table-responsive,
+    .tabla-wrapper {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        min-width: 640px;
+    }
+
+    .modal,
+    .dialog,
+    .menu,
+    .dropdown-menu {
+        max-width: calc(100vw - 20px) !important;
+    }
+
+    .alerta,
+    .flash,
+    .notice {
+        width: 100% !important;
+        overflow-wrap: anywhere;
+    }
+
+    .registro-pagina,
+    .registro-layout,
+    .registro-contenedor {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .registro-layout {
+        display: block !important;
+    }
+
+    .registro-ilustracion {
+        display: none !important;
+    }
+
+    .registro-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    .registro-grid .registro-opcion,
+    .registro-grid .registro-opcion:last-child {
+        width: 100% !important;
+        min-height: 96px !important;
+        grid-column: auto !important;
+    }
+
+    .pagina {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .pagina > main,
+    .hero,
+    .hero-interior,
+    .hero-texto {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .pagina > main {
+        padding: 0 var(--mobile-gutter) !important;
+    }
+
+    .barra {
+        width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    .barra-interior {
+        min-height: 58px !important;
+        padding: 10px 12px !important;
+        gap: 10px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .marca {
+        min-width: 0 !important;
+        gap: 8px !important;
+        font-size: 16px !important;
+        letter-spacing: 0.02em !important;
+        white-space: nowrap !important;
+    }
+
+    .marca-nombre {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .marca-logo {
+        width: 34px !important;
+        height: 34px !important;
+        flex: 0 0 34px !important;
+        object-fit: contain;
+        display: block;
+    }
+
+    .nav {
+        gap: 8px !important;
+        padding: 0 !important;
+        min-height: 42px !important;
+    }
+
+    .nav a {
+        font-size: 12px !important;
+        padding: 7px 10px !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+    }
+
+    .hero {
+        padding: 26px 0 24px !important;
+    }
+
+    .hero-interior {
+        display: block !important;
+        gap: 0 !important;
+    }
+
+    .hero h1 {
+        font-size: clamp(34px, 12vw, 52px) !important;
+        line-height: 0.98 !important;
+        margin-bottom: 18px !important;
+        letter-spacing: -0.04em !important;
+    }
+
+    .hero-texto {
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+        margin-bottom: 20px !important;
+    }
+
+    .acciones {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+
+    .boton {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .flujo {
+        padding: 18px !important;
+    }
+
+    .flujo-cabecera {
+        display: block !important;
+        gap: 10px !important;
+        padding-bottom: 12px !important;
+    }
+
+    .paso {
+        grid-template-columns: 40px 1fr !important;
+        gap: 12px !important;
+        padding: 14px 0 !important;
+    }
+
+    .numero {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 11px !important;
+    }
+
+    .informacion,
+    .cierre {
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+
+    .beneficios-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .beneficio {
+        padding: 18px !important;
+    }
+
+    footer,
+    .footer-interior {
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+
+    .footer-interior {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+}
+
+@media (max-width: 560px) {
+    .barra-interior {
+        padding: 10px 12px !important;
+    }
+
+    .marca {
+        font-size: 14px !important;
+    }
+
+    .marca-logo {
+        width: 30px !important;
+        height: 30px !important;
+        flex-basis: 30px !important;
+    }
+
+    .nav a {
+        font-size: 11px !important;
+        padding: 6px 9px !important;
+    }
+
+    .hero h1 {
+        font-size: clamp(29px, 11vw, 42px) !important;
+    }
+
+    .hero-texto {
+        font-size: 14px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    body,
+    html,
+    main,
+    section,
+    article,
+    form,
+    .panel,
+    .card,
+    .tarjeta,
+    .form-card,
+    .page-shell,
+    .contenedor,
+    .contenido-principal,
+    .page-shell {
+        max-width: 100% !important;
+        overflow-wrap: anywhere;
+    }
+
+    img,
+    svg,
+    video,
+    canvas,
+    iframe {
+        display: block !important;
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    .form-grid,
+    .grid,
+    .registro-grid,
+    .cards-grid,
+    .dashboard-grid,
+    .dashboard-kpis,
+    .dashboard-action-grid,
+    .quick-actions,
+    .acciones-rapidas {
+        grid-template-columns: 1fr !important;
+    }
+
+    label,
+    .field,
+    .full-field,
+    .personal-field,
+    .form-group {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .table-responsive,
+    .tabla-wrapper,
+    .calendar-wrapper,
+    .calendario-wrapper,
+    .fc-scroller,
+    .fc-view-harness,
+    .calendar-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table,
+    .fc-view,
+    .fc-scrollgrid,
+    .fc-header-toolbar {
+        min-width: 640px !important;
+    }
+
+    .fc-toolbar {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+
+    .fc-header-toolbar .fc-toolbar-chunk {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+    }
+}
+
+@media (max-width: 430px) {
+    .barra-interior,
+    .brand-row,
+    .header-row {
+        gap: 8px !important;
+    }
+
+    .nav,
+    .barra nav {
+        gap: 6px !important;
+    }
+
+    .nav a,
+    .barra nav a {
+        padding: 6px 8px !important;
+    }
+
+    .boton,
+    button,
+    a.boton,
+    .btn,
+    input[type="submit"],
+    input[type="button"] {
+        min-height: 42px !important;
+        font-size: 15px !important;
+    }
+
+    h2,
+    h3,
+    .dashboard-page .dashboard-card h2,
+    .dashboard-page .dashboard-card h3 {
+        line-height: 1.2 !important;
+        overflow-wrap: anywhere;
+    }
+}
+
+
+html body #contenido .dashboard-page .dashboard-card h2 {
+    font-size: 20px !important;
+    line-height: 1.15 !important;
+}
+
+html body #contenido label {
+    font-size: 13px !important;
+}
+
+html body #contenido input,
+html body #contenido select,
+html body #contenido textarea,
+html body #contenido button,
+html body #contenido .boton,
+html body #contenido a.boton {
+    min-height: 42px !important;
+    font-size: 14px !important;
+}
+
+/* Formulario de registro por rol: la cuadrícula de PC se vuelve una columna. */
+html body.auth-page .portal-registro-page {
+    width: calc(100% - 24px) !important;
+    max-width: 520px !important;
+    margin: 14px auto 28px !important;
+}
+
+html body.auth-page .portal-registro-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 18px 14px !important;
+}
+
+html body.auth-page .portal-registro-form {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px !important;
+    width: 100% !important;
+}
+
+html body.auth-page .portal-registro-form .form-group,
+html body.auth-page .portal-registro-form .form-group[style] {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+html body.auth-page .portal-registro-form input,
+html body.auth-page .portal-registro-form select,
+html body.auth-page .portal-registro-form textarea {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    height: 42px !important;
+    font-size: 14px !important;
+}
+
+html body.auth-page .portal-registro-form > div:last-child {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+}
+
+html body.auth-page .portal-registro-form > div:last-child button,
+html body.auth-page .portal-registro-form > div:last-child a {
+    width: 100% !important;
+    margin: 0 !important;
+    text-align: center !important;
+}
+
+html body .pagina .hero h1 {
+    font-size: 30px !important;
+    line-height: 1.1 !important;
+}
+
+html body .pagina .hero-texto p {
+    font-size: 15px !important;
+}
+
+/* Mantener la ilustracion del dashboard, reducida y sin empujar el contenido. */
+html body #contenido .dashboard-page .dashboard-left-art {
+    display: flex !important;
+    position: relative !important;
+    width: 72px !important;
+    height: 62px !important;
+    min-width: 72px !important;
+    min-height: 62px !important;
+    max-width: 72px !important;
+    max-height: 62px !important;
+    margin: 0 auto 4px !important;
+    overflow: visible !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+html body #contenido .dashboard-page .dashboard-left-art .dashboard-dibujo {
+    display: block !important;
+    width: 72px !important;
+    height: 64px !important;
+    max-width: 72px !important;
+    max-height: 64px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-head {
+    padding-top: 4px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-head-info h1,
+html body #contenido .dashboard-page.dashboard-rol-rector .dashboard-head-info h1 {
+    font-size: 21px !important;
+    line-height: 1.08 !important;
+    margin: 5px 0 !important;
+}
+
+html body #contenido .dashboard-page .dashboard-kpi {
+    min-height: 68px !important;
+    padding: 12px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-kpi strong {
+    font-size: 22px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-card {
+    padding: 14px !important;
+}
+
+/* Compact app mode for 360-430px screens. */
+html body #contenido {
+    padding: 8px 10px 18px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-left-art {
+    width: 54px !important;
+    height: 48px !important;
+    min-width: 54px !important;
+    min-height: 48px !important;
+    max-width: 54px !important;
+    max-height: 48px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-left-art .dashboard-dibujo {
+    width: 54px !important;
+    height: 48px !important;
+    max-width: 54px !important;
+    max-height: 48px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-head-info h1,
+html body #contenido .dashboard-page.dashboard-rol-rector .dashboard-head-info h1 {
+    font-size: 19px !important;
+    line-height: 1.05 !important;
+    margin: 3px 0 !important;
+}
+
+html body #contenido .dashboard-page .dashboard-head-info .muted {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+}
+
+html body #contenido .dashboard-page .dashboard-kpi {
+    min-height: 58px !important;
+    padding: 10px 12px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-kpi strong {
+    font-size: 19px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-kpi span,
+html body #contenido .dashboard-page .dashboard-card p {
+    font-size: 11px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-card {
+    padding: 11px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-card h2 {
+    font-size: 17px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-action {
+    min-height: 44px !important;
+    padding: 10px !important;
+}
+
+html body.auth-page .portal-registro-card,
+html body.auth-page .registro-contenedor {
+    padding: 14px 11px !important;
+}
+
+html body.auth-page .portal-registro-card h1,
+html body.auth-page .registro-contenedor h1 {
+    font-size: 23px !important;
+}
+
+html body.auth-page .portal-registro-form .form-group label {
+    font-size: 12px !important;
+}
+
+html body.auth-page .portal-registro-form input,
+html body.auth-page .portal-registro-form select,
+html body.auth-page .portal-registro-form textarea {
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 7px 9px !important;
+    font-size: 13px !important;
+}
+
+/* Final compact scale for the Android/iPhone app. */
+html body {
+    font-size: 13px !important;
+}
+
+html body #contenido h1,
+html body #contenido .page-head h1,
+html body #contenido .section-heading h1 {
+    font-size: 22px !important;
+    line-height: 1.12 !important;
+}
+
+html body #contenido h2,
+html body #contenido .dashboard-card h2 {
+    font-size: 17px !important;
+    line-height: 1.18 !important;
+}
+
+html body #contenido h3 {
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+}
+
+html body #contenido p,
+html body #contenido .muted {
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+}
+
+html body #contenido .tarjeta,
+html body #contenido .panel,
+html body #contenido .form-card,
+html body #contenido .dashboard-card {
+    padding: 12px !important;
+    border-radius: 10px !important;
+}
+
+html body #contenido input,
+html body #contenido select,
+html body #contenido textarea,
+html body #contenido button,
+html body #contenido .boton,
+html body #contenido a.boton {
+    min-height: 40px !important;
+    height: auto !important;
+    padding: 9px 11px !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+}
+
+html body #contenido label {
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+}
+
+html body #contenido .dashboard-page .dashboard-head-info h1,
+html body #contenido .dashboard-page.dashboard-rol-rector .dashboard-head-info h1 {
+    font-size: 19px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-kpi {
+    min-height: 55px !important;
+    padding: 9px 11px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-kpi strong {
+    font-size: 18px !important;
+}
+
+html body #contenido .dashboard-page .dashboard-action {
+    min-height: 42px !important;
+    padding: 9px 11px !important;
+}
+
+html body.auth-page .portal-registro-card h1,
+html body.auth-page .registro-contenedor h1 {
+    font-size: 22px !important;
+}

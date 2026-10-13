@@ -1,0 +1,2110 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Calendario · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* ==========================================================
+   EDUTURNOS · CALENDARIO
+   ========================================================== */
+
+.edc-page {
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 10px 10px 22px;
+    font-family: inherit;
+}
+
+.edc-page *,
+.edc-page *::before,
+.edc-page *::after {
+    box-sizing: border-box;
+}
+
+
+/* ==========================================================
+   CABECERA
+   ========================================================== */
+
+.edc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 12px;
+}
+
+.edc-header-info {
+    min-width: 0;
+}
+
+.edc-kicker {
+    margin: 0 0 5px;
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 600;
+    opacity: .68;
+}
+
+.edc-header h1 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.15;
+    font-weight: 700;
+}
+
+.edc-header p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 400;
+    opacity: .70;
+}
+
+
+/* ==========================================================
+   BOTONES DE CABECERA
+   ========================================================== */
+
+.edc-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.edc-header-actions a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 34px;
+    min-height: 34px;
+
+    margin: 0;
+    padding: 7px 12px;
+
+    border-radius: 7px;
+
+    background: #1769aa;
+    color: #ffffff;
+
+    border: 1px solid #1769aa;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+
+    text-decoration: none;
+    white-space: nowrap;
+
+    transition:
+        background-color .15s ease,
+        border-color .15s ease;
+}
+
+.edc-header-actions a:hover {
+    background: #145b91;
+    border-color: #145b91;
+    color: #ffffff;
+}
+
+
+/* ==========================================================
+   BOTÓN ← ATRÁS
+   Mismo estilo de Citas
+   ========================================================== */
+
+.edc-back {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-height: 34px !important;
+
+    padding: 7px 12px !important;
+
+    background: #1769aa !important;
+    color: #ffffff !important;
+
+    border: 1px solid #1769aa !important;
+    border-radius: 7px !important;
+
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+
+    text-decoration: none !important;
+}
+
+.edc-back:hover {
+    background: #145b91 !important;
+    border-color: #145b91 !important;
+    color: #ffffff !important;
+}
+
+
+/* ==========================================================
+   CONTADOR
+   ========================================================== */
+
+.edc-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    margin: 0 0 10px;
+    padding: 7px 11px;
+
+    border: 1px solid rgba(80, 100, 120, .12);
+    border-radius: 8px;
+
+    background: rgba(80, 100, 120, .05);
+
+    font-size: 13px;
+    line-height: 1;
+}
+
+.edc-count strong {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+/* ==========================================================
+   FILTROS
+   ========================================================== */
+
+.edc-filters {
+    width: 100%;
+    margin: 0 0 10px;
+    padding: 10px;
+
+    border: 1px solid rgba(80, 100, 120, .12);
+    border-radius: 9px;
+
+    background: rgba(255, 255, 255, .90);
+}
+
+.edc-filter-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    width: 100%;
+    min-height: 32px;
+
+    margin: 0 0 10px;
+    padding: 6px 9px;
+
+    border-radius: 7px;
+
+    background: rgba(80, 100, 120, .045);
+
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.edc-filter-subtitle {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 400;
+    opacity: .60;
+}
+
+
+/* ==========================================================
+   FORMULARIO
+   ========================================================== */
+
+.edc-filter-form {
+    display: grid !important;
+
+    grid-template-columns:
+        1.40fr
+        1.05fr
+        .90fr
+        1.15fr
+        .95fr
+        .95fr
+        auto;
+
+    gap: 8px !important;
+
+    width: 100%;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    align-items: end;
+}
+
+
+/* ==========================================================
+   CAMPOS
+   ========================================================== */
+
+.edc-field {
+    width: 100%;
+    min-width: 0;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.edc-field label {
+    display: block !important;
+
+    margin: 0 0 4px !important;
+    padding: 0 !important;
+
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+    font-weight: 600 !important;
+}
+
+
+/* ==========================================================
+   INPUTS
+   ========================================================== */
+
+.edc-field input {
+    display: block !important;
+
+    width: 100% !important;
+    height: 34px !important;
+    min-height: 34px !important;
+
+    margin: 0 !important;
+    padding: 6px 9px !important;
+
+    border: 1px solid rgba(80, 100, 120, .22) !important;
+    border-radius: 6px !important;
+
+    background: #ffffff !important;
+    color: inherit !important;
+
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: normal !important;
+}
+
+.edc-field input::placeholder {
+    color: inherit !important;
+    opacity: .45;
+}
+
+.edc-field input:focus {
+    outline: none !important;
+
+    border-color: rgba(50, 90, 140, .48) !important;
+
+    box-shadow:
+        0 0 0 2px rgba(50, 90, 140, .07) !important;
+}
+
+
+/* ==========================================================
+   LISTAS DESPLEGABLES
+   ========================================================== */
+
+.edc-field select {
+    display: block !important;
+
+    width: 100% !important;
+    height: 34px !important;
+    min-height: 34px !important;
+
+    margin: 0 !important;
+    padding: 6px 9px !important;
+
+    border: 1px solid rgba(80, 100, 120, .22) !important;
+    border-radius: 6px !important;
+
+    background: #ffffff !important;
+    color: inherit !important;
+
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    line-height: normal !important;
+
+    cursor: pointer !important;
+
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    -moz-appearance: auto !important;
+}
+
+.edc-field select:focus {
+    outline: none !important;
+
+    border-color: rgba(50, 90, 140, .48) !important;
+
+    box-shadow:
+        0 0 0 2px rgba(50, 90, 140, .07) !important;
+}
+
+.edc-field select option {
+    background: #ffffff !important;
+    color: #27313b !important;
+
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+
+/* ==========================================================
+   BOTONES FILTROS
+   ========================================================== */
+
+.edc-buttons {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    height: 34px;
+}
+
+.edc-buttons button,
+.edc-buttons a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    height: 34px !important;
+    min-height: 34px !important;
+
+    margin: 0 !important;
+    padding: 6px 11px !important;
+
+    border: 1px solid #1769aa !important;
+    border-radius: 6px !important;
+
+    background: #1769aa !important;
+    color: #ffffff !important;
+
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+
+    text-decoration: none !important;
+    white-space: nowrap;
+}
+
+.edc-buttons button:hover,
+.edc-buttons a:hover {
+    background: #145b91 !important;
+    border-color: #145b91 !important;
+    color: #ffffff !important;
+}
+
+
+/* ==========================================================
+   BARRA DEL MES
+   ========================================================== */
+
+.edc-month-toolbar {
+    display: grid;
+
+    grid-template-columns: 1fr auto 1fr;
+
+    align-items: center;
+
+    width: 100%;
+
+    min-height: 34px;
+
+    margin: 0 0 6px;
+
+    gap: 8px;
+}
+
+.edc-month-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.edc-month-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edc-month-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+}
+
+.edc-month-toolbar a {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 29px !important;
+    min-height: 29px !important;
+    min-width: 30px;
+
+    margin: 0 !important;
+    padding: 5px 9px !important;
+
+    border: 1px solid #1769aa !important;
+    border-radius: 6px !important;
+
+    background: #1769aa !important;
+    color: #ffffff !important;
+
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+
+    text-decoration: none !important;
+}
+
+.edc-month-toolbar a:hover {
+    background: #145b91 !important;
+    border-color: #145b91 !important;
+    color: #ffffff !important;
+}
+
+.edc-month-title {
+    margin: 0;
+    padding: 0 7px;
+
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 700;
+
+    text-transform: capitalize;
+}
+
+.edc-hoy {
+    min-width: 48px !important;
+    font-size: 11px !important;
+}
+
+
+/* ==========================================================
+   CALENDARIO
+   ========================================================== */
+
+.edc-calendar-card {
+    width: 100%;
+
+    padding: 5px;
+
+    border: 1px solid rgba(80, 100, 120, .12);
+    border-radius: 9px;
+
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, .92);
+}
+
+.edc-month {
+    width: 100%;
+
+    table-layout: fixed;
+
+    border-collapse: separate;
+    border-spacing: 3px;
+
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.edc-month th {
+    height: 27px;
+
+    padding: 4px 3px;
+
+    border: 0;
+
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 700;
+
+    text-align: center;
+
+    opacity: .74;
+}
+
+.edc-month td {
+    height: 74px;
+
+    padding: 4px;
+
+    vertical-align: top;
+
+    border: 1px solid rgba(80, 100, 120, .10);
+    border-radius: 6px;
+
+    background: rgba(255, 255, 255, .96);
+
+    overflow: hidden;
+}
+
+.edc-month td.edc-other-month {
+    opacity: .40;
+}
+
+
+/* ==========================================================
+   DÍAS
+   ========================================================== */
+
+.edc-day-number {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 21px;
+    height: 21px;
+
+    margin-bottom: 3px;
+
+    border-radius: 50%;
+
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.edc-today {
+    box-shadow:
+        inset 0 0 0 2px rgba(60, 100, 150, .27);
+}
+
+
+/* ==========================================================
+   CITAS
+   ========================================================== */
+
+.edc-citas-dia {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+    max-height: 47px;
+
+    overflow: hidden;
+}
+
+.edc-cita {
+    display: block;
+
+    margin: 0;
+    padding: 3px 4px;
+
+    border: 1px solid rgba(80, 100, 120, .10);
+    border-radius: 4px;
+
+    background: rgba(80, 100, 120, .055);
+
+    font-size: 9px;
+    line-height: 1.18;
+
+    overflow: hidden;
+}
+
+.edc-cita summary {
+    cursor: pointer;
+
+    font-size: 9px;
+    line-height: 1.18;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.edc-cita p {
+    margin: 3px 0 0;
+
+    font-size: 9px;
+    line-height: 1.18;
+    font-weight: 400;
+}
+
+.edc-cita small {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 8px;
+    line-height: 1.15;
+    font-weight: 400;
+
+    opacity: .72;
+}
+
+.edc-cita a {
+    color: #1769aa;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.edc-cita a:hover {
+    text-decoration: underline;
+}
+
+.edc-more {
+    margin: 0;
+
+    font-size: 8px;
+    line-height: 1;
+
+    opacity: .58;
+
+    text-align: center;
+}
+
+
+/* ==========================================================
+   PRÓXIMAS CITAS
+   ========================================================== */
+
+.edc-upcoming {
+    margin-top: 9px;
+
+    padding: 9px 10px;
+
+    border: 1px solid rgba(80, 100, 120, .12);
+    border-radius: 9px;
+
+    background: rgba(255, 255, 255, .80);
+}
+
+.edc-upcoming h2 {
+    margin: 0 0 7px;
+
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.edc-upcoming-list {
+    display: grid;
+
+    gap: 4px;
+}
+
+.edc-upcoming-item {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 5px 7px;
+
+    border-radius: 6px;
+
+    background: rgba(80, 100, 120, .04);
+
+    font-size: 10px;
+    line-height: 1.15;
+}
+
+.edc-upcoming-date {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.edc-upcoming-info {
+    min-width: 0;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.edc-empty {
+    padding: 14px;
+
+    text-align: center;
+
+    font-size: 12px;
+
+    opacity: .65;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 1050px) {
+
+    .edc-filter-form {
+        grid-template-columns:
+            repeat(4, minmax(130px, 1fr));
+    }
+
+    .edc-buttons {
+        grid-column: span 4;
+    }
+}
+
+
+@media (max-width: 800px) {
+
+    .edc-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .edc-header-actions {
+        width: 100%;
+    }
+
+    .edc-filter-form {
+        grid-template-columns:
+            repeat(2, minmax(130px, 1fr));
+    }
+
+    .edc-buttons {
+        grid-column: span 2;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .edc-page {
+        padding: 6px;
+    }
+
+    .edc-filter-form {
+        grid-template-columns: 1fr;
+    }
+
+    .edc-buttons {
+        grid-column: span 1;
+    }
+
+    .edc-month-toolbar {
+        grid-template-columns: auto 1fr auto;
+        gap: 4px;
+    }
+
+    .edc-month-title {
+        font-size: 15px;
+    }
+
+    .edc-month {
+        border-spacing: 1px;
+    }
+
+    .edc-month td {
+        height: 62px;
+        padding: 2px;
+    }
+
+    .edc-cita,
+    .edc-cita summary {
+        font-size: 8px;
+    }
+}
+
+</style>
+
+
+<div class="edc-page">
+
+
+    <!-- ======================================================
+         CABECERA
+         ====================================================== -->
+
+    <header class="edc-header">
+
+        <div class="edc-header-info">
+
+            <div class="edc-kicker">
+                Agenda institucional · EDUTURNOS
+            </div>
+
+            <h1>
+                Calendario de citas
+            </h1>
+
+            <p>
+                Consulta tus citaciones de forma rápida y organizada.
+            </p>
+
+        </div>
+
+
+        <div class="edc-header-actions">
+
+            <!-- MISMA ESTRUCTURA DE REGRESO QUE CITAS -->
+
+            <a
+                class="edc-back eduturnos-atras"
+                href="{{ request.referrer or url_for('auth.dashboard') }}"
+             style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border:1px solid #1769aa !important;border-radius:7px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;min-height:34px !important;padding:7px 12px !important;text-decoration:none !important;font-weight:600 !important;box-shadow:none !important;">← Atrás</a>
+
+            <a
+                class="boton"
+                href="{{ url_for('citas.index') }}"
+             style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">
+                Ver citas
+            </a>
+
+            {% if puede_crear %}
+
+                <a
+                    class="boton"
+                    href="{{ url_for('citas.nueva') }}"
+                 style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">
+                    + Nueva cita
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </header>
+
+
+    <!-- ======================================================
+         CONTADOR
+         ====================================================== -->
+
+    <div class="edc-count">
+
+        <strong>
+            {{ citas|length }}
+        </strong>
+
+        <span>
+
+            {% if citas|length == 1 %}
+                cita visible
+            {% else %}
+                citas visibles
+            {% endif %}
+
+        </span>
+
+    </div>
+
+
+    <!-- ======================================================
+         FILTROS RÁPIDOS
+         ====================================================== -->
+
+    <section class="edc-filters">
+
+        <div class="edc-filter-title">
+
+            <span>
+                🔎 Filtros rápidos
+            </span>
+
+            <span class="edc-filter-subtitle">
+                Buscar y filtrar citas
+            </span>
+
+        </div>
+
+
+        <form
+            id="edc-filter-form"
+            class="edc-filter-form"
+            method="get"
+            action="{{ url_for('calendario.index') }}"
+        >
+
+            <!-- MANTENER MES Y AÑO -->
+
+            <input
+                type="hidden"
+                name="anio"
+                value="{{ anio }}"
+            >
+
+            <input
+                type="hidden"
+                name="mes"
+                value="{{ mes }}"
+            >
+
+
+            <!-- ==================================================
+                 BUSCAR
+                 ================================================== -->
+
+            <div class="edc-field">
+
+                <label for="edc-buscar">
+                    Buscar
+                </label>
+
+                <input
+                    id="edc-buscar"
+                    type="search"
+                    name="buscar"
+                    value="{{ request.args.get('buscar', '') }}"
+                    placeholder="Nombre o palabra..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- ==================================================
+                 SEDE
+                 ================================================== -->
+
+            <div class="edc-field">
+
+                <label for="edc-sede">
+                    Sede
+                </label>
+
+                <select
+                    id="edc-sede"
+                    name="sede_id"
+                >
+
+                    <!-- ESPACIO EN BLANCO INICIAL -->
+
+                    <option
+                        value=""
+                        {% if not request.args.get('sede_id') %}
+                            selected
+                        {% endif %}
+                    ></option>
+
+
+                    <!-- ORDEN IGUAL A INICIO DE SESIÓN -->
+
+                    <option
+                        value="1"
+                        {% if request.args.get('sede_id') == '1' %}
+                            selected
+                        {% endif %}
+                    >
+                        Principal (Las Américas)
+                    </option>
+
+                    <option
+                        value="2"
+                        {% if request.args.get('sede_id') == '2' %}
+                            selected
+                        {% endif %}
+                    >
+                        Arboleda Campestre
+                    </option>
+
+                    <option
+                        value="3"
+                        {% if request.args.get('sede_id') == '3' %}
+                            selected
+                        {% endif %}
+                    >
+                        Picaleña
+                    </option>
+
+                    <option
+                        value="4"
+                        {% if request.args.get('sede_id') == '4' %}
+                            selected
+                        {% endif %}
+                    >
+                        Bello Horizonte
+                    </option>
+
+                    <option
+                        value="5"
+                        {% if request.args.get('sede_id') == '5' %}
+                            selected
+                        {% endif %}
+                    >
+                        Secundino Porras Cruz
+                    </option>
+
+                    <option
+                        value="6"
+                        {% if request.args.get('sede_id') == '6' %}
+                            selected
+                        {% endif %}
+                    >
+                        San Francisco Club
+                    </option>
+
+                    <option
+                        value="7"
+                        {% if request.args.get('sede_id') == '7' %}
+                            selected
+                        {% endif %}
+                    >
+                        San Martín
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ==================================================
+                 JORNADA
+                 ================================================== -->
+
+            <div class="edc-field">
+
+                <label for="edc-jornada">
+                    Jornada
+                </label>
+
+                <select
+                    id="edc-jornada"
+                    name="jornada_id"
+                >
+
+                    <!-- ESPACIO EN BLANCO -->
+
+                    <option
+                        value=""
+                        {% if not request.args.get('jornada_id') %}
+                            selected
+                        {% endif %}
+                    ></option>
+
+                    <option
+                        value="1"
+                        {% if request.args.get('jornada_id') == '1' %}
+                            selected
+                        {% endif %}
+                    >
+                        Mañana
+                    </option>
+
+                    <option
+                        value="2"
+                        {% if request.args.get('jornada_id') == '2' %}
+                            selected
+                        {% endif %}
+                    >
+                        Tarde
+                    </option>
+
+                    <option
+                        value="3"
+                        {% if request.args.get('jornada_id') == '3' %}
+                            selected
+                        {% endif %}
+                    >
+                        Noche
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ==================================================
+                 DOCENTE
+                 ================================================== -->
+
+            <div class="edc-field">
+
+                <label for="edc-docente">
+                    Docente
+                </label>
+
+                <select
+                    id="edc-docente"
+                    name="docente_id"
+                >
+
+                    <!-- ESPACIO EN BLANCO -->
+
+                    <option
+                        value=""
+                        {% if not request.args.get('docente_id') %}
+                            selected
+                        {% endif %}
+                    ></option>
+
+
+                    {% for docente in docentes %}
+
+                        {% if docente.id_docente is defined %}
+
+                            <option
+                                value="{{ docente.id_docente }}"
+                                {% if request.args.get('docente_id') == (docente.id_docente|string) %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {% if docente.nombre is defined %}
+
+                                    {{ docente.nombre }}
+
+                                {% else %}
+
+                                    {{ docente.nombres }}
+                                    {{ docente.apellidos }}
+
+                                {% endif %}
+
+                            </option>
+
+                        {% else %}
+
+                            <option
+                                value="{{ docente }}"
+                                {% if request.args.get('docente_id') == docente %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ docente }}
+                            </option>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- ==================================================
+                 ESTADO
+                 ================================================== -->
+
+            <div class="edc-field">
+
+                <label for="edc-estado">
+                    Estado
+                </label>
+
+                <select
+                    id="edc-estado"
+                    name="estado"
+                >
+
+                    <!-- ESPACIO EN BLANCO -->
+
+                    <option
+                        value=""
+                        {% if not request.args.get('estado') %}
+                            selected
+                        {% endif %}
+                    ></option>
+
+                    <option
+                        value="Pendiente"
+                        {% if request.args.get('estado') == 'Pendiente' %}
+                            selected
+                        {% endif %}
+                    >
+                        Pendiente
+                    </option>
+
+                    <option
+                        value="Confirmada"
+                        {% if request.args.get('estado') == 'Confirmada' %}
+                            selected
+                        {% endif %}
+                    >
+                        Confirmada
+                    </option>
+
+                    <option
+                        value="Reprogramada"
+                        {% if request.args.get('estado') == 'Reprogramada' %}
+                            selected
+                        {% endif %}
+                    >
+                        Reprogramada
+                    </option>
+
+                    <option
+                        value="Cancelada"
+                        {% if request.args.get('estado') == 'Cancelada' %}
+                            selected
+                        {% endif %}
+                    >
+                        Cancelada
+                    </option>
+
+                    <option
+                        value="Realizada"
+                        {% if request.args.get('estado') == 'Realizada' %}
+                            selected
+                        {% endif %}
+                    >
+                        Realizada
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ==================================================
+                 DESDE
+                 ================================================== -->
+
+            <div class="edc-field">
+
+                <label for="edc-desde">
+                    Desde
+                </label>
+
+                <input
+                    id="edc-desde"
+                    type="date"
+                    name="desde"
+                    value="{{ request.args.get('desde', '') }}"
+                >
+
+            </div>
+
+
+            <!-- ==================================================
+                 BOTONES
+                 ================================================== -->
+
+            <div class="edc-buttons">
+
+                <button
+                    type="submit"
+                 style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">
+                    Filtrar
+                </button>
+
+                <a
+                    href="{{ url_for(
+                        'calendario.index',
+                        anio=anio,
+                        mes=mes
+                    ) }}"
+                >
+                    Limpiar
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- ======================================================
+         MESES
+         ====================================================== -->
+
+    {% set meses_calendario = [
+        'enero',
+        'febrero',
+        'marzo',
+        'abril',
+        'mayo',
+        'junio',
+        'julio',
+        'agosto',
+        'septiembre',
+        'octubre',
+        'noviembre',
+        'diciembre'
+    ] %}
+
+
+    {% set nombre_mes = meses_calendario[mes - 1] %}
+
+
+    <!-- ======================================================
+         MES ANTERIOR
+         ====================================================== -->
+
+    {% if mes == 1 %}
+
+        {% set prev_mes = 12 %}
+        {% set prev_anio = anio - 1 %}
+
+    {% else %}
+
+        {% set prev_mes = mes - 1 %}
+        {% set prev_anio = anio %}
+
+    {% endif %}
+
+
+    <!-- ======================================================
+         MES SIGUIENTE
+         ====================================================== -->
+
+    {% if mes == 12 %}
+
+        {% set next_mes = 1 %}
+        {% set next_anio = anio + 1 %}
+
+    {% else %}
+
+        {% set next_mes = mes + 1 %}
+        {% set next_anio = anio %}
+
+    {% endif %}
+
+
+    <!-- ======================================================
+         BARRA DEL MES
+         ====================================================== -->
+
+    <div class="edc-month-toolbar">
+
+
+        <!-- MES ANTERIOR -->
+
+        <div class="edc-month-left">
+
+            <a
+                href="{{ url_for(
+                    'calendario.index',
+                    anio=prev_anio,
+                    mes=prev_mes
+                ) }}"
+                title="Mes anterior"
+            >
+                ‹
+            </a>
+
+        </div>
+
+
+        <!-- MES Y AÑO -->
+
+        <div class="edc-month-center">
+
+            <h2 class="edc-month-title">
+                {{ nombre_mes }} {{ anio }}
+            </h2>
+
+        </div>
+
+
+        <!-- SIGUIENTE + HOY -->
+
+        <div class="edc-month-right">
+
+            <a
+                href="{{ url_for(
+                    'calendario.index',
+                    anio=next_anio,
+                    mes=next_mes
+                ) }}"
+                title="Mes siguiente"
+            >
+                ›
+            </a>
+
+            <a
+                class="edc-hoy"
+                href="{{ url_for('calendario.index') }}"
+            >
+                Hoy
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         CALENDARIO MENSUAL
+         ====================================================== -->
+
+    <section class="edc-calendar-card">
+
+        {% if semanas %}
+
+            <table class="edc-month">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Lun</th>
+                        <th>Mar</th>
+                        <th>Mié</th>
+                        <th>Jue</th>
+                        <th>Vie</th>
+                        <th>Sáb</th>
+                        <th>Dom</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for semana in semanas %}
+
+                        <tr>
+
+                            {% for dia in semana %}
+
+                                <td
+                                    class="
+                                        {% if not dia.es_mes %}
+                                            edc-other-month
+                                        {% endif %}
+
+                                        {% if dia.es_hoy %}
+                                            edc-today
+                                        {% endif %}
+                                    "
+                                >
+
+
+                                    <!-- NÚMERO -->
+
+                                    <div class="edc-day-number">
+                                        {{ dia.numero }}
+                                    </div>
+
+
+                                    <!-- CITAS DEL DÍA -->
+
+                                    {% if dia.citas %}
+
+                                        <div class="edc-citas-dia">
+
+                                            {% for cita in dia.citas[:3] %}
+
+                                                <details class="edc-cita">
+
+                                                    <summary>
+
+                                                        {{ cita.hora|string|truncate(
+                                                            5,
+                                                            True,
+                                                            ''
+                                                        ) }}
+
+                                                        ·
+
+                                                        {{ cita.estudiante_n }}
+
+                                                    </summary>
+
+
+                                                    <p>
+
+                                                        <strong>
+
+                                                            {{ cita.estudiante_n }}
+                                                            {{ cita.estudiante_a }}
+
+                                                        </strong>
+
+                                                    </p>
+
+
+                                                    <p>
+
+                                                        Docente:
+
+                                                        {{ cita.docente_n }}
+                                                        {{ cita.docente_a }}
+
+                                                    </p>
+
+
+                                                    <p>
+                                                        {{ cita.motivo }}
+                                                    </p>
+
+
+                                                    <p>
+                                                        {{ cita.lugar }}
+                                                    </p>
+
+
+                                                    <small>
+
+                                                        Estado:
+                                                        {{ cita.estado }}
+
+                                                    </small>
+
+
+                                                    {% if cita.observaciones %}
+
+                                                        <small>
+                                                            {{ cita.observaciones }}
+                                                        </small>
+
+                                                    {% endif %}
+
+
+                                                    <small>
+
+                                                        <a
+                                                            href="{{ url_for(
+                                                                'calendario.descargar_ics',
+                                                                cita_id=cita.id
+                                                            ) }}"
+                                                        >
+                                                            Agregar al calendario
+                                                        </a>
+
+                                                    </small>
+
+                                                </details>
+
+                                            {% endfor %}
+
+
+                                            {% if dia.citas|length > 3 %}
+
+                                                <div class="edc-more">
+
+                                                    +{{ dia.citas|length - 3 }} más
+
+                                                </div>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </td>
+
+                            {% endfor %}
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        {% else %}
+
+            <div class="edc-empty">
+                No hay días para mostrar.
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- ======================================================
+         PRÓXIMAS CITAS
+         ====================================================== -->
+
+    {% if proximas %}
+
+        <section class="edc-upcoming">
+
+            <h2>
+                Próximas citas
+            </h2>
+
+
+            <div class="edc-upcoming-list">
+
+                {% for cita in proximas[:6] %}
+
+                    <div class="edc-upcoming-item">
+
+                        <span class="edc-upcoming-date">
+
+                            {{ cita.fecha }}
+
+                            ·
+
+                            {{ cita.hora|string|truncate(
+                                5,
+                                True,
+                                ''
+                            ) }}
+
+                        </span>
+
+
+                        <span class="edc-upcoming-info">
+
+                            {{ cita.estudiante_n }}
+                            {{ cita.estudiante_a }}
+
+                            ·
+
+                            {{ cita.docente_n }}
+                            {{ cita.docente_a }}
+
+                        </span>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+
+</div>
+
+
+
+
+
+{% endblock %}
+
+
+
+<style id="EDUTURNOS_BOTONES_REALES_V6">
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a.btn,
+a[class*="boton"],
+a[class*="button"],
+a[class*="btn-"],
+a[role="button"],
+a.link-back,
+a.edc-back,
+.edc-header-actions a,
+.edc-header-actions button,
+.edc-buttons a,
+.edc-buttons button,
+.edc-month-toolbar a,
+.edc-month-toolbar button,
+.citas-actions a,
+.citas-actions button,
+.form-actions a,
+.form-actions button,
+.acciones a,
+.acciones button,
+.page-actions a,
+.page-actions button,
+.dashboard-actions a,
+.dashboard-actions button,
+.dashboard-card a.boton,
+.dashboard-card button,
+.quick-card a.boton,
+.quick-card button,
+.account-actions a.boton,
+.account-actions button {
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+    color: #ffffff !important;
+    border-color: #1769aa !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a.btn:hover,
+a[class*="boton"]:hover,
+a[class*="button"]:hover,
+a[class*="btn-"]:hover,
+a[role="button"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.edc-header-actions a:hover,
+.edc-header-actions button:hover,
+.edc-buttons a:hover,
+.edc-buttons button:hover,
+.edc-month-toolbar a:hover,
+.edc-month-toolbar button:hover,
+.citas-actions a:hover,
+.citas-actions button:hover,
+.form-actions a:hover,
+.form-actions button:hover,
+.acciones a:hover,
+.acciones button:hover,
+.page-actions a:hover,
+.page-actions button:hover,
+.dashboard-actions a:hover,
+.dashboard-actions button:hover,
+.dashboard-card a.boton:hover,
+.dashboard-card button:hover,
+.quick-card a.boton:hover,
+.quick-card button:hover,
+.account-actions a.boton:hover,
+.account-actions button:hover {
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+    color: #ffffff !important;
+    border-color: #145b91 !important;
+}
+
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a.btn *,
+a[role="button"] *,
+a.link-back *,
+a.edc-back *,
+.edc-header-actions a *,
+.edc-header-actions button *,
+.edc-buttons a *,
+.edc-buttons button *,
+.edc-month-toolbar a *,
+.edc-month-toolbar button *,
+.citas-actions a *,
+.citas-actions button *,
+.form-actions a *,
+.form-actions button *,
+.acciones a *,
+.acciones button *,
+.page-actions a *,
+.page-actions button *,
+.dashboard-actions a *,
+.dashboard-actions button *,
+.dashboard-card a.boton *,
+.dashboard-card button *,
+.quick-card a.boton *,
+.quick-card button *,
+.account-actions a.boton *,
+.account-actions button * {
+    color: #ffffff !important;
+}
+</style>
+
+<script id="EDUTURNOS_BOTONES_REALES_V6">
+(function() {
+    "use strict";
+
+    const azul = "#1769aa";
+    const hover = "#145b91";
+    const blanco = "#ffffff";
+
+    const selectores = [
+        "button",
+        "input[type='submit']",
+        "input[type='button']",
+        "input[type='reset']",
+
+        "a.boton",
+        "a.btn",
+        "a[class*='boton']",
+        "a[class*='button']",
+        "a[class*='btn-']",
+        "a[class*='accion']",
+        "a[class*='action']",
+        "a[role='button']",
+
+        "a.link-back",
+        "a.edc-back",
+
+        ".edc-header-actions a",
+        ".edc-header-actions button",
+
+        ".edc-buttons a",
+        ".edc-buttons button",
+
+        ".edc-month-toolbar a",
+        ".edc-month-toolbar button",
+
+        ".citas-actions a",
+        ".citas-actions button",
+
+        ".form-actions a",
+        ".form-actions button",
+
+        ".acciones a",
+        ".acciones button",
+
+        ".page-actions a",
+        ".page-actions button",
+
+        ".dashboard-actions a",
+        ".dashboard-actions button",
+
+        ".account-actions a",
+        ".account-actions button",
+
+        ".quick-card a.boton",
+        ".quick-card button",
+
+        ".dashboard-card a.boton",
+        ".dashboard-card button"
+    ].join(",");
+
+
+    function aplicar(elemento) {
+        if (!elemento) return;
+
+        elemento.style.setProperty(
+            "background",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "background-color",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "color",
+            blanco,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "border-color",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "text-decoration",
+            "none",
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "box-shadow",
+            "none",
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "opacity",
+            "1",
+            "important"
+        );
+
+        elemento.querySelectorAll("*").forEach(function(hijo) {
+            hijo.style.setProperty(
+                "color",
+                blanco,
+                "important"
+            );
+        });
+
+        if (!elemento.dataset.eduturnosBotonV6) {
+            elemento.dataset.eduturnosBotonV6 = "1";
+
+            elemento.addEventListener("mouseenter", function() {
+                elemento.style.setProperty(
+                    "background",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "background-color",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "border-color",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "color",
+                    blanco,
+                    "important"
+                );
+            });
+
+            elemento.addEventListener("mouseleave", function() {
+                elemento.style.setProperty(
+                    "background",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "background-color",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "border-color",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "color",
+                    blanco,
+                    "important"
+                );
+            });
+        }
+    }
+
+
+    function buscarBotonesPorTexto() {
+        document.querySelectorAll("a").forEach(function(a) {
+            const texto = (a.textContent || "")
+                .trim()
+                .toLowerCase();
+
+            const href = (a.getAttribute("href") || "")
+                .toLowerCase();
+
+            const palabras = [
+                "atrás",
+                "atras",
+                "nueva citación",
+                "nueva cita",
+                "ver citas",
+                "filtrar",
+                "limpiar",
+                "editar",
+                "eliminar",
+                "confirmar",
+                "cancelar",
+                "reprogramar",
+                "descargar",
+                "exportar",
+                "importar",
+                "guardar",
+                "enviar",
+                "volver",
+                "marcar",
+                "crear",
+                "solicitar"
+            ];
+
+            const coincideTexto = palabras.some(function(p) {
+                return texto === p || texto.includes(p);
+            });
+
+            const coincideRuta =
+                href.includes("/citas/") ||
+                href.includes("/calendario") ||
+                href.includes("/notificaciones/") ||
+                href.includes("/solicitudes/") ||
+                href.includes("/reportes/") ||
+                href.includes("/usuarios/") ||
+                href.includes("/auth/recuperar");
+
+            const contenedor = a.closest(
+                ".edc-header-actions," +
+                ".edc-buttons," +
+                ".edc-month-toolbar," +
+                ".citas-actions," +
+                ".form-actions," +
+                ".acciones," +
+                ".page-actions," +
+                ".dashboard-actions," +
+                ".dashboard-card," +
+                ".quick-card," +
+                ".account-actions"
+            );
+
+            if (coincideTexto || coincideRuta || contenedor) {
+                aplicar(a);
+            }
+        });
+    }
+
+
+    function ejecutar() {
+        document.querySelectorAll(selectores).forEach(aplicar);
+        buscarBotonesPorTexto();
+    }
+
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", ejecutar);
+    } else {
+        ejecutar();
+    }
+
+
+    const observador = new MutationObserver(function() {
+        ejecutar();
+    });
+
+    observador.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
+
+})();
+</script>
+
+
+
+<style id="EDUTURNOS_ATRAS_TODOS_V7">
+
+/* SOLO LOS BOTONES ATRÁS */
+a.eduturnos-atras,
+a.link-back,
+a.edc-back {
+    background:#1769aa !important;
+    background-color:#1769aa !important;
+    color:#ffffff !important;
+    border:1px solid #1769aa !important;
+    border-radius:7px !important;
+    text-decoration:none !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    min-height:34px !important;
+    padding:7px 12px !important;
+    font-weight:600 !important;
+    box-shadow:none !important;
+}
+
+a.eduturnos-atras:hover,
+a.link-back:hover,
+a.edc-back:hover {
+    background:#145b91 !important;
+    background-color:#145b91 !important;
+    color:#ffffff !important;
+    border-color:#145b91 !important;
+}
+
+a.eduturnos-atras *,
+a.link-back *,
+a.edc-back * {
+    color:#ffffff !important;
+}
+
+</style>

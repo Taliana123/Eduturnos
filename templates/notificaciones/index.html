@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+
+{% block title %}Notificaciones · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<div class="notificaciones-page">
+
+<section class="page-head">
+    <div>
+        <div class="page-navigation">
+            <a
+                class="link-back"
+                href="{{ url_for('auth.dashboard') }}">
+                ← Volver
+            </a>
+        </div>
+
+        <h1>Notificaciones</h1>
+        <p>Consulta los avisos y actualizaciones de tu cuenta.</p>
+    </div>
+
+    {% if avisos %}
+    <form method="post" action="{{ url_for('notificaciones.marcar_todas') }}">
+        {% if csrf_token is defined %}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% endif %}
+        <button type="submit" class="btn btn-secondary eduturnos-marcar-leidas" >Marcar todas como leídas</button>
+    </form>
+    {% endif %}
+</section>
+
+<section class="content-card notificaciones-card">
+
+    {% if avisos %}
+
+        <div class="notifications-list">
+
+            {% for aviso in avisos %}
+
+                <article class="notification-card {% if not aviso.leida %}notification-unread{% endif %}">
+
+                    <div class="notification-content">
+
+                        <div class="notification-header">
+                            <h2>{{ aviso.titulo }}</h2>
+
+                            {% if not aviso.leida %}
+                                <span class="notification-badge">
+                                    Nueva
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <p class="notification-message">
+                            {{ aviso.mensaje }}
+                        </p>
+
+                        <div class="notification-meta">
+                            <span>
+                                Tipo: {{ aviso.tipo }}
+                            </span>
+
+                            <span>
+                                {{ aviso.fecha_creacion.strftime('%d/%m/%Y') }} {{ aviso.fecha_creacion|hora_ampm }}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    {% if not aviso.leida %}
+                        <form
+                            method="post"
+                            action="{{ url_for('notificaciones.marcar_leida', notificacion_id=aviso.id) }}"
+                        >
+                            {% if csrf_token is defined %}
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {% endif %}
+
+                            <button type="submit" class="btn btn-secondary eduturnos-marcar-leidas">
+                                Marcar como leída
+                            </button>
+                        </form>
+                    {% else %}
+                        <span class="notification-read">
+                            Leída
+                        </span>
+                    {% endif %}
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            <div class="empty-state-icon">🔔</div>
+
+            <h2>No tienes notificaciones</h2>
+
+            <p>
+                Cuando recibas una notificación aparecerá aquí.
+            </p>
+        </div>
+
+    {% endif %}
+
+</section>
+
+</div>
+
+<style>
+    #contenido .notificaciones-page .page-head h1 {
+        color: #111111 !important;
+    }
+
+    .notifications-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .notification-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 20px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        background: #ffffff;
+    }
+
+    .notification-unread {
+        border-left: 4px solid #2563eb;
+        background: #f8fbff;
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .notification-header h2 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .notification-badge {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: #2563eb;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .notification-message {
+        margin: 0 0 12px;
+        line-height: 1.5;
+        color: #374151;
+    }
+
+    .notification-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .notification-read {
+        color: #6b7280;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-state-icon {
+        font-size: 42px;
+        margin-bottom: 12px;
+    }
+
+    .empty-state h2 {
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: #6b7280;
+    }
+
+    @media (max-width: 700px) {
+        .notification-card {
+            flex-direction: column;
+        }
+    }
+</style>
+
+
+
+
+
+{% endblock %}
+<!-- EDUTURNOS_NOTIFICACIONES_ACTUALIZACION_2026 -->
+
+
+
+<!-- FIN EDUTURNOS_NOTIFICACIONES_ACTUALIZACION_2026 -->
+
+
+
+
+
+
+<style id="eduturnos-notificaciones-definitivo-real">
+
+/* NOTIFICACIONES */
+.eduturnos-marcar-leidas{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    float:right !important;
+
+    width:auto !important;
+    min-width:0 !important;
+    height:34px !important;
+    min-height:34px !important;
+
+    margin:0 0 10px auto !important;
+    padding:6px 11px !important;
+
+    font-size:12px !important;
+    font-weight:600 !important;
+    line-height:1 !important;
+
+    white-space:nowrap !important;
+    box-sizing:border-box !important;
+}
+
+</style>
+<style id="eduturnos-notificaciones-boton-final">
+.eduturnos-notificaciones-boton-final {
+    display: flex !important;
+    justify-content: flex-end !important;
+    width: 100% !important;
+    margin-bottom: 12px !important;
+}
+
+.eduturnos-notificaciones-boton-final button {
+    font-size: 13px !important;
+    padding: 6px 11px !important;
+    min-height: 32px !important;
+    width: auto !important;
+}
+</style>
+<style id="EDUTURNOS_NOTIFICACIONES_FINAL_2026">
+.page-head > form { margin-left:auto !important; }
+.page-head > form .eduturnos-marcar-leidas {
+    min-height:30px !important;
+    height:30px !important;
+    padding:5px 10px !important;
+    font-size:11px !important;
+    font-weight:500 !important;
+    border-radius:8px !important;
+}
+</style>

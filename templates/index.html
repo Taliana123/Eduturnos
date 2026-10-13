@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EDUTURNOS | Comunidad educativa</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0d3158;
+            color: #102a43;
+            line-height: 1.6;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .pagina {    
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, .50), transparent 30%),
+linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%) !important;}
+
+        .pagina > main {    
+    flex: 0 0 auto;
+    width: 100%;
+    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, .50), transparent 30%),
+linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%) !important;
+    margin: 0 !important;
+    padding-bottom: 0 !important;}
+a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .pagina {    
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, .50), transparent 30%),
+linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%) !important;}
+
+        .pagina > main {    
+    flex: 0 0 auto;
+    width: 100%;
+    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, .50), transparent 30%),
+linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%) !important;
+    margin: 0 !important;
+    padding-bottom: 0 !important;}
+/* =================================================
+           NAVEGACION
+           ================================================= */
+
+        .barra {
+            width: 100%;
+            background: #ffffff;
+            border-bottom: 1px solid #dbe8f5;
+        }
+
+        .barra-interior {
+            max-width: 1180px;
+            margin: 0 auto;
+            min-height: 78px;
+            padding: 0 28px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .marca {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: .04em;
+            color: #123f73;
+            white-space: nowrap;
+        }
+
+        .marca-logo {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            display: block;
+            flex-shrink: 0;
+            border-radius: 0;
+            filter: none;
+            opacity: 1;
+        }
+
+        .marca-nombre {
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .marca-icono {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #1769aa;
+            color: white;
+
+            font-size: 19px;
+            font-weight: 800;
+
+            box-shadow: 0 8px 20px rgba(23,105,170,.20);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 28px;
+        }
+
+        .nav-menu {
+            position: relative;
+        }
+
+        .nav-desktop-links {
+            display: none;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .nav-menu-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 44px;
+            padding: 8px 12px;
+            border: 1px solid #d7e5f2;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #34556f;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            list-style: none;
+        }
+
+        .nav-menu-toggle::-webkit-details-marker {
+            display: none;
+        }
+
+        .nav-menu-toggle::marker {
+            content: "";
+        }
+
+        .nav-menu-toggle::after {
+            width: 7px;
+            height: 7px;
+            margin: 0 0 4px 2px;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            content: "";
+            transform: rotate(45deg);
+            transition: transform .15s ease;
+        }
+
+        .nav-menu[open] .nav-menu-toggle::after {
+            margin-bottom: 0;
+            transform: rotate(225deg);
+        }
+
+        .nav-menu-icon {
+            display: grid;
+            gap: 4px;
+        }
+
+        .nav-menu-icon span {
+            width: 16px;
+            height: 2px;
+            border-radius: 2px;
+            background: currentColor;
+        }
+
+        .nav-menu-links {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            z-index: 30;
+            display: none;
+            width: min(250px, calc(100vw - 36px));
+            gap: 4px;
+            padding: 8px;
+            border: 1px solid #dce8f2;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 14px 32px rgba(20, 62, 99, .18);
+        }
+
+        .nav-menu[open] .nav-menu-links {
+            display: grid;
+        }
+
+        .nav-menu-links a {
+            display: flex;
+            width: 100%;
+            min-height: 44px;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .nav-menu-links a:hover,
+        .nav-menu-links a:focus-visible {
+            background: #edf6fc;
+            outline: none;
+        }
+
+        @media (min-width: 901px) {
+            .nav-desktop-links {
+                display: flex;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+        }
+
+        .nav a {
+            display: inline-flex;
+            align-items: center;
+            min-height: 40px;
+            font-size: 16px;
+            line-height: 1.3;
+            font-weight: 700;
+            color: #45627d;
+            transition: .2s ease;
+        }
+
+        .nav a:hover {
+            color: #1769aa;
+        }
+
+        .nav-login {
+            padding: 11px 18px;
+            border-radius: 10px;
+
+            background: #1769aa;
+            color: #ffffff !important;
+
+            box-shadow: 0 7px 18px rgba(23,105,170,.20);
+        }
+
+        .nav-login:hover {
+            background: #12568d;
+            transform: translateY(-1px);
+        }
+
+        /* =================================================
+           HERO
+           ================================================= */
+
+        .hero {    
+    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, .50), transparent 30%),
+linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
+
+        .hero-interior {
+            max-width: 1180px;
+            margin: 0 auto;
+
+            display: grid;
+            grid-template-columns: minmax(0, 1.05fr) minmax(420px, .95fr);
+            gap: 70px;
+            align-items: center;
+    transform: none;}
+
+        .etiqueta {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            margin-bottom: 22px;
+
+            color: #1769aa;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: .13em;
+        }
+
+        .etiqueta::before {
+            content: "";
+            width: 28px;
+            height: 3px;
+            border-radius: 99px;
+            background: #d89b27;
+        }
+
+        .hero h1 {
+            max-width: 680px;
+
+            color: #10385f;
+
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(48px, 6vw, 76px);
+            line-height: .98;
+            letter-spacing: -.045em;
+
+            margin-bottom: 28px;
+        }
+
+        .hero-texto {
+            max-width: 650px;
+
+            color: #385a76;
+            font-size: 18px;
+            line-height: 1.8;
+
+            margin-bottom: 34px;
+        }
+
+        .acciones {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .boton {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-height: 50px;
+            padding: 0 22px;
+
+            border-radius: 11px;
+
+            font-size: 15px;
+            font-weight: 800;
+
+            transition: .2s ease;
+        }
+
+        .boton:hover {
+            transform: translateY(-2px);
+        }
+
+        .boton-principal {
+            background: #1769aa;
+            color: white;
+
+            box-shadow: 0 12px 25px rgba(23,105,170,.23);
+        }
+
+        .boton-secundario {
+            background: rgba(255,255,255,.72);
+            color: #174a73;
+            border: 1px solid rgba(23,74,115,.12);
+        }
+
+        /* =================================================
+           FLUJO
+           ================================================= */
+
+        .flujo {
+            background: #ffffff;
+            border-radius: 24px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 25px 60px rgba(35,78,115,.18),
+                0 4px 14px rgba(35,78,115,.07);
+
+            border: 1px solid rgba(255,255,255,.9);
+        }
+
+        .flujo-cabecera {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+
+            padding-bottom: 22px;
+            margin-bottom: 6px;
+
+            border-bottom: 1px solid #e5edf5;
+        }
+
+        .flujo-mini {
+            color: #d08e1b;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: .12em;
+        }
+
+        .flujo h2 {
+            margin-top: 7px;
+
+            color: #173e63;
+
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 27px;
+        }
+
+        .flujo-estado {
+            padding: 7px 10px;
+            border-radius: 999px;
+
+            background: #eef8f3;
+            color: #26764e;
+
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .06em;
+        }
+
+        .paso {
+            display: grid;
+            grid-template-columns: 48px 1fr;
+            gap: 16px;
+
+            padding: 21px 0;
+
+            border-bottom: 1px solid #edf2f6;
+        }
+
+        .paso:last-child {
+            border-bottom: 0;
+            padding-bottom: 3px;
+        }
+
+        .numero {
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 12px;
+
+            background: #e7f3fd;
+            color: #1769aa;
+
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .paso h3 {
+            color: #183e60;
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .paso p {
+            color: #6a8093;
+            font-size: 14px;
+        }
+
+        /* =================================================
+           SECCION INFORMACION
+           ================================================= */
+
+        .informacion {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 100px 28px;
+        }
+
+        .encabezado-seccion {
+            max-width: 700px;
+            margin-bottom: 45px;
+        }
+
+        .encabezado-seccion span {
+            color: #d08e1b;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: .13em;
+        }
+
+        .encabezado-seccion h2 {
+            margin-top: 10px;
+
+            color: #143e63;
+
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(35px, 4vw, 52px);
+            line-height: 1.08;
+        }
+
+        .encabezado-seccion p {
+            margin-top: 17px;
+
+            color: #60788e;
+            font-size: 17px;
+        }
+
+        .beneficios-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .beneficio {
+            background: white;
+            border: 1px solid #dfeaf3;
+            border-radius: 18px;
+
+            padding: 28px;
+
+            box-shadow: 0 10px 30px rgba(31,73,107,.06);
+        }
+
+        .beneficio-numero {
+            color: #1769aa;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .beneficio h3 {
+            margin: 13px 0 8px;
+
+            color: #183e60;
+            font-size: 19px;
+        }
+
+        .beneficio p {
+            color: #6a8093;
+            font-size: 15px;
+        }
+
+        /* =================================================
+           CTA
+           ================================================= */
+
+        .cierre {
+            background:
+                radial-gradient(circle at 80% 20%, rgba(96,173,230,.25), transparent 30%),
+                #123f73;
+
+            padding: 80px 28px;
+        }
+
+        .cierre-interior {
+            max-width: 950px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .cierre h2 {
+            color: white;
+
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(35px, 5vw, 57px);
+            line-height: 1.05;
+        }
+
+        .cierre p {
+            max-width: 690px;
+            margin: 20px auto 30px;
+
+            color: #c9dff1;
+            font-size: 17px;
+        }
+
+        .boton-claro {
+            background: white;
+            color: #1769aa;
+        }
+
+        /* =================================================
+           FOOTER
+           ================================================= */
+
+        footer {
+            background: #0d3158;
+            color: #aac6dd;
+
+            padding: 25px 28px;
+        }
+
+        .footer-interior {
+            max-width: 1180px;
+            margin: 0 auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        footer strong {
+            color: white;
+        }
+
+        footer .footer-interior > span {
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        /* =================================================
+           RESPONSIVE
+           ================================================= */
+
+        @media (max-width: 900px) {
+
+            .barra-interior {
+                min-height: 68px;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                flex-direction: row;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .nav {
+                width: auto;
+                flex: 0 0 auto;
+                justify-content: flex-end;
+                margin-left: auto;
+                overflow: visible;
+                gap: 0;
+            }
+
+            .hero {    
+    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, .50), transparent 30%),
+linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
+
+            .hero-interior {
+                grid-template-columns: 1fr;
+                gap: 45px;}
+
+            .beneficios-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-interior {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 560px) {
+
+            .barra-interior,
+            .hero,
+            .informacion,
+            .cierre {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+
+            .nav {
+                gap: 0;
+            }
+
+            .hero h1 {
+                font-size: 48px;
+            }
+
+            .flujo {
+                padding: 22px;
+            }
+
+            .acciones {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .boton {
+                width: 100%;
+            }
+        }
+</style>
+{% if beepy_inicio %}<script src="{{ url_for('static', filename='js/beepy.js') }}" defer></script>{% endif %}
+</head>
+
+<body class="public-home-page">
+
+<div class="pagina">
+
+    <!-- =================================================
+         NAVEGACION
+         ================================================= -->
+
+    <header class="barra">
+        <div class="barra-interior">
+
+            <a class="marca" href="{{ url_for('inicio') }}">
+                <img class="marca-logo" src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional">
+                <span class="marca-nombre">EDUTURNOS</span>
+            </a>
+
+            <nav class="nav" aria-label="Navegaci&oacute;n principal">
+                <div class="nav-desktop-links">
+                    <a href="{{ url_for('como_funciona') }}">C&oacute;mo funciona</a>
+                    <a href="{{ url_for('beneficios') }}">Beneficios</a>
+                    <a href="{{ url_for('institucion') }}">Instituci&oacute;n</a>
+                    <a href="{{ url_for('privacidad') }}">Privacidad</a>
+                    <a href="{{ url_for('terminos') }}">Condiciones</a>
+                </div>
+                <details class="nav-menu">
+                    <summary class="nav-menu-toggle">
+                        <span class="nav-menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+                        <span>Men&uacute;</span>
+                    </summary>
+                    <div class="nav-menu-links">
+                        <a href="{{ url_for('como_funciona') }}">C&oacute;mo funciona</a>
+                        <a href="{{ url_for('beneficios') }}">Beneficios</a>
+                        <a href="{{ url_for('institucion') }}">Instituci&oacute;n</a>
+                        <a href="{{ url_for('privacidad') }}">Privacidad</a>
+                        <a href="{{ url_for('terminos') }}">Condiciones</a>
+                    </div>
+                </details>
+            </nav>
+
+        </div>
+    </header>
+
+
+    <!-- =================================================
+         HERO
+         ================================================= -->
+
+    <main>
+
+        <section class="hero">
+
+            <div class="hero-interior">
+
+                <div>
+
+                    <div class="etiqueta">
+                        COMUNIDAD EDUCATIVA
+                    </div>
+
+                    <h1>
+                        Organiza.<br>
+                        Acompa&ntilde;a.<br>
+                        Conecta.
+                    </h1>
+
+                    <p class="hero-texto">
+                        EDUTURNOS re&uacute;ne en un solo lugar las citaciones,
+                        reuniones y seguimientos que conectan a estudiantes,
+                        acudientes y equipo educativo.
+                    </p>
+
+                    <div class="acciones">
+
+                        <a class="boton boton-principal"
+                           href="{{ url_for('auth.login') }}">
+                            Iniciar sesi&oacute;n &rarr;
+                        </a>
+
+                        <a class="boton boton-secundario"
+                           href="{{ url_for('auth.registro') }}">
+                            Crear cuenta
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FLUJO -->
+
+                <div class="flujo">
+
+                    <div class="flujo-cabecera">
+
+                        <div>
+                            <div class="flujo-mini">
+                                SEGUIMIENTO
+                            </div>
+
+                            <h2>
+                                Flujo de una citaci&oacute;n
+                            </h2>
+                        </div>
+
+                        <div class="flujo-estado">
+                            ORGANIZADO
+                        </div>
+
+                    </div>
+
+
+                    <div class="paso">
+
+                        <div class="numero">01</div>
+
+                        <div>
+                            <h3>Solicitud</h3>
+                            <p>Se registra el encuentro.</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="paso">
+
+                        <div class="numero">02</div>
+
+                        <div>
+                            <h3>Confirmaci&oacute;n</h3>
+                            <p>Todos reciben la informaci&oacute;n.</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="paso">
+
+                        <div class="numero">03</div>
+
+                        <div>
+                            <h3>Reuni&oacute;n</h3>
+                            <p>Fecha, hora y lugar claros.</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="paso">
+
+                        <div class="numero">04</div>
+
+                        <div>
+                            <h3>Seguimiento</h3>
+                            <p>El proceso contin&uacute;a.</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =================================================
+         FOOTER
+         ================================================= -->
+
+    <footer>
+
+        <div class="footer-interior">
+
+            <span class="footer-brand-block">
+                <span class="footer-description">Sistema de gesti&oacute;n de citaciones escolares</span>
+            </span>
+
+            <span>
+                Organización y acompañamiento escolar
+            </span>
+
+            <span class="footer-legal-links">
+                <a href="{{ url_for('privacidad') }}">Privacidad</a>
+                <a href="{{ url_for('terminos') }}">Condiciones</a>
+            </span>
+
+        </div>
+
+    </footer>
+
+</div>
+
+{% if request.args.get('mobile') == '1' or session.get('mobile_mode') or 'Android' in request.user_agent.string or 'iPhone' in request.user_agent.string or 'iPad' in request.user_agent.string %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261013_public_mobile_nav_v55">
+{% endif %}
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+<style>
+/* =========================================================
+   EDUTURNOS - FOOTER FINAL
+   Sin espacio, sin transformaciones y sin franjas debajo
+   ========================================================= */
+
+html,
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.pagina {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.pagina > main {
+    margin: 0 !important;
+    padding-bottom: 0 !important;
+    flex: 0 0 auto !important;
+}
+/* El footer termina exactamente en su propio borde */
+.eduturnos-footer::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Sin pseudo-franjas alrededor del footer */
+.eduturnos-footer::before {
+    display: none !important;
+    content: none !important;
+}
+</style>
+
+<style>
+/* ============================================================
+   EDUTURNOS - POSICION FINAL DE LA PORTADA
+   ============================================================ */
+
+/* La página termina con el footer.
+   No se fuerza una altura mínima que cree espacio debajo. */
+.pagina {
+    min-height: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* El contenido conserva su tamaño natural */
+.pagina > main {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.pagina > footer {
+    margin-top: 60px !important;
+}
+
+/* El documento termina exactamente con el footer */
+html,
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+</style>
+
+<style id="eduturnos-footer-estructura-final">
+
+/* =========================================================
+   EDUTURNOS
+   ESTRUCTURA FINAL DE PAGINA + FOOTER
+   ========================================================= */
+
+html,
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* La página ocupa como mínimo la pantalla.
+   El footer queda en el extremo inferior.
+   No se crea contenido después del footer. */
+.pagina {
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* El main ocupa el espacio disponible.
+   Esto hace que el footer baje sin generar una franja debajo. */
+.pagina > main {
+    flex: 1 0 auto !important;
+
+    width: 100% !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+
+    margin: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* ÚNICA regla del footer */
+.pagina > footer {
+    flex: 0 0 auto !important;
+
+    width: 100% !important;
+    box-sizing: border-box !important;
+
+    position: relative !important;
+    transform: none !important;
+
+    margin-bottom: 0 !important;
+
+    /* Los 60px quedan ANTES del footer */
+    margin-top: 60px !important;
+
+    padding: 25px 28px !important;
+}
+
+/* El footer es el último elemento visual */
+.pagina > footer::before,
+.pagina > footer::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Nada debe crear espacio debajo del contenido */
+.pagina > footer .footer-interior {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+</style>
+
+<style id="eduturnos-hero-centrado-final">
+
+/* =========================================================
+   EDUTURNOS — HERO CENTRADO FINAL
+   ========================================================= */
+
+.hero {
+    min-height: 700px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    box-sizing: border-box !important;
+}
+
+.hero .hero-interior {
+    width: min(1180px, calc(100% - 56px)) !important;
+    max-width: 1180px !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.05fr) minmax(420px, .95fr) !important;
+    gap: 70px !important;
+
+    align-items: center !important;
+    align-self: center !important;
+
+    transform: none !important;
+}
+
+/* =========================================================
+   TABLET / MOVIL
+   ========================================================= */
+
+@media (max-width: 899px) {
+
+    .hero {
+        min-height: 0 !important;
+        padding-top: 70px !important;
+        padding-bottom: 70px !important;
+    }
+
+    .hero .hero-interior {
+        width: calc(100% - 36px) !important;
+        grid-template-columns: 1fr !important;
+        gap: 45px !important;
+    }
+}
+
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261013_public_mobile_nav_v55" media="(max-width: 900px)">
+<style id="eduturnos-footer-mobile-text">
+@media (max-width: 900px) {
+    html body .pagina > footer .footer-interior > .footer-brand-block,
+    html body .pagina > footer .footer-interior > span:nth-child(2) {
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+    }
+
+    html body .pagina > footer .footer-legal-links a {
+        font-size: 11px !important;
+    }
+}
+</style>

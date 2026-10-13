@@ -1,0 +1,483 @@
+﻿EDUTURNOS - DIAGNOSTICO VISUAL
+Fecha: 20260925_151946
+
+
+===== F:\edu_Final\templates\auth\cambiar_password.html =====
+LINEA 4: <div class="section-heading"><span class="badge">Seguridad</span><h1>Cambiar contraseña</h1><p>Usa una contraseña de mínimo 12 caracteres con mayúsculas, minúsculas y números.</p></div>
+
+===== F:\edu_Final\templates\auth\login.html =====
+LINEA 141: ILUSTRACIÓN
+LINEA 158: .login-illustration {
+LINEA 190: .login-illustration::before,
+LINEA 191: .login-illustration::after {
+LINEA 197: .illustration-svg {
+LINEA 213: animation:
+LINEA 227: animation:
+LINEA 235: @keyframes eduturnosFloat {
+LINEA 239: transform:
+LINEA 244: transform:
+LINEA 250: @keyframes eduturnosPulse {
+LINEA 254: transform:
+LINEA 259: transform:
+LINEA 269: .login-card {
+LINEA 293: .section-heading {
+LINEA 307: .section-heading::before,
+LINEA 308: .section-heading::after {
+LINEA 347: text-transform: uppercase;
+LINEA 351: .section-heading h1 {
+LINEA 370: .section-heading p {
+LINEA 397: .section-heading p::before,
+LINEA 398: .section-heading p::after {
+LINEA 546: .personal-fields-grid {
+LINEA 687: NO appearance:none.
+LINEA 784: transform:
+LINEA 795: transform:
+LINEA 916: .login-illustration {
+LINEA 953: .login-card {
+LINEA 963: .login-illustration {
+LINEA 973: .section-heading h1 {
+LINEA 980: .personal-fields-grid {
+LINEA 1055: DIBUJO ANIMADO
+LINEA 1060: <div class="login-illustration">
+LINEA 1063: class="illustration-svg ill-float"
+LINEA 1302: <section class="login-card">
+LINEA 1305: <div class="section-heading">
+LINEA 1400: <div class="personal-fields-grid">
+LINEA 1547: <script id="EDUTURNOS_LINEA_DIBUJO_FINAL">
+LINEA 1551: const card = document.querySelector(".login-card");
+LINEA 1634: document.querySelector(".personal-fields-grid");
+
+===== F:\edu_Final\templates\auth\registro.html =====
+LINEA 48: text-transform: uppercase !important;
+LINEA 89: transform: translateY(-3px) !important;
+LINEA 134: transform: translateY(-2px) !important;
+LINEA 196: <div class="section-heading registro-encabezado">
+LINEA 352: transform: translateY(-2px);
+LINEA 900: text-transform: uppercase !important;
+LINEA 941: transform: translateY(-3px) !important;
+LINEA 986: transform: translateY(-2px) !important;
+
+===== F:\edu_Final\templates\auth\restablecer.html =====
+LINEA 4: <div class="section-heading"><span class="badge">Seguridad de cuenta</span><h1>Nueva contraseña</h1><p>Crea una contraseña de mínimo 12 caracteres con mayúsculas, minúsculas y números.</p></div>
+
+===== F:\edu_Final\templates\auth\verificar_codigo.html =====
+LINEA 6: <div class="section-heading"><span class="badge">Seguridad de cuenta</span><h1>Verificar código</h1><p>Escribe el código de 6 dígitos que recibiste en tu correo.</p></div>
+
+===== F:\edu_Final\templates\calendario\index.html =====
+LINEA 32: text-transform:capitalize !important;
+LINEA 48: transform:translateY(-50%) !important;
+LINEA 57: .edc-month-toolbar .eduturnos-hoy { position:static !important; transform:none !important; margin-left:10px !important; }
+LINEA 80: .edc-page *::before,
+LINEA 81: .edc-page *::after {
+LINEA 397: appearance: auto !important;
+LINEA 398: -webkit-appearance: auto !important;
+LINEA 399: -moz-appearance: auto !important;
+LINEA 546: text-transform: capitalize;
+LINEA 2368: transform:translate(-50%,-50%) !important;
+LINEA 2427: transform:translateY(-50%) !important;
+
+===== F:\edu_Final\templates\configuracion\index.html =====
+LINEA 13: <div class="section-heading">
+LINEA 34: <div class="section-heading"><h2>Periodos académicos</h2><p>El periodo activo alimenta las nuevas citaciones y registros.</p></div>
+LINEA 66: <div class="section-heading"><h2>Sedes</h2><p>Cada sede puede desactivarse sin borrar las relaciones históricas.</p></div>
+LINEA 106: <div class="section-heading"><h2>Jornadas</h2><p>Horarios disponibles para estudiantes y personal.</p></div>
+LINEA 122: <div class="section-heading"><h2>Grados</h2><p>Niveles académicos activos o inactivos.</p></div>
+LINEA 139: <div class="section-heading"><h2>Grupos</h2><p>Cada grupo pertenece a un grado y mantiene sus relaciones históricas.</p></div>
+LINEA 180: <div class="section-heading"><h2>Motivos</h2><p>Motivos disponibles al crear una citación.</p></div>
+LINEA 196: <div class="section-heading"><h2>Estados de citación</h2><p>Los estados inactivos dejan de estar disponibles para cambios futuros.</p></div>
+
+===== F:\edu_Final\templates\publico\base_publica.html =====
+LINEA 105: text-transform: uppercase;
+LINEA 142: transform: translateY(-4px);
+
+===== F:\edu_Final\templates\base.html =====
+LINEA 22: #contenido *::before,
+LINEA 23: #contenido *::after {
+LINEA 53: #contenido .section-heading {
+LINEA 61: #contenido .section-heading .badge {
+LINEA 66: #contenido .section-heading h1 {
+LINEA 76: #contenido .section-heading p {
+LINEA 772: transform: translateY(-3px) !important;
+LINEA 1217: #contenido .page-head:has(a[href*="/citas/nueva"]) h1::before {
+LINEA 1290: transform: translateY(-1px) !important;
+LINEA 1429: ~ table tbody td[colspan]::before {
+LINEA 1535: #contenido .page-head:has(a[href*="/citas/nueva"]) h1::before {
+LINEA 1710: .barra .logo::after,
+LINEA 1711: .logo::after{
+LINEA 1783: transform:translateY(-1px) !important;
+LINEA 1881: #contenido .ed-welcome::after{
+LINEA 1924: text-transform:uppercase !important;
+LINEA 1959: transform:translateY(-3px) !important;
+LINEA 2045: #contenido .ed-action::before{
+LINEA 2058: transform:scaleY(0) !important;
+LINEA 2069: transform:translateY(-4px) !important;
+LINEA 2074: #contenido .ed-action:hover::before{
+LINEA 2075: transform:scaleY(1) !important;
+LINEA 2172: transform:translateY(-2px) !important;
+LINEA 2284: text-transform:uppercase !important;
+LINEA 2809: #contenido .ed-dashboard .ed-welcome::after {
+LINEA 2882: transform: translateY(-2px) !important;
+LINEA 2924: transform: translateY(-3px) !important;
+LINEA 2934: text-transform: uppercase !important;
+LINEA 3015: transform: translateY(-3px) !important;
+LINEA 3094: transform: translateY(-2px) !important;
+
+===== F:\edu_Final\templates\dashboard.html =====
+LINEA 560: transform: translateY(-2px);
+LINEA 861: transform: translateY(0) !important;
+LINEA 869: animation:
+LINEA 901: @keyframes entradaAcceso {
+LINEA 905: transform: translateY(14px) scale(0.98);
+LINEA 910: transform: translateY(0) scale(1);
+LINEA 918: .dashboard-action::before {
+LINEA 937: transform: rotate(18deg) translateX(-220%);
+LINEA 947: .dashboard-action:hover::before {
+LINEA 948: transform:
+LINEA 959: transform:
+LINEA 1034: transform:
+LINEA 1074: transform: translateX(2px);
+LINEA 1126: transform: translateX(5px);
+LINEA 1135: .dashboard-action::after {
+LINEA 1158: transform: scaleX(0.35);
+LINEA 1167: .dashboard-action:hover::after {
+LINEA 1169: transform: scaleX(1);
+LINEA 1204: animation: none !important;
+LINEA 1209: .dashboard-action::before,
+LINEA 1210: .dashboard-action::after {
+
+===== F:\edu_Final\templates\index.html =====
+LINEA 121: transform: translateY(-1px);
+LINEA 159: .etiqueta::before {
+LINEA 214: transform: translateY(-2px);
+
+===== F:\edu_Final\static\css\BACKUP_ESTILOS_GLOBAL_20260922_151559.css =====
+LINEA 7: .formulario{max-width:720px;margin:0 auto}.form-card{padding:30px}.section-heading{margin-bottom:22px}.section-heading h1{margin:10px 0 8px}.section-heading p{margin:0;color:var(--gris)}.form-grid{display:grid;grid-template-columns:repeat(2
+LINEA 14: .form-top-actions{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}.link-back{font-size:13px;font-weight:700}.form-actions{margin-top:4px}.ancho-medio{max-width:900px}.registro-grid{gr
+LINEA 472: .section-heading,
+LINEA 474: .formulario .section-heading,
+LINEA 475: .form-card .section-heading {
+LINEA 482: .section-heading h1,
+LINEA 484: .section-heading h2,
+LINEA 495: .section-heading p,
+LINEA 550: transform: translateY(-1px);
+LINEA 554: transform: translateY(0);
+LINEA 910: main.contenedor .section-heading,
+LINEA 917: main.contenedor .section-heading p,
+LINEA 942: main.contenedor .section-heading + form,
+LINEA 1209: appearance: auto !important;
+LINEA 1412: text-transform: capitalize !important;
+LINEA 2237: animation: edDashboardAppear .45s ease both;
+LINEA 2240: @keyframes edDashboardAppear {
+LINEA 2243: transform: translateY(10px);
+LINEA 2248: transform: translateY(0);
+LINEA 2311: appearance: none;
+LINEA 2337: transform: translateY(-1px);
+LINEA 2371: .ed-dashboard .ed-kpi::before {
+LINEA 2383: transform: translateY(-3px);
+LINEA 2490: transform: translateY(-3px);
+LINEA 2589: transform: translateY(-1px);
+LINEA 2719: animation: none !important;
+LINEA 2909: transform: translateY(-1px) !important;
+LINEA 3045: transform: translateY(-2px) !important;
+LINEA 3111: transform: translateY(-2px) !important;
+LINEA 3347: transform: none !important;
+LINEA 3429: .ed-welcome::before {
+LINEA 3452: .ed-welcome::after {
+LINEA 3519: text-transform: uppercase !important;
+LINEA 3568: transform: translateY(-2px) !important;
+LINEA 3612: .ed-kpi::before,
+LINEA 3613: .dashboard-stat::before {
+LINEA 3629: transform: translateY(-3px) !important;
+LINEA 3762: .ed-action::before,
+LINEA 3763: .ed-actions a::before,
+LINEA 3764: .dashboard-grid a::before {
+LINEA 3777: transform: scaleY(.35) !important;
+LINEA 3790: transform: translateY(-3px) !important;
+LINEA 3796: .ed-action:hover::before,
+LINEA 3797: .ed-actions a:hover::before,
+LINEA 3798: .dashboard-grid a:hover::before {
+LINEA 3799: transform: scaleY(1) !important;
+LINEA 3863: transform: translateY(-3px) !important;
+LINEA 3922: .ed-account::before {
+LINEA 4005: transform: translateY(-2px) !important;
+LINEA 4158: transform: none !important;
+LINEA 4257: .ed-dashboard::before {
+LINEA 4364: .ed-welcome::before {
+LINEA 4393: .ed-welcome::after {
+LINEA 4453: animation:
+LINEA 4468: animation:
+LINEA 4473: @keyframes edFutureTitle {
+LINEA 4477: transform: translateY(12px);
+LINEA 4482: transform: translateY(0);
+LINEA 4487: @keyframes edFutureText {
+LINEA 4491: transform: translateY(8px);
+LINEA 4496: transform: translateY(0);
+LINEA 4534: text-transform: uppercase !important;
+LINEA 4605: transform:
+LINEA 4670: .ed-kpi::before,
+LINEA 4671: .dashboard-stat::before {
+LINEA 4690: .ed-kpi::after,
+LINEA 4691: .dashboard-stat::after {
+LINEA 4713: transform:
+LINEA 4916: .ed-action::before,
+LINEA 4917: .ed-actions a::before,
+LINEA 4918: .dashboard-grid a::before {
+LINEA 4941: transform:
+LINEA 4951: .ed-action::after,
+LINEA 4952: .ed-actions a::after,
+LINEA 4953: .dashboard-grid a::after {
+LINEA 4987: transform:
+LINEA 4996: .ed-action:hover::before,
+LINEA 4997: .ed-actions a:hover::before,
+LINEA 4998: .dashboard-grid a:hover::before {
+LINEA 5000: transform:
+LINEA 5005: .ed-action:hover::after,
+LINEA 5006: .ed-actions a:hover::after,
+LINEA 5007: .dashboard-grid a:hover::after {
+LINEA 5009: transform:
+LINEA 5124: transform:
+LINEA 5212: .ed-account::before {
+LINEA 5345: transform:
+LINEA 5563: animation:
+LINEA 5569: transform:
+LINEA 5675: .ed-dashboard::before {
+LINEA 5773: .ed-welcome::before {
+LINEA 5808: .ed-welcome::after {
+LINEA 5836: transform:
+LINEA 5886: animation:
+LINEA 5905: animation:
+LINEA 5910: @keyframes edTitleIn {
+LINEA 5914: transform: translateY(10px);
+LINEA 5919: transform: translateY(0);
+LINEA 5924: @keyframes edTextIn {
+LINEA 5928: transform: translateY(7px);
+LINEA 5933: transform: translateY(0);
+LINEA 5980: text-transform:
+LINEA 6061: transform:
+LINEA 6137: .ed-kpi::before,
+LINEA 6138: .dashboard-stat::before {
+LINEA 6170: transform:
+LINEA 6391: .ed-action::before,
+LINEA 6392: .ed-actions a::before,
+LINEA 6393: .dashboard-grid a::before {
+LINEA 6422: transform:
+LINEA 6440: transform:
+LINEA 6449: .ed-action:hover::before,
+LINEA 6450: .ed-actions a:hover::before,
+LINEA 6451: .dashboard-grid a:hover::before {
+LINEA 6453: transform:
+LINEA 6565: transform:
+LINEA 6659: .ed-account::before {
+LINEA 6787: transform:
+LINEA 6965: animation:
+LINEA 6971: transform:
+LINEA 7074: .ed-kpi::before,
+LINEA 7075: .ed-kpi::after,
+LINEA 7077: .ed-card::before,
+LINEA 7078: .ed-card::after,
+LINEA 7080: .tarjeta::before,
+LINEA 7081: .tarjeta::after,
+LINEA 7083: .card::before,
+LINEA 7084: .card::after,
+LINEA 7086: .kpi-card::before,
+LINEA 7087: .kpi-card::after,
+LINEA 7089: .dashboard-card::before,
+LINEA 7090: .dashboard-card::after {
+LINEA 7145: .ed-welcome::before,
+LINEA 7146: .ed-welcome::after {
+LINEA 7239: transform: translateY(-2px) !important;
+LINEA 7251: transform: translateY(0) !important;
+LINEA 7315: transform: translateY(-4px) !important;
+LINEA 7440: transform: translateY(-3px) !important;
+LINEA 7851: .ed-account::before,
+LINEA 7852: .ed-account::after {
+LINEA 8011: @keyframes edFadeUp {
+LINEA 8017: transform: translateY(12px);
+LINEA 8025: transform: translateY(0);
+LINEA 8032: @keyframes edGlow {
+LINEA 8054: animation:
+LINEA 8062: animation:
+LINEA 8091: animation:
+LINEA 8099: animation:
+LINEA 8153: *::before,
+LINEA 8154: *::after {
+
+===== F:\edu_Final\static\css\estilos.css =====
+LINEA 7: .formulario{max-width:720px;margin:0 auto}.form-card{padding:30px}.section-heading{margin-bottom:22px}.section-heading h1{margin:10px 0 8px}.section-heading p{margin:0;color:var(--gris)}.form-grid{display:grid;grid-template-columns:repeat(2
+LINEA 14: .form-top-actions{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}.link-back{font-size:13px;font-weight:700}.form-actions{margin-top:4px}.ancho-medio{max-width:900px}.registro-grid{gr
+LINEA 472: .section-heading,
+LINEA 474: .formulario .section-heading,
+LINEA 475: .form-card .section-heading {
+LINEA 482: .section-heading h1,
+LINEA 484: .section-heading h2,
+LINEA 495: .section-heading p,
+LINEA 550: transform: translateY(-1px);
+LINEA 554: transform: translateY(0);
+LINEA 910: main.contenedor .section-heading,
+LINEA 917: main.contenedor .section-heading p,
+LINEA 942: main.contenedor .section-heading + form,
+LINEA 1209: appearance: auto !important;
+LINEA 1412: text-transform: capitalize !important;
+LINEA 1809: transform: translateY(-2px);
+LINEA 1820: transform: translateY(0) scale(.98);
+LINEA 1845: transform: none;
+LINEA 2137: .entrada-hero,.palabra-hero,.revelar,.boton,.boton::before,.hero-visual::after{animation:none!important;transition:none!important}
+LINEA 2142: .boton::before{content:"";position:absolute;inset:0;z-index:-1;transform:translateX(-120%) skewX(-20deg);background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transition:transform .6s ease}
+LINEA 2143: .boton:hover::before{transform:translateX(120%) skewX(-20deg)}
+LINEA 2144: .boton:hover{transform:translateY(-3px);box-shadow:0 14px 26px -12px rgba(15,63,143,.45)}
+LINEA 2145: .boton:active{transform:translateY(-1px) scale(.97);transition-duration:.12s}
+LINEA 2148: .entrada-hero{opacity:0;transform:translateY(16px);animation:eduHeroEntrar .6s ease forwards}
+LINEA 2149: .palabra-hero{display:inline-block;opacity:0;transform:translateY(14px);animation:eduHeroEntrar .6s ease forwards}
+LINEA 2150: @keyframes eduHeroEntrar{to{opacity:1;transform:translateY(0)}}
+LINEA 2154: .hero-visual::after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(22,93,202,.12),transparent 70%);top:-90px;right:-60px;animation:eduFlotar 9s ease-in-out infinite}
+LINEA 2155: @keyframes eduFlotar{0%,100%{transform:translateY(0)}50%{transform:translateY(18px)}}
+LINEA 2158: .revelar{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease,box-shadow .3s ease,border-color .3s ease}
+LINEA 2159: .revelar.visible{opacity:1;transform:translateY(0)}
+LINEA 2163: .revelar:hover{transform:translateY(-6px);box-shadow:0 16px 28px -16px rgba(15,37,63,.28);border-color:#6EA8FF}
+LINEA 2259: .hero.hero-animado::before {
+LINEA 2280: animation:
+LINEA 2287: @keyframes edu-luz-flotante {
+LINEA 2291: transform: translate3d(0,0,0);
+LINEA 2295: transform: translate3d(-18px,14px,0);
+LINEA 2336: .hero-titulo span::after {
+LINEA 2375: .hero-visual::after {
+LINEA 2405: transform:
+LINEA 2427: .feature-grid .feature-card::before {
+LINEA 2456: transform:
+LINEA 2464: transform:
+LINEA 2520: transform:
+LINEA 2554: transform:
+LINEA 2602: @keyframes edu-aparecer-suave {
+LINEA 2606: transform:
+LINEA 2612: transform:
+LINEA 2618: animation:
+LINEA 2631: .hero.hero-animado::before,
+LINEA 2637: animation: none !important;
+LINEA 2657: .hero.hero-animado::before {
+LINEA 2755: transform: translateY(-2px);
+LINEA 2779: transform: translateY(-2px);
+LINEA 2786: transform: translateY(0) scale(.98);
+LINEA 2921: transform: translateY(-1px);
+LINEA 2967: *::before,
+LINEA 2968: *::after {
+LINEA 3128: .login-page::before { content:none !important; display:none !important; }
+LINEA 3130: .login-page::after { content:none !important; display:none !important; }
+LINEA 3153: .login-page .section-heading {
+LINEA 3159: .login-page .section-heading::after {
+LINEA 3172: .login-page .section-heading .badge {
+LINEA 3177: text-transform: uppercase;
+LINEA 3180: .login-page .section-heading h1 {
+LINEA 3195: .login-page .section-heading p {
+LINEA 3311: transform: translateY(-2px);
+LINEA 3349: .login-page .section-heading h1 {
+LINEA 3526: transform: translateY(-2px);
+LINEA 3556: transform: translateY(-2px);
+LINEA 3700: .page-title::after,
+LINEA 3701: .section-title::after {
+LINEA 3743: transform: translateX(2px);
+LINEA 3859: .ed-v6-hero::before {
+LINEA 3893: text-transform: uppercase;
+LINEA 3968: transform: translateY(-5px) !important;
+LINEA 4014: *::before,
+LINEA 4015: *::after {
+LINEA 4081: #contenido.login-page::before,
+LINEA 4082: #contenido.login-page::after,
+LINEA 4083: .login-page::before,
+LINEA 4084: .login-page::after {
+LINEA 4112: #contenido.login-page .section-heading {
+LINEA 4117: #contenido.login-page .section-heading::after {
+LINEA 4130: #contenido.login-page .section-heading .badge {
+LINEA 4142: #contenido.login-page .section-heading h1 {
+LINEA 4157: #contenido.login-page .section-heading p {
+LINEA 4267: transform: translateY(-2px) !important;
+LINEA 4380: body:has(#contenido.login-page) #contenido.login-page::before,
+LINEA 4381: body:has(#contenido.login-page) #contenido.login-page::after {
+LINEA 4407: body:has(.login-card) .login-card {
+LINEA 4416: body:has(.login-card) label:has(input[name="identificador"]),
+LINEA 4417: body:has(.login-card) label:has(input[name="password"]),
+LINEA 4418: body:has(.login-card) label:has(input[name="identificador"]) *,
+LINEA 4419: body:has(.login-card) label:has(input[name="password"]) * {
+LINEA 4423: body:has(.login-card) input[name="identificador"],
+LINEA 4424: body:has(.login-card) input[name="password"] {
+LINEA 4433: body:has(.login-card) .personal-fields-grid .personal-field-title {
+LINEA 4443: body:has(.login-card) .personal-fields-grid {
+LINEA 4456: body:has(.login-card)
+LINEA 4457: .personal-fields-grid input[name="codigo_institucional"] {
+LINEA 4469: body:has(.login-card)
+LINEA 4470: .personal-fields-grid select[name="sede_id"] {
+LINEA 4482: body:has(.login-card)
+LINEA 4483: .personal-fields-grid select[name="jornada_id"] {
+LINEA 4501: body:has(.login-card) .section-heading p,
+LINEA 4502: body:has(.login-card) .section-heading p *,
+LINEA 4503: body:has(.login-card) .section-heading strong,
+LINEA 4504: body:has(.login-card) .section-heading span {
+LINEA 4513: body:has(.login-card) .section-heading::before,
+LINEA 4514: body:has(.login-card) .section-heading::after {
+LINEA 4525: body:has(.login-card) .personal-login::before,
+LINEA 4526: body:has(.login-card) .personal-login::after {
+LINEA 4536: body:has(.login-card) .form-links,
+LINEA 4537: body:has(.login-card) .form-links::before,
+LINEA 4538: body:has(.login-card) .form-links::after {
+LINEA 4544: body:has(.login-card) .form-links a {
+LINEA 4550: LINEA BLANCA DEL DIBUJO
+LINEA 4554: .eduturnos-linea-blanca-dibujo-final {
+LINEA 4565: body:has(.login-card) .personal-fields-grid {
+LINEA 4571: body:has(.login-card)
+LINEA 4572: .personal-fields-grid input[name="codigo_institucional"],
+LINEA 4574: body:has(.login-card)
+LINEA 4575: .personal-fields-grid select[name="sede_id"],
+LINEA 4577: body:has(.login-card)
+LINEA 4578: .personal-fields-grid select[name="jornada_id"] {
+LINEA 4594: body:has(.login-card)
+LINEA 4596: body:has(.login-card)
+LINEA 4598: body:has(.login-card)
+LINEA 4600: body:has(.login-card)
+LINEA 4605: body:has(.login-card)
+LINEA 4607: body:has(.login-card)
+LINEA 4614: body:has(.login-card)
+LINEA 4615: .personal-fields-grid
+LINEA 4623: body:has(.login-card)
+LINEA 4624: .personal-fields-grid {
+LINEA 4636: body:has(.login-card)
+LINEA 4637: .section-heading p,
+LINEA 4638: body:has(.login-card)
+LINEA 4639: .section-heading p *,
+LINEA 4640: body:has(.login-card)
+LINEA 4641: .section-heading strong,
+LINEA 4642: body:has(.login-card)
+LINEA 4643: .section-heading span {
+LINEA 4652: body:has(.login-card)
+LINEA 4653: .section-heading::before,
+LINEA 4654: body:has(.login-card)
+LINEA 4655: .section-heading::after {
+LINEA 4663: body:has(.login-card)
+LINEA 4664: .personal-login::before,
+LINEA 4665: body:has(.login-card)
+LINEA 4666: .personal-login::after {
+LINEA 4673: body:has(.login-card)
+LINEA 4675: body:has(.login-card)
+LINEA 4676: .form-links::before,
+LINEA 4677: body:has(.login-card)
+LINEA 4678: .form-links::after {
+LINEA 4684: body:has(.login-card)
+LINEA 4689: /* Solo la línea blanca fina detectada en el dibujo */
+
+===== F:\edu_Final\static\css\listas_eduturnos.css =====
+LINEA 72: transform: translateY(-50%);
+LINEA 83: transform:
+
+===== F:\edu_Final\static\css\style.css =====
+LINEA 5: .hero{background:linear-gradient(135deg,#eaf3ff,#fff);border:1px solid var(--borde);border-radius:22px;padding:45px;display:flex;gap:25px;align-items:center}.hero-logo{width:80px;height:80px;font-size:35px;border-radius:22px}.hero h1{font-s
+LINEA 64: transform: translateY(-50%);
+LINEA 71: transform: translateY(-50%) rotate(180deg);
+
+===== F:\edu_Final\static\vendor\fullcalendar\themes\classic\theme.css =====
+LINEA 8: appearance: button;
+
+===== F:\edu_Final\static\vendor\fullcalendar\fullcalendar.global.js =====
+LINEA 3102: eventDataTransform: identity,
+LINEA 5507: eventDataTransform: identity,
+LINEA 5533: eventDataTransform: refined.eventDataTransform,
+
+===== F:\edu_Final\static\vendor\fullcalendar\skeleton.css =====
+LINEA 62: .fc-OY .fc-TV::after {

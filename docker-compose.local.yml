@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: eduturnos
+      MYSQL_USER: eduturnos
+      MYSQL_PASSWORD: eduturnos_local
+      MYSQL_ROOT_PASSWORD: eduturnos_root_local
+    volumes:
+      - eduturnos_local_mysql:/var/lib/mysql
+      - ./database/eduturnos.sql:/docker-entrypoint-initdb.d/01-eduturnos.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: development
+      DEV_MODE: "1"
+      SECRET_KEY: eduturnos-local-dev-only
+      SESSION_COOKIE_SECURE: "0"
+      MYSQL_HOST: db
+      MYSQL_PORT: "3306"
+      MYSQL_USER: eduturnos
+      MYSQL_PASSWORD: eduturnos_local
+      MYSQL_DATABASE: eduturnos
+      MAIL_MODE: disabled
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.8-flash}
+    ports:
+      - "${EDUTURNOS_BIND_IP:-127.0.0.1}:5000:5000"
+volumes:
+  eduturnos_local_mysql:

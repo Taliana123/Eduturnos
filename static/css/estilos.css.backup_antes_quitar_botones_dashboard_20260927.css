@@ -1,0 +1,3182 @@
+
+:root{--azul:#165dca;--azul2:#0f3f8f;--fondo:#f4f7fb;--texto:#17365D;--gris:#5F7895;--borde:#dce3ed;--blanco:#fff;--verde:#1f9d62;--rojo:#d64545;--sombra:0 10px 30px rgba(17,37,63,.08);--radio:16px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--fondo);color:var(--texto);line-height:1.5}a{color:var(--azul);text-decoration:none}button,input,select,textarea{font:inherit}
+.barra{background:var(--blanco);border-bottom:1px solid var(--borde);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;gap:18px;position:sticky;top:0;z-index:20;box-shadow:0 1px 0 rgba(17,37,63,.03)}.logo{font-size:22px;font-weight:800;color:var(--azul2)!important;white-space:nowrap}.barra nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}.barra nav a,.logout-form button{font-weight:600;color:var(--texto);background:transparent;border:0;cursor:pointer;padding:9px 10px;border-radius:8px}.barra nav a:hover,.logout-form button:hover{color:var(--azul);background:#f5f8fd}
+.contenedor{width:min(1180px,92%);margin:32px auto}.tarjeta,.panel{background:var(--blanco);border:1px solid var(--borde);border-radius:var(--radio);padding:26px;box-shadow:var(--sombra);margin-bottom:18px}.grid,.kpi-grid{display:grid;gap:18px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.kpi{min-height:128px;padding:22px;border:1px solid var(--borde);border-radius:var(--radio);background:#fff;display:flex;flex-direction:column;justify-content:center}.kpi span{color:var(--gris);font-size:13px}.kpi strong{font-size:30px;margin-top:4px}
+.page-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:18px}.acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.boton{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border:0;border-radius:10px;background:var(--azul);color:#fff;padding:11px 18px;font-weight:700;cursor:pointer}.boton:hover{background:var(--azul2)}.boton.secundario{background:#5F7895}.boton.pequeno{min-height:36px;padding:7px 11px;font-size:12px}.boton-full{width:100%}
+.formulario{max-width:720px;margin:0 auto}.form-card{padding:30px}.section-heading{margin-bottom:22px}.section-heading h1{margin:10px 0 8px}.section-heading p{margin:0;color:var(--gris)}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.stack-form{display:flex;flex-direction:column;gap:18px}.stack-form label,.form-grid label{display:flex;flex-direction:column;gap:7px;font-weight:700;font-size:13px}input,select,textarea{width:100%;min-height:46px;padding:11px 13px;border:1px solid var(--borde);border-radius:10px;background:#fff;color:var(--texto);outline:none}input:focus,select:focus,textarea:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(22,93,202,.10)}textarea{min-height:110px;resize:vertical}small,.muted{color:var(--gris)}.full-field{grid-column:1/-1}.personal-login{padding:18px;border:1px solid var(--borde);background:#EAF3FF;border-radius:12px}.personal-login h3{margin:0 0 6px}.personal-login p{margin:0 0 16px;color:var(--gris);font-size:13px}.info-box{padding:14px 16px;margin-bottom:20px;border:1px solid #DCEBFA;background:#EAF3FF;border-radius:10px;color:#17365D}.form-links{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:18px}.form-links.single{justify-content:flex-start}.badge{display:inline-flex;padding:5px 10px;border-radius:999px;background:#EAF3FF;color:#123B68;font-weight:700;font-size:12px}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch}.hero-card{min-height:300px;height:100%;padding:28px}.hero-visual{padding:28px;border-radius:var(--radio);background:linear-gradient(135deg,#EAF3FF,#f7fbff);border:1px solid var(--borde);display:flex;flex-direction:column;justify-content:center}.hero-visual h2{font-size:32px;margin:10px 0 8px;color:var(--azul2)}.hero-visual p{margin:10px 0 0}.table-wrap{overflow:auto;background:#fff;border:1px solid var(--borde);border-radius:14px}table{width:100%;border-collapse:collapse;min-width:850px}th,td{padding:12px;border-bottom:1px solid #edf0f5;text-align:left;font-size:13px}th{background:#EAF3FF}.no-leida{border-left:5px solid var(--azul)}.alerta{padding:13px 15px;border-radius:10px;margin-bottom:15px;background:#fff;border:1px solid var(--borde)}.alerta.error{border-left:4px solid var(--rojo)}.alerta.success{border-left:4px solid var(--verde)}.inline-form{display:inline-flex;gap:5px;margin:0}.skip-link{position:absolute;left:-9999px}.skip-link:focus{left:10px;top:10px;background:#fff;padding:8px;z-index:99}
+@media(max-width:900px){.hero,.grid{grid-template-columns:1fr 1fr}.kpi-grid{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.full-field{grid-column:auto}.barra{align-items:flex-start}.barra nav{justify-content:flex-start}}@media(max-width:640px){.contenedor{width:94%;margin:24px auto}.barra{padding:12px 3%;flex-direction:column;align-items:stretch}.barra nav{width:100%}.hero,.grid,.kpi-grid{grid-template-columns:1fr}.tarjeta,.panel,.form-card{padding:20px}.form-links{flex-direction:column}}
+
+.dashboard-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}.dashboard-card{height:100%}.action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.quick-card{min-height:112px;border:1px solid var(--borde);border-radius:12px;padding:18px;background:#EAF3FF;display:flex;flex-direction:column;justify-content:center;gap:6px;color:var(--texto)}.quick-card:hover{border-color:#6EA8FF;background:#EAF3FF}.quick-card strong{font-size:16px;color:var(--azul2)}.quick-card span{font-size:13px;color:var(--gris)}@media(max-width:850px){.dashboard-grid{grid-template-columns:1fr}.action-grid{grid-template-columns:1fr}}
+
+/* Normalización visual global */
+.form-top-actions{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}.link-back{font-size:13px;font-weight:700}.form-actions{margin-top:4px}.ancho-medio{max-width:900px}.registro-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.option-card{display:flex;flex-direction:column;min-height:210px;margin-bottom:0}.option-card .boton{margin-top:auto}.feature-card{min-height:150px;height:100%}.equal-cards>.tarjeta{margin-bottom:0}.form-grid{align-items:stretch}.form-grid>label{min-height:92px;height:100%;justify-content:flex-start}.form-grid>label:has(textarea){min-height:160px}.stack-form{gap:20px}.stack-form label{min-height:78px}.stack-form input,.stack-form select,.stack-form textarea{margin-top:7px}.boton-full{min-height:46px}.page-head{align-items:flex-end}
+.kpi-grid{align-items:stretch}.kpi{height:140px;min-height:140px}.quick-card{height:120px;min-height:120px}.dashboard-card{height:100%}.barra nav{gap:4px}.barra nav a,.logout-form button{min-height:40px;display:inline-flex;align-items:center;justify-content:center}.alerta{margin-bottom:18px}.form-card{padding:32px}.section-heading{margin-bottom:24px}.section-heading h1{line-height:1.2}.info-box{margin-bottom:22px}.form-links{margin-top:20px}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.registro-grid{grid-template-columns:1fr}.hero-card{min-height:260px}}
+
+/* ============================================================
+   NAVEGACIÓN DEL DASHBOARD - EDUTURNOS
+============================================================ */
+
+
+.dashboard-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.boton-secondary {
+    background: #ffffff;
+    color: #17365d;
+    border: 1px solid #cbd5e1;
+}
+
+.boton-secondary:hover {
+    background: #EAF3FF;
+}
+
+.boton-danger {
+    background: #b91c1c;
+    color: #ffffff;
+    border: 1px solid #b91c1c;
+}
+
+.boton-danger:hover {
+    background: #991b1b;
+}
+
+.card-heading {
+    margin-bottom: 20px;
+}
+
+.card-heading h2 {
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+.quick-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.quick-card small {
+    margin-top: 6px;
+    font-weight: 600;
+}
+
+.quick-icon {
+    font-size: 28px;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.account-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+
+
+EL CALENDARIO
+   Este bloque solo afecta al calendario.
+   ========================================================== */
+
+/* CONTENEDOR GENERAL */
+.edc-page {
+    width: 100% !important;
+    max-width: 1120px !important;
+    margin: 0 auto !important;
+    padding: 8px 10px 18px !important;
+    font-family: inherit !important;
+    font-size: 14px !important;
+    color: inherit !important;
+}
+
+
+/* ==========================================================
+   FILTROS
+   ========================================================== */
+
+.edc-filters {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 0 8px !important;
+    padding: 8px !important;
+
+    border-radius: 9px !important;
+    border: 1px solid rgba(80,100,120,.12) !important;
+
+    background: rgba(255,255,255,.80) !important;
+
+    box-shadow: none !important;
+}
+
+
+/* TÍTULO FILTROS */
+
+.edc-filter-summary {
+    display: flex !important;
+    align-items: center !important;
+
+    width: 100% !important;
+    min-height: 30px !important;
+
+    margin: 0 !important;
+    padding: 5px 8px !important;
+
+    font-family: inherit !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+
+    color: inherit !important;
+
+    border-radius: 7px !important;
+
+    background: rgba(80,100,120,.045) !important;
+}
+
+
+/* TEXTO SECUNDARIO */
+
+.edc-filter-subtitle {
+    margin-left: 6px !important;
+
+    font-family: inherit !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    font-weight: 400 !important;
+
+    color: inherit !important;
+    opacity: .62 !important;
+}
+
+
+/* ==========================================================
+   FORMULARIO
+   ========================================================== */
+
+.edc-filter-form {
+    display: grid !important;
+
+    grid-template-columns:
+        minmax(160px,1.30fr)
+        minmax(125px,1fr)
+        minmax(125px,1fr)
+        minmax(135px,1.10fr)
+        minmax(120px,.95fr)
+        minmax(115px,.90fr)
+        auto !important;
+
+    align-items: end !important;
+
+    gap: 7px !important;
+
+    width: 100% !important;
+
+    margin: 8px 0 0 !important;
+    padding: 0 !important;
+
+    font-family: inherit !important;
+}
+
+
+/* QUITA ESTILOS DEL FORMULARIO GENERAL */
+
+.edc-filter-form {
+    flex-direction: initial !important;
+}
+
+
+/* ==========================================================
+   CAMPOS
+   ========================================================== */
+
+.edc-field {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+
+/* ETIQUETAS */
+
+.edc-field label {
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 0 4px !important;
+    padding: 0 !important;
+
+    font-family: inherit !important;
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+    font-weight: 600 !important;
+
+    color: inherit !important;
+}
+
+
+/* ==========================================================
+   INPUTS
+   ========================================================== */
+
+.edc-field input {
+    display: block !important;
+
+    width: 100% !important;
+    height: 33px !important;
+    min-height: 33px !important;
+
+    margin: 0 !important;
+    padding: 6px 9px !important;
+
+    border: 1px solid rgba(80,100,120,.22) !important;
+    border-radius: 6px !important;
+
+    background: #fff !important;
+
+    color: inherit !important;
+
+    font-family: inherit !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    font-weight: 400 !important;
+
+    box-shadow: none !important;
+}
+
+
+/* ==========================================================
+   SELECTS
+   ========================================================== */
+
+.edc-field select {
+    display: block !important;
+
+    width: 100% !important;
+    height: 33px !important;
+    min-height: 33px !important;
+
+    margin: 0 !important;
+    padding: 6px 9px !important;
+
+    border: 1px solid rgba(80,100,120,.22) !important;
+    border-radius: 6px !important;
+
+    background-color: #fff !important;
+
+    color: inherit !important;
+
+    font-family: inherit !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    font-weight: 400 !important;
+
+    box-shadow: none !important;
+
+    cursor: pointer !important;
+
+    appearance: auto !important;
+}
+
+
+/* OPCIONES DEL SELECT */
+
+.edc-field select option {
+    padding: 5px 8px !important;
+
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+
+    background: #fff !important;
+}
+
+
+/* ==========================================================
+   BOTONES
+   ========================================================== */
+
+.edc-buttons {
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 5px !important;
+
+    height: 33px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.edc-buttons button,
+.edc-buttons a {
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: auto !important;
+    height: 33px !important;
+    min-height: 33px !important;
+
+    margin: 0 !important;
+    padding: 6px 10px !important;
+
+    border-radius: 6px !important;
+
+    font-family: inherit !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+    font-weight: 600 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* ==========================================================
+   CALENDARIO
+   ========================================================== */
+
+.edc-calendar-card {
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 5px !important;
+
+    border-radius: 9px !important;
+
+    overflow: hidden !important;
+
+    background: rgba(255,255,255,.84) !important;
+
+    border: 1px solid rgba(80,100,120,.12) !important;
+
+    box-shadow: none !important;
+}
+
+
+/* TABLA */
+
+.edc-month {
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    table-layout: fixed !important;
+
+    border-collapse: separate !important;
+    border-spacing: 3px !important;
+
+    font-family: inherit !important;
+    font-size: 11px !important;
+}
+
+
+/* ENCABEZADOS */
+
+.edc-month th {
+    height: 27px !important;
+
+    margin: 0 !important;
+    padding: 4px 3px !important;
+
+    border: 0 !important;
+
+    font-family: inherit !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+
+    text-align: center !important;
+
+    color: inherit !important;
+
+    opacity: .74 !important;
+}
+
+
+/* CELDAS */
+
+.edc-month td {
+    height: 74px !important;
+
+    margin: 0 !important;
+    padding: 4px !important;
+
+    vertical-align: top !important;
+
+    border-radius: 6px !important;
+
+    overflow: hidden !important;
+
+    border: 1px solid rgba(80,100,120,.10) !important;
+
+    background: rgba(255,255,255,.90) !important;
+}
+
+
+/* ==========================================================
+   TÍTULO DEL MES
+   ========================================================== */
+
+.edc-month-toolbar {
+    display: grid !important;
+
+    grid-template-columns: 1fr auto 1fr !important;
+
+    align-items: center !important;
+
+    width: 100% !important;
+
+    min-height: 34px !important;
+
+    margin: 0 0 6px !important;
+
+    padding: 0 !important;
+
+    gap: 8px !important;
+}
+
+.edc-month-left {
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: flex-end !important;
+}
+
+.edc-month-center {
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+}
+
+.edc-month-right {
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: flex-start !important;
+
+    gap: 6px !important;
+}
+
+.edc-month-title {
+    margin: 0 !important;
+    padding: 0 7px !important;
+
+    font-family: inherit !important;
+
+    font-size: 17px !important;
+    line-height: 1 !important;
+
+    font-weight: 700 !important;
+
+    color: inherit !important;
+
+    text-transform: capitalize !important;
+}
+
+.edc-month-toolbar a {
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: auto !important;
+    min-width: 30px !important;
+    height: 29px !important;
+    min-height: 29px !important;
+
+    margin: 0 !important;
+    padding: 5px 9px !important;
+
+    border-radius: 6px !important;
+
+    font-family: inherit !important;
+    font-size: 15px !important;
+    line-height: 1 !important;
+    font-weight: 600 !important;
+}
+
+.edc-hoy {
+    min-width: 48px !important;
+    font-size: 11px !important;
+}
+
+
+/* ==========================================================
+   DÍAS
+   ========================================================== */
+
+.edc-day-number {
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 21px !important;
+    height: 21px !important;
+
+    margin: 0 0 3px !important;
+    padding: 0 !important;
+
+    border-radius: 50% !important;
+
+    font-family: inherit !important;
+    font-size: 11px !important;
+    line-height: 1 !important;
+
+    font-weight: 700 !important;
+}
+
+
+/* ==========================================================
+   CITAS
+   ========================================================== */
+
+.edc-citas-dia {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    gap: 3px !important;
+
+    max-height: 47px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+}
+
+.edc-cita {
+    display: block !important;
+
+    margin: 0 !important;
+    padding: 3px 4px !important;
+
+    border-radius: 4px !important;
+
+    font-family: inherit !important;
+    font-size: 9px !important;
+    line-height: 1.18 !important;
+    font-weight: 400 !important;
+
+    overflow: hidden !important;
+
+    border: 1px solid rgba(80,100,120,.10) !important;
+
+    background: rgba(80,100,120,.055) !important;
+}
+
+.edc-cita summary {
+    font-family: inherit !important;
+    font-size: 9px !important;
+    line-height: 1.18 !important;
+    font-weight: 700 !important;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 1000px) {
+
+    .edc-filter-form {
+        grid-template-columns: repeat(3, minmax(120px, 1fr)) !important;
+    }
+
+    .edc-buttons {
+        grid-column: span 3 !important;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .edc-filter-form {
+        grid-template-columns: repeat(2, minmax(120px, 1fr)) !important;
+    }
+
+    .edc-buttons {
+        grid-column: span 2 !important;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .edc-filter-form {
+        grid-template-columns: 1fr !important;
+    }
+
+    .edc-buttons {
+        grid-column: span 1 !important;
+    }
+
+    .edc-
+}
+
+/* ==========================================================
+   EDUTURNOS · FILTROS COMO INICIO DE SESIÓN
+   ========================================================== */
+
+.edc-filter-form select {
+    width: 100% !important;
+    height: 33px !important;
+    min-height: 33px !important;
+
+    padding: 6px 9px !important;
+
+    border: 1px solid rgba(80,100,120,.22) !important;
+    border-radius: 6px !important;
+
+    background-color: #fff !important;
+    color: inherit !important;
+
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+
+    cursor: pointer !important;
+}
+
+.edc-filter-form select option {
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    padding: 5px 8px !important;
+}
+
+.edc-filter-form label {
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: inherit !important;
+}
+
+.edc-filter-form input {
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+}
+
+/* ==========================================================
+   EDUTURNOS · BOTONES INSTITUCIONALES UNIFICADOS
+   ========================================================== */
+
+/* Botones normales */
+
+button,
+.boton,
+a.boton {
+    background: #2F78FF !important;
+    color: #ffffff !important;
+
+    border: 1px solid #2F78FF !important;
+
+    border-radius: 7px !important;
+
+    text-decoration: none !important;
+
+    cursor: pointer;
+
+    transition:
+        background-color .15s ease,
+        border-color .15s ease,
+        opacity .15s ease;
+}
+
+
+/* Hover */
+
+button:hover,
+.boton:hover,
+a.boton:hover {
+    background: #123B68 !important;
+    border-color: #123B68 !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+
+/* Botón ← Atrás de Citas y Calendario */
+
+.page-navigation .link-back,
+.link-back {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-height: 34px;
+
+    padding: 7px 12px !important;
+
+    background: #2F78FF !important;
+    color: #ffffff !important;
+
+    border: 1px solid #2F78FF !important;
+    border-radius: 7px !important;
+
+    font-size: 13px !important;
+    font-weight: 600 !important;
+
+    line-height: 1 !important;
+
+    text-decoration: none !important;
+
+    cursor: pointer;
+}
+
+
+.page-navigation .link-back:hover,
+.link-back:hover {
+    background: #123B68 !important;
+    border-color: #123B68 !important;
+    color: #ffffff !important;
+
+    opacity: 1 !important;
+}
+
+
+/* Botones dentro del dashboard */
+
+.dashboard-card .boton,
+.dashboard-card button,
+.account-actions .boton,
+.quick-card .boton {
+    background: #2F78FF !important;
+    color: #ffffff !important;
+    border-color: #2F78FF !important;
+}
+
+
+/* Hover del dashboard */
+
+.dashboard-card .boton:hover,
+.dashboard-card button:hover,
+.account-actions .boton:hover,
+.quick-card .boton:hover {
+    background: #123B68 !important;
+    border-color: #123B68 !important;
+    color: #ffffff !important;
+}
+
+
+/* Botones de cabecera */
+
+.edc-header-actions .boton {
+    background: #2F78FF !important;
+    color: #ffffff !important;
+    border-color: #2F78FF !important;
+}
+
+.edc-header-actions .boton:hover {
+    background: #123B68 !important;
+    border-color: #123B68 !important;
+}
+
+
+/* Botones del calendario */
+
+.edc-buttons button,
+.edc-buttons a,
+.edc-month-toolbar a {
+    background: #2F78FF !important;
+    color: #ffffff !important;
+    border-color: #2F78FF !important;
+}
+
+.edc-buttons button:hover,
+.edc-buttons a:hover,
+.edc-month-toolbar a:hover {
+    background: #123B68 !important;
+    border-color: #123B68 !important;
+    color: #ffffff !important;
+}
+
+/* =========================================================
+   EDUTURNOS - BOTONES VISUALES ACTUALIZADOS
+   ========================================================= */
+
+/* Botones generales */
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+.boton,
+a.boton,
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-danger,
+.btn-warning,
+.action-button,
+.accion,
+.boton-accion {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 9px 16px;
+    margin: 0;
+    box-sizing: border-box;
+
+    background: var(--edu-blue);
+    color: #ffffff;
+
+    border: 1px solid var(--edu-blue);
+    border-radius: 10px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    box-shadow: 0 6px 16px rgba(18,57,95,.10);
+
+    transition:
+        transform .25s cubic-bezier(.34,1.56,.64,1),
+        background-color .2s ease,
+        border-color .2s ease,
+        box-shadow .25s ease,
+        color .2s ease;
+}
+
+/* Hover general */
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+.boton:hover,
+a.boton:hover,
+.btn:hover,
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-success:hover,
+.btn-danger:hover,
+.btn-warning:hover,
+.action-button:hover,
+.accion:hover,
+.boton-accion:hover {
+    background: var(--edu-navy);
+    color: #ffffff;
+    border-color: var(--edu-navy);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(18,57,95,.16);
+}
+
+/* Activación */
+button:active,
+input[type="submit"]:active,
+input[type="button"]:active,
+input[type="reset"]:active,
+.boton:active,
+a.boton:active {
+    transform: translateY(0) scale(.98);
+}
+
+/* Texto interno de botones */
+button *,
+.boton *,
+a.boton *,
+.btn *,
+.action-button *,
+.accion *,
+.boton-accion * {
+    color: inherit;
+}
+
+/* Estados deshabilitados */
+button:disabled,
+input[type="submit"]:disabled,
+input[type="button"]:disabled,
+.boton.disabled,
+.boton[aria-disabled="true"] {
+    background: #6EA8FF;
+    color: #ffffff;
+    border-color: #6EA8FF;
+    opacity: .6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ---------------------------------------------------------
+   CALENDARIO
+   Se conserva la apariencia de sus controles.
+   NO modifica la cuadrícula ni FullCalendar.
+   --------------------------------------------------------- */
+
+.edc-header-actions .boton,
+.edc-header-actions a,
+.edc-buttons button,
+.edc-buttons a,
+.edc-month-toolbar a {
+    background: var(--edu-blue);
+    color: #ffffff;
+    border-color: var(--edu-blue);
+}
+
+.edc-header-actions .boton:hover,
+.edc-header-actions a:hover,
+.edc-buttons button:hover,
+.edc-buttons a:hover,
+.edc-month-toolbar a:hover {
+    background: var(--edu-navy);
+    color: #ffffff;
+    border-color: var(--edu-navy);
+}
+
+.edc-back,
+.link-back,
+.page-navigation .link-back {
+    background: var(--edu-blue);
+    color: #ffffff;
+    border-color: var(--edu-blue);
+}
+
+.edc-back:hover,
+.link-back:hover,
+.page-navigation .link-back:hover {
+    background: var(--edu-navy);
+    color: #ffffff;
+    border-color: var(--edu-navy);
+}
+
+/* =========================================================
+   FIN - BOTONES VISUALES ACTUALIZADOS
+   ========================================================= */
+/* La estructura REAL utiliza action-grid */
+.action-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    width:100%;
+}
+
+.action-grid .quick-card{
+    min-height:186px;
+    box-sizing:border-box;
+    padding:18px;
+    background:#fff;
+    color:#1f2933;
+    border:1px solid #dce4ec;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+    text-decoration:none;
+    display:flex;
+    flex-direction:column;
+}
+
+.action-grid .quick-card:hover{
+    background:#fff;
+    color:#1f2933;
+    border-color:#6EA8FF;
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+.action-grid .quick-card .quick-icon{
+    background:#eaf2ff;
+    color:#2F78FF;
+    border-radius:8px;
+    padding:6px 10px;
+    margin-bottom:12px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.action-grid .quick-card strong{
+    color:#111827;
+    background:transparent;
+    font-size:17px;
+    margin-bottom:8px;
+}
+
+.action-grid .quick-card span:not(.quick-icon){
+    color:#5f6b76;
+    background:transparent;
+    font-size:13px;
+}
+
+.action-grid .quick-card small{
+    color:#2F78FF;
+    background:transparent;
+    margin-top:auto;
+    padding-top:14px;
+    font-size:12px;
+    font-weight:700;
+}
+
+@media(max-width:950px){
+    .action-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+
+@media(max-width:600px){
+    .action-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+
+/* =========================================================
+   EDUTURNOS - ACCESOS / ACCIONES RAPIDAS
+   CODIGO ORIGINAL FUNCIONAL
+   ========================================================= */
+
+.action-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+    width:100%;
+    align-items:stretch;
+}
+
+.quick-card{
+    min-height:112px;
+    height:120px;
+    border:1px solid var(--borde);
+    border-radius:12px;
+    padding:18px;
+    background:#EAF3FF;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:6px;
+    color:var(--texto);
+    text-decoration:none;
+    box-sizing:border-box;
+    transition:
+        border-color .15s ease,
+        background-color .15s ease;
+}
+
+.quick-card:hover{
+    border-color:#6EA8FF;
+    background:#EAF3FF;
+    color:var(--texto);
+    text-decoration:none;
+}
+
+.quick-card strong{
+    font-size:16px;
+    color:var(--azul2);
+    line-height:1.25;
+}
+
+.quick-card span{
+    font-size:13px;
+    color:var(--gris);
+    line-height:1.4;
+}
+
+.quick-card small{
+    color:var(--azul);
+    font-size:12px;
+    font-weight:700;
+    margin-top:4px;
+}
+
+@media(max-width:850px){
+    .action-grid{
+        grid-template-columns:1fr;
+    }
+
+    .quick-card{
+        height:auto;
+        min-height:112px;
+    }
+}
+
+/* =========================================================
+   EDUTURNOS - OVERRIDE VISUAL DEFINITIVO
+   ========================================================= */
+
+/* CALENDARIO */
+.edc-month-toolbar {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    margin: 0 0 12px 0 !important;
+}
+
+.edc-month-toolbar > * {
+    box-sizing: border-box !important;
+}
+
+.eduturnos-final-cal-nav {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 16px !important;
+}
+
+.eduturnos-final-cal-nav a {
+    text-decoration: none !important;
+}
+
+.eduturnos-final-cal-title {
+    min-width: 190px !important;
+    text-align: center !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+}
+
+.eduturnos-final-cal-today {
+    align-self: flex-end !important;
+    margin-top: 8px !important;
+    margin-right: 5px !important;
+}
+
+.eduturnos-final-cal-today a {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    padding: 5px 10px !important;
+}
+
+/* NOTIFICACIONES */
+.eduturnos-final-read-wrap {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    margin-bottom: 12px !important;
+}
+
+.eduturnos-final-read {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: max-content !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    padding: 6px 11px !important;
+    min-height: 32px !important;
+}
+
+/* SOLICITUDES */
+.eduturnos-final-follow-up {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+    padding: 9px 15px !important;
+    min-height: 38px !important;
+    white-space: nowrap !important;
+}
+
+/* EVITAR QUE REGLAS ANTERIORES AGRANDEN EL BOTON */
+button.eduturnos-final-read,
+input.eduturnos-final-read {
+    width: auto !important;
+    height: auto !important;
+}
+
+/* TEXTO */
+body {
+    overflow-x: hidden !important;
+}
+
+/* ============================================================
+   MOVIMIENTO Y ANIMACIÓN — dirección visual "animada, elegante"
+   Se apoya en las variables ya existentes (--azul, --azul2,
+   --sombra, --radio); no redefine colores nuevos.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .entrada-hero,.palabra-hero,.revelar,.boton,.boton::before,.hero-visual::after{animation:none!important;transition:none!important}
+}
+
+/* Botones vivos: elevación + barrido de brillo + micro-rebote al clic */
+.boton{position:relative;overflow:hidden;isolation:isolate;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .35s ease,background .2s ease}
+.boton::before{content:"";position:absolute;inset:0;z-index:-1;transform:translateX(-120%) skewX(-20deg);background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transition:transform .6s ease}
+.boton:hover::before{transform:translateX(120%) skewX(-20deg)}
+.boton:hover{transform:translateY(-3px);box-shadow:0 14px 26px -12px rgba(15,63,143,.45)}
+.boton:active{transform:translateY(-1px) scale(.97);transition-duration:.12s}
+
+/* Entrada orquestada del héroe: una sola vez al cargar la página */
+.entrada-hero{opacity:0;transform:translateY(16px);animation:eduHeroEntrar .6s ease forwards}
+.palabra-hero{display:inline-block;opacity:0;transform:translateY(14px);animation:eduHeroEntrar .6s ease forwards}
+@keyframes eduHeroEntrar{to{opacity:1;transform:translateY(0)}}
+
+/* Realce sutil del panel "Multiusuario" para que no se sienta plano */
+.hero-visual{position:relative;background:linear-gradient(135deg,#EAF3FF,#e3f0ff)!important;overflow:hidden}
+.hero-visual::after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(22,93,202,.12),transparent 70%);top:-90px;right:-60px;animation:eduFlotar 9s ease-in-out infinite}
+@keyframes eduFlotar{0%,100%{transform:translateY(0)}50%{transform:translateY(18px)}}
+
+/* Tarjetas que revelan al hacer scroll, en cascada */
+.revelar{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease,box-shadow .3s ease,border-color .3s ease}
+.revelar.visible{opacity:1;transform:translateY(0)}
+.feature-grid .revelar:nth-child(1){transition-delay:0s}
+.feature-grid .revelar:nth-child(2){transition-delay:.1s}
+.feature-grid .revelar:nth-child(3){transition-delay:.2s}
+.revelar:hover{transform:translateY(-6px);box-shadow:0 16px 28px -16px rgba(15,37,63,.28);border-color:#6EA8FF}
+
+/* ============================================================
+   EDUTURNOS - TINTA PIZARRA + AZUL + AMBAR
+   EDUTURNOS_TINTA_PIZARRA_AMBAR_20260923
+
+   Capa exclusivamente visual.
+   No modifica estructura HTML ni funcionalidad.
+   ============================================================ */
+
+:root {
+    --edu-tinta: #0B2E55;
+    --edu-tinta-2: #0E2F52;
+    --edu-tinta-3: #16406B;
+
+    --edu-azul: #2F78FF;
+    --edu-azul-brillante: #4E8FF0;
+    --edu-azul-suave: #EAF3FF;
+
+    --edu-ambar: #D9A441;
+    --edu-ambar-claro: #F2C66D;
+
+    --edu-papel: #F5F7FA;
+    --edu-blanco: #FFFFFF;
+
+    --edu-texto: #172333;
+    --edu-texto-suave: #607080;
+
+    --edu-borde: #D9E2EC;
+
+    --edu-sombra:
+        0 14px 35px rgba(7,27,51,.10);
+
+    --edu-sombra-fuerte:
+        0 22px 50px rgba(7,27,51,.18);
+
+    --edu-serif:
+        "Source Serif 4",
+        Georgia,
+        serif;
+
+    --edu-sans:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+/* ------------------------------------------------------------
+   TIPOGRAFIA GENERAL
+   ------------------------------------------------------------ */
+
+html,
+body {
+    font-family: var(--edu-sans);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--edu-serif);
+}
+
+/* ------------------------------------------------------------
+   PORTADA
+   ------------------------------------------------------------ */
+
+.hero.hero-animado {
+    position: relative;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 82% 18%,
+            rgba(78,143,240,.20),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 12% 85%,
+            rgba(217,164,65,.12),
+            transparent 28%
+        ),
+        linear-gradient(
+            135deg,
+            var(--edu-tinta),
+            var(--edu-tinta-2)
+        ) !important;
+
+    color: var(--edu-blanco);
+}
+
+/* Luz ambiental discreta */
+
+.hero.hero-animado::before {
+    content: "";
+    position: absolute;
+
+    width: 420px;
+    height: 420px;
+
+    right: -180px;
+    top: -190px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(78,143,240,.20),
+            transparent 68%
+        );
+
+    pointer-events: none;
+
+    animation:
+        edu-luz-flotante
+        10s
+        ease-in-out
+        infinite;
+}
+
+@keyframes edu-luz-flotante {
+
+    0%,
+    100% {
+        transform: translate3d(0,0,0);
+    }
+
+    50% {
+        transform: translate3d(-18px,14px,0);
+    }
+}
+
+/* ------------------------------------------------------------
+   TARJETA PRINCIPAL DEL HERO
+   ------------------------------------------------------------ */
+
+.hero-card {
+    border-color:
+        rgba(255,255,255,.13) !important;
+
+    box-shadow:
+        0 24px 55px rgba(0,0,0,.18) !important;
+}
+
+.hero.hero-animado .hero-card {
+    background:
+        rgba(255,255,255,.055);
+
+    backdrop-filter:
+        blur(8px);
+
+    -webkit-backdrop-filter:
+        blur(8px);
+}
+
+/* ------------------------------------------------------------
+   TITULO HERO
+   ------------------------------------------------------------ */
+
+.hero-titulo {
+    font-family: var(--edu-serif) !important;
+    letter-spacing: -.025em;
+}
+
+.hero-titulo span,
+.palabra-hero {
+    color: var(--edu-blanco);
+}
+
+.hero-titulo span::after {
+    content: "";
+
+    display: block;
+
+    width: 62px;
+    height: 4px;
+
+    margin-top: 12px;
+
+    border-radius: 999px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--edu-ambar),
+            var(--edu-ambar-claro)
+        );
+}
+
+/* ------------------------------------------------------------
+   PANEL MULTIUSUARIO
+   ------------------------------------------------------------ */
+
+.hero-visual {
+    border:
+        1px solid rgba(255,255,255,.14) !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.10),
+            rgba(78,143,240,.09)
+        ) !important;
+
+    box-shadow:
+        0 25px 55px rgba(0,0,0,.16) !important;
+}
+
+.hero-visual::after {
+    background:
+        radial-gradient(
+            circle,
+            rgba(217,164,65,.20),
+            transparent 70%
+        ) !important;
+}
+
+/* ------------------------------------------------------------
+   TARJETAS DE FUNCIONES
+   ------------------------------------------------------------ */
+
+.feature-grid .feature-card {
+    background:
+        var(--edu-blanco) !important;
+
+    border:
+        1px solid var(--edu-borde) !important;
+
+    box-shadow:
+        var(--edu-sombra) !important;
+
+    transition:
+        transform .30s ease,
+        box-shadow .30s ease,
+        border-color .30s ease !important;
+}
+
+.feature-grid .feature-card:hover {
+    transform:
+        translateY(-5px);
+
+    border-color:
+        rgba(22,93,202,.35) !important;
+
+    box-shadow:
+        var(--edu-sombra-fuerte) !important;
+}
+
+.feature-grid .feature-card h3 {
+    color:
+        var(--edu-tinta) !important;
+}
+
+.feature-grid .feature-card p {
+    color:
+        var(--edu-texto-suave);
+}
+
+/* Línea superior ámbar */
+
+.feature-grid .feature-card::before {
+    content: "";
+
+    display: block;
+
+    width: 38px;
+    height: 3px;
+
+    margin-bottom: 14px;
+
+    border-radius: 999px;
+
+    background:
+        var(--edu-ambar);
+}
+
+/* ------------------------------------------------------------
+   BOTONES
+   ------------------------------------------------------------ */
+
+.boton {
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        background-color .25s ease,
+        border-color .25s ease !important;
+}
+
+.boton:hover {
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 12px 24px rgba(7,27,51,.16);
+}
+
+.boton:active {
+    transform:
+        translateY(0);
+}
+
+
+
+/* ============================================================
+   CALENDARIO — SOLO PRESENTACION
+   NO MODIFICA FULLCALENDAR NI SU LOGICA
+   ============================================================ */
+
+.fc {
+    font-family: "Public Sans", system-ui, sans-serif !important;
+}
+
+.fc .fc-toolbar-title {
+    font-family: "Source Serif 4", Georgia, serif !important;
+    color: var(--ed-ink) !important;
+}
+
+.fc .fc-button {
+    border-radius: 10px !important;
+    border: 1px solid #d7e5f3 !important;
+    background: #fff !important;
+    color: var(--ed-text) !important;
+    box-shadow: none !important;
+}
+
+.fc .fc-button:hover {
+    background: #eef5ff !important;
+}
+
+.fc .fc-button-primary {
+    background: #2f78ff !important;
+    border-color: #2f78ff !important;
+    color: #fff !important;
+}
+
+.fc .fc-daygrid-day {
+    background: #fff !important;
+}
+
+.fc .fc-daygrid-day:hover {
+    background: #f7fbff !important;
+}
+
+/* ============================================================
+   AUTH — LOGIN / REGISTRO / RECUPERACION
+   ============================================================ */
+
+.auth-page,
+.login-page,
+.registro-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 15% 10%, rgba(47,120,255,.18), transparent 28rem),
+        radial-gradient(circle at 85% 90%, rgba(242,184,75,.12), transparent 24rem),
+        linear-gradient(135deg, #08192d 0%, #123b68 58%, #0b2e55 100%) !important;
+}
+
+.auth-page .card,
+.login-page .card,
+.registro-page .card,
+.auth-container .card {
+    border-radius: 26px !important;
+    box-shadow: 0 30px 90px rgba(0,0,0,.22) !important;
+}
+
+/* ============================================================
+   EDUTURNOS V6 — PORTADA
+   ============================================================ */
+
+.ed-v6,
+.ed-v6 * {
+    box-sizing: border-box;
+}
+
+.ed-v6 {
+    min-height: 100vh;
+    background: #f4f9ff;
+    color: #17365d;
+    font-family: "Public Sans", system-ui, sans-serif;
+}
+
+.ed-v6-hero {
+    position: relative;
+    min-height: 760px;
+    overflow: hidden;
+    color: #fff !important;
+    background:
+        radial-gradient(circle at 76% 20%, rgba(47,120,255,.34), transparent 28rem),
+        radial-gradient(circle at 90% 80%, rgba(242,184,75,.12), transparent 24rem),
+        linear-gradient(135deg, #071728 0%, #0b2440 48%, #123b68 100%) !important;
+}
+
+.ed-v6-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: .18;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px);
+    background-size: 54px 54px;
+    mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+.ed-v6-nav {
+    position: relative;
+    z-index: 5;
+}
+
+.ed-v6-title {
+    font-family: "Source Serif 4", Georgia, serif !important;
+    color: #fff !important;
+    font-size: clamp(3.6rem, 7vw, 7.2rem) !important;
+    line-height: .94 !important;
+    letter-spacing: -.055em !important;
+}
+
+.ed-v6-copy {
+    position: relative;
+    z-index: 3;
+}
+
+.ed-v6-eyebrow {
+    color: #9bc1ff !important;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.ed-v6-copy p {
+    color: rgba(255,255,255,.76) !important;
+}
+
+.ed-v6-stage {
+    position: relative;
+    z-index: 2;
+}
+
+.ed-v6-window {
+    background: rgba(255,255,255,.97) !important;
+    color: #17365d !important;
+    border: 1px solid rgba(255,255,255,.42) !important;
+    box-shadow: 0 38px 100px rgba(0,0,0,.28) !important;
+    border-radius: 26px !important;
+}
+
+.ed-v6-window * {
+    color: inherit;
+}
+
+.ed-v6-notification {
+    box-shadow: 0 18px 45px rgba(0,0,0,.24) !important;
+}
+
+.ed-v6-blue-block {
+    background: linear-gradient(135deg, #2f78ff, #174fae) !important;
+}
+
+.ed-v6-amber-block {
+    background: linear-gradient(135deg, #f5c15d, #df9a22) !important;
+}
+
+.ed-v6-trust {
+    background: #fff !important;
+    border-top: 1px solid #dce7f3;
+    border-bottom: 1px solid #dce7f3;
+}
+
+.ed-v6-statement {
+    background:
+        radial-gradient(circle at 10% 20%, rgba(47,120,255,.18), transparent 26rem),
+        #0b1d33 !important;
+    color: #fff !important;
+}
+
+.ed-v6-statement h2,
+.ed-v6-statement h3 {
+    color: #fff !important;
+}
+
+.ed-v6-statement p {
+    color: rgba(255,255,255,.72) !important;
+}
+
+.ed-v6-services {
+    background: #f4f9ff !important;
+}
+
+.ed-v6-service {
+    background: #fff !important;
+    border: 1px solid #dce7f3 !important;
+    box-shadow: 0 10px 35px rgba(11,29,51,.06) !important;
+    border-radius: 22px !important;
+    transition:
+        transform 180ms ease,
+        box-shadow 180ms ease,
+        border-color 180ms ease !important;
+}
+
+.ed-v6-service:hover {
+    transform: translateY(-5px) !important;
+    border-color: rgba(47,120,255,.35) !important;
+    box-shadow: 0 24px 55px rgba(11,29,51,.11) !important;
+}
+
+.ed-v6-final {
+    background:
+        radial-gradient(circle at 75% 30%, rgba(47,120,255,.25), transparent 26rem),
+        linear-gradient(135deg, #071728, #123b68) !important;
+    color: #fff !important;
+}
+
+.ed-v6-final h2,
+.ed-v6-final h3 {
+    color: #fff !important;
+}
+
+.ed-v6-final p {
+    color: rgba(255,255,255,.72) !important;
+}
+
+.ed-v6-footer {
+    background: #071728 !important;
+    color: rgba(255,255,255,.68) !important;
+}
+
+.ed-v6-footer a {
+    color: rgba(255,255,255,.78) !important;
+}
+
+.ed-v6-footer a:hover {
+    color: #fff !important;
+}
+
+/* ============================================================
+   MICROINTERACCIONES
+   ============================================================ */
+
+.ed-v6 a,
+.ed-v6 button,
+.ed-v6 .ed-v6-service {
+    will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .ed-v6-hero {
+        min-height: auto;
+    }
+
+    .card,
+    .panel,
+    .widget {
+        border-radius: 18px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .ed-v6-title {
+        font-size: clamp(3rem, 14vw, 4.5rem) !important;
+    }
+
+    .container {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    table {
+        font-size: .88rem;
+    }
+}
+
+
+/* =========================================================
+   EDUTURNOS - LOGIN FINAL
+   Solo apariencia. No modifica funcionalidad.
+   ========================================================= */
+
+#contenido.login-page {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #F4F9FF !important;
+}
+
+#contenido.login-page.login-page {
+    min-height: calc(100vh - 90px) !important;
+    padding: 48px 24px 60px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: #F4F9FF !important;
+    position: relative !important;
+    overflow: visible !important;
+}
+
+/* Eliminar cualquier adorno anterior */
+#contenido.login-page::before,
+#contenido.login-page::after,
+.login-page::before,
+.login-page::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Tarjeta */
+#contenido.login-page .form-card {
+    position: relative !important;
+    z-index: 5 !important;
+
+    width: min(760px, 100%) !important;
+    max-width: 760px !important;
+
+    margin: 0 auto !important;
+    padding: 42px !important;
+
+    box-sizing: border-box !important;
+
+    background: #FFFFFF !important;
+    border: 1px solid #DCEBFA !important;
+    border-radius: 24px !important;
+
+    box-shadow:
+        0 20px 55px rgba(11, 46, 85, .10),
+        0 4px 16px rgba(11, 46, 85, .06) !important;
+}
+
+/* Encabezado */
+#contenido.login-page .section-heading {
+    margin: 0 0 30px !important;
+    padding: 0 0 22px !important;
+}
+
+#contenido.login-page .section-heading::after {
+    content: "" !important;
+    display: block !important;
+
+    width: 58px !important;
+    height: 3px !important;
+
+    margin-top: 20px !important;
+
+    background: #F2B84B !important;
+    border-radius: 99px !important;
+}
+
+#contenido.login-page .section-heading .badge {
+    display: inline-flex !important;
+
+    padding: 6px 11px !important;
+
+    background: #EAF3FF !important;
+    color: #123B68 !important;
+
+    border: 1px solid #DCEBFA !important;
+    border-radius: 999px !important;
+}
+
+#contenido.login-page .section-heading h1 {
+    margin: 14px 0 10px !important;
+
+    color: #0B2E55 !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size: clamp(34px, 5vw, 46px) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -.025em !important;
+}
+
+#contenido.login-page .section-heading p {
+    max-width: 600px !important;
+
+    margin: 0 !important;
+
+    color: #647B94 !important;
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+}
+
+/* Formulario */
+#contenido.login-page .stack-form {
+    gap: 18px !important;
+}
+
+#contenido.login-page .stack-form > label {
+    color: #17365D !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+}
+
+#contenido.login-page .stack-form input,
+#contenido.login-page .stack-form select {
+    min-height: 48px !important;
+
+    margin-top: 6px !important;
+
+    background: #F8FBFF !important;
+    border: 1px solid #DCEBFA !important;
+    border-radius: 11px !important;
+
+    color: #17365D !important;
+}
+
+#contenido.login-page .stack-form input:hover,
+#contenido.login-page .stack-form select:hover {
+    border-color: #6EA8FF !important;
+}
+
+#contenido.login-page .stack-form input:focus,
+#contenido.login-page .stack-form select:focus {
+    border-color: #2F78FF !important;
+    background: #FFFFFF !important;
+
+    box-shadow:
+        0 0 0 4px rgba(47,120,255,.12) !important;
+
+    outline: none !important;
+}
+
+/* Panel de personal institucional */
+#contenido.login-page .personal-login {
+    margin-top: 4px !important;
+    padding: 20px !important;
+
+    background: #F4F9FF !important;
+
+    border: 1px solid #DCEBFA !important;
+    border-left: 4px solid #F2B84B !important;
+    border-radius: 14px !important;
+}
+
+#contenido.login-page .personal-login h3 {
+    margin: 0 0 7px !important;
+
+    color: #123B68 !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size: 21px !important;
+}
+
+#contenido.login-page .personal-login > p {
+    margin: 0 0 18px !important;
+
+    color: #647B94 !important;
+    font-size: 12px !important;
+    line-height: 1.55 !important;
+}
+
+#contenido.login-page .personal-login strong {
+    color: #123B68 !important;
+}
+
+#contenido.login-page .personal-login .form-grid {
+    margin: 0 !important;
+}
+
+/* Botón */
+#contenido.login-page .boton-full {
+    min-height: 50px !important;
+    margin-top: 2px !important;
+
+    background: #2F78FF !important;
+    border: 1px solid #2F78FF !important;
+    border-radius: 11px !important;
+
+    color: #FFFFFF !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+
+    box-shadow: 0 9px 22px rgba(47,120,255,.18) !important;
+}
+
+#contenido.login-page .boton-full:hover {
+    background: #123B68 !important;
+    border-color: #123B68 !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Enlaces */
+#contenido.login-page .form-links {
+    margin-top: 24px !important;
+    padding-top: 20px !important;
+
+    border-top: 1px solid #E3EDF8 !important;
+}
+
+#contenido.login-page .form-links a {
+    color: #2F78FF !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+}
+
+#contenido.login-page .form-links a:hover {
+    color: #123B68 !important;
+    text-decoration: underline !important;
+}
+
+/* Móvil */
+@media (max-width: 700px) {
+
+    #contenido.login-page.login-page {
+        min-height: auto !important;
+        padding: 30px 16px 44px !important;
+    }
+
+    #contenido.login-page .form-card {
+        padding: 28px 22px !important;
+        border-radius: 20px !important;
+    }
+
+}
+
+@media (max-width: 520px) {
+
+    #contenido.login-page.login-page {
+        padding: 20px 12px 32px !important;
+    }
+
+    #contenido.login-page .form-card {
+        padding: 24px 18px !important;
+    }
+
+    #contenido.login-page .personal-login {
+        padding: 17px !important;
+    }
+
+}
+
+
+/* =========================================================
+   EDUTURNOS - CORRECCION FONDO LOGIN
+   Solo apariencia del login.
+   ========================================================= */
+
+html:has(#contenido.login-page),
+body:has(#contenido.login-page) {
+    background: #F4F9FF !important;
+}
+
+body:has(#contenido.login-page) {
+    background-image: none !important;
+}
+
+#contenido.login-page,
+#contenido.login-page.login-page {
+    background: #F4F9FF !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+#contenido.login-page .form-card {
+    background: #FFFFFF !important;
+}
+
+
+
+
+/* =========================================================
+   EDUTURNOS — LOGIN: FONDO FINAL
+   Solo afecta la pantalla de inicio de sesión.
+   ========================================================= */
+
+html:has(body #contenido.login-page),
+body:has(#contenido.login-page) {
+    background: #F4F9FF !important;
+    background-image: none !important;
+}
+
+body:has(#contenido.login-page) {
+    min-height: 100vh !important;
+}
+
+body:has(#contenido.login-page) #contenido,
+body:has(#contenido.login-page) #contenido.login-page,
+body:has(#contenido.login-page) #contenido.login-page.login-page {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: calc(100vh - 90px) !important;
+    margin: 0 !important;
+    padding: 48px 24px 60px !important;
+
+    background: #F4F9FF !important;
+    background-image: none !important;
+
+    box-shadow: none !important;
+}
+
+body:has(#contenido.login-page) #contenido.login-page::before,
+body:has(#contenido.login-page) #contenido.login-page::after {
+    content: none !important;
+    display: none !important;
+}
+
+body:has(#contenido.login-page) #contenido.login-page .form-card {
+    background: #FFFFFF !important;
+}
+
+@media (max-width: 700px) {
+    body:has(#contenido.login-page) #contenido.login-page {
+        padding: 30px 16px 42px !important;
+    }
+}
+
+/* ============================================================
+   EDUTURNOS - MASTER VISUAL FINAL LOGIN
+   SOLO PRESENTACION
+   NO MODIFICA RUTAS NI LOGICA
+   NO MODIFICA APPEARANCE DE SELECTS
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   LOGIN: CONTENEDOR GENERAL
+   ------------------------------------------------------------ */
+
+body:has(.login-card) .login-card {
+    box-sizing: border-box !important;
+}
+
+/* ------------------------------------------------------------
+   DOCUMENTO O CORREO + CONTRASEÑA
+   NEGRO SUAVE
+   ------------------------------------------------------------ */
+
+body:has(.login-card) label:has(input[name="identificador"]),
+body:has(.login-card) label:has(input[name="password"]),
+body:has(.login-card) label:has(input[name="identificador"]) *,
+body:has(.login-card) label:has(input[name="password"]) * {
+    color: #273142 !important;
+}
+
+body:has(.login-card) input[name="identificador"],
+body:has(.login-card) input[name="password"] {
+
+/* ------------------------------------------------------------
+   LOS 3 CAMPOS JUNTOS
+   ------------------------------------------------------------ */
+
+body:has(.login-card) 
+
+/* ------------------------------------------------------------
+   CÓDIGO: 6 DIGITOS + POCO ESPACIO
+   ------------------------------------------------------------ */
+
+
+
+/* ------------------------------------------------------------
+   SEDE:
+   Sede Principal (Las Américas)
+   ------------------------------------------------------------ */
+
+
+
+/* ------------------------------------------------------------
+   JORNADA:
+   Normal
+   ------------------------------------------------------------ */
+
+
+
+/* ------------------------------------------------------------
+   IMPORTANTE:
+   NO SE DEFINE APPEARANCE
+   LOS SELECTS SIGUEN SIENDO NATIVOS
+   ------------------------------------------------------------ */
+
+/* ------------------------------------------------------------
+   TEXTO "NO DEBES ESCOGERLO."
+   TEXTO NORMAL, SIN LINEA DORADA
+   ------------------------------------------------------------ */
+
+body:has(.login-card) .section-heading p,
+body:has(.login-card) .section-heading p *,
+body:has(.login-card) .section-heading strong,
+body:has(.login-card) .section-heading span {
+    border: 0 !important;
+    border-bottom: 0 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+/* Elimina adornos que puedan estar produciendo la linea */
+body:has(.login-card) .section-heading::before,
+body:has(.login-card) .section-heading::after {
+    border: 0 !important;
+    box-shadow: none !important;
+    background-image: none !important;
+    content: none !important;
+}
+
+/* ------------------------------------------------------------
+   NUNCA CREAR LINEAS NUEVAS EN EL FORMULARIO
+   ------------------------------------------------------------ */
+
+body:has(.login-card) .personal-login::before,
+body:has(.login-card) .personal-login::after {
+    content: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+/* ------------------------------------------------------------
+   ENLACES SIN LINEA DECORATIVA
+   ------------------------------------------------------------ */
+
+body:has(.login-card) .form-links,
+body:has(.login-card) .form-links::before,
+body:has(.login-card) .form-links::after {
+    border: 0 !important;
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+body:has(.login-card) .form-links a {
+    border-bottom: 0 !important;
+    text-decoration: none !important;
+}
+
+/* ------------------------------------------------------------
+   LINEA BLANCA DEL DIBUJO
+   LA CLASE SOLO SE CREA PARA LA LINEA IDENTIFICADA
+   ------------------------------------------------------------ */
+
+.eduturnos-linea-blanca-dibujo-final {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* ------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------ */
+
+@media (max-width: 560px) {
+
+html body:has(.login-card)
+input[name="identificador"],
+
+html body:has(.login-card)
+input[name="password"] {
+    color: #273142 !important;
+    caret-color: #273142 !important;
+}
+
+/* ---------------------------------------------------------------
+   TRES TITULOS CENTRADOS
+   --------------------------------------------------------------- */
+
+
+
+/* ---------------------------------------------------------------
+   LOS TRES CUADROS JUNTOS
+   --------------------------------------------------------------- */
+
+html body:has(.login-card)
+
+
+/* ---------------------------------------------------------------
+   ELIMINAR LINEA DORADA
+   SOLO DEL ENCABEZADO
+   --------------------------------------------------------------- */
+
+html body:has(.login-card)
+.section-heading p,
+
+html body:has(.login-card)
+.section-heading p *,
+
+html body:has(.login-card)
+.section-heading strong,
+
+html body:has(.login-card)
+.section-heading span {
+    border-top: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+    border-left: 0 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+/* Pseudo-elementos del encabezado */
+html body:has(.login-card)
+.section-heading::before,
+
+html body:has(.login-card)
+.section-heading::after {
+    content: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+/* ---------------------------------------------------------------
+   NO APARECERAN LINEAS EXTRA EN PERSONAL
+   --------------------------------------------------------------- */
+
+html body:has(.login-card)
+.personal-login::before,
+
+html body:has(.login-card)
+.personal-login::after {
+    content: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+/* ---------------------------------------------------------------
+   SOLO LA CLASE QUE EL SCRIPT CREARA PARA LA LINEA DEL DIBUJO
+   --------------------------------------------------------------- */
+
+.eduturnos-linea-blanca-final {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Pseudo-elementos, solamente cuando JS detecta que son la
+   linea horizontal blanca fina del dibujo */
+
+.eduturnos-dibujo-linea-before::before,
+.eduturnos-dibujo-linea-after::after {
+    display: none !important;
+    visibility: hidden !important;
+    content: none !important;
+}
+
+/* ---------------------------------------------------------------
+   ENLACES
+   --------------------------------------------------------------- */
+
+html body:has(.login-card)
+.form-links a {
+    border-bottom: 0 !important;
+    text-decoration: none !important;
+}
+
+/* ---------------------------------------------------------------
+   SELECTS
+   --------------------------------------------------------------- */
+
+/*
+   No se redefine appearance.
+   Las opciones y el HTML del select siguen originales.
+*/
+
+/* ---------------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------------- */
+
+@media (max-width: 560px) {
+
+
+
+/* ============================================================
+   FIN GRID FINAL CAMPOS INSTITUCIONALES LOGIN
+   ============================================================ */
+
+/* ============================================================
+   EDUTURNOS
+   AREA INSTITUCIONAL DEL LOGIN
+   VERSION AISLADA
+   ============================================================ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   FIN BLOQUE AISLADO
+   ============================================================ */
+
+/* ============================================================
+   FIN
+   ============================================================ */
+
+/* =========================================================
+   EDUTURNOS — LOGIN FINAL REAL
+   ========================================================= */
+
+@media (min-width: 701px) {
+
+    html body.login-page .personal-login .personal-fields-grid {
+        display: grid !important;
+        grid-template-columns: 112px 280px 92px !important;
+        column-gap: 14px !important;
+        row-gap: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    html body.login-page .personal-login .personal-field-code {
+        width: 112px !important;
+        min-width: 112px !important;
+        max-width: 112px !important;
+    }
+
+    html body.login-page .personal-login .personal-field-sede {
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+    }
+
+    html body.login-page .personal-login .personal-field-sede select[name="sede_id"] {
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+        box-sizing: border-box !important;
+    }
+
+    html body.login-page .personal-login .personal-field-jornada {
+        width: 92px !important;
+        min-width: 92px !important;
+        max-width: 92px !important;
+    }
+
+    html body.login-page .login-visual .login-illustration { transform: none !important; }
+
+    html body.login-page .login-visual .login-illustration svg { width: 96% !important; height: 96% !important; transform: none !important; transform-origin: center center !important; }
+}
+
+
+
+
+/* =========================================================
+   EDUTURNOS - CORRECCION DEFINITIVA CAMPOS LOGIN
+   ========================================================= */
+
+html body.login-page .personal-login .personal-fields-grid {
+    display: grid !important;
+    grid-template-columns: 112px 280px 92px !important;
+    column-gap: 14px !important;
+    row-gap: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    align-items: end !important;
+}
+
+html body.login-page .personal-login
+.personal-fields-grid .personal-field-code {
+    width: 112px !important;
+    min-width: 112px !important;
+    max-width: 112px !important;
+}
+
+html body.login-page .personal-login
+.personal-fields-grid .personal-field-sede {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+}
+
+html body.login-page .personal-login
+.personal-fields-grid .personal-field-jornada {
+    width: 92px !important;
+    min-width: 92px !important;
+    max-width: 92px !important;
+}
+
+html body.login-page .personal-login
+.personal-fields-grid select[name="sede_id"],
+html body.login-page .personal-login
+.personal-fields-grid select[name="jornada_id"] {
+    display: block !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    overflow: hidden !important;
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    box-sizing: border-box !important;
+}
+
+html body.login-page .personal-login
+.personal-fields-grid select[name="sede_id"] {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+}
+
+html body.login-page .personal-login
+.personal-fields-grid select[name="jornada_id"] {
+    width: 92px !important;
+    min-width: 92px !important;
+    max-width: 92px !important;
+}
+
+html body.login-page .login-visual .login-illustration {
+    background: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+html body.login-page .login-visual .login-illustration::before,
+html body.login-page .login-visual .login-illustration::after {
+    background: transparent !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+
+html body.login-page .login-visual .login-illustration svg {
+    transform: none !important;
+}
+
+/* ============================================================
+   EDUTURNOS - HEADER INSTITUCIONAL UNICO
+   IGUAL AL LOGIN
+   ============================================================ */
+
+header.eduturnos-header .eduturnos-logo span {
+    color: #eab64a !important;
+    margin-left: 2px !important;
+}
+
+/* ============================================================
+   FIN HEADER INSTITUCIONAL
+   ============================================================ */
+
+/* ============================================================
+   EDUTURNOS - HEADER OFICIAL UNICO
+   MISMA BARRA DE INICIAR SESION
+   ============================================================ */
+
+header.eduturnos-header {
+    width: 100%;
+    min-height: 76px;
+    height: 76px;
+    padding: 0 46px;
+
+    display: flex;
+    align-items: center;
+
+    background: #172942;
+
+    border: 0;
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    outline: 0;
+
+    box-shadow: 0 4px 18px rgba(15,32,55,.16);
+
+    margin: 0;
+
+    box-sizing: border-box;
+
+    position: relative;
+    z-index: 100;
+}
+
+header.eduturnos-header .eduturnos-logo {
+    display: flex;
+    align-items: center;
+
+    margin: 0;
+    padding: 0;
+
+    font-family: "Public Sans", "Segoe UI", Arial, sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: .02em;
+
+    color: #ffffff;
+
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+header.eduturnos-header .eduturnos-logo span {
+    color: #eab64a;
+    margin-left: 2px;
+}
+
+/* ============================================================
+   EDUTURNOS - AUTENTICACION
+   HEADER AZUL COMO PRIMERA BARRA
+   LA FRANJA .barra NO DEBE APARECER ARRIBA
+   ============================================================ */
+
+body > .barra:first-child,
+body > div.barra:first-child,
+.barra.eduturnos-barra-superior {
+    display: none !important;
+}
+
+/* Si .barra aparece inmediatamente antes del header,
+   se oculta sin afectar otros componentes. */
+
+.barra:has(+ header.eduturnos-header) {
+    display: none !important;
+}
+
+header.eduturnos-header {
+    position: relative !important;
+    z-index: 1000 !important;
+    margin-top: 0 !important;
+}
+
+
+
+
+@media (max-width: 640px) {
+    .registro-pagina .registro-boton,
+    .registro-pagina .registro-boton-volver {
+        width: 100% !important;
+    }
+}
+
+
+/* =========================================================
+   EDUTURNOS · REGISTRO ELEGANTE · ESTILO INICIO DE SESIÓN
+   2026-09-26
+   ========================================================= */
+
+/* ---------- FONDO ÚNICO ---------- */
+
+.registro-pagina {
+    background: #f4f7fb !important;
+    padding: 28px 0 36px !important;
+}
+
+body {
+    background: #f4f7fb !important;
+}
+
+
+/* ---------- CONTENEDOR PRINCIPAL MÁS COMPACTO ---------- */
+
+.registro-pagina .registro-contenedor {
+    width: min(760px, 94%) !important;
+    max-width: 760px !important;
+    margin: 18px auto !important;
+    padding: 28px !important;
+    background: #ffffff !important;
+    border: 1px solid #dce3ed !important;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 30px rgba(17, 37, 63, .07) !important;
+}
+
+
+/* ---------- ENCABEZADO ---------- */
+
+.registro-pagina .section-heading {
+    margin-bottom: 20px !important;
+}
+
+.registro-pagina .section-heading h1 {
+    color: #123b68 !important;
+    font-size: 28px !important;
+    line-height: 1.15 !important;
+    margin: 6px 0 7px !important;
+}
+
+.registro-pagina .section-heading p {
+    color: #5f7895 !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+}
+
+
+/* ---------- CUADRÍCULA DE ROLES ---------- */
+
+.registro-pagina .registro-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-top: 18px !important;
+}
+
+
+/* ---------- TARJETAS DE ROLES PEQUEÑAS ---------- */
+
+.registro-pagina .registro-opcion {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 16px !important;
+    margin: 0 !important;
+
+    background: #ffffff !important;
+    border: 1px solid #dce3ed !important;
+    border-radius: 12px !important;
+
+    box-shadow: 0 4px 14px rgba(17, 37, 63, .045) !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+
+    transition:
+        transform .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease !important;
+}
+
+.registro-pagina .registro-opcion:hover {
+    transform: translateY(-2px) !important;
+    border-color: #6ea8ff !important;
+    box-shadow: 0 8px 20px rgba(47, 120, 255, .10) !important;
+}
+
+
+/* ---------- TEXTO DE LOS ROLES ---------- */
+
+.registro-pagina .registro-opcion-contenido {
+    margin-bottom: 12px !important;
+}
+
+.registro-pagina .registro-opcion h3 {
+    margin: 0 0 5px !important;
+    color: #123b68 !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+}
+
+.registro-pagina .registro-opcion p {
+    margin: 0 !important;
+    color: #5f7895 !important;
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+}
+
+
+/* ---------- TODOS LOS BOTONES: UN SOLO AZUL ---------- */
+
+.registro-pagina .registro-boton,
+.registro-pagina .registro-boton-volver {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-height: 40px !important;
+    height: 40px !important;
+    width: 100% !important;
+
+    padding: 9px 14px !important;
+    margin: 0 !important;
+
+    background: #2f78ff !important;
+    background-image: none !important;
+
+    color: #ffffff !important;
+    border: 1px solid #2f78ff !important;
+    border-radius: 9px !important;
+
+    font-family: "Public Sans", "Segoe UI", Arial, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+
+    text-decoration: none !important;
+
+    box-shadow: 0 5px 13px rgba(47, 120, 255, .14) !important;
+
+    transition:
+        background-color .18s ease,
+        border-color .18s ease,
+        transform .18s ease,
+        box-shadow .18s ease !important;
+}
+
+.registro-pagina .registro-boton:hover,
+.registro-pagina .registro-boton-volver:hover {
+    background: #123b68 !important;
+    background-image: none !important;
+    border-color: #123b68 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 18px rgba(18, 59, 104, .16) !important;
+}
+
+
+/* ---------- VOLVER A INICIAR SESIÓN ---------- */
+
+/* Elimina cualquier separador/línea anterior */
+.registro-pagina .registro-volver {
+    border: 0 !important;
+    border-top: 0 !important;
+    box-shadow: none !important;
+
+    margin: 20px 0 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* El botón de volver NO lleva línea encima */
+.registro-pagina .registro-volver::before,
+.registro-pagina .registro-volver::after {
+    display: none !important;
+    content: none !important;
+}
+
+.registro-pagina .registro-volver .registro-boton-volver {
+    width: auto !important;
+    min-width: 220px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+}
+
+
+/* ---------- QUITAR DIVISORES HEREDADOS ---------- */
+
+.registro-pagina hr,
+.registro-pagina .divider,
+.registro-pagina .separador {
+    display: none !important;
+}
+
+.registro-pagina .registro-volver {
+    border-top: none !important;
+}
+
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 680px) {
+
+    .registro-pagina {
+        padding: 18px 0 26px !important;
+    }
+
+    .registro-pagina .registro-contenedor {
+        width: 94% !important;
+        padding: 20px !important;
+        margin: 10px auto !important;
+    }
+
+    .registro-pagina .registro-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    .registro-pagina .registro-opcion {
+        padding: 14px !important;
+    }
+
+    .registro-pagina .section-heading h1 {
+        font-size: 24px !important;
+    }
+
+    .registro-pagina .registro-volver .registro-boton-volver {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}
+
+
+
+/* ============================================================
+   EDUTURNOS — DASHBOARD UNIFICADO
+   ============================================================ */
+
+.dashboard-page[class*="dashboard-rol-"] {
+    --dash-ink:#172b4d;
+    --dash-blue:#1769e0;
+    --dash-gold:#e8ad3d;
+    --dash-bg:#f5f7fb;
+    --dash-line:#dfe6ef;
+    --dash-muted:#66758a;
+    background:var(--dash-bg)!important;
+    color:var(--dash-ink)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-head {
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:28px;
+    padding:30px;
+    margin-bottom:22px;
+    background:linear-gradient(135deg,#fff,#eef5ff)!important;
+    border:1px solid var(--dash-line)!important;
+    border-radius:22px!important;
+    box-shadow:0 12px 30px rgba(23,43,77,.08)!important;
+    overflow:hidden;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-head::before {
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:5px;
+    background:linear-gradient(90deg,var(--dash-blue),var(--dash-gold));
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-head h1 {
+    color:var(--dash-ink)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-head .muted {
+    color:var(--dash-muted)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-head-info .badge,
+.dashboard-page[class*="dashboard-rol-"] .dashboard-card-head .badge {
+    background:#e9f2ff!important;
+    color:var(--dash-blue)!important;
+    border:1px solid #c8dcf8!important;
+    border-radius:999px;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-role-art {
+    background:linear-gradient(145deg,#fff,#eaf2ff)!important;
+    border:1px solid #d5e3f5!important;
+    box-shadow:0 8px 20px rgba(23,105,224,.10)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .role-symbol {
+    background:#edf5ff!important;
+    border-color:#cfe0f6!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .role-symbol span {
+    background:linear-gradient(135deg,var(--dash-blue),#0f4fae)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .role-symbol i {
+    background:var(--dash-gold)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-logout {
+    background:var(--dash-ink)!important;
+    border-color:var(--dash-ink)!important;
+    color:#fff!important;
+    border-radius:11px;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-logout:hover {
+    background:var(--dash-blue)!important;
+    border-color:var(--dash-blue)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-kpis {
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:16px!important;
+    margin-bottom:22px;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-kpi,
+.dashboard-page[class*="dashboard-rol-"] .dashboard-card {
+    background:#fff!important;
+    border:1px solid var(--dash-line)!important;
+    border-radius:20px!important;
+    box-shadow:0 10px 25px rgba(23,43,77,.06)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-kpi strong {
+    color:var(--dash-blue)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-kpi span {
+    color:var(--dash-muted)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-card-head h2 {
+    color:var(--dash-ink)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-action-grid {
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:16px!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-action {
+    min-height:170px!important;
+    padding:20px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    background:#fff!important;
+    border:1px solid var(--dash-line)!important;
+    border-radius:17px!important;
+    box-shadow:0 7px 18px rgba(23,43,77,.055)!important;
+    transition:.2s ease!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-action::before {
+    content:"";
+    width:42px;
+    height:4px;
+    margin-bottom:16px;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--dash-blue),var(--dash-gold));
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-action:hover {
+    transform:translateY(-4px)!important;
+    border-color:#c8d9ee!important;
+    box-shadow:0 14px 28px rgba(23,105,224,.11)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-action-top {
+    display:none!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-action-icon {
+    display:inline-flex!important;
+    width:max-content;
+    padding:5px 9px;
+    margin-bottom:10px;
+    border-radius:8px;
+    background:#edf5ff!important;
+    border:1px solid #d3e3f7!important;
+    color:var(--dash-blue)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-action h3 {
+    margin:0 0 7px!important;
+    color:var(--dash-ink)!important;
+    font-size:17px!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-action p {
+    margin:0!important;
+    color:var(--dash-muted)!important;
+    line-height:1.5!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-action-link {
+    margin-top:auto!important;
+    padding-top:15px!important;
+    color:var(--dash-blue)!important;
+    font-weight:800;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-account-card {
+    padding:22px;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-account-text {
+    color:var(--dash-muted)!important;
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-account-action {
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px solid var(--dash-line);
+}
+
+.dashboard-page[class*="dashboard-rol-"] .dashboard-account-card .boton {
+    background:var(--dash-blue)!important;
+    border-color:var(--dash-blue)!important;
+    color:#fff!important;
+    border-radius:11px;
+}
+
+@media(max-width:1000px) {
+    .dashboard-page[class*="dashboard-rol-"] .dashboard-action-grid {
+        grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    }
+}
+
+@media(max-width:700px) {
+    .dashboard-page[class*="dashboard-rol-"] .dashboard-head {
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .dashboard-page[class*="dashboard-rol-"] .dashboard-kpis {
+        grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    }
+
+    .dashboard-page[class*="dashboard-rol-"] .dashboard-action-grid {
+        grid-template-columns:1fr!important;
+    }
+}
+
+@media(max-width:520px) {
+    .dashboard-page[class*="dashboard-rol-"] .dashboard-kpis {
+        grid-template-columns:1fr!important;
+    }
+}
+
+/* ============================================================
+   FIN DASHBOARD UNIFICADO
+   ============================================================ */
+
+

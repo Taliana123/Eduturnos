@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}Solicitud docente a coordinación · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<div class="page-navigation">
+    <a class="link-back" href="{{ url_for('solicitudes.index') }}">← Atrás</a>
+</div>
+
+<section class="page-head">
+    <div>
+        <h1>Solicitud docente a coordinación</h1>
+        <p>Solicita a coordinación un espacio para una reunión o citación.</p>
+    </div>
+</section>
+
+<section class="tarjeta">
+    <form method="post" action="{{ url_for('solicitudes.nueva_docente') }}">
+
+        {{ csrf_field()|safe }}
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label for="estudiante_id">Estudiante</label>
+
+                <select
+                    id="estudiante_id"
+                    name="estudiante_id"
+                    required
+                >
+<option value="" selected disabled hidden></option>
+
+{% for estudiante in estudiantes %}
+                    <option value="{{ estudiante.id_estudiante }}">
+                        {{ estudiante.nombres }} {{ estudiante.apellidos }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="fecha_solicitada">Fecha solicitada</label>
+
+                <input
+                    type="date"
+                    id="fecha_solicitada"
+                    name="fecha_solicitada"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="hora_solicitada">Hora solicitada</label>
+
+                <input
+                    type="time"
+                    id="hora_solicitada"
+                    name="hora_solicitada"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="motivo">Motivo</label>
+
+                <input
+                    type="text"
+                    id="motivo"
+                    name="motivo"
+                    placeholder="Motivo de la reunión o citación"
+                    maxlength="255"
+                    required
+                >
+            </div>
+
+            <div class="form-group form-group-full">
+                <label for="observaciones">Observaciones</label>
+
+                <textarea
+                    id="observaciones"
+                    name="observaciones"
+                    rows="5"
+                    placeholder="Escribe información adicional..."
+                ></textarea>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+
+            <a
+                class="boton boton-secondary"
+                href="{{ url_for('solicitudes.index') }}"
+            >
+                Cancelar
+            </a>
+
+            <button
+                type="submit"
+                class="boton"
+            >
+                Enviar solicitud
+            </button>
+
+        </div>
+
+    </form>
+</section>
+
+
+
+<style id="EDUTURNOS_BOTONES_V4">
+/* =========================================================
+   EDUTURNOS
+   SOLO BOTONES
+   Mismo azul y letra que "+ Nueva citación" de Citas
+   ========================================================= */
+
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a[class*="boton"],
+a.btn,
+a[class*="btn-"],
+a.link-back,
+a.edc-back,
+.boton,
+.btn,
+[class*="boton-"],
+[class*="btn-"],
+.link-back,
+.edc-back {
+
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+
+    color: #ffffff !important;
+
+    border-color: #1769aa !important;
+
+    text-decoration: none !important;
+}
+
+/* Texto dentro de botones */
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a[class*="boton"] *,
+a.btn *,
+a[class*="btn-"] *,
+.link-back *,
+.edc-back * {
+    color: #ffffff !important;
+}
+
+/* Hover */
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a[class*="boton"]:hover,
+a.btn:hover,
+a[class*="btn-"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.boton:hover,
+.btn:hover,
+[class*="boton-"]:hover,
+[class*="btn-"]:hover,
+.link-back:hover,
+.edc-back:hover {
+
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+
+    color: #ffffff !important;
+
+    border-color: #145b91 !important;
+
+    text-decoration: none !important;
+}
+
+/* Elementos hijos durante hover */
+button:hover *,
+a.boton:hover *,
+a[class*="boton"]:hover *,
+a.btn:hover *,
+a[class*="btn-"]:hover *,
+.link-back:hover *,
+.edc-back:hover * {
+    color: #ffffff !important;
+}
+</style>
+
+{% endblock %}
+

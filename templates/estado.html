@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h1>EDUTURNOS</h1>
+  {% if db_ok %}
+    <p>El sistema está listo y conectado a la base de datos.</p>
+    <a class="btn" href="/">Entrar a EDUTURNOS</a>
+  {% else %}
+    <p>El servidor web está funcionando, pero la base de datos no está disponible todavía.</p>
+    <p>Servidor configurado: {{ db_host }}:{{ db_port }}</p>
+    <p>Cuando MySQL esté disponible, vuelve a cargar esta página.</p>
+  {% endif %}
+</section>
+
+
+
+
+{% endblock %}

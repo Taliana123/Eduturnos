@@ -1,0 +1,908 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}EDUTURNOS | Sistema de citaciones escolares{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   EDUTURNOS — PORTADA PREMIUM 2026
+   Solo portada. No modifica dashboard ni módulos internos.
+   ========================================================= */
+
+.ed-premium {
+    --ep-ink: #071B33;
+    --ep-ink-2: #0D2D4D;
+    --ep-blue: #4D91F5;
+    --ep-blue-light: #73ACFF;
+    --ep-paper: #F4F7FB;
+    --ep-white: #FFFFFF;
+    --ep-text: #172033;
+    --ep-muted: #64748B;
+    --ep-line: #DCE5F0;
+
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    background: var(--ep-paper);
+    color: var(--ep-text);
+    overflow: hidden;
+}
+
+/* HERO */
+
+.ep-hero {
+    position: relative;
+    background:
+        radial-gradient(circle at 78% 18%, rgba(77,145,245,.16), transparent 28%),
+        var(--ep-ink);
+    color: white;
+}
+
+.ep-hero::before {
+    content: "";
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 50%;
+    right: -180px;
+    top: -250px;
+}
+
+.ep-hero-inner {
+    width: min(1240px, calc(100% - 48px));
+    min-height: 650px;
+    margin: 0 auto;
+    padding: 82px 0 76px;
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(500px, 1.1fr);
+    gap: 70px;
+    align-items: center;
+}
+
+.ep-copy {
+    position: relative;
+    z-index: 2;
+    max-width: 620px;
+}
+
+.ep-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+    font-family: "Public Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ep-blue-light);
+}
+
+.ep-eyebrow::before {
+    content: "";
+    width: 28px;
+    height: 2px;
+    background: var(--ep-blue);
+}
+
+.ep-title {
+    margin: 0;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: clamp(58px, 7vw, 94px);
+    line-height: .9;
+    letter-spacing: -.055em;
+    font-weight: 600;
+}
+
+.ep-title span {
+    display: block;
+    color: #fff;
+}
+
+.ep-title em {
+    display: block;
+    margin-top: 15px;
+    color: var(--ep-blue-light);
+    font-style: normal;
+}
+
+.ep-description {
+    max-width: 540px;
+    margin: 32px 0 0;
+    color: rgba(255,255,255,.70);
+    font-family: "Public Sans", sans-serif;
+    font-size: 17px;
+    line-height: 1.75;
+}
+
+.ep-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 34px;
+}
+
+.ep-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 22px;
+    border-radius: 9px;
+    font-family: "Public Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        background .25s ease;
+}
+
+.ep-btn-primary {
+    background: var(--ep-blue);
+    color: white;
+    box-shadow: 0 10px 28px rgba(77,145,245,.22);
+}
+
+.ep-btn-primary:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 34px rgba(77,145,245,.30);
+}
+
+.ep-btn-secondary {
+    border: 1px solid rgba(255,255,255,.22);
+    color: white;
+    background: rgba(255,255,255,.04);
+}
+
+.ep-btn-secondary:hover {
+    color: white;
+    background: rgba(255,255,255,.09);
+    transform: translateY(-2px);
+}
+
+.ep-note {
+    margin-top: 28px;
+    color: rgba(255,255,255,.42);
+    font: 500 12px/1.5 "Public Sans", sans-serif;
+}
+
+/* PRODUCT PREVIEW */
+
+.ep-product {
+    position: relative;
+    z-index: 2;
+}
+
+.ep-window {
+    width: 100%;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 18px;
+    overflow: hidden;
+    background: #f8fafc;
+    box-shadow:
+        0 35px 80px rgba(0,0,0,.35),
+        0 0 0 8px rgba(255,255,255,.025);
+    transform: perspective(1300px) rotateY(-3deg) rotateX(1deg);
+    transition: transform .5s ease, box-shadow .5s ease;
+}
+
+.ep-window:hover {
+    transform: perspective(1300px) rotateY(0deg) rotateX(0deg) translateY(-4px);
+    box-shadow:
+        0 42px 90px rgba(0,0,0,.40),
+        0 0 0 8px rgba(255,255,255,.03);
+}
+
+.ep-browser {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 15px;
+    background: #e9eef5;
+    border-bottom: 1px solid #d9e1eb;
+}
+
+.ep-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #b5c1d0;
+}
+
+.ep-browser-name {
+    margin-left: 9px;
+    color: #7b8999;
+    font: 600 10px "Public Sans", sans-serif;
+    letter-spacing: .04em;
+}
+
+.ep-dashboard {
+    min-height: 430px;
+    display: grid;
+    grid-template-columns: 132px 1fr;
+    color: var(--ep-text);
+}
+
+/* SIDEBAR DEL MOCKUP */
+
+.ep-side {
+    padding: 20px 12px;
+    background: #0D2D4D;
+}
+
+.ep-side-logo {
+    margin: 0 8px 26px;
+    color: white;
+    font: 700 13px "Public Sans", sans-serif;
+    letter-spacing: .04em;
+}
+
+.ep-side-item {
+    height: 34px;
+    margin: 3px 0;
+    padding: 0 9px;
+    display: flex;
+    align-items: center;
+    border-radius: 7px;
+    color: rgba(255,255,255,.55);
+    font: 600 9px "Public Sans", sans-serif;
+}
+
+.ep-side-item.active {
+    background: rgba(77,145,245,.18);
+    color: white;
+}
+
+.ep-side-line {
+    width: 38px;
+    height: 1px;
+    margin: 18px 9px;
+    background: rgba(255,255,255,.12);
+}
+
+/* CONTENIDO DEL MOCKUP */
+
+.ep-main {
+    padding: 24px;
+    background: #f8fafc;
+}
+
+.ep-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.ep-top h3 {
+    margin: 0;
+    color: #172033;
+    font: 700 19px "Public Sans", sans-serif;
+    letter-spacing: -.03em;
+}
+
+.ep-top p {
+    margin: 5px 0 0;
+    color: #7b8999;
+    font: 500 9px "Public Sans", sans-serif;
+}
+
+.ep-user {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #dceaff;
+    border: 1px solid #c7dcfb;
+}
+
+.ep-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9px;
+    margin-bottom: 12px;
+}
+
+.ep-kpi {
+    padding: 13px;
+    background: white;
+    border: 1px solid #e1e8f0;
+    border-radius: 9px;
+}
+
+.ep-kpi-label {
+    color: #8794a4;
+    font: 600 8px "Public Sans", sans-serif;
+}
+
+.ep-kpi-value {
+    margin-top: 5px;
+    color: #12395F;
+    font: 700 21px "Public Sans", sans-serif;
+}
+
+.ep-kpi-blue {
+    border-top: 2px solid #4D91F5;
+}
+
+.ep-kpi-green {
+    border-top: 2px solid #3CA56A;
+}
+
+.ep-kpi-amber {
+    border-top: 2px solid #D99A17;
+}
+
+.ep-panel-row {
+    display: grid;
+    grid-template-columns: 1.18fr .82fr;
+    gap: 10px;
+}
+
+.ep-panel {
+    padding: 15px;
+    background: white;
+    border: 1px solid #e1e8f0;
+    border-radius: 9px;
+}
+
+.ep-panel-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 13px;
+    color: #26374b;
+    font: 700 9px "Public Sans", sans-serif;
+}
+
+.ep-panel-link {
+    color: #4D91F5;
+    font-size: 8px;
+}
+
+.ep-appointment {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 0;
+    border-top: 1px solid #edf1f5;
+}
+
+.ep-date {
+    width: 30px;
+    text-align: center;
+}
+
+.ep-date strong {
+    display: block;
+    color: #12395F;
+    font: 700 12px "Public Sans", sans-serif;
+}
+
+.ep-date small {
+    color: #8b98a8;
+    font: 600 6px "Public Sans", sans-serif;
+}
+
+.ep-appt-text {
+    min-width: 0;
+    flex: 1;
+}
+
+.ep-appt-text strong {
+    display: block;
+    overflow: hidden;
+    color: #26374b;
+    font: 700 8px "Public Sans", sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ep-appt-text span {
+    color: #8b98a8;
+    font: 500 7px "Public Sans", sans-serif;
+}
+
+.ep-status {
+    padding: 4px 6px;
+    border-radius: 20px;
+    background: #e9f7ef;
+    color: #27844f;
+    font: 700 6px "Public Sans", sans-serif;
+}
+
+.ep-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.ep-calendar span {
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border-radius: 4px;
+    color: #8b98a8;
+    font: 600 6px "Public Sans", sans-serif;
+}
+
+.ep-calendar span.mark {
+    background: #eaf2ff;
+    color: #327bdc;
+}
+
+.ep-calendar span.today {
+    background: #4D91F5;
+    color: white;
+}
+
+/* SECCIÓN DE INFORMACIÓN */
+
+.ep-section {
+    width: min(1120px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 95px 0 105px;
+}
+
+.ep-section-heading {
+    max-width: 680px;
+    margin-bottom: 45px;
+}
+
+.ep-section-kicker {
+    margin-bottom: 13px;
+    color: var(--ep-blue);
+    font: 700 11px "Public Sans", sans-serif;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.ep-section-heading h2 {
+    margin: 0;
+    color: var(--ep-ink);
+    font: 600 clamp(35px, 4vw, 54px)/1.05 "Source Serif 4", Georgia, serif;
+    letter-spacing: -.035em;
+}
+
+.ep-section-heading p {
+    margin: 18px 0 0;
+    color: var(--ep-muted);
+    font: 400 16px/1.7 "Public Sans", sans-serif;
+}
+
+.ep-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--ep-line);
+    border-bottom: 1px solid var(--ep-line);
+}
+
+.ep-feature {
+    min-height: 225px;
+    padding: 31px 28px;
+    border-right: 1px solid var(--ep-line);
+}
+
+.ep-feature:last-child {
+    border-right: 0;
+}
+
+.ep-number {
+    color: #9aabc0;
+    font: 700 11px "Public Sans", sans-serif;
+}
+
+.ep-feature h3 {
+    margin: 42px 0 10px;
+    color: var(--ep-ink);
+    font: 700 18px "Public Sans", sans-serif;
+}
+
+.ep-feature p {
+    max-width: 280px;
+    margin: 0;
+    color: var(--ep-muted);
+    font: 400 13px/1.65 "Public Sans", sans-serif;
+}
+
+/* FRANJA FINAL */
+
+.ep-final {
+    background: var(--ep-ink);
+    color: white;
+}
+
+.ep-final-inner {
+    width: min(1120px, calc(100% - 48px));
+    min-height: 250px;
+    margin: 0 auto;
+    padding: 58px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.ep-final h2 {
+    max-width: 600px;
+    margin: 0;
+    font: 600 clamp(30px, 4vw, 48px)/1.05 "Source Serif 4", Georgia, serif;
+    letter-spacing: -.035em;
+}
+
+.ep-final p {
+    margin: 10px 0 0;
+    color: rgba(255,255,255,.52);
+    font: 400 13px "Public Sans", sans-serif;
+}
+
+.ep-final .ep-btn {
+    flex: 0 0 auto;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1050px) {
+    .ep-hero-inner {
+        grid-template-columns: 1fr;
+        gap: 45px;
+        padding-top: 65px;
+    }
+
+    .ep-copy {
+        max-width: 760px;
+    }
+
+    .ep-product {
+        width: min(760px, 100%);
+        margin: 0 auto;
+    }
+
+    .ep-window {
+        transform: none;
+    }
+}
+
+@media (max-width: 760px) {
+    .ep-hero-inner,
+    .ep-section,
+    .ep-final-inner {
+        width: min(100% - 32px, 680px);
+    }
+
+    .ep-hero-inner {
+        min-height: auto;
+        padding: 55px 0 55px;
+    }
+
+    .ep-title {
+        font-size: clamp(52px, 16vw, 76px);
+    }
+
+    .ep-description {
+        font-size: 15px;
+    }
+
+    .ep-dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .ep-side {
+        display: none;
+    }
+
+    .ep-main {
+        padding: 17px;
+    }
+
+    .ep-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .ep-panel-row {
+        grid-template-columns: 1fr;
+    }
+
+    .ep-features {
+        grid-template-columns: 1fr;
+    }
+
+    .ep-feature {
+        min-height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--ep-line);
+    }
+
+    .ep-feature:last-child {
+        border-bottom: 0;
+    }
+
+    .ep-final-inner {
+        display: block;
+        padding: 48px 0;
+    }
+
+    .ep-final .ep-btn {
+        margin-top: 25px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ep-btn,
+    .ep-window {
+        transition: none;
+    }
+}
+</style>
+
+<section class="ed-premium">
+
+    <section class="ep-hero">
+        <div class="ep-hero-inner">
+
+            <div class="ep-copy">
+
+                <div class="ep-eyebrow">
+                    Sistema de citaciones escolares
+                </div>
+
+                <h1 class="ep-title">
+                    <span>EDUTURNOS</span>
+                    <em>Cada citación.</em>
+                    <span>En su lugar.</span>
+                </h1>
+
+                <p class="ep-description">
+                    Una plataforma institucional para organizar citaciones,
+                    horarios, seguimiento y notificaciones en un solo lugar.
+                </p>
+
+                <div class="ep-actions">
+                    <a class="ep-btn ep-btn-primary"
+                       href="{{ url_for('auth.login') }}">
+                        Iniciar sesión
+                    </a>
+
+                    <a class="ep-btn ep-btn-secondary"
+                       href="{{ url_for('auth.registro') }}">
+                        Crear cuenta
+                    </a>
+                </div>
+
+                <p class="ep-note">
+                    Una experiencia conectada para estudiantes, acudientes,
+                    docentes y equipos institucionales.
+                </p>
+
+            </div>
+
+            <div class="ep-product">
+
+                <div class="ep-window">
+
+                    <div class="ep-browser">
+                        <span class="ep-dot"></span>
+                        <span class="ep-dot"></span>
+                        <span class="ep-dot"></span>
+                        <span class="ep-browser-name">EDUTURNOS / Panel institucional</span>
+                    </div>
+
+                    <div class="ep-dashboard">
+
+                        <aside class="ep-side">
+                            <div class="ep-side-logo">EDUTURNOS</div>
+
+                            <div class="ep-side-item active">Inicio</div>
+                            <div class="ep-side-item">Citas</div>
+                            <div class="ep-side-item">Calendario</div>
+                            <div class="ep-side-item">Solicitudes</div>
+                            <div class="ep-side-item">Notificaciones</div>
+
+                            <div class="ep-side-line"></div>
+
+                            <div class="ep-side-item">Seguimiento</div>
+                            <div class="ep-side-item">Reportes</div>
+                        </aside>
+
+                        <div class="ep-main">
+
+                            <div class="ep-top">
+                                <div>
+                                    <h3>Panel institucional</h3>
+                                    <p>Resumen de actividad</p>
+                                </div>
+                                <div class="ep-user"></div>
+                            </div>
+
+                            <div class="ep-kpis">
+
+                                <div class="ep-kpi ep-kpi-blue">
+                                    <div class="ep-kpi-label">CITACIONES HOY</div>
+                                    <div class="ep-kpi-value">08</div>
+                                </div>
+
+                                <div class="ep-kpi ep-kpi-green">
+                                    <div class="ep-kpi-label">CONFIRMADAS</div>
+                                    <div class="ep-kpi-value">24</div>
+                                </div>
+
+                                <div class="ep-kpi ep-kpi-amber">
+                                    <div class="ep-kpi-label">PENDIENTES</div>
+                                    <div class="ep-kpi-value">06</div>
+                                </div>
+
+                            </div>
+
+                            <div class="ep-panel-row">
+
+                                <div class="ep-panel">
+                                    <div class="ep-panel-title">
+                                        <span>Próximas citaciones</span>
+                                        <span class="ep-panel-link">Ver todas</span>
+                                    </div>
+
+                                    <div class="ep-appointment">
+                                        <div class="ep-date">
+                                            <strong>24</strong>
+                                            <small>SEP</small>
+                                        </div>
+                                        <div class="ep-appt-text">
+                                            <strong>Seguimiento académico</strong>
+                                            <span>08:00 · Sala 2</span>
+                                        </div>
+                                        <span class="ep-status">Confirmada</span>
+                                    </div>
+
+                                    <div class="ep-appointment">
+                                        <div class="ep-date">
+                                            <strong>24</strong>
+                                            <small>SEP</small>
+                                        </div>
+                                        <div class="ep-appt-text">
+                                            <strong>Reunión con acudiente</strong>
+                                            <span>10:30 · Coordinación</span>
+                                        </div>
+                                        <span class="ep-status">Pendiente</span>
+                                    </div>
+
+                                    <div class="ep-appointment">
+                                        <div class="ep-date">
+                                            <strong>25</strong>
+                                            <small>SEP</small>
+                                        </div>
+                                        <div class="ep-appt-text">
+                                            <strong>Seguimiento estudiantil</strong>
+                                            <span>14:00 · Sala 1</span>
+                                        </div>
+                                        <span class="ep-status">Confirmada</span>
+                                    </div>
+                                </div>
+
+                                <div class="ep-panel">
+
+                                    <div class="ep-panel-title">
+                                        <span>Calendario</span>
+                                        <span class="ep-panel-link">Septiembre</span>
+                                    </div>
+
+                                    <div class="ep-calendar">
+                                        <span>L</span><span>M</span><span>X</span>
+                                        <span>J</span><span>V</span><span>S</span><span>D</span>
+
+                                        <span></span><span>1</span><span>2</span>
+                                        <span>3</span><span>4</span><span>5</span><span>6</span>
+
+                                        <span>7</span><span>8</span><span class="mark">9</span>
+                                        <span>10</span><span>11</span><span>12</span><span>13</span>
+
+                                        <span>14</span><span>15</span><span>16</span>
+                                        <span>17</span><span class="mark">18</span><span>19</span><span>20</span>
+
+                                        <span>21</span><span>22</span><span class="today">23</span>
+                                        <span class="mark">24</span><span>25</span><span>26</span><span>27</span>
+
+                                        <span>28</span><span>29</span><span>30</span>
+                                        <span></span><span></span><span></span><span></span>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+
+    <section class="ep-section">
+
+        <div class="ep-section-heading">
+
+            <div class="ep-section-kicker">
+                Todo conectado
+            </div>
+
+            <h2>
+                La gestión escolar,
+                sin perder de vista lo importante.
+            </h2>
+
+            <p>
+                EDUTURNOS reúne las herramientas necesarias para organizar
+                cada citación y mantener informada a la comunidad educativa.
+            </p>
+
+        </div>
+
+        <div class="ep-features">
+
+            <article class="ep-feature">
+                <div class="ep-number">01</div>
+                <h3>Citaciones</h3>
+                <p>
+                    Crea y administra citas con información clara,
+                    horarios organizados y estados actualizados.
+                </p>
+            </article>
+
+            <article class="ep-feature">
+                <div class="ep-number">02</div>
+                <h3>Seguimiento</h3>
+                <p>
+                    Mantén el historial de cada encuentro y consulta
+                    su evolución desde un mismo espacio.
+                </p>
+            </article>
+
+            <article class="ep-feature">
+                <div class="ep-number">03</div>
+                <h3>Notificaciones</h3>
+                <p>
+                    Las personas correspondientes reciben información
+                    y recordatorios de sus citaciones.
+                </p>
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <section class="ep-final">
+
+        <div class="ep-final-inner">
+
+            <div>
+                <h2>
+                    Una sola plataforma para toda la comunidad educativa.
+                </h2>
+
+                <p>
+                    EDUTURNOS · Sistema de citaciones escolares
+                </p>
+            </div>
+
+            <a class="ep-btn ep-btn-primary"
+               href="{{ url_for('auth.login') }}">
+                Entrar a EDUTURNOS
+            </a>
+
+        </div>
+
+    </section>
+
+</section>
+
+{% endblock %}

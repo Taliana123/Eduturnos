@@ -1,0 +1,40 @@
+﻿EDUTURNOS - REVISION FUNCIONAL
+Fecha: 09/21/2026 15:09:15
+
+PROYECTO:
+D:\edu_Final
+
+BACKUP:
+D:\BACKUPS_EDUTURNOS\BACKUP_EDUTURNOS_20260921_150752
+
+BASE DE DATOS:
+NO MODIFICADA
+
+CALENDARIO:
+NO SE MODIFICO LA INTERFAZ NI LA CUADRICULA.
+
+CORREO / GMAIL:
+NO CONFIGURADO NI MODIFICADO EN ESTA FASE.
+
+AREAS REVISADAS:
+- Autenticacion
+- Registro
+- Roles
+- Sedes
+- Jornadas
+- Codigo institucional
+- Citas
+- Validacion de duplicados
+- Notificaciones internas
+- Recordatorios 24h
+- Recordatorios 2h
+- Calendario
+- Solicitudes
+- Justificaciones
+- Reportes
+- Recuperacion de contraseña
+- Compatibilidad MySQL
+
+IMPORTANTE:
+Esta revision no crea usuarios de prueba ni envia correos.
+La configuracion Gmail queda para la ultima fase.

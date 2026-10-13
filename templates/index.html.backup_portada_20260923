@@ -1,0 +1,71 @@
+﻿{% extends 'base.html' %}
+{% block title %}EDUTURNOS · Gestión de citaciones escolares{% endblock %}
+{% block content %}
+<section class="hero hero-animado">
+<svg class="constelacion" viewBox="0 0 1200 500" preserveAspectRatio="none" aria-hidden="true">
+    <g class="grupo">
+        <line x1="80" y1="90" x2="250" y2="150"></line>
+        <line x1="250" y1="150" x2="390" y2="80"></line>
+        <line x1="390" y1="80" x2="540" y2="170"></line>
+        <circle cx="80" cy="90" r="3"></circle>
+        <circle cx="250" cy="150" r="4"></circle>
+        <circle cx="390" cy="80" r="3"></circle>
+        <circle cx="540" cy="170" r="4"></circle>
+    </g>
+
+    <g class="grupo">
+        <line x1="690" y1="110" x2="820" y2="190"></line>
+        <line x1="820" y1="190" x2="980" y2="100"></line>
+        <line x1="980" y1="100" x2="1110" y2="180"></line>
+        <circle cx="690" cy="110" r="3"></circle>
+        <circle cx="820" cy="190" r="4"></circle>
+        <circle cx="980" cy="100" r="3"></circle>
+        <circle cx="1110" cy="180" r="4"></circle>
+    </g>
+
+    <g class="grupo">
+        <line x1="180" y1="350" x2="340" y2="290"></line>
+        <line x1="340" y1="290" x2="510" y2="370"></line>
+        <line x1="510" y1="370" x2="700" y2="310"></line>
+        <circle cx="180" cy="350" r="3"></circle>
+        <circle cx="340" cy="290" r="4"></circle>
+        <circle cx="510" cy="370" r="3"></circle>
+        <circle cx="700" cy="310" r="4"></circle>
+    </g>
+</svg>
+  <div class="tarjeta hero-card entrada-hero" style="animation-delay:.05s">
+    <span class="badge">Portal institucional</span>
+    <h1 class="hero-titulo"><span class="palabra-hero" style="animation-delay:.15s">EDUTURNOS</span></h1>
+    <p class="entrada-hero" style="animation-delay:.35s">Un solo lugar para crear, confirmar y hacer seguimiento a las citaciones escolares, con calendario, notificaciones y reportes.</p>
+    <div class="acciones entrada-hero" style="animation-delay:.5s">
+      <a class="boton" href="{{ url_for('auth.login') }}">Iniciar sesión</a>
+      <a class="boton secundario" href="{{ url_for('auth.registro') }}">Crear cuenta</a>
+    </div>
+  </div>
+  <div class="hero-visual hero-card entrada-hero" style="animation-delay:.2s">
+    <span class="badge">Portal institucional</span>
+    <h2>Multiusuario</h2>
+    <p>Estudiantes, acudientes, docentes, coordinación y rectoría trabajan sobre la misma información institucional.</p>
+    <p class="muted">Segura · centralizada · multiusuario</p>
+  </div>
+</section>
+<div class="grid equal-cards feature-grid">
+  <div class="tarjeta feature-card revelar"><h3>Citaciones</h3><p>Agenda y consulta reuniones sin duplicar horarios.</p></div>
+  <div class="tarjeta feature-card revelar"><h3>Seguimiento</h3><p>Registra asistencia, resultados y justificaciones.</p></div>
+  <div class="tarjeta feature-card revelar"><h3>Comunicación</h3><p>Notificaciones y eventos de calendario en un solo sitio.</p></div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var tarjetas = document.querySelectorAll('.revelar');
+    if (!('IntersectionObserver' in window)) { tarjetas.forEach(function (t) { t.classList.add('visible'); }); return; }
+    var observador = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (entrada) {
+        if (entrada.isIntersecting) { entrada.target.classList.add('visible'); observador.unobserve(entrada.target); }
+      });
+    }, { threshold: 0.15 });
+    tarjetas.forEach(function (t) { observador.observe(t); });
+  });
+</script>
+{% endblock %}
+

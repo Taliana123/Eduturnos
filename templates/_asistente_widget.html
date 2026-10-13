@@ -1,0 +1,88 @@
+{% if beepy_disponible or usuario.rol_nombre in ['Super Admin','Rector','Administrador / Coordinador','Docente'] %}
+<details class="dashboard-assistant" data-eduturnos-assistant data-endpoint="{{ url_for('asistente.preguntar') }}" data-csrf="{{ csrf_token() }}">
+    <summary><span class="assistant-desktop-label">Ayuda</span><span class="assistant-mobile-label"><strong>Ayuda EDUTURNOS</strong><small>Asistente general para personal institucional</small></span></summary>
+    <div class="dashboard-assistant-panel">
+        {% if beepy_disponible %}
+        <div class="assistant-chat-header"><div class="assistant-beepy-identity"><img src="{{ url_for('static', filename='icons/edubot.png') }}" alt="Robot EDUBOT" width="38" height="38"><div><strong>EDUBOT</strong><small>¡Bienvenido a EDUTURNOS!</small></div></div><div class="assistant-chat-tools"><button type="button" data-beepy-restart aria-label="Nueva conversación" title="Nueva conversación"><img src="{{ url_for('static', filename='icons/lucide-trash-2.svg') }}" alt="" width="18" height="18"></button><button type="button" data-beepy-close aria-label="Cerrar chat" title="Cerrar chat"><img src="{{ url_for('static', filename='icons/lucide-x.svg') }}" alt="" width="18" height="18"></button></div></div>
+        <iframe data-beepy-frame data-src="{{ url_for('asistente.abrir_beepy') }}" title="EDUBOT - Ayuda EDUTURNOS" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" class="assistant-beepy-frame"></iframe>
+        {% else %}
+        <div class="assistant-chat-header">
+            <div><strong>Ayuda EDUTURNOS</strong><small>Asistente institucional</small></div>
+            <div class="assistant-chat-tools">
+                <button type="button" data-assistant-clear title="Borrar conversación" aria-label="Borrar conversación"><img src="{{ url_for('static', filename='icons/lucide-trash-2.svg') }}" alt="" width="18" height="18"></button>
+                <button type="button" data-assistant-expand title="Ampliar chat" aria-label="Ampliar chat" aria-pressed="false"><img src="{{ url_for('static', filename='icons/lucide-maximize-2.svg') }}" alt="" width="18" height="18"></button>
+                <button type="button" data-assistant-close title="Cerrar chat" aria-label="Cerrar chat"><img src="{{ url_for('static', filename='icons/lucide-x.svg') }}" alt="" width="18" height="18"></button>
+            </div>
+        </div>
+        {% if not asistente_disponible %}
+        <p class="muted assistant-unavailable" role="status">El chat todavía no está activado.</p>
+        {% else %}
+        <p class="assistant-privacy">Responde dudas generales. No envíes nombres ni información de estudiantes; el asistente no consulta expedientes.</p>
+        {% endif %}
+        <div class="assistant-messages" data-assistant-messages role="log" aria-live="polite" aria-label="Conversación con el asistente"><p class="assistant-answer" data-assistant-greeting>¡Hola! ¿Cómo puedo ayudarte hoy?</p></div>
+        <small class="assistant-chat-status" data-assistant-status aria-live="polite"></small>
+        <form>
+            <label class="visually-hidden" for="dashboard-assistant-question">Tu pregunta</label>
+            <div class="assistant-chat-composer">
+                <textarea id="dashboard-assistant-question" maxlength="1200" rows="1" placeholder="Ingresa el texto aquí..." required {% if not asistente_disponible %}disabled{% endif %}></textarea>
+                <button type="submit" aria-label="Enviar mensaje" title="Enviar mensaje" disabled><img src="{{ url_for('static', filename='icons/lucide-send.svg') }}" alt="" width="18" height="18"></button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</details>
+<style>
+.dashboard-assistant{width:min(1160px,calc(100% - 44px));margin:0 auto 28px;border-top:1px solid #dce4eb;border-bottom:1px solid #dce4eb;}
+.assistant-desktop-label,.assistant-desktop-description{display:none;}
+.dashboard-assistant>summary{display:flex;align-items:center;min-height:58px;padding:10px 2px;cursor:pointer;list-style:none;}
+.dashboard-assistant>summary::-webkit-details-marker{display:none;}
+.dashboard-assistant>summary::after{content:'+';margin-left:auto;color:#1769aa;font-size:20px;}
+.dashboard-assistant[open]>summary::after{content:'−';}
+.dashboard-assistant>summary span{display:grid;gap:3px;}
+.dashboard-assistant>summary strong{color:#17365d;font-size:14px;}
+.dashboard-assistant>summary small,.assistant-privacy{color:#66788a;font-size:12px;}
+.dashboard-assistant-panel{max-width:720px;padding:0 0 16px;}
+.dashboard-assistant-panel textarea{width:100%;max-width:100%;resize:vertical;box-sizing:border-box;}
+.assistant-privacy{margin:0 0 10px;}
+.assistant-messages{display:grid;gap:8px;max-height:260px;overflow:auto;}
+.assistant-messages p{margin:0;padding:9px 11px;border-radius:6px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;}
+.assistant-question{background:#eaf3ff;color:#17365d;}
+.assistant-answer{background:#f3f6f8;color:#243b53;}
+.assistant-form-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:8px;}
+.assistant-form-actions small{margin-right:auto;color:#66788a;}
+.assistant-unavailable{margin:0 0 16px;padding:12px;background:#f3f6f8;border-radius:4px;line-height:1.6;}
+.dashboard-assistant-panel textarea{margin:12px 0 0;min-height:76px;padding:10px 12px;border:1px solid #d5e1fa;border-radius:4px;font:inherit;line-height:1.5;}
+.dashboard-assistant-panel textarea:disabled{background:#f3f6f8;cursor:not-allowed;}
+.dashboard-assistant-panel button:disabled{opacity:.5;cursor:not-allowed;}
+.assistant-chat-header{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.assistant-chat-header>div:first-child{display:grid;gap:4px;min-width:0;}
+.assistant-chat-header strong{color:#17365d;font-size:14px;}
+.assistant-chat-header small{color:#66788a;font-size:11px;}
+.assistant-chat-tools{display:flex;gap:4px;flex-shrink:0;}
+html body .dashboard-assistant .assistant-chat-tools button,html body .dashboard-assistant .assistant-chat-composer button{display:grid!important;place-items:center;width:34px!important;min-width:34px!important;height:34px!important;min-height:34px!important;padding:6px!important;border:0!important;border-radius:4px!important;background:transparent!important;box-shadow:none!important;}
+.assistant-chat-tools img,.assistant-chat-composer img{width:18px;height:18px;}
+.assistant-chat-tools button:hover{outline:1px solid #d5e1fa;}
+html body .dashboard-assistant .assistant-messages{display:flex;flex-direction:column;align-items:flex-start;gap:12px;min-height:0;max-height:none;overflow-y:auto;padding:8px 4px;}
+html body .dashboard-assistant .assistant-messages p{max-width:90%;font-size:13px;line-height:1.6;}
+.assistant-messages .assistant-question{align-self:flex-end;background:#e7f0ff;}
+.assistant-messages .assistant-answer{background:#f3f6f8;}
+.assistant-chat-status{display:block;min-height:18px;color:#66788a;font-size:11px;}
+.assistant-chat-composer{display:flex;align-items:flex-end;gap:8px;border:1px solid #a8bced;border-radius:8px;padding:5px 7px;background:#f6f9ff;}
+html body .dashboard-assistant .assistant-chat-composer textarea{flex:1;width:100%;min-width:0;margin:0!important;min-height:34px!important;max-height:120px;padding:7px 6px!important;border:0!important;box-shadow:none!important;background:transparent!important;resize:none;line-height:1.5;font-size:13px;}
+.assistant-chat-composer:focus-within{outline:2px solid #2458d6;outline-offset:2px;}
+.assistant-beepy-frame{display:block;width:100%;height:100%;min-height:360px;border:0;background:#fff;}
+.dashboard-assistant-panel:has(.assistant-beepy-frame){grid-template-rows:auto minmax(0,1fr)!important;}
+.dashboard-assistant-panel:has(.assistant-beepy-frame){gap:0!important;padding:0!important;}
+.dashboard-assistant-panel:has(.assistant-beepy-frame)>.assistant-chat-header{padding:12px 16px;background:#2458d6;}
+.dashboard-assistant-panel:has(.assistant-beepy-frame)>.assistant-chat-header strong,.dashboard-assistant-panel:has(.assistant-beepy-frame)>.assistant-chat-header small{color:#fff;}
+.dashboard-assistant-panel:has(.assistant-beepy-frame)>.assistant-chat-header .assistant-chat-tools img{filter:brightness(0) invert(1);}
+.assistant-chat-header>.assistant-beepy-identity{display:flex;align-items:center;gap:10px;}
+.assistant-beepy-identity>img{width:38px;height:38px;object-fit:contain;background:#fff;border-radius:4px;flex-shrink:0;}
+.assistant-beepy-identity>div{display:grid;gap:4px;}
+html body .dashboard-assistant .assistant-chat-composer button{color:#2458d6!important;}
+@media(max-width:900px){.dashboard-assistant-panel{display:grid;grid-template-rows:auto auto minmax(180px,1fr) auto auto;gap:12px;height:520px;max-height:calc(100dvh - 120px);}.assistant-chat-tools button[data-assistant-expand]{display:none!important;}}
+.visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+@media(max-width:900px){.dashboard-assistant{width:100%;margin-bottom:18px;}.dashboard-assistant-panel{max-width:100%;}.assistant-form-actions .boton{width:auto!important;}}
+</style>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261011_beepy_session_v7" defer></script>
+{% endif %}

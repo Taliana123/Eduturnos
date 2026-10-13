@@ -1,0 +1,98 @@
+{% extends "base.html" %}{% block content %}<div class="page-head"><div><h1>Citaciones</h1><p class="muted">Gestiona y consulta el ciclo completo de cada citación.</p></div>{% if rol in ['Super Admin','Administrador / Coordinador','Docente'] %}<a class="btn" href="{{ url_for('citaciones.nueva') }}">+ Nueva citación</a>{% endif %}</div>
+<div class="table-wrap"><table><tr><th>Fecha</th><th>Estudiante</th><th>Docente</th><th>Motivo</th><th>Estado</th><th>Lugar</th><th>Acciones</th></tr>
+{% for c in citaciones %}<tr><td>{{ c.fecha }}<br>{{ c.hora }}</td><td>{{ c.estudiante_n }} {{ c.estudiante_a }}</td><td>{{ c.docente_n }} {{ c.docente_a }}</td><td>{{ c.motivo }}</td>
+<td><span class="badge {% if c.estado in ['Confirmada','Realizada','Justificada'] %}green{% elif c.estado in ['Cancelada','No asistió'] %}red{% else %}yellow{% endif %}">{{ c.estado }}</span></td><td>{{ c.lugar }}</td>
+<td><form method="post" action="{{ url_for('citaciones.cambiar_estado',id=c.id) }}" class="inline-form">{{ csrf_field()|safe }}<select name="estado">
+<option value="" selected disabled hidden></option>
+<option>Confirmada</option><option>Cancelada</option><option>Realizada</option><option>No asistió</option><option>Justificada</option></select><button>Actualizar</button></form>
+{% if rol in ['Super Admin','Administrador / Coordinador','Docente'] %}<a href="{{ url_for('seguimiento.registrar',id=c.id) }}">Seguimiento</a>{% endif %}</td></tr>{% else %}<tr><td colspan="7">No hay citaciones.</td></tr>{% endfor %}</table></div>
+
+<style id="EDUTURNOS_BOTONES_V4">
+/* =========================================================
+   EDUTURNOS
+   SOLO BOTONES
+   Mismo azul y letra que "+ Nueva citación" de Citas
+   ========================================================= */
+
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a[class*="boton"],
+a.btn,
+a[class*="btn-"],
+a.link-back,
+a.edc-back,
+.boton,
+.btn,
+[class*="boton-"],
+[class*="btn-"],
+.link-back,
+.edc-back {
+
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+
+    color: #ffffff !important;
+
+    border-color: #1769aa !important;
+
+    text-decoration: none !important;
+}
+
+/* Texto dentro de botones */
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a[class*="boton"] *,
+a.btn *,
+a[class*="btn-"] *,
+.link-back *,
+.edc-back * {
+    color: #ffffff !important;
+}
+
+/* Hover */
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a[class*="boton"]:hover,
+a.btn:hover,
+a[class*="btn-"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.boton:hover,
+.btn:hover,
+[class*="boton-"]:hover,
+[class*="btn-"]:hover,
+.link-back:hover,
+.edc-back:hover {
+
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+
+    color: #ffffff !important;
+
+    border-color: #145b91 !important;
+
+    text-decoration: none !important;
+}
+
+/* Elementos hijos durante hover */
+button:hover *,
+a.boton:hover *,
+a[class*="boton"]:hover *,
+a.btn:hover *,
+a[class*="btn-"]:hover *,
+.link-back:hover *,
+.edc-back:hover * {
+    color: #ffffff !important;
+}
+</style>
+
+{% endblock %}

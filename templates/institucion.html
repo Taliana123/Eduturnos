@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Institución · EDUTURNOS{% endblock %}
+{% block content %}
+<main class="institucion-page">
+    <header class="institucion-heading">
+        <a class="link-back" href="{{ url_for('inicio') }}">← Inicio</a>
+        <p class="institucion-kicker">Institución educativa</p>
+        <h1>{{ informacion.nombre }}</h1>
+        <p>Información institucional y ubicaciones de sus sedes en Ibagué, Tolima.</p>
+    </header>
+
+    <section class="institucion-info" aria-labelledby="institucion-info-title">
+        <h2 id="institucion-info-title">Información general</h2>
+        <dl>
+            <div><dt>Código del establecimiento</dt><dd>{{ informacion.codigo }}</dd></div>
+            <div><dt>Secretaría</dt><dd>{{ informacion.secretaria }}</dd></div>
+            <div><dt>Dirección principal</dt><dd>{{ informacion.direccion }}</dd></div>
+            <div><dt>Teléfono</dt><dd><a href="tel:+576082697083">{{ informacion.telefono }}</a></dd></div>
+            <div><dt>Correo electrónico</dt><dd>{% for correo in informacion.correos %}<a href="mailto:{{ correo }}">{{ correo }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}</dd></div>
+            <div><dt>Municipio / departamento</dt><dd>{{ informacion.municipio }} ({{ informacion.codigo_municipio }}), {{ informacion.departamento }} ({{ informacion.codigo_departamento }})</dd></div>
+            <div><dt>Tipo y género</dt><dd>{{ informacion.tipo }} · {{ informacion.genero }}</dd></div>
+            <div><dt>Zona</dt><dd>{{ informacion.zona }}</dd></div>
+            <div><dt>Niveles</dt><dd>{{ informacion.niveles }}</dd></div>
+            <div><dt>Jornadas</dt><dd>{{ informacion.jornadas }}</dd></div>
+            <div><dt>Grados</dt><dd>{{ informacion.grados }}</dd></div>
+            <div><dt>Modelos educativos</dt><dd>{{ informacion.modelos }}</dd></div>
+        </dl>
+    </section>
+
+    <section class="institucion-sedes" aria-labelledby="institucion-sedes-title">
+        <div class="institucion-section-head">
+            <div>
+                <h2 id="institucion-sedes-title">Sedes</h2>
+                <p>Selecciona una sede para consultar su ubicación en el mapa.</p>
+            </div>
+            <span>{{ sedes|length }} sedes</span>
+        </div>
+        <div class="institucion-sedes-list">
+            {% for sede in sedes %}
+            <details class="institucion-sede" {% if loop.first %}open{% endif %}>
+                <summary>
+                    <span><strong>{{ sede.nombre }}</strong><small>{{ sede.direccion }}</small></span>
+                </summary>
+                <div class="institucion-sede-content">
+                    <a href="https://www.google.com/maps/search/?api=1&amp;query={{ sede.direccion|urlencode }}" target="_blank" rel="noopener noreferrer">Abrir indicaciones en Google Maps</a>
+                    <iframe
+                        title="Mapa de {{ sede.nombre }}"
+                        src="{{ sede.mapa }}"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </details>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+
+<style>
+.institucion-page{width:100%;max-width:1180px;margin:0 auto;padding:24px 18px 48px;}
+.institucion-heading{max-width:780px;margin:0 0 30px;}
+.institucion-heading .link-back{display:inline-flex;margin:0 0 18px;}
+.institucion-kicker{margin:0 0 8px;color:#2875c7;font-size:12px;font-weight:700;}
+.institucion-heading h1{margin:0;color:#172942;font-size:32px;line-height:1.2;overflow-wrap:anywhere;}
+.institucion-heading>p:last-child{margin:10px 0 0;color:#5c6e80;line-height:1.5;}
+.institucion-info{padding:20px;margin:0 0 20px;border:1px solid #dce4eb;border-radius:8px;background:#fff;}
+.institucion-info h2,.institucion-section-head h2{margin:0 0 16px;color:#172942;font-size:21px;}
+.institucion-info dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 24px;margin:0;}
+.institucion-info dl>div{min-width:0;}
+.institucion-info dt{margin-bottom:4px;color:#66788a;font-size:12px;font-weight:700;}
+.institucion-info dd{margin:0;color:#20354a;font-size:14px;line-height:1.5;overflow-wrap:anywhere;}
+.institucion-info a,.institucion-sede-content>a{color:#1769aa;}
+.institucion-sedes{padding-top:26px;}
+.institucion-section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:14px;}
+.institucion-section-head h2{margin-bottom:5px;}
+.institucion-section-head p{margin:0;color:#5c6e80;font-size:14px;}
+.institucion-section-head>span{color:#66788a;font-size:12px;white-space:nowrap;}
+.institucion-sedes-list{border-top:1px solid #dce4eb;}
+.institucion-sede{margin-bottom:8px;padding:0 12px;border:1px solid #dce4eb;border-radius:6px;background:#fff;}
+.institucion-sede summary{display:flex;align-items:center;min-height:64px;padding:12px 4px;cursor:pointer;list-style:none;}
+.institucion-sede summary::-webkit-details-marker{display:none;}
+.institucion-sede summary::after{content:'+';margin-left:auto;padding-left:14px;color:#1769aa;font-size:20px;}
+.institucion-sede[open] summary::after{content:'−';}
+.institucion-sede summary span{display:grid;gap:4px;min-width:0;}
+.institucion-sede summary strong{color:#20354a;font-size:14px;}
+.institucion-sede summary small{color:#66788a;font-size:12px;line-height:1.4;}
+.institucion-sede-content{padding:0 4px 16px;}
+.institucion-sede-content>a{display:inline-block;margin:0 0 10px;font-size:13px;}
+.institucion-sede-content iframe{display:block;width:100%;height:300px;border:0;border-radius:6px;background:#f0f3f6;}
+@media(max-width:760px){
+    .institucion-page{padding:18px 14px 30px;}
+    .institucion-heading{margin-bottom:22px;}
+    .institucion-heading h1{font-size:25px;}
+    .institucion-info dl{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;}
+    .institucion-info dd{font-size:13px;}
+    .institucion-section-head{align-items:start;}
+    .institucion-sede-content iframe{height:240px;}
+}
+@media(max-width:420px){.institucion-info dl{grid-template-columns:1fr;}}
+</style>
+{% endblock %}

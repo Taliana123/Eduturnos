@@ -1,0 +1,1500 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear cuenta · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<section class="registro-pagina">
+
+    <div class="registro-layout">
+
+        <!-- =================================================
+             ILUSTRACIÃ“N CREAR CUENTA
+             SIN PERSONAS
+             SIN CUADRO
+             ================================================= -->
+
+        <div class="registro-ilustracion" aria-hidden="true">
+
+            <svg
+                class="registro-dibujo"
+                viewBox="0 0 460 430"
+            >
+
+                <!-- DecoraciÃ³n -->
+
+                <circle
+                    class="decor-punto punto-1"
+                    cx="65"
+                    cy="92"
+                    r="5"
+                />
+
+                <circle
+                    class="decor-punto punto-2"
+                    cx="386"
+                    cy="112"
+                    r="4"
+                />
+
+                <circle
+                    class="decor-punto punto-3"
+                    cx="355"
+                    cy="334"
+                    r="6"
+                />
+
+                <path
+                    class="decor-estrella estrella-1"
+                    d="M82 154
+                       L87 166
+                       L99 171
+                       L87 176
+                       L82 188
+                       L77 176
+                       L65 171
+                       L77 166 Z"
+                />
+
+                <path
+                    class="decor-estrella estrella-2"
+                    d="M366 205
+                       L370 215
+                       L380 219
+                       L370 223
+                       L366 233
+                       L362 223
+                       L352 219
+                       L362 215 Z"
+                />
+
+
+                <!-- LÃ­nea decorativa -->
+
+                <path
+                    class="decor-trazo"
+                    d="M55 260
+                       C42 230 51 195 77 178"
+                />
+
+
+                <!-- Sombra -->
+
+                <ellipse
+                    class="dibujo-sombra"
+                    cx="229"
+                    cy="372"
+                    rx="132"
+                    ry="17"
+                />
+
+
+                <!-- =================================================
+                     CALENDARIO
+                     ================================================= -->
+
+                <g class="dibujo-calendario">
+
+                    <rect
+                        x="88"
+                        y="91"
+                        width="225"
+                        height="205"
+                        rx="18"
+                    />
+
+                    <!-- parte superior -->
+
+                    <rect
+                        x="88"
+                        y="91"
+                        width="225"
+                        height="55"
+                        rx="18"
+                    />
+
+                    <rect
+                        x="88"
+                        y="125"
+                        width="225"
+                        height="21"
+                    />
+
+                    <!-- anillos -->
+
+                    <rect
+                        x="126"
+                        y="72"
+                        width="13"
+                        height="45"
+                        rx="6"
+                    />
+
+                    <rect
+                        x="262"
+                        y="72"
+                        width="13"
+                        height="45"
+                        rx="6"
+                    />
+
+
+                    <!-- tÃ­tulo -->
+
+                    <line
+                        x1="121"
+                        y1="169"
+                        x2="181"
+                        y2="169"
+                    />
+
+                    <line
+                        x1="121"
+                        y1="182"
+                        x2="163"
+                        y2="182"
+                    />
+
+
+                    <!-- cuadricula -->
+
+                    <line x1="120" y1="207" x2="281" y2="207" />
+                    <line x1="120" y1="239" x2="281" y2="239" />
+                    <line x1="120" y1="271" x2="281" y2="271" />
+
+                    <line x1="152" y1="197" x2="152" y2="281" />
+                    <line x1="184" y1="197" x2="184" y2="281" />
+                    <line x1="216" y1="197" x2="216" y2="281" />
+                    <line x1="248" y1="197" x2="248" y2="281" />
+
+
+                    <!-- dÃ­a seleccionado -->
+
+                    <circle
+                        class="dia-seleccionado"
+                        cx="200"
+                        cy="223"
+                        r="12"
+                    />
+
+                </g>
+
+
+                <!-- =================================================
+                     DOCUMENTO
+                     ================================================= -->
+
+                <g class="dibujo-documento">
+
+                    <rect
+                        x="274"
+                        y="157"
+                        width="101"
+                        height="132"
+                        rx="13"
+                    />
+
+                    <path
+                        d="M346 157
+                           L375 186
+                           L346 186 Z"
+                    />
+
+                    <line
+                        x1="292"
+                        y1="211"
+                        x2="350"
+                        y2="211"
+                    />
+
+                    <line
+                        x1="292"
+                        y1="229"
+                        x2="341"
+                        y2="229"
+                    />
+
+                    <line
+                        x1="292"
+                        y1="247"
+                        x2="353"
+                        y2="247"
+                    />
+
+                    <circle
+                        cx="305"
+                        cy="270"
+                        r="6"
+                    />
+
+                </g>
+
+
+                <!-- =================================================
+                     CHECK
+                     ================================================= -->
+
+                <g class="dibujo-check">
+
+                    <circle
+                        cx="334"
+                        cy="321"
+                        r="31"
+                    />
+
+                    <path
+                        d="M317 321
+                           L329 333
+                           L353 305"
+                    />
+
+                </g>
+
+
+                <!-- =================================================
+                     LÃPIZ
+                     ================================================= -->
+
+                <g class="dibujo-lapiz">
+
+                    <rect
+                        x="285"
+                        y="278"
+                        width="17"
+                        height="83"
+                        rx="7"
+                        transform="rotate(25 285 278)"
+                    />
+
+                    <path
+                        d="M318 354
+                           L326 369
+                           L311 363 Z"
+                    />
+
+                    <line
+                        x1="294"
+                        y1="292"
+                        x2="307"
+                        y2="298"
+                    />
+
+                </g>
+
+            </svg>
+
+
+            <div class="registro-ilustracion-texto">
+
+                <strong>Crear tu cuenta</strong>
+
+                <span>Organiza tus citas en EDUTURNOS</span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CONTENIDO DE REGISTRO
+             ================================================= -->
+
+        <div class="registro-contenedor">
+
+            <div class="registro-encabezado">
+
+                <p class="registro-etiqueta">EDUTURNOS</p>
+
+                <h1>Crear cuenta</h1>
+
+                <p class="registro-descripcion">
+                    Selecciona el tipo de cuenta que deseas crear
+                    para continuar.
+                </p>
+
+            </div>
+
+
+            <div class="registro-grid">
+
+{% for slug, info in portales.items() %}
+
+            <article class="registro-opcion">
+
+                <div class="registro-opcion-contenido">
+
+                    <h3>{{ info.label }}</h3>
+
+                    <p>{{ info.descripcion }}</p>
+
+                </div>
+
+                <a
+                    class="registro-boton"
+                    href="{{ url_for('auth.registro_portal', portal=slug) }}"
+                >
+                    Crear cuenta
+                </a>
+
+            </article>
+
+            {% endfor %}
+
+            </div>
+
+
+            <div class="registro-retorno">
+    <a
+        href="{{ url_for('auth.login') }}"
+        class="link-back"
+    >
+        <span aria-hidden="true">←</span>
+        <span>Volver al inicio de sesión</span>
+    </a>
+</div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<style id="EDUTURNOS_REGISTRO_UNICO_2026">
+
+/* =========================================================
+   FONDO
+   ========================================================= */
+
+/*
+   El usuario encontrÃ³ en F12 que #contenido tenÃ­a:
+
+   linear-gradient(
+       180deg,
+       #f5f9ff 0%,
+       #eef5fc 48%,
+       #f8fbff 100%
+   )
+
+   Se mantiene ESE MISMO fondo.
+   El contenedor no tendrÃ¡ otro color.
+*/
+
+#contenido {
+    background: #f4f7fb !important;
+    background-color: #f4f7fb !important;
+}
+
+
+#contenido main.contenedor,
+#contenido .contenedor,
+#contenido main.container,
+#contenido .container {
+    background: #f4f7fb !important;
+    background-color: #f4f7fb !important;
+}
+
+body.auth-page {
+    background: #f4f7fb !important;
+    background-color: #f4f7fb !important;
+}
+
+
+/* =========================================================
+   PAGINA
+   ========================================================= */
+
+.registro-pagina {
+    width: 100%;
+
+    max-width: 1080px;
+
+    margin: 0 auto;
+
+    padding: 38px 20px 46px;
+
+    background: transparent !important;
+}
+
+
+/* =========================================================
+   DISTRIBUCIÃ“N
+   ========================================================= */
+
+.registro-layout {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(330px, .92fr)
+        minmax(440px, 1fr);
+
+    align-items: center;
+
+    gap: 42px;
+}
+
+
+/* =========================================================
+   ILUSTRACIÃ“N
+   TOTALMENTE TRANSPARENTE
+   ========================================================= */
+
+.registro-ilustracion {
+    position: relative;
+
+    width: 100%;
+
+    min-height: 455px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: transparent !important;
+
+    background-color: transparent !important;
+
+    border: 0 !important;
+
+    border-radius: 0 !important;
+
+    box-shadow: none !important;
+
+    overflow: visible;
+}
+
+
+.registro-dibujo {
+    width: min(100%, 440px);
+
+    height: auto;
+
+    overflow: visible;
+
+    animation:
+        dibujo-flotar 5s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   CALENDARIO
+   ========================================================= */
+
+.dibujo-calendario rect {
+    fill: #ffffff;
+
+    stroke: #123b68;
+
+    stroke-width: 4;
+}
+
+
+.dibujo-calendario > rect:nth-child(2) {
+    fill: #2f78ff;
+}
+
+
+.dibujo-calendario line {
+    stroke: #b7c9dc;
+
+    stroke-width: 4;
+
+    stroke-linecap: round;
+}
+
+
+.dibujo-calendario rect:nth-of-type(3),
+.dibujo-calendario rect:nth-of-type(4) {
+    fill: #123b68;
+
+    stroke: none;
+}
+
+
+.dia-seleccionado {
+    fill: #f4bd4f !important;
+
+    stroke: #123b68 !important;
+
+    stroke-width: 3 !important;
+
+    animation:
+        dia-pulso 2.5s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   DOCUMENTO
+   ========================================================= */
+
+.dibujo-documento rect {
+    fill: #ffffff;
+
+    stroke: #123b68;
+
+    stroke-width: 4;
+}
+
+
+.dibujo-documento path {
+    fill: #eaf3ff;
+
+    stroke: #123b68;
+
+    stroke-width: 4;
+}
+
+
+.dibujo-documento line {
+    stroke: #9db4cd;
+
+    stroke-width: 5;
+
+    stroke-linecap: round;
+}
+
+
+.dibujo-documento circle {
+    fill: #2f78ff;
+}
+
+
+/* =========================================================
+   CHECK
+   ========================================================= */
+
+.dibujo-check circle {
+    fill: #ffffff;
+
+    stroke: #2f78ff;
+
+    stroke-width: 5;
+
+    filter:
+        drop-shadow(
+            0 5px 10px rgba(47,120,255,.15)
+        );
+}
+
+
+.dibujo-check path {
+    fill: none;
+
+    stroke: #2f78ff;
+
+    stroke-width: 7;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+
+    stroke-dasharray: 60;
+
+    stroke-dashoffset: 60;
+
+    animation:
+        check-aparece 3s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   LÃPIZ
+   ========================================================= */
+
+.dibujo-lapiz rect {
+    fill: #f4bd4f;
+
+    stroke: #123b68;
+
+    stroke-width: 3;
+}
+
+
+.dibujo-lapiz path {
+    fill: #ffd9c2;
+
+    stroke: #123b68;
+
+    stroke-width: 3;
+}
+
+
+.dibujo-lapiz line {
+    stroke: #ffffff;
+
+    stroke-width: 3;
+
+    stroke-linecap: round;
+}
+
+
+/* =========================================================
+   DECORACIÃ“N
+   ========================================================= */
+
+.decor-punto {
+    fill: #2f78ff;
+
+    opacity: .30;
+
+    animation:
+        punto-flota 3.5s ease-in-out infinite;
+}
+
+
+.punto-2 {
+    animation-delay: .5s;
+}
+
+
+.punto-3 {
+    animation-delay: 1s;
+}
+
+
+.decor-estrella {
+    fill: #f4bd4f;
+
+    opacity: .70;
+
+    animation:
+        estrella-brilla 3.5s ease-in-out infinite;
+}
+
+
+.estrella-2 {
+    animation-delay: 1s;
+}
+
+
+.decor-trazo {
+    fill: none;
+
+    stroke: #2f78ff;
+
+    stroke-width: 3;
+
+    stroke-linecap: round;
+
+    stroke-dasharray: 8 12;
+
+    opacity: .30;
+}
+
+
+.dibujo-sombra {
+    fill: rgba(18,59,104,.10);
+
+    animation:
+        sombra-respira 5s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   TEXTO DE LA ILUSTRACIÃ“N
+   ========================================================= */
+
+.registro-ilustracion-texto {
+    position: absolute;
+
+    bottom: 23px;
+
+    left: 0;
+
+    right: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+}
+
+
+.registro-ilustracion-texto strong {
+    color: #123b68;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif;
+
+    font-size: 22px;
+
+    font-weight: 700;
+}
+
+
+.registro-ilustracion-texto span {
+    margin-top: 3px;
+
+    color: #6b8098;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   TARJETA CREAR CUENTA
+   UN POCO MÃS GRANDE
+   ========================================================= */
+
+.registro-contenedor {
+    width: 100%;
+    max-width: 620px;
+    padding: 34px;
+
+    background: #ffffff;
+    border: 1px solid #dce7f4;
+    border-radius: 18px;
+
+    box-shadow: 0 15px 38px rgba(18,59,104,.08);
+
+    box-sizing: border-box;
+    background-image: none !important;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+   ========================================================= */
+
+.registro-encabezado {
+    margin-bottom: 21px;
+}
+
+
+.registro-etiqueta {
+    margin: 0 0 7px;
+
+    color: #2f78ff;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: .13em;
+
+    text-transform: uppercase;
+
+    /*
+       Un poco mÃ¡s abajo dentro de la zona superior.
+    */
+
+    transform: translateY(4px);
+}
+
+
+.registro-encabezado h1 {
+    margin: 0;
+
+    color: #123b68;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif;
+
+    font-size: 35px;
+
+    line-height: 1.05;
+}
+
+
+.registro-descripcion {
+    margin: 8px 0 0;
+
+    color: #5f7895;
+
+    font-size: 13px;
+
+    line-height: 1.48;
+}
+
+
+/* =========================================================
+   ROLES
+   UN POCO MÃS GRANDES
+   ========================================================= */
+
+/* =========================================================
+   EDUTURNOS - TARJETAS DE ROLES
+   Todas las tarjetas tienen exactamente el mismo tamaño.
+   ========================================================= */
+
+
+
+.registro-opcion {
+    width: 100%;
+    height: 112px;
+    min-height: 112px;
+    max-height: 112px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 18px;
+    padding: 16px 17px;
+
+    box-sizing: border-box;
+    overflow: hidden;
+
+    background: #ffffff;
+    border: 1px solid #dfe8f2;
+    border-radius: 12px;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease;
+}
+
+.registro-opcion:hover {
+    transform: translateY(-2px);
+    border-color: #bdd5f2;
+    box-shadow: 0 8px 18px rgba(18, 59, 104, .08);
+}
+
+.registro-opcion-contenido {
+    min-width: 0;
+    flex: 1 1 auto;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.registro-opcion h3 {
+    margin: 0 0 6px;
+
+    color: #123b68;
+
+    font-size: 15px;
+    font-weight: 750;
+    line-height: 1.2;
+}
+
+.registro-opcion p {
+    margin: 0;
+
+    color: #71859a;
+
+    font-size: 11.5px;
+    line-height: 1.45;
+
+    max-width: 100%;
+}
+
+.registro-opcion .registro-boton {
+    flex: 0 0 auto;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 88px;
+    min-width: 88px;
+    height: 34px;
+    min-height: 34px;
+
+    padding: 8px 10px;
+    box-sizing: border-box;
+
+    background: #2f78ff;
+    color: #ffffff;
+
+    border: 1px solid #2f78ff;
+    border-radius: 8px;
+
+    font-size: 10.5px;
+    font-weight: 700;
+    line-height: 1;
+
+    text-decoration: none;
+
+    box-shadow: 0 4px 9px rgba(47, 120, 255, .13);
+
+    transition:
+        transform .18s ease,
+        background-color .18s ease;
+}
+
+.registro-opcion .registro-boton:hover {
+    background: #2368eb;
+    border-color: #2368eb;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 700px) {
+
+
+    .registro-opcion {
+        height: 112px;
+        min-height: 112px;
+        max-height: 112px;
+    }
+}
+
+@media (max-width: 540px) {
+    .registro-opcion {
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .registro-opcion h3 {
+        font-size: 14px;
+    }
+
+    .registro-opcion p {
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .registro-opcion .registro-boton {
+        width: 84px;
+        min-width: 84px;
+        font-size: 10px;
+    }
+}
+
+    /* =========================================================
+       EDUTURNOS - ROLES
+       COMPOSICION LIMPIA Y UNIFORME
+       ========================================================= */
+
+    .registro-grid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        align-items: stretch;
+    }
+
+    .registro-grid .registro-opcion {
+        width: 100%;
+        height: 112px;
+        min-height: 112px;
+        max-height: 112px;
+
+        box-sizing: border-box;
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 14px;
+        padding: 14px 15px;
+
+        overflow: hidden;
+
+        background: #ffffff;
+        border: 1px solid #dfe8f2;
+        border-radius: 12px;
+
+        box-shadow: 0 3px 10px rgba(18, 59, 104, .045);
+    }
+
+    .registro-grid .registro-opcion-contenido {
+        min-width: 0;
+        width: auto;
+        max-width: calc(100% - 100px);
+
+        flex: 1 1 auto;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .registro-grid .registro-opcion h3 {
+        width: 100%;
+        margin: 0 0 5px;
+        padding: 0;
+
+        color: #123b68;
+
+        font-size: 13.5px;
+        font-weight: 750;
+        line-height: 1.18;
+
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: normal;
+    }
+
+    .registro-grid .registro-opcion p {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+
+        color: #71859a;
+
+        font-size: 10.4px;
+        font-weight: 400;
+        line-height: 1.32;
+
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: normal;
+    }
+
+    .registro-grid .registro-opcion .registro-boton {
+        flex: 0 0 86px;
+
+        width: 86px;
+        min-width: 86px;
+        max-width: 86px;
+
+        height: 34px;
+        min-height: 34px;
+        max-height: 34px;
+
+        box-sizing: border-box;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        margin: 0;
+        padding: 0 7px;
+
+        background: #2f78ff;
+        color: #ffffff;
+
+        border: 1px solid #2f78ff;
+        border-radius: 8px;
+
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
+
+        text-decoration: none;
+        white-space: nowrap;
+
+        box-shadow: 0 4px 9px rgba(47, 120, 255, .13);
+    }
+
+    /* Quinta tarjeta: Rector */
+    .registro-grid .registro-opcion:last-child {
+        grid-column: 1 / -1;
+
+        width: calc(50% - 7px);
+        justify-self: center;
+    }
+
+    /* =========================================================
+       VOLVER AL INICIO DE SESION
+       ========================================================= */
+
+    .registro-retorno {
+        width: 100%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin: 18px 0 0;
+        padding: 0;
+
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+    }
+
+    .registro-retorno .link-back {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 5px;
+
+        width: auto;
+        height: auto;
+
+        margin: 0;
+        padding: 0;
+
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+
+        color: #2f78ff;
+
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.3;
+
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .registro-retorno .link-back:hover {
+        color: #123b68;
+        text-decoration: underline;
+    }
+
+    .registro-retorno .link-back span:first-child {
+        display: inline-block;
+
+        margin: 0;
+        padding: 0;
+
+        font-size: 15px;
+        line-height: 1;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 700px) {
+
+        .registro-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .registro-grid .registro-opcion {
+            width: 100%;
+            height: 112px;
+            min-height: 112px;
+            max-height: 112px;
+        }
+
+        .registro-grid .registro-opcion:last-child {
+            grid-column: auto;
+            width: 100%;
+            justify-self: stretch;
+        }
+    }
+
+    @media (max-width: 540px) {
+
+        .registro-grid {
+            gap: 12px;
+        }
+
+        .registro-grid .registro-opcion {
+            gap: 10px;
+            padding: 13px;
+        }
+
+        .registro-grid .registro-opcion-contenido {
+            max-width: calc(100% - 94px);
+        }
+
+        .registro-grid .registro-opcion h3 {
+            font-size: 13px;
+            line-height: 1.15;
+        }
+
+        .registro-grid .registro-opcion p {
+            font-size: 10px;
+            line-height: 1.28;
+        }
+
+        .registro-grid .registro-opcion .registro-boton {
+            flex-basis: 82px;
+            width: 82px;
+            min-width: 82px;
+            max-width: 82px;
+            font-size: 9.8px;
+        }
+    }
+
+    /* AJUSTE FINAL ACUDIENTE */
+    .registro-grid .registro-opcion h3 {
+        letter-spacing: -0.15px;
+    }
+
+    /* El texto largo del acudiente puede ocupar mejor su espacio */
+    .registro-grid .registro-opcion p {
+        letter-spacing: -0.05px;
+    }
+
+    /* REGRESO A LOGIN: TEXTO SIMPLE, SIN BOTON */
+    .registro-retorno {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 18px 0 0;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+    }
+
+    .registro-retorno .link-back {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+
+        width: auto;
+        height: auto;
+
+        margin: 0;
+        padding: 0;
+
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+
+        color: #2f78ff;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.3;
+
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .registro-retorno .link-back:hover {
+        color: #123b68;
+        text-decoration: underline;
+    }
+
+    .registro-retorno .link-back span:first-child {
+        font-size: 15px;
+        line-height: 1;
+    }
+
+    /* =========================================================
+       EDUTURNOS - AJUSTE DEFINITIVO
+       SOLO ROLES Y REGRESO
+       EL DIBUJO NO SE TOCA
+       ========================================================= */
+
+    .registro-grid .registro-opcion-contenido {
+        min-width: 0 !important;
+        max-width: calc(100% - 100px) !important;
+        flex: 1 1 auto !important;
+        overflow: hidden !important;
+    }
+
+    .registro-grid .registro-opcion h3 {
+        width: 100% !important;
+        margin: 0 0 5px !important;
+        padding: 0 !important;
+
+        font-size: 13px !important;
+        line-height: 1.15 !important;
+        font-weight: 750 !important;
+
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+
+        overflow-wrap: normal !important;
+        word-break: normal !important;
+        letter-spacing: -0.25px !important;
+    }
+
+    .registro-grid .registro-opcion p {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+
+        font-size: 10px !important;
+        line-height: 1.28 !important;
+        font-weight: 400 !important;
+
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+
+        overflow-wrap: break-word !important;
+        word-break: normal !important;
+        letter-spacing: -0.1px !important;
+    }
+
+    .registro-grid .registro-opcion .registro-boton {
+        flex: 0 0 86px !important;
+
+        width: 86px !important;
+        min-width: 86px !important;
+        max-width: 86px !important;
+
+        height: 34px !important;
+        min-height: 34px !important;
+        max-height: 34px !important;
+
+        padding: 0 7px !important;
+        margin: 0 !important;
+
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        font-size: 10px !important;
+        line-height: 1 !important;
+        white-space: nowrap !important;
+    }
+
+    /* ---------------------------------------------------------
+       ACUDIENTE
+       --------------------------------------------------------- */
+
+    .registro-grid .registro-opcion:nth-child(2) h3 {
+        font-size: 12.5px !important;
+        letter-spacing: -0.35px !important;
+        line-height: 1.12 !important;
+    }
+
+    .registro-grid .registro-opcion:nth-child(2) p {
+        font-size: 9.7px !important;
+        line-height: 1.25 !important;
+        letter-spacing: -0.12px !important;
+    }
+
+    /* ---------------------------------------------------------
+       DOCENTE
+       --------------------------------------------------------- */
+
+    .registro-grid .registro-opcion:nth-child(3) p {
+        font-size: 9.7px !important;
+        line-height: 1.25 !important;
+    }
+
+    /* ---------------------------------------------------------
+       RECTOR
+       --------------------------------------------------------- */
+
+    .registro-grid .registro-opcion:last-child {
+        grid-column: 1 / -1 !important;
+        width: calc(50% - 7px) !important;
+        justify-self: center !important;
+    }
+
+    /* ---------------------------------------------------------
+       VOLVER AL INICIO DE SESION
+       --------------------------------------------------------- */
+
+    .registro-retorno {
+        width: 100% !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        margin: 18px 0 0 !important;
+        padding: 0 !important;
+
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .registro-retorno .link-back {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        width: auto !important;
+        height: auto !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        gap: 5px !important;
+
+        background: transparent !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+
+        color: #2f78ff !important;
+
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        line-height: 1.3 !important;
+
+        text-decoration: none !important;
+        white-space: nowrap !important;
+    }
+
+    .registro-retorno .link-back:hover {
+        color: #123b68 !important;
+        text-decoration: underline !important;
+    }
+
+    .registro-retorno .link-back span:first-child {
+        display: inline-block !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        font-size: 15px !important;
+        line-height: 1 !important;
+    }
+
+    .registro-grid .registro-opcion {
+        background: #ffffff !important;
+        border-color: #dce3ed !important;
+        box-shadow: 0 6px 18px rgba(23, 41, 66, .06) !important;
+    }
+
+    .registro-grid .registro-opcion:hover {
+        border-color: #2875c7 !important;
+        box-shadow: 0 10px 22px rgba(23, 41, 66, .10) !important;
+    }
+
+    .registro-grid .registro-opcion .registro-boton {
+        background: #2875c7 !important;
+        border-color: #2875c7 !important;
+        color: #ffffff !important;
+    }
+
+    .registro-grid .registro-opcion .registro-boton:hover {
+        background: #172942 !important;
+        border-color: #172942 !important;
+        color: #ffffff !important;
+    }
+</style>
+<!-- FIN EDUTURNOS_ROLES_UNIFORMES_20260926 -->
+
+{% endblock %}
+
+/* REGISTRO - regreso a login: texto limpio, sin cuadro */
+.registro-retorno .link-back {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: #2f78ff !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+}
+
+.registro-retorno .link-back:hover {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    text-decoration: underline !important;
+}
+
+.registro-retorno .link-back span:first-child {
+    display: inline !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}{% from '_hora_cita.html' import selector_hora %}{% block content %}<div class="page-head nueva-cita-heading"><h1>Nueva citación</h1></div><form method="post" class="panel form-grid nueva-cita-form">{{ csrf_field()|safe }}<input type="hidden" name="vista_movil" value="1" data-mobile-only disabled>
+{% if periodos %}<input type="hidden" name="id_periodo" value="{{ periodos[0].id }}">{% endif %}
+<label>Estudiante<select name="id_estudiante" required>
+<option value="" selected disabled hidden></option>
+{% for e in estudiantes %}<option value="{{ e.id_estudiante }}">{{ e.nombre }} · {{ e.documento }}{% if e.detalle %} · {{ e.detalle }}{% endif %}</option>{% endfor %}</select></label>
+<label>Docente<select name="id_docente" required>
+<option value="" selected disabled hidden></option>
+{% for d in docentes %}<option value="{{ d.id_docente }}">{{ d.nombre }}</option>{% endfor %}</select></label>
+<label>Acudiente<select name="id_acudiente" required>
+<option value="" selected disabled hidden></option>
+{% for a in acudientes %}<option value="{{ a.id_acudiente }}">{{ a.nombre }}</option>{% endfor %}</select></label>
+<label>Motivo<select name="id_motivo" required>
+<option value="" selected disabled hidden></option>
+{% for m in motivos %}<option value="{{ m.id }}">{{ m.nombre }}</option>{% endfor %}</select></label>
+<label>Fecha<input type="date" name="fecha" min="{{ fecha_minima }}" required></label><label>Hora{{ selector_hora('hora') }}</label>
+<div class="full-field mobile-command-group"><button class="boton">Crear citación</button> <a class="boton secundario" href="{% if request.args.get('origen') == 'calendario' %}{{ url_for('calendario.index') }}{% else %}{{ url_for('citas.index') }}{% endif %}">Cancelar</a></div></form>
+
+
+
+{% endblock %}

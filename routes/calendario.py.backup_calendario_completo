@@ -1,0 +1,333 @@
+from datetime import datetime, timedelta
+from flask import Blueprint, Response, abort, jsonify, render_template
+from database.db import consultar
+from routes.helpers import usuario_actual, login_requerido
+
+
+calendario_bp = Blueprint(
+    "calendario",
+    __name__,
+    url_prefix="/calendario"
+)
+
+
+def _filtros_usuario(usuario):
+    rol = usuario["rol_nombre"]
+    filtros = []
+    params = []
+
+    if rol in (
+        "Super Admin",
+        "Rector",
+        "Administrador / Coordinador",
+    ):
+        return filtros, params
+
+    if rol == "Docente":
+        filtros.append(
+            """
+            c.id_docente = (
+                SELECT d.id_docente
+                FROM docentes d
+                WHERE d.id_usuario = %s
+            )
+            """
+        )
+        params.append(usuario["id_usuario"])
+
+    elif rol == "Estudiante":
+        filtros.append(
+            """
+            c.id_estudiante = (
+                SELECT e.id_estudiante
+                FROM estudiantes e
+                WHERE e.id_usuario = %s
+            )
+            """
+        )
+        params.append(usuario["id_usuario"])
+
+    elif rol == "Acudiente":
+        filtros.append(
+            """
+            c.id_acudiente = (
+                SELECT a.id_acudiente
+                FROM acudientes a
+                WHERE a.id_usuario = %s
+            )
+            """
+        )
+        params.append(usuario["id_usuario"])
+
+    else:
+        filtros.append("1 = 0")
+
+    return filtros, params
+
+
+def _normalizar_cita(cita):
+    resultado = dict(cita)
+
+    if resultado.get("fecha") is not None:
+        resultado["fecha"] = resultado["fecha"].isoformat()
+
+    if resultado.get("hora") is not None:
+        valor_hora = resultado["hora"]
+        if hasattr(valor_hora, "isoformat"):
+            resultado["hora"] = valor_hora.isoformat()
+
+    if resultado.get("fecha_creacion") is not None:
+        resultado["fecha_creacion"] = resultado["fecha_creacion"].isoformat()
+
+    return resultado
+
+
+def citas_visibles(usuario=None):
+    usuario = usuario or usuario_actual()
+
+    filtros, params = _filtros_usuario(usuario)
+
+    where_sql = ""
+    if filtros:
+        where_sql = " WHERE " + " AND ".join(filtros)
+
+    sql = f"""
+        SELECT
+            c.id,
+            c.id_estudiante,
+            c.id_acudiente,
+            c.id_docente,
+            c.id_motivo,
+            c.id_estado,
+            c.id_periodo,
+            c.fecha,
+            c.hora,
+            c.lugar,
+            c.observaciones,
+            c.fecha_creacion,
+
+            e.id_sede AS id_sede,
+            e.id_jornada AS id_jornada,
+            e.documento AS estudiante_documento,
+            e.codigo_estudiantil,
+
+            CONCAT(e.nombres, ' ', e.apellidos) AS estudiante,
+            CONCAT(a.nombres, ' ', a.apellidos) AS acudiente,
+            CONCAT(d.nombres, ' ', d.apellidos) AS docente,
+
+            m.nombre AS motivo_nombre,
+            ec.nombre AS estado_nombre,
+
+            s.nombre AS sede_nombre,
+            j.nombre AS jornada_nombre
+
+        FROM citas c
+
+        INNER JOIN estudiantes e
+            ON e.id_estudiante = c.id_estudiante
+
+        INNER JOIN acudientes a
+            ON a.id_acudiente = c.id_acudiente
+
+        INNER JOIN docentes d
+            ON d.id_docente = c.id_docente
+
+        INNER JOIN motivos m
+            ON m.id = c.id_motivo
+
+        INNER JOIN estados_cita ec
+            ON ec.id = c.id_estado
+
+        LEFT JOIN sedes s
+            ON s.id = e.id_sede
+
+        LEFT JOIN jornadas j
+            ON j.id = e.id_jornada
+
+        {where_sql}
+
+        ORDER BY
+            c.fecha ASC,
+            c.hora ASC,
+            c.id ASC
+
+        LIMIT 1000
+    """
+
+    registros = consultar(sql, tuple(params))
+    return [_normalizar_cita(cita) for cita in registros]
+
+
+@calendario_bp.route("/")
+@login_requerido
+def index():
+    usuario = usuario_actual()
+
+    citas = citas_visibles(usuario)
+
+    sedes = consultar(
+        """
+        SELECT id, nombre
+        FROM sedes
+        ORDER BY nombre
+        """
+    )
+
+    jornadas = consultar(
+        """
+        SELECT id, nombre
+        FROM jornadas
+        ORDER BY id
+        """
+    )
+
+    puede_crear = usuario["rol_nombre"] in (
+        "Super Admin",
+        "Rector",
+        "Administrador / Coordinador",
+        "Docente",
+    )
+
+    return render_template(
+        "calendario/index.html",
+        citas=citas,
+        sedes=sedes,
+        jornadas=jornadas,
+        puede_crear=puede_crear,
+    )
+
+
+@calendario_bp.route("/api/citas")
+@login_requerido
+def api_citas():
+    usuario = usuario_actual()
+
+    return jsonify({
+        "ok": True,
+        "citas": citas_visibles(usuario)
+    })
+
+
+@calendario_bp.route("/<int:cita_id>.ics")
+@login_requerido
+def descargar_ics(cita_id):
+    usuario = usuario_actual()
+
+    visibles = citas_visibles(usuario)
+    ids_visibles = {int(cita["id"]) for cita in visibles}
+
+    if cita_id not in ids_visibles:
+        abort(404)
+
+    cita = consultar(
+        """
+        SELECT
+            c.id,
+            c.fecha,
+            c.hora,
+            c.lugar,
+            c.observaciones,
+
+            m.nombre AS motivo,
+            ec.nombre AS estado,
+
+            CONCAT(
+                e.nombres,
+                ' ',
+                e.apellidos
+            ) AS estudiante,
+
+            CONCAT(
+                d.nombres,
+                ' ',
+                d.apellidos
+            ) AS docente,
+
+            CONCAT(
+                a.nombres,
+                ' ',
+                a.apellidos
+            ) AS acudiente
+
+        FROM citas c
+
+        INNER JOIN estudiantes e
+            ON e.id_estudiante = c.id_estudiante
+
+        INNER JOIN docentes d
+            ON d.id_docente = c.id_docente
+
+        INNER JOIN acudientes a
+            ON a.id_acudiente = c.id_acudiente
+
+        INNER JOIN motivos m
+            ON m.id = c.id_motivo
+
+        INNER JOIN estados_cita ec
+            ON ec.id = c.id_estado
+
+        WHERE c.id = %s
+
+        LIMIT 1
+        """,
+        (cita_id,),
+        uno=True
+    )
+
+    if not cita:
+        abort(404)
+
+    inicio = datetime.combine(
+        cita["fecha"],
+        cita["hora"]
+    )
+
+    fin = inicio + timedelta(minutes=45)
+
+    def escapar(valor):
+        return (
+            str(valor or "")
+            .replace("\\", "\\\\")
+            .replace(";", "\\;")
+            .replace(",", "\\,")
+            .replace("\r", "")
+            .replace("\n", "\\n")
+        )
+
+    descripcion = (
+        f"Estado: {cita['estado']} | "
+        f"Estudiante: {cita['estudiante']} | "
+        f"Docente: {cita['docente']} | "
+        f"Acudiente: {cita['acudiente']} | "
+        f"{cita['observaciones'] or ''}"
+    )
+
+    lineas = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//EDUTURNOS//ES",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "BEGIN:VEVENT",
+        f"UID:eduturnos-cita-{cita['id']}@eduturnos",
+        f"DTSTAMP:{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}",
+        f"DTSTART:{inicio.strftime('%Y%m%dT%H%M%S')}",
+        f"DTEND:{fin.strftime('%Y%m%dT%H%M%S')}",
+        f"SUMMARY:{escapar('EDUTURNOS - ' + cita['motivo'])}",
+        f"LOCATION:{escapar(cita['lugar'])}",
+        f"DESCRIPTION:{escapar(descripcion)}",
+        "END:VEVENT",
+        "END:VCALENDAR",
+    ]
+
+    contenido = "\r\n".join(lineas) + "\r\n"
+
+    return Response(
+        contenido,
+        mimetype="text/calendar",
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="eduturnos_cita_{cita_id}.ics"'
+            )
+        }
+    )

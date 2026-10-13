@@ -1,0 +1,69 @@
+{% extends 'base.html' %}{% block title %}Estudiantes · EDUTURNOS{% endblock %}{% block content %}
+<div class="estudiantes-desktop">
+	<a class="boton secundario desktop-back-link" href="{{ url_for('auth.dashboard') }}" aria-label="Volver al panel">← Volver</a>
+	<section class="page-head estudiantes-desktop-head">
+		<div><h1>Estudiantes</h1><p class="muted">Cada estudiante, con su información en orden.</p></div>
+		{% if puede_gestionar %}<a class="boton" href="{{ url_for('estudiantes.nuevo') }}">+ Registrar estudiante</a>{% endif %}
+	</section>
+	<section class="estudiantes-directorio" aria-label="Directorio de estudiantes">
+		<div class="estudiantes-directorio-header">
+			<strong>{{ estudiantes|length }} {{ 'estudiante' if estudiantes|length == 1 else 'estudiantes' }}</strong>
+			<form method="get" role="search" class="estudiantes-search">
+				<input type="search" name="q" value="{{ q }}" placeholder="Nombre, sede o grado" aria-label="Buscar estudiantes por nombre, sede o grado">
+				<button class="boton secundario" type="submit">Buscar</button>
+				{% if q %}<a class="boton secundario estudiantes-clear-search" href="{{ url_for('estudiantes.lista') }}" aria-label="Mostrar todos los estudiantes">Mostrar todos</a>{% endif %}
+			</form>
+		</div>
+		<table class="estudiantes-directorio-table">
+			<thead><tr><th scope="col">Estudiante</th><th scope="col">Grado / Grupo</th><th scope="col">Sede y jornada</th><th scope="col">Acudiente</th></tr></thead>
+			<tbody>
+				{% for estudiante in estudiantes %}
+				<tr>
+					<td><div class="estudiantes-identidad"><span class="estudiantes-avatar"><img src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="" width="24" height="24"></span>
+						{% if puede_gestionar %}<a href="{{ url_for('estudiantes.editar', id=estudiante.id_estudiante) }}">{{ estudiante.nombres }} {{ estudiante.apellidos }}</a>{% else %}<span>{{ estudiante.nombres }} {{ estudiante.apellidos }}</span>{% endif %}
+					</div></td>
+					<td>{{ estudiante.grado or estudiante.curso or 'Sin grado asignado' }}{% if estudiante.grupo %} · {{ estudiante.grupo }}{% endif %}</td>
+					<td>{{ estudiante.sede or 'Sin sede asignada' }}<small>{{ estudiante.jornada or 'Sin jornada asignada' }}</small></td>
+					<td>{{ estudiante.acudiente or 'Sin acudiente asociado' }}</td>
+				</tr>
+				{% else %}<tr><td colspan="4" class="estudiantes-directorio-vacio">No hay resultados.</td></tr>{% endfor %}
+			</tbody>
+		</table>
+	</section>
+</div>
+<div class="estudiantes-mobile-legacy">
+{% if q %}<p class="estudiantes-mobile-clear"><a class="boton secundario" href="{{ url_for('estudiantes.lista') }}">Mostrar todos</a></p>{% endif %}
+<div class="page-head"><div><h1>Estudiantes</h1></div><a class="boton" href="{{ url_for('estudiantes.nuevo') }}">+ Nuevo</a></div><form method="get" class="search">{{ csrf_field()|safe }}<input name="q" value="{{ q }}" placeholder="Nombre, apellido o documento"><button class="boton secundario">Buscar</button></form><div class="table-wrap"><table><tr><th>Estudiante</th><th>Documento</th><th>Curso</th><th>Sede</th><th>Estado</th><th>Acción</th></tr>{% for e in estudiantes %}<tr><td>{{ e.nombres }} {{ e.apellidos }}</td><td>{{ e.documento }}</td><td>{{ e.curso or '-' }}</td><td>{{ e.sede or '-' }}</td><td>{{ e.estado }}</td><td><a href="{{ url_for('estudiantes.editar',id=e.id_estudiante) }}">Editar</a></td></tr>{% else %}<tr><td colspan="6">No hay resultados.</td></tr>{% endfor %}</table></div>
+</div>
+<style>
+.estudiantes-desktop{display:none;}
+@media(min-width:901px){
+	html body #contenido .estudiantes-mobile-legacy{display:none!important;}
+	html body #contenido .estudiantes-desktop{display:block;}
+	html body #contenido .estudiantes-desktop-head{align-items:flex-start;margin-bottom:32px;}
+	html body #contenido .estudiantes-desktop-head p{margin:12px 0 0;font-size:14px;}
+	html body #contenido .estudiantes-directorio{background:#fff;border:1px solid #d5e1fa;border-radius:6px;overflow:hidden;}
+	html body #contenido .estudiantes-directorio-header{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:14px 22px;}
+	html body #contenido .estudiantes-directorio-header strong{font-size:14px;}
+	html body #contenido .estudiantes-directorio-header form{margin:0;width:300px;max-width:50%;}
+	html body #contenido .estudiantes-directorio-header input{width:100%;min-height:44px;margin:0;font-family:inherit;font-size:13px;}
+	html body #contenido table.estudiantes-directorio-table{width:100%;border-collapse:collapse;table-layout:fixed;margin:0;}
+	html body #contenido .estudiantes-directorio-table th{background:#f8fafc;border-top:1px solid #d5e1fa;border-bottom:1px solid #d5e1fa;padding:14px 22px;text-align:left;font-size:11px;font-weight:400;text-transform:uppercase;color:#557096;}
+	html body #contenido .estudiantes-directorio-table th:first-child{width:36%;}
+	html body #contenido .estudiantes-directorio-table th:nth-child(2){width:20%;}
+	html body #contenido .estudiantes-directorio-table th:nth-child(3){width:21%;}
+	html body #contenido .estudiantes-directorio-table td{padding:24px 22px;border-bottom:1px solid #d5e1fa;font-size:13px;line-height:1.5;overflow-wrap:anywhere;color:#557096;}
+	html body #contenido .estudiantes-directorio-table tr:last-child td{border-bottom:0;}
+	html body #contenido .estudiantes-identidad{display:flex;align-items:center;gap:12px;color:#142d50;}
+	html body #contenido .estudiantes-identidad a{color:inherit;text-decoration:none;}
+	html body #contenido .estudiantes-identidad a:hover{text-decoration:underline;}
+	html body #contenido .estudiantes-avatar{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:50%;background:#f0f4f8;}
+	html body #contenido .estudiantes-avatar img{width:24px;height:24px;object-fit:contain;}
+	html body #contenido .estudiantes-directorio-table small{display:block;margin-top:5px;font-size:12px;}
+	html body #contenido .estudiantes-directorio-vacio{text-align:center;}
+}
+</style>
+
+
+
+{% endblock %}

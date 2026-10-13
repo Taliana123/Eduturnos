@@ -1,0 +1,473 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Recuperar acceso - EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<style id="EDUTURNOS_RECUPERAR_INICIO">
+
+/* =========================================================
+   RECUPERAR ACCESO
+   Inspirado en la portada / inicio de EDUTURNOS
+   ========================================================= */
+
+html body .formulario {
+    min-height: calc(100vh - 78px) !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 38px 20px 46px !important;
+
+    box-sizing: border-box !important;
+
+    background: #f7f9fb !important;
+}
+
+/* =========================================================
+   TARJETA COMPACTA
+   ========================================================= */
+
+html body .formulario .form-card {
+    position: relative !important;
+
+    width: 100% !important;
+    max-width: 430px !important;
+
+    margin: 0 auto !important;
+
+    padding: 0 !important;
+
+    overflow: hidden !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #e6ebf0 !important;
+
+    border-radius: 15px !important;
+
+    box-shadow:
+        0 10px 28px rgba(19, 44, 70, .07) !important;
+}
+
+/* Detalle superior */
+
+html body .formulario .form-card::before {
+    content: "" !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    height: 4px !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            #172f49 0%,
+            #2875c7 72%,
+            #e8ad3d 100%
+        ) !important;
+}
+
+/* =========================================================
+   VOLVER
+   ========================================================= */
+
+html body .formulario .form-top-actions {
+    padding: 18px 25px 0 !important;
+}
+
+html body .formulario .link-back {
+    color: #52677b !important;
+
+    font-family:
+        "Public Sans",
+        Arial,
+        sans-serif !important;
+
+    font-size: 12.5px !important;
+
+    font-weight: 600 !important;
+
+    text-decoration: none !important;
+
+    transition: color .18s ease !important;
+}
+
+html body .formulario .link-back:hover {
+    color: #2875c7 !important;
+}
+
+/* =========================================================
+   ENCABEZADO
+   ========================================================= */
+
+html body .formulario .form-header {
+    padding: 17px 25px 0 !important;
+}
+
+html body .formulario .form-header h1 {
+    margin: 0 !important;
+
+    color: #17324d !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size: 28px !important;
+
+    line-height: 1.1 !important;
+
+    font-weight: 700 !important;
+
+    letter-spacing: -.018em !important;
+}
+
+html body .formulario .form-header h1::after {
+    content: "" !important;
+
+    display: block !important;
+
+    width: 34px !important;
+
+    height: 3px !important;
+
+    margin-top: 8px !important;
+
+    border-radius: 99px !important;
+
+    background: #e8ad3d !important;
+}
+
+html body .formulario .form-header p {
+    margin: 11px 0 0 !important;
+
+    max-width: 360px !important;
+
+    color: #66788a !important;
+
+    font-family:
+        "Public Sans",
+        Arial,
+        sans-serif !important;
+
+    font-size: 13px !important;
+
+    line-height: 1.55 !important;
+}
+
+/* =========================================================
+   MENSAJES
+   ========================================================= */
+
+html body .formulario .mensajes {
+    margin: 17px 25px 0 !important;
+}
+
+html body .formulario .mensaje {
+    padding: 9px 11px !important;
+
+    border-radius: 8px !important;
+
+    font-size: 12.5px !important;
+}
+
+/* =========================================================
+   CAMPO
+   ========================================================= */
+
+html body .formulario .formulario-eduturnos {
+    margin: 21px 25px 0 !important;
+}
+
+html body .formulario .formulario-eduturnos .campo label {
+    display: block !important;
+
+    margin: 0 0 6px !important;
+
+    color: #25384a !important;
+
+    font-family:
+        "Public Sans",
+        Arial,
+        sans-serif !important;
+
+    font-size: 12.5px !important;
+
+    font-weight: 600 !important;
+}
+
+html body .formulario .formulario-eduturnos .campo input {
+    display: block !important;
+
+    width: 100% !important;
+
+    height: 42px !important;
+
+    box-sizing: border-box !important;
+
+    padding: 0 12px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #ccd6df !important;
+
+    border-radius: 8px !important;
+
+    color: #263746 !important;
+
+    font-family:
+        "Public Sans",
+        Arial,
+        sans-serif !important;
+
+    font-size: 13.5px !important;
+
+    outline: none !important;
+
+    box-shadow: none !important;
+
+    transition:
+        border-color .18s ease,
+        box-shadow .18s ease !important;
+}
+
+html body .formulario .formulario-eduturnos .campo input::placeholder {
+    color: #9aa7b3 !important;
+}
+
+html body .formulario .formulario-eduturnos .campo input:focus {
+    border-color: #2875c7 !important;
+
+    box-shadow:
+        0 0 0 3px rgba(40, 117, 199, .09) !important;
+}
+
+/* =========================================================
+   BOTÓN
+   Mismo lenguaje visual institucional del inicio
+   ========================================================= */
+
+html body .formulario .formulario-eduturnos .btn-primary {
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 100% !important;
+
+    height: 43px !important;
+
+    min-height: 43px !important;
+
+    margin-top: 15px !important;
+
+    padding: 0 16px !important;
+
+    box-sizing: border-box !important;
+
+    border: 0 !important;
+
+    border-radius: 8px !important;
+
+    background: #2875c7 !important;
+
+    color: #ffffff !important;
+
+    font-family:
+        "Public Sans",
+        Arial,
+        sans-serif !important;
+
+    font-size: 13px !important;
+
+    font-weight: 700 !important;
+
+    line-height: 1 !important;
+
+    text-align: center !important;
+
+    text-shadow: none !important;
+
+    cursor: pointer !important;
+
+    opacity: 1 !important;
+
+    box-shadow:
+        0 6px 14px rgba(40, 117, 199, .17) !important;
+
+    transition:
+        background .18s ease,
+        transform .18s ease,
+        box-shadow .18s ease !important;
+}
+
+html body .formulario .formulario-eduturnos .btn-primary:hover {
+    background: #2168b2 !important;
+
+    color: #ffffff !important;
+
+    transform: translateY(-1px) !important;
+
+    box-shadow:
+        0 8px 17px rgba(40, 117, 199, .21) !important;
+}
+
+html body .formulario .formulario-eduturnos .btn-primary:active {
+    background: #1d5d9f !important;
+
+    color: #ffffff !important;
+
+    transform: translateY(0) !important;
+}
+
+/* =========================================================
+   PIE
+   ========================================================= */
+
+html body .formulario .form-footer {
+    margin: 17px 25px 21px !important;
+
+    padding-top: 13px !important;
+
+    border-top: 1px solid #edf0f3 !important;
+
+    text-align: center !important;
+}
+
+html body .formulario .form-footer p {
+    margin: 0 !important;
+
+    color: #7a8997 !important;
+
+    font-family:
+        "Public Sans",
+        Arial,
+        sans-serif !important;
+
+    font-size: 11.5px !important;
+
+    line-height: 1.5 !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    html body .formulario {
+        min-height: auto !important;
+
+        padding: 28px 15px 38px !important;
+
+        align-items: flex-start !important;
+    }
+
+    html body .formulario .form-card {
+        max-width: 100% !important;
+
+        border-radius: 14px !important;
+    }
+
+    html body .formulario .form-top-actions,
+    html body .formulario .form-header {
+        padding-left: 21px !important;
+        padding-right: 21px !important;
+    }
+
+    html body .formulario .mensajes,
+    html body .formulario .formulario-eduturnos {
+        margin-left: 21px !important;
+        margin-right: 21px !important;
+    }
+
+    html body .formulario .form-footer {
+        margin-left: 21px !important;
+        margin-right: 21px !important;
+    }
+}
+
+</style>
+
+<section class="formulario">
+
+    <div class="tarjeta form-card">
+
+        <div class="form-top-actions">
+            <a class="link-back" href="{{ url_for('auth.login') }}">
+                ← Volver al inicio de sesión
+            </a>
+        </div>
+
+        <div class="form-header">
+            <h1>Recuperar acceso</h1>
+
+            <p>
+                Ingresa el correo asociado a tu cuenta y te enviaremos
+                un código de recuperación de 6 dígitos.
+            </p>
+        </div>
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                <div class="mensajes">
+                    {% for categoria, mensaje in mensajes %}
+                        <div class="mensaje mensaje-{{ categoria }}">
+                            {{ mensaje }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST"
+              action="{{ url_for('passwords.recuperar') }}"
+              class="formulario-eduturnos"
+              autocomplete="off">
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}">
+
+            <div class="campo">
+
+                <label for="correo">
+                    Correo electrónico
+                </label>
+
+                <input
+                    type="email"
+                    id="correo"
+                    name="correo"
+                    value="{{ request.form.get('correo', '') }}"
+                    placeholder="correo@ejemplo.com"
+                    autocomplete="email"
+                    required
+                    autofocus>
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-primary">
+                Enviar código de recuperación
+            </button>
+
+        </form>
+
+        <div class="form-footer">
+            <p>
+                Recibirás un código de 6 dígitos válido durante 10 minutos.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

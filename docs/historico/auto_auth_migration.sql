@@ -1,0 +1,1 @@
+-- Archivo histórico. La instalación nueva usa sql/eduturnos.sql como esquema único.
