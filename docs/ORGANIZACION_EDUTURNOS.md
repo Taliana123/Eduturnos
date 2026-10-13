@@ -17,10 +17,10 @@ EDUTURNOS es una aplicación web para organizar las citaciones escolares y su se
 
 ```text
 Navegador
-	-> proxy HTTPS (cuando está configurado)
-	-> Waitress / WSGI
-	-> Flask: autenticación y blueprints de cada módulo
-	-> MySQL
+  -> proxy HTTPS (cuando está configurado)
+  -> Waitress / WSGI
+  -> Flask: autenticación y blueprints de cada módulo
+  -> MySQL
 ```
 
 El navegador nunca se conecta directamente a MySQL. Flask aplica controles de sesión, rol y CSRF en las operaciones que modifican datos; los módulos ejecutan las consultas y preparan la respuesta HTML o la descarga solicitada.

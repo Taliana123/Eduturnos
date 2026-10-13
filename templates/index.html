@@ -890,7 +890,7 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
 </div>
 
 {% if request.args.get('mobile') == '1' or session.get('mobile_mode') or 'Android' in request.user_agent.string or 'iPhone' in request.user_agent.string or 'iPad' in request.user_agent.string %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261013_public_mobile_nav_v54">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261013_public_mobile_nav_v55">
 {% endif %}
 </body>
 </html>
@@ -1102,7 +1102,7 @@ body {
 }
 
 </style>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261013_public_mobile_nav_v54" media="(max-width: 900px)">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261013_public_mobile_nav_v55" media="(max-width: 900px)">
 <style id="eduturnos-footer-mobile-text">
 @media (max-width: 900px) {
     html body .pagina > footer .footer-interior > .footer-brand-block,

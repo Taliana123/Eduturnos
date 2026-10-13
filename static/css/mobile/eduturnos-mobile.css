@@ -3827,6 +3827,12 @@ html body.auth-page .registro-contenedor h1 {
 }
 
 @media (max-width: 900px) {
+    html body.public-home-page .pagina > header.barra {
+        position: relative !important;
+        z-index: 20 !important;
+        overflow: visible !important;
+    }
+
     html body.public-home-page .pagina > header.barra > .barra-interior {
         width: 100% !important;
         min-height: 68px !important;

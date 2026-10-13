@@ -301,7 +301,7 @@ def test_formularios_y_acciones_de_listas_conservan_contexto():
     assert '<th>Área</th>' not in lista_docentes
     assert '>Editar</a>' in lista_docentes and 'Asignaciones</a>' not in lista_docentes
     assert '>Editar</a>' in lista_acudientes and 'Estudiantes</a>' not in lista_acudientes
-    assert portada.count('v=20261013_public_mobile_nav_v54') == 2
+    assert portada.count('v=20261013_public_mobile_nav_v55') == 2
     assert 'font-size: 16px;' in portada
     assert 'font-size: 14px;' in portada
     assert 'eduturnos-footer-mobile-text' in portada
