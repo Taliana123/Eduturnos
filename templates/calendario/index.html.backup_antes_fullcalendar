@@ -1,0 +1,2569 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Calendario Â· EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<section class="calendario-page">
+
+    <!-- =====================================================
+         CABECERA
+         ===================================================== -->
+
+    <header class="cal-header">
+
+        <div class="cal-header-left">
+
+            <a
+                class="cal-back"
+                href="{{ request.referrer or url_for('auth.dashboard') }}"
+            >
+                â† AtrÃ¡s
+            </a>
+
+            <div class="cal-title-row">
+
+                <div class="cal-title-icon">
+                    CAL
+                </div>
+
+                <div>
+                    <span class="badge">Agenda institucional</span>
+
+                    <h1>Calendario</h1>
+
+                    <p>
+                        Consulta tus citaciones y actividades programadas.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="cal-header-actions">
+
+            <div class="cal-counter">
+
+                <strong id="contadorTotal">
+                    {{ citas|length }}
+                </strong>
+
+                <span>
+                    {{ 'citaciÃ³n' if citas|length == 1 else 'citaciones' }}
+                </span>
+
+            </div>
+
+            <a
+                class="cal-button cal-button-primary"
+                href="{{ url_for('citas.index') }}"
+            >
+                Ver citas
+            </a>
+
+            {% if usuario_sesion and usuario_sesion.rol_nombre in [
+                'Docente',
+                'Administrador / Coordinador',
+                'Rector',
+                'Super Admin'
+            ] %}
+
+            <a
+                class="cal-button cal-button-main"
+                href="{{ url_for('citas.nueva') }}"
+            >
+                + Nueva citaciÃ³n
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         PANEL PRINCIPAL
+         ===================================================== -->
+
+    <section class="cal-main-card">
+
+        <!-- CONTROLES -->
+
+        <div class="cal-toolbar">
+
+            <div class="cal-toolbar-left">
+
+                <button
+                    type="button"
+                    class="cal-nav-button"
+                    id="btnAnterior"
+                    aria-label="Mes anterior"
+                >
+                    â€¹
+                </button>
+
+                <button
+                    type="button"
+                    class="cal-today-button"
+                    id="btnHoy"
+                >Hoy</button>
+
+                <button
+                    type="button"
+                    class="cal-nav-button"
+                    id="btnSiguiente"
+                    aria-label="Mes siguiente"
+                >
+                    â€º
+                </button>
+
+            </div>
+
+
+            <div class="cal-month-title">
+
+                <span id="mesActual">
+                    Calendario
+                </span>
+
+            </div>
+
+
+            <div class="cal-filter">
+
+                <label for="filtroEstado">
+                    Mostrar
+                </label>
+
+                <select id="filtroEstado">
+
+                    <option value="Todos">
+                        Todas
+                    </option>
+
+                    <option value="Confirmada">
+                        Confirmadas
+                    </option>
+
+                    <option value="Pendiente">
+                        Pendientes
+                    </option>
+
+                    <option value="Reprogramada">
+                        Reprogramadas
+                    </option>
+
+                    <option value="Cancelada">
+                        Canceladas
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             DÃAS
+             ================================================= -->
+
+        <div class="cal-week">
+
+            <span>Lun</span>
+            <span>Mar</span>
+            <span>MiÃ©</span>
+            <span>Jue</span>
+            <span>Vie</span>
+            <span>SÃ¡b</span>
+            <span>Dom</span>
+
+        </div>
+
+
+        <!-- =================================================
+             CALENDARIO
+             ================================================= -->
+
+        <div
+            id="calendarGrid"
+            class="cal-grid"
+            aria-label="Calendario mensual"
+        ></div>
+
+
+        <!-- =================================================
+             LEYENDA
+             ================================================= -->
+
+        <div class="cal-legend">
+
+            <span>
+                <i class="dot dot-green"></i>
+                Confirmada
+            </span>
+
+            <span>
+                <i class="dot dot-yellow"></i>
+                Pendiente
+            </span>
+
+            <span>
+                <i class="dot dot-blue"></i>
+                Reprogramada
+            </span>
+
+            <span>
+                <i class="dot dot-red"></i>
+                Cancelada
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DOS COLUMNAS DE INFORMACIÃ“N
+         ===================================================== -->
+
+    <div class="cal-bottom-grid">
+
+
+        <!-- =================================================
+             DETALLE DEL DÃA
+             ================================================= -->
+
+        <section class="cal-detail-card">
+
+            <div class="cal-card-heading">
+
+                <div>
+
+                    <span class="badge">
+                        Detalle del dÃ­a
+                    </span>
+
+                    <h2 id="detalleTitulo">
+                        Selecciona una fecha
+                    </h2>
+
+                    <p id="detalleSubtitulo">
+                        Haz clic sobre un dÃ­a para consultar
+                        sus citaciones.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div id="detalleContenido">
+
+                <div class="cal-empty">
+
+                    <div class="cal-empty-icon">
+                        +
+                    </div>
+
+                    <h3>Sin fecha seleccionada</h3>
+
+                    <p>
+                        Selecciona un dÃ­a del calendario para
+                        ver las citas programadas.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PRÃ“XIMAS CITAS
+             ================================================= -->
+
+        <aside class="cal-upcoming-card">
+
+            <div class="cal-card-heading">
+
+                <div>
+
+                    <span class="badge">
+                        Agenda
+                    </span>
+
+                    <h2>PrÃ³ximas citas</h2>
+
+                    <p>
+                        Tus siguientes citaciones programadas.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div id="proximasCitas"></div>
+
+        </aside>
+
+    </div>
+
+
+    <!-- =====================================================
+         DATOS REALES DESDE MYSQL
+         ===================================================== -->
+
+    <div id="citasFuente" hidden>
+
+        {% for cita in citas %}
+
+        <article
+            class="cita-data"
+
+            data-id="{{ cita.id }}"
+            data-fecha="{{ cita.fecha }}"
+            data-hora="{{ cita.hora }}"
+            data-estudiante="{{ cita.estudiante_n }} {{ cita.estudiante_a }}"
+            data-docente="{{ cita.docente_n }} {{ cita.docente_a }}"
+            data-acudiente="{{ cita.acudiente_n }} {{ cita.acudiente_a }}"
+            data-motivo="{{ cita.motivo }}"
+            data-estado="{{ cita.estado }}"
+            data-lugar="{{ cita.lugar or 'Por definir' }}"
+            data-observaciones="{{ cita.observaciones or '' }}"
+            data-ics="{{ url_for('calendario.descargar_ics', cita_id=cita.id) }}"
+        ></article>
+
+        {% endfor %}
+
+    </div>
+
+
+<style>
+
+/* =========================================================
+   EDUTURNOS - CALENDARIO DEFINITIVO
+   ========================================================= */
+
+.calendario-page {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 8px 0 40px;
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   CABECERA
+   ========================================================= */
+
+.cal-header {
+    width: 100%;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    margin-bottom: 22px;
+}
+
+.cal-header-left {
+    min-width: 0;
+}
+
+.cal-back {
+    display: inline-flex;
+
+    margin-bottom: 14px;
+
+    color: #64748b;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    text-decoration: none;
+}
+
+.cal-back:hover {
+    color: #2563eb;
+}
+
+.cal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.cal-title-icon {
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: linear-gradient(
+        135deg,
+        #eaf2ff,
+        #dceaff
+    );
+
+    color: #2563eb;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.cal-title-row h1 {
+    margin: 7px 0 7px;
+
+    color: #0f172a;
+
+    font-size: 30px;
+    line-height: 1.15;
+}
+
+.cal-title-row p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+.cal-header-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+
+    gap: 9px;
+}
+
+.cal-counter {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    min-height: 44px;
+
+    padding: 0 13px;
+
+    background: #ffffff;
+
+    border: 1px solid #dbe4ee;
+
+    border-radius: 9px;
+
+    box-sizing: border-box;
+}
+
+.cal-counter strong {
+    color: #2563eb;
+    font-size: 19px;
+}
+
+.cal-counter span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.cal-button {
+    min-height: 44px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 14px;
+
+    border-radius: 9px;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    box-sizing: border-box;
+}
+
+.cal-button-primary {
+    background: #ffffff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+}
+
+.cal-button-main {
+    background: #2563eb;
+    color: #ffffff;
+    border: 1px solid #2563eb;
+
+    box-shadow:
+        0 4px 10px rgba(37, 99, 235, .15);
+}
+
+.cal-button:hover {
+    opacity: .92;
+}
+
+
+/* =========================================================
+   PANEL
+   ========================================================= */
+
+.cal-main-card,
+.cal-detail-card,
+.cal-upcoming-card {
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #dbe4ee;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, .05);
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.cal-toolbar {
+    display: grid;
+
+    grid-template-columns:
+        1fr auto 1fr;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 16px 18px;
+
+    border-bottom: 1px solid #e7edf4;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #f8fafc
+        );
+}
+
+.cal-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.cal-nav-button,
+.cal-today-button {
+    min-height: 38px;
+
+    border: 1px solid #d7e0ea;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    font-family: inherit;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.cal-nav-button {
+    width: 38px;
+    padding: 0;
+
+    font-size: 22px;
+    line-height: 1;
+}
+
+.cal-today-button {
+    padding: 0 12px;
+}
+
+.cal-nav-button:hover,
+.cal-today-button:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+
+.cal-month-title {
+    text-align: center;
+}
+
+.cal-month-title span {
+    color: #0f172a;
+
+    font-size: 21px;
+
+    font-weight: 750;
+
+    line-height: 1.2;
+
+    text-transform: capitalize;
+}
+
+.cal-filter {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    gap: 7px;
+}
+
+.cal-filter label {
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+.cal-filter select {
+    min-height: 37px;
+
+    padding: 7px 10px;
+
+    border: 1px solid #d7e0ea;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    font-family: inherit;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   SEMANA
+   ========================================================= */
+
+.cal-week {
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, minmax(0, 1fr));
+
+    border-bottom: 1px solid #e7edf4;
+
+    background: #f8fafc;
+}
+
+.cal-week span {
+    padding: 11px 7px;
+
+    text-align: center;
+
+    color: #64748b;
+
+    font-size: 10px;
+
+    font-weight: 750;
+
+    text-transform: uppercase;
+
+    letter-spacing: .03em;
+}
+
+
+/* =========================================================
+   GRID DE 42 DÃAS
+   ========================================================= */
+
+.cal-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, minmax(0, 1fr));
+
+    width: 100%;
+}
+
+.cal-day {
+    position: relative;
+
+    min-width: 0;
+
+    min-height: 108px;
+
+    padding: 8px;
+
+    background: #ffffff;
+
+    border-right: 1px solid #edf2f7;
+    border-bottom: 1px solid #edf2f7;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+
+    transition:
+        background-color .16s ease,
+        box-shadow .16s ease;
+}
+
+.cal-day:nth-child(7n) {
+    border-right: 0;
+}
+
+.cal-day:hover {
+    background: #f8fbff;
+}
+
+.cal-day.other-month {
+    background: #fafbfc;
+    cursor: default;
+}
+
+.cal-day.other-month .cal-day-number {
+    color: #cbd5e1;
+}
+
+.cal-day.today {
+    background: #f4f8ff;
+}
+
+.cal-day.selected {
+    box-shadow:
+        inset 0 0 0 2px #2563eb;
+
+    z-index: 2;
+}
+
+.cal-day-number {
+    width: 27px;
+    height: 27px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 6px;
+
+    border-radius: 50%;
+
+    color: #334155;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.cal-day.today .cal-day-number {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   EVENTOS DENTRO DO DIA
+   ========================================================= */
+
+.cal-events {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+.cal-event {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 5px 6px;
+
+    border: 0;
+    border-left: 3px solid #94a3b8;
+
+    border-radius: 5px;
+
+    background: #f8fafc;
+
+    color: #334155;
+
+    font-family: inherit;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+}
+
+.cal-event:hover {
+    background: #eef6ff;
+}
+
+.cal-event.confirmada {
+    border-left-color: #22c55e;
+    background: #f0fdf4;
+}
+
+.cal-event.pendiente {
+    border-left-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.cal-event.reprogramada {
+    border-left-color: #6366f1;
+    background: #eef2ff;
+}
+
+.cal-event.cancelada {
+    border-left-color: #ef4444;
+    background: #fef2f2;
+}
+
+.cal-event-time {
+    font-size: 10px;
+    font-weight: 750;
+    color: #475569;
+}
+
+.cal-event-name {
+    margin-top: 2px;
+
+    overflow: hidden;
+
+    color: #334155;
+
+    font-size: 10px;
+
+    line-height: 1.25;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.cal-more {
+    margin-top: 2px;
+
+    color: #64748b;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   LEYENDA
+   ========================================================= */
+
+.cal-legend {
+    display: flex;
+
+    justify-content: flex-end;
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    padding: 11px 16px;
+
+    border-top: 1px solid #edf2f7;
+
+    background: #fbfdff;
+}
+
+.cal-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    color: #64748b;
+
+    font-size: 11px;
+}
+
+.dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+}
+
+.dot-green {
+    background: #22c55e;
+}
+
+.dot-yellow {
+    background: #f59e0b;
+}
+
+.dot-blue {
+    background: #6366f1;
+}
+
+.dot-red {
+    background: #ef4444;
+}
+
+
+/* =========================================================
+   PARTE INFERIOR
+   ========================================================= */
+
+.cal-bottom-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.35fr)
+        minmax(300px, .65fr);
+
+    gap: 18px;
+
+    margin-top: 18px;
+}
+
+.cal-card-heading {
+    padding: 19px 20px;
+
+    border-bottom: 1px solid #e7edf4;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #f8fafc
+        );
+}
+
+.cal-card-heading h2 {
+    margin: 7px 0 6px;
+
+    color: #0f172a;
+
+    font-size: 20px;
+
+    line-height: 1.2;
+}
+
+.cal-card-heading p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   DETALLE
+   ========================================================= */
+
+#detalleContenido {
+    padding: 17px;
+}
+
+.cal-detail-item {
+    display: grid;
+
+    grid-template-columns:
+        78px minmax(0, 1fr) auto;
+
+    gap: 14px;
+
+    align-items: center;
+
+    padding: 14px;
+
+    margin-bottom: 9px;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+}
+
+.cal-detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.cal-detail-time {
+    color: #2563eb;
+
+    font-size: 14px;
+
+    font-weight: 750;
+}
+
+.cal-detail-content h3 {
+    margin: 0 0 5px;
+
+    color: #0f172a;
+
+    font-size: 14px;
+
+    line-height: 1.3;
+}
+
+.cal-detail-content p {
+    margin: 3px 0;
+
+    color: #64748b;
+
+    font-size: 11.5px;
+
+    line-height: 1.4;
+}
+
+.cal-detail-status {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 8px;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.cal-detail-status.confirmada {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.cal-detail-status.pendiente {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.cal-detail-status.reprogramada {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.cal-detail-status.cancelada {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.cal-ics {
+    display: inline-flex;
+
+    margin-top: 7px;
+
+    color: #2563eb;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+.cal-ics:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   PRÃ“XIMAS CITAS
+   ========================================================= */
+
+#proximasCitas {
+    padding: 15px;
+}
+
+.cal-upcoming-item {
+    display: grid;
+
+    grid-template-columns:
+        54px minmax(0, 1fr);
+
+    gap: 11px;
+
+    padding: 12px;
+
+    margin-bottom: 8px;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+}
+
+.cal-upcoming-item:last-child {
+    margin-bottom: 0;
+}
+
+.cal-upcoming-date {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 50px;
+
+    border-radius: 8px;
+
+    background: #eef6ff;
+
+    color: #2563eb;
+}
+
+.cal-upcoming-date strong {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.cal-upcoming-date span {
+    margin-top: 3px;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+}
+
+.cal-upcoming-content h3 {
+    margin: 0 0 4px;
+
+    color: #0f172a;
+
+    font-size: 13px;
+
+    line-height: 1.3;
+}
+
+.cal-upcoming-content p {
+    margin: 2px 0;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    line-height: 1.35;
+}
+
+.cal-no-upcoming {
+    padding: 22px 12px;
+
+    text-align: center;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   VACÃO
+   ========================================================= */
+
+.cal-empty {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 190px;
+
+    padding: 25px;
+
+    text-align: center;
+}
+
+.cal-empty-icon {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 11px;
+
+    border-radius: 50%;
+
+    background: #eef6ff;
+
+    color: #2563eb;
+
+    font-size: 21px;
+}
+
+.cal-empty h3 {
+    margin: 0 0 6px;
+
+    color: #334155;
+
+    font-size: 14px;
+}
+
+.cal-empty p {
+    max-width: 380px;
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    .cal-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cal-header-actions {
+        justify-content: flex-start;
+    }
+
+    .cal-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .cal-toolbar-left,
+    .cal-filter {
+        justify-content: center;
+    }
+
+    .cal-bottom-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .cal-title-row h1 {
+        font-size: 26px;
+    }
+
+    .cal-header-actions {
+        width: 100%;
+    }
+
+    .cal-button,
+    .cal-counter {
+        flex: 1;
+    }
+
+    .cal-day {
+        min-height: 78px;
+        padding: 6px;
+    }
+
+    .cal-event-name {
+        display: none;
+    }
+
+    .cal-week span {
+        font-size: 9px;
+    }
+
+    .cal-detail-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}
+
+.ed-calendario-hoy{
+    margin-left:auto !important;
+    min-width:58px !important;
+    padding:7px 12px !important;
+}.ed-calendar-header{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    position:relative !important;
+    gap:12px !important;
+}
+
+.ed-calendar-header .ed-calendario-hoy{
+    position:absolute !important;
+    right:0 !important;
+}</style>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const grid = document.getElementById("calendarGrid");
+    const mesActual = document.getElementById("mesActual");
+
+    const btnAnterior =
+        document.getElementById("btnAnterior");
+
+    const btnSiguiente =
+        document.getElementById("btnSiguiente");
+
+    const btnHoy =
+        document.getElementById("btnHoy");
+
+    const filtroEstado =
+        document.getElementById("filtroEstado");
+
+    const detalleTitulo =
+        document.getElementById("detalleTitulo");
+
+    const detalleSubtitulo =
+        document.getElementById("detalleSubtitulo");
+
+    const detalleContenido =
+        document.getElementById("detalleContenido");
+
+    const proximasCitas =
+        document.getElementById("proximasCitas");
+
+
+    /* =====================================================
+       CARGAR CITAS REALES
+       ===================================================== */
+
+    const elementos =
+        document.querySelectorAll(".cita-data");
+
+
+    const citas = Array.from(elementos).map(
+        function (elemento) {
+
+            return {
+                id: elemento.dataset.id || "",
+
+                fecha:
+                    elemento.dataset.fecha || "",
+
+                hora:
+                    normalizarHora(
+                        elemento.dataset.hora || ""
+                    ),
+
+                estudiante:
+                    elemento.dataset.estudiante || "",
+
+                docente:
+                    elemento.dataset.docente || "",
+
+                acudiente:
+                    elemento.dataset.acudiente || "",
+
+                motivo:
+                    elemento.dataset.motivo || "CitaciÃ³n",
+
+                estado:
+                    elemento.dataset.estado || "Pendiente",
+
+                lugar:
+                    elemento.dataset.lugar || "Por definir",
+
+                observaciones:
+                    elemento.dataset.observaciones || "",
+
+                ics:
+                    elemento.dataset.ics || ""
+            };
+
+        }
+    );
+
+
+    /* =====================================================
+       FECHAS
+       ===================================================== */
+
+    const hoy = new Date();
+
+    hoy.setHours(
+        0, 0, 0, 0
+    );
+
+
+    let mesVista = new Date(
+        hoy.getFullYear(),
+        hoy.getMonth(),
+        1
+    );
+
+
+    let diaSeleccionado = new Date(hoy);
+
+
+    function normalizarHora(valor) {
+
+        const partes =
+            String(valor).split(":");
+
+        if (partes.length < 2) {
+            return valor;
+        }
+
+        return String(partes[0]).padStart(2, "0")
+            + ":"
+            + String(partes[1]).padStart(2, "0");
+    }
+
+
+    function convertirFecha(texto) {
+
+        if (!texto) {
+            return null;
+        }
+
+        const partes =
+            String(texto).split("-");
+
+        if (partes.length !== 3) {
+            return null;
+        }
+
+        const aÃ±o = Number(partes[0]);
+        const mes = Number(partes[1]) - 1;
+        const dia = Number(partes[2]);
+
+        if (
+            !Number.isInteger(aÃ±o) ||
+            !Number.isInteger(mes) ||
+            !Number.isInteger(dia)
+        ) {
+            return null;
+        }
+
+        return new Date(
+            aÃ±o,
+            mes,
+            dia
+        );
+    }
+
+
+    function claveFecha(fecha) {
+
+        return fecha.getFullYear()
+            + "-"
+            + String(
+                fecha.getMonth() + 1
+            ).padStart(2, "0")
+            + "-"
+            + String(
+                fecha.getDate()
+            ).padStart(2, "0");
+    }
+
+
+    function textoFecha(fecha) {
+
+        return new Intl.DateTimeFormat(
+            "es-CO",
+            {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            }
+        ).format(fecha);
+    }
+
+
+    function nombreMes(fecha) {
+
+        const texto =
+            new Intl.DateTimeFormat(
+                "es-CO",
+                {
+                    month: "long",
+                    year: "numeric"
+                }
+            ).format(fecha);
+
+        return texto.charAt(0).toUpperCase()
+            + texto.slice(1);
+    }
+
+
+    function claseEstado(estado) {
+
+        const valor =
+            String(estado)
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(
+                    /[\u0300-\u036f]/g,
+                    ""
+                );
+
+        if (valor.includes("confirm")) {
+            return "confirmada";
+        }
+
+        if (valor.includes("reprogram")) {
+            return "reprogramada";
+        }
+
+        if (
+            valor.includes("cancel")
+            ||
+            valor.includes("anulad")
+        ) {
+            return "cancelada";
+        }
+
+        return "pendiente";
+    }
+
+
+    function citasFiltradas() {
+
+        const filtro =
+            filtroEstado.value;
+
+        if (filtro === "Todos") {
+            return citas;
+        }
+
+        return citas.filter(
+            function (cita) {
+                return cita.estado === filtro;
+            }
+        );
+    }
+
+
+    /* =====================================================
+       RENDER CALENDARIO
+       ===================================================== */
+
+    function renderCalendario() {
+
+        grid.innerHTML = "";
+
+        mesActual.textContent =
+            nombreMes(mesVista);
+
+
+        const aÃ±o =
+            mesVista.getFullYear();
+
+        const mes =
+            mesVista.getMonth();
+
+
+        const primerDia =
+            new Date(aÃ±o, mes, 1);
+
+
+        /*
+           Lunes = 0
+           Domingo = 6
+        */
+
+        const desplazamiento =
+            primerDia.getDay() === 0
+                ? 6
+                : primerDia.getDay() - 1;
+
+
+        const diasMes =
+            new Date(
+                aÃ±o,
+                mes + 1,
+                0
+            ).getDate();
+
+
+        const diasAnterior =
+            new Date(
+                aÃ±o,
+                mes,
+                0
+            ).getDate();
+
+
+        const visibles =
+            citasFiltradas();
+
+
+        for (
+            let indice = 0;
+            indice < 42;
+            indice++
+        ) {
+
+            let fecha;
+            let numero;
+            let otroMes = false;
+
+
+            if (
+                indice < desplazamiento
+            ) {
+
+                numero =
+                    diasAnterior
+                    - desplazamiento
+                    + indice
+                    + 1;
+
+                fecha =
+                    new Date(
+                        aÃ±o,
+                        mes - 1,
+                        numero
+                    );
+
+                otroMes = true;
+
+            } else if (
+                indice >=
+                desplazamiento + diasMes
+            ) {
+
+                numero =
+                    indice
+                    - desplazamiento
+                    - diasMes
+                    + 1;
+
+                fecha =
+                    new Date(
+                        aÃ±o,
+                        mes + 1,
+                        numero
+                    );
+
+                otroMes = true;
+
+            } else {
+
+                numero =
+                    indice
+                    - desplazamiento
+                    + 1;
+
+                fecha =
+                    new Date(
+                        aÃ±o,
+                        mes,
+                        numero
+                    );
+            }
+
+
+            const clave =
+                claveFecha(fecha);
+
+
+            const eventos =
+                visibles.filter(
+                    function (cita) {
+                        return cita.fecha === clave;
+                    }
+                );
+
+
+            const celda =
+                document.createElement("div");
+
+
+            celda.className =
+                "cal-day";
+
+
+            if (otroMes) {
+                celda.classList.add(
+                    "other-month"
+                );
+            }
+
+
+            if (
+                clave === claveFecha(hoy)
+            ) {
+
+                celda.classList.add(
+                    "today"
+                );
+            }
+
+
+            if (
+                diaSeleccionado
+                &&
+                clave ===
+                claveFecha(diaSeleccionado)
+            ) {
+
+                celda.classList.add(
+                    "selected"
+                );
+            }
+
+
+            const numeroElemento =
+                document.createElement("div");
+
+
+            numeroElemento.className =
+                "cal-day-number";
+
+
+            numeroElemento.textContent =
+                numero;
+
+
+            celda.appendChild(
+                numeroElemento
+            );
+
+
+            const eventosContenedor =
+                document.createElement("div");
+
+
+            eventosContenedor.className =
+                "cal-events";
+
+
+            eventos
+                .slice(0, 3)
+                .forEach(
+                    function (cita) {
+
+                        const evento =
+                            document.createElement("button");
+
+
+                        evento.type =
+                            "button";
+
+
+                        evento.className =
+                            "cal-event "
+                            + claseEstado(
+                                cita.estado
+                            );
+
+
+                        const hora =
+                            document.createElement("span");
+
+
+                        hora.className =
+                            "cal-event-time";
+
+
+                        hora.textContent =
+                            cita.hora
+                            || "Sin hora";
+
+
+                        const nombre =
+                            document.createElement("span");
+
+
+                        nombre.className =
+                            "cal-event-name";
+
+
+                        nombre.textContent =
+                            cita.motivo
+                            || cita.estudiante
+                            || "CitaciÃ³n";
+
+
+                        evento.appendChild(hora);
+                        evento.appendChild(nombre);
+
+
+                        evento.addEventListener(
+                            "click",
+                            function (e) {
+
+                                e.stopPropagation();
+
+                                diaSeleccionado =
+                                    new Date(fecha);
+
+                                renderCalendario();
+
+                                mostrarDetalle(
+                                    fecha
+                                );
+
+                                document
+                                    .querySelector(
+                                        ".cal-detail-card"
+                                    )
+                                    .scrollIntoView({
+                                        behavior: "smooth",
+                                        block: "start"
+                                    });
+                            }
+                        );
+
+
+                        eventosContenedor.appendChild(
+                            evento
+                        );
+
+                    }
+                );
+
+
+            if (
+                eventos.length > 3
+            ) {
+
+                const mas =
+                    document.createElement("div");
+
+
+                mas.className =
+                    "cal-more";
+
+
+                mas.textContent =
+                    "+"
+                    + (
+                        eventos.length - 3
+                    )
+                    + " mÃ¡s";
+
+
+                eventosContenedor.appendChild(
+                    mas
+                );
+            }
+
+
+            celda.appendChild(
+                eventosContenedor
+            );
+
+
+            if (!otroMes) {
+
+                celda.addEventListener(
+                    "click",
+                    function () {
+
+                        diaSeleccionado =
+                            new Date(fecha);
+
+                        renderCalendario();
+
+                        mostrarDetalle(
+                            fecha
+                        );
+
+                    }
+                );
+            }
+
+
+            grid.appendChild(celda);
+        }
+
+    }
+
+
+    /* =====================================================
+       DETALLE
+       ===================================================== */
+
+    function mostrarDetalle(fecha) {
+
+        const clave =
+            claveFecha(fecha);
+
+
+        const eventos =
+            citas
+                .filter(
+                    function (cita) {
+                        return (
+                            cita.fecha === clave
+                            &&
+                            (
+                                filtroEstado.value
+                                === "Todos"
+                                ||
+                                cita.estado
+                                === filtroEstado.value
+                            )
+                        );
+                    }
+                )
+                .sort(
+                    function (a, b) {
+                        return a.hora.localeCompare(
+                            b.hora
+                        );
+                    }
+                );
+
+
+        detalleTitulo.textContent =
+            capitalizar(
+                textoFecha(fecha)
+            );
+
+
+        detalleSubtitulo.textContent =
+            eventos.length === 0
+                ? "No tienes citaciones programadas para este dÃ­a."
+                : eventos.length === 1
+                    ? "Tienes 1 citaciÃ³n programada."
+                    : "Tienes "
+                        + eventos.length
+                        + " citaciones programadas.";
+
+
+        detalleContenido.innerHTML = "";
+
+
+        if (eventos.length === 0) {
+
+            detalleContenido.innerHTML = `
+                <div class="cal-empty">
+                    <div class="cal-empty-icon">âœ“</div>
+                    <h3>DÃ­a sin citaciones</h3>
+                    <p>
+                        No hay citas para esta fecha
+                        con el filtro seleccionado.
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+
+        eventos.forEach(
+            function (cita) {
+
+                const item =
+                    document.createElement("article");
+
+
+                item.className =
+                    "cal-detail-item";
+
+
+                const hora =
+                    document.createElement("div");
+
+
+                hora.className =
+                    "cal-detail-time";
+
+
+                hora.textContent =
+                    cita.hora || "Sin hora";
+
+
+                const contenido =
+                    document.createElement("div");
+
+
+                contenido.className =
+                    "cal-detail-content";
+
+
+                const titulo =
+                    document.createElement("h3");
+
+
+                titulo.textContent =
+                    cita.motivo
+                    || "CitaciÃ³n";
+
+
+                contenido.appendChild(
+                    titulo
+                );
+
+
+                agregarLinea(
+                    contenido,
+                    "Estudiante: ",
+                    cita.estudiante
+                );
+
+
+                agregarLinea(
+                    contenido,
+                    "Docente: ",
+                    cita.docente
+                );
+
+
+                if (cita.acudiente) {
+
+                    agregarLinea(
+                        contenido,
+                        "Acudiente: ",
+                        cita.acudiente
+                    );
+                }
+
+
+                agregarLinea(
+                    contenido,
+                    "Lugar: ",
+                    cita.lugar
+                );
+
+
+                if (cita.observaciones) {
+
+                    agregarLinea(
+                        contenido,
+                        "Observaciones: ",
+                        cita.observaciones
+                    );
+                }
+
+
+                if (cita.ics) {
+
+                    const enlace =
+                        document.createElement("a");
+
+                    enlace.href =
+                        cita.ics;
+
+                    enlace.target =
+                        "_blank";
+
+                    enlace.className =
+                        "cal-ics";
+
+                    enlace.textContent =
+                        "Agregar al calendario (.ics)";
+
+                    contenido.appendChild(
+                        enlace
+                    );
+                }
+
+
+                const estado =
+                    document.createElement("span");
+
+
+                estado.className =
+                    "cal-detail-status "
+                    + claseEstado(
+                        cita.estado
+                    );
+
+
+                estado.textContent =
+                    cita.estado;
+
+
+                item.appendChild(hora);
+
+                item.appendChild(
+                    contenido
+                );
+
+                item.appendChild(
+                    estado
+                );
+
+
+                detalleContenido.appendChild(
+                    item
+                );
+
+            }
+        );
+
+    }
+
+
+    function agregarLinea(
+        contenedor,
+        etiqueta,
+        valor
+    ) {
+
+        const linea =
+            document.createElement("p");
+
+
+        const fuerte =
+            document.createElement("strong");
+
+
+        fuerte.textContent =
+            etiqueta;
+
+
+        linea.appendChild(
+            fuerte
+        );
+
+
+        linea.appendChild(
+            document.createTextNode(
+                valor || "No informado"
+            )
+        );
+
+
+        contenedor.appendChild(
+            linea
+        );
+
+    }
+
+
+    function capitalizar(texto) {
+
+        if (!texto) {
+            return "";
+        }
+
+        return (
+            texto.charAt(0).toUpperCase()
+            + texto.slice(1)
+        );
+    }
+
+
+    /* =====================================================
+       PRÃ“XIMAS CITAS
+       ===================================================== */
+
+    function renderProximas() {
+
+        const ahora =
+            new Date();
+
+        ahora.setHours(
+            0, 0, 0, 0
+        );
+
+
+        const siguientes =
+            citas
+                .map(
+                    function (cita) {
+
+                        return {
+                            cita: cita,
+                            fecha:
+                                convertirFecha(
+                                    cita.fecha
+                                )
+                        };
+
+                    }
+                )
+                .filter(
+                    function (obj) {
+
+                        return (
+                            obj.fecha
+                            &&
+                            obj.fecha >= ahora
+                            &&
+                            claseEstado(
+                                obj.cita.estado
+                            )
+                            !== "cancelada"
+                        );
+
+                    }
+                )
+                .sort(
+                    function (a, b) {
+
+                        if (
+                            a.fecha - b.fecha
+                        ) {
+                            return (
+                                a.fecha - b.fecha
+                            );
+                        }
+
+                        return a.cita.hora
+                            .localeCompare(
+                                b.cita.hora
+                            );
+                    }
+                )
+                .slice(0, 5);
+
+
+        proximasCitas.innerHTML = "";
+
+
+        if (siguientes.length === 0) {
+
+            proximasCitas.innerHTML = `
+                <div class="cal-no-upcoming">
+                    No tienes prÃ³ximas citaciones.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        siguientes.forEach(
+            function (obj) {
+
+                const cita =
+                    obj.cita;
+
+                const fecha =
+                    obj.fecha;
+
+
+                const item =
+                    document.createElement("article");
+
+
+                item.className =
+                    "cal-upcoming-item";
+
+
+                const fechaCaja =
+                    document.createElement("div");
+
+
+                fechaCaja.className =
+                    "cal-upcoming-date";
+
+
+                const numero =
+                    document.createElement("strong");
+
+
+                numero.textContent =
+                    fecha.getDate();
+
+
+                const mes =
+                    document.createElement("span");
+
+
+                mes.textContent =
+                    new Intl.DateTimeFormat(
+                        "es-CO",
+                        {
+                            month: "short"
+                        }
+                    ).format(
+                        fecha
+                    );
+
+
+                fechaCaja.appendChild(
+                    numero
+                );
+
+                fechaCaja.appendChild(
+                    mes
+                );
+
+
+                const contenido =
+                    document.createElement("div");
+
+
+                contenido.className =
+                    "cal-upcoming-content";
+
+
+                const titulo =
+                    document.createElement("h3");
+
+
+                titulo.textContent =
+                    cita.motivo
+                    || "CitaciÃ³n";
+
+
+                const informacion =
+                    document.createElement("p");
+
+
+                informacion.textContent =
+                    (
+                        cita.hora
+                        || "Sin hora"
+                    )
+                    + " Â· "
+                    + (
+                        cita.estudiante
+                        || "Estudiante"
+                    );
+
+
+                const estado =
+                    document.createElement("p");
+
+
+                estado.textContent =
+                    cita.estado;
+
+
+                contenido.appendChild(
+                    titulo
+                );
+
+                contenido.appendChild(
+                    informacion
+                );
+
+                contenido.appendChild(
+                    estado
+                );
+
+
+                item.appendChild(
+                    fechaCaja
+                );
+
+                item.appendChild(
+                    contenido
+                );
+
+
+                proximasCitas.appendChild(
+                    item
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       EVENTOS DE BOTONES
+       ===================================================== */
+
+    btnAnterior.addEventListener(
+        "click",
+        function () {
+
+            mesVista =
+                new Date(
+                    mesVista.getFullYear(),
+                    mesVista.getMonth() - 1,
+                    1
+                );
+
+            diaSeleccionado =
+                null;
+
+            renderCalendario();
+
+            limpiarDetalle();
+        }
+    );
+
+
+    btnSiguiente.addEventListener(
+        "click",
+        function () {
+
+            mesVista =
+                new Date(
+                    mesVista.getFullYear(),
+                    mesVista.getMonth() + 1,
+                    1
+                );
+
+            diaSeleccionado =
+                null;
+
+            renderCalendario();
+
+            limpiarDetalle();
+        }
+    );
+
+
+    btnHoy.addEventListener(
+        "click",
+        function () {
+
+            mesVista =
+                new Date(
+                    hoy.getFullYear(),
+                    hoy.getMonth(),
+                    1
+                );
+
+            diaSeleccionado =
+                new Date(hoy);
+
+            renderCalendario();
+
+            mostrarDetalle(hoy);
+        }
+    );
+
+
+    filtroEstado.addEventListener(
+        "change",
+        function () {
+
+            renderCalendario();
+
+            if (diaSeleccionado) {
+                mostrarDetalle(
+                    diaSeleccionado
+                );
+            }
+
+        }
+    );
+
+
+    function limpiarDetalle() {
+
+        detalleTitulo.textContent =
+            "Selecciona una fecha";
+
+        detalleSubtitulo.textContent =
+            "Haz clic sobre un dÃ­a para consultar sus citaciones.";
+
+        detalleContenido.innerHTML = `
+            <div class="cal-empty">
+                <div class="cal-empty-icon">+</div>
+                <h3>Sin fecha seleccionada</h3>
+                <p>
+                    Selecciona un dÃ­a del calendario para
+                    ver las citas programadas.
+                </p>
+            </div>
+        `;
+    }
+
+
+    /* =====================================================
+       INICIALIZAR
+       ===================================================== */
+
+    renderCalendario();
+
+    renderProximas();
+
+    if (citas.length > 0) {
+
+        const primera =
+            citas
+                .map(
+                    function (cita) {
+                        return {
+                            cita: cita,
+                            fecha:
+                                convertirFecha(
+                                    cita.fecha
+                                )
+                        };
+                    }
+                )
+                .filter(
+                    function (obj) {
+                        return (
+                            obj.fecha
+                            &&
+                            obj.fecha >= hoy
+                        );
+                    }
+                )
+                .sort(
+                    function (a, b) {
+                        return (
+                            a.fecha - b.fecha
+                        );
+                    }
+                )[0];
+
+        if (primera) {
+
+            mesVista =
+                new Date(
+                    primera.fecha.getFullYear(),
+                    primera.fecha.getMonth(),
+                    1
+                );
+
+            diaSeleccionado =
+                new Date(
+                    primera.fecha
+                );
+
+            renderCalendario();
+
+            mostrarDetalle(
+                primera.fecha
+            );
+        }
+
+    }
+
+});
+
+</script>
+
+{% endblock %}
+

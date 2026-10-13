@@ -1,0 +1,396 @@
+{% extends 'base.html' %}
+
+{% block title %}Citas · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<div class="citas-page">
+
+<section class="citas-desktop-view">
+    <div class="page-head">
+        <div><h1>Citaciones escolares</h1><p>Consulta, organiza y da seguimiento a cada encuentro.</p></div>
+        {% if puede_crear %}<a class="boton" href="{{ url_for('citas.nueva', origen='citas') }}">+ Nueva citación</a>{% endif %}
+    </div>
+    <section class="citas-desktop-directory" aria-label="Citaciones escolares">
+        <div class="citas-desktop-toolbar">
+            <div class="citas-desktop-tabs" role="tablist" aria-label="Estado de citaciones">
+                <button type="button" role="tab" aria-selected="true" aria-controls="citas-desktop-list" data-citas-state="">Todas las citaciones <span>{{ citas|length }}</span></button>
+                <button type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="citas-desktop-list" data-citas-state="Pendiente">Pendientes</button>
+                <button type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="citas-desktop-list" data-citas-state="Realizada">Realizadas</button>
+            </div>
+            <div class="citas-desktop-search">
+                <input type="search" data-citas-search placeholder="Buscar estudiante..." aria-label="Buscar estudiante">
+                <select class="citas-desktop-state-filter" data-citas-status aria-label="Filtrar por estado">
+                    <option value="">Filtros</option><option value="Pendiente">Pendiente</option><option value="Confirmada">Confirmada</option><option value="Realizada">Atendida</option><option value="No asistió">Incumplida</option>
+                    {% for estado in citas|map(attribute='estado')|unique|sort if estado not in ['Pendiente','Confirmada','Realizada','No asistió'] %}<option>{{ estado }}</option>{% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="citas-desktop-table-scroll"><table>
+            <thead><tr><th>Estudiante</th><th>Fecha y hora</th><th>Motivo</th><th>Responsable</th><th>Estado</th><th><span class="citas-visually-hidden">Detalle</span></th></tr></thead>
+            <tbody id="citas-desktop-list">
+            {% set meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'] %}
+            {% for cita in citas %}
+            <tr data-citas-row data-student="{{ cita.estudiante }}" data-state="{{ cita.estado }}" data-teacher="{{ cita.docente }}" data-date="{{ cita.fecha }}">
+                <td><div class="citas-desktop-student"><span class="citas-desktop-avatar" aria-hidden="true">{{ cita.estudiante[:1] }}</span><div><strong>{{ cita.estudiante }}</strong><small>{% if cita.grado %}Grado {{ cita.grado }}{% endif %}{% if cita.grupo %} · {{ cita.grupo }}{% endif %}{% if cita.jornada %} · {{ cita.jornada }}{% endif %}</small></div></div></td>
+                <td>{{ cita.fecha.day }} de {{ meses[cita.fecha.month - 1] }}, {{ cita.fecha.year }}<small>{{ cita.hora|hora_ampm }}</small></td>
+                <td>{{ cita.motivo }}</td><td>{{ cita.docente }}</td>
+                <td><span class="citas-desktop-status citas-status-{{ cita.estado|lower|replace(' ', '-') }}">{{ cita.estado }}</span></td>
+                <td><a href="#cita-desktop-detail-{{ cita.id }}" data-desktop-cita-dialog="cita-desktop-detail-{{ cita.id }}" aria-haspopup="dialog" aria-label="Ver detalle de {{ cita.estudiante }}" title="Ver detalle">↗</a></td>
+            </tr>
+            {% endfor %}
+            <tr data-citas-empty {% if citas %}hidden{% endif %}><td colspan="6">No hay citaciones para mostrar.</td></tr>
+            </tbody>
+        </table></div>
+    </section>
+</section>
+
+{% for cita in citas %}
+<dialog id="cita-desktop-detail-{{ cita.id }}" class="mobile-record-dialog citas-reference-detail" aria-labelledby="citas-reference-title-{{ cita.id }}">
+    <div class="citas-reference-heading"><h2 id="citas-reference-title-{{ cita.id }}">Detalle de citación</h2><button type="button" data-mobile-dialog-close aria-label="Cerrar detalle" title="Cerrar detalle">×</button></div>
+    <div class="citas-reference-student">
+        <span class="citas-desktop-status citas-status-{{ cita.estado|lower|replace(' ', '-') }}">{{ cita.estado }}</span>
+        <h3>{{ cita.estudiante }}</h3>
+        {% set grado = (cita.grado or '')|string %}{% set grupo = (cita.grupo or '')|string %}
+        <p class="muted">{% if grado %}{% if not grado.lower().startswith('grado ') %}Grado {% endif %}{{ grado }}{% if grado.isdigit() %}°{% endif %}{% else %}Sin grado asignado{% endif %}{% if grupo %} · {{ grupo.zfill(2) if grupo.isdigit() else grupo }}{% endif %} · {{ cita.motivo }}</p>
+    </div>
+    <div class="citas-reference-data">
+        <strong>{{ cita.fecha.day }} de {{ meses[cita.fecha.month - 1] }} de {{ cita.fecha.year }} · {{ cita.hora|hora_ampm }}</strong>
+        <p>{{ cita.lugar or 'Sin lugar asignado' }}{% if cita.sede %} · {{ cita.sede }}{% endif %}</p><p>Acudiente: {{ cita.acudiente }}</p>
+    </div>
+    <p class="muted citas-reference-notes">{{ cita.observaciones or 'Sin observaciones registradas.' }}</p>
+    <button type="button" class="boton secundario citas-reference-print" data-cita-print>Imprimir</button>
+    <section class="citas-reference-history" aria-label="Historial de seguimiento"><h4>Historial de seguimiento</h4>
+        {% for nota in detalles_escolares.get(cita.id, {}).get('notas', []) %}
+        <article><strong>{{ nota.fecha_seguimiento.strftime('%d/%m/%Y') }} · {{ nota.fecha_seguimiento|hora_ampm }}</strong><p>{{ nota.autor }} · {{ nota.estado_actual }} · {{ nota.asistencia }}</p><p class="muted">{{ nota.observaciones or 'Sin observaciones.' }}</p></article>
+        {% else %}<p class="muted">{{ 'Aún no hay acciones registradas.' if puede_anotar else 'Historial disponible para el personal institucional.' }}</p>{% endfor %}
+    </section>
+    <section class="cita-print-content" data-cita-print-content>
+        <header class="cita-print-header">
+            <img src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional" width="72" height="72">
+            <div><strong>Institución Educativa José Joaquín Flórez Hernández</strong><p>EDUTURNOS · Citación escolar</p></div>
+            <span>Citación #{{ cita.id }}</span>
+        </header>
+        <div class="cita-print-title"><h1>Citación escolar</h1><span class="cita-print-status">{{ cita.estado }}</span></div>
+        <section class="cita-print-section">
+            <h2>Información del estudiante</h2>
+            <h3>{{ cita.estudiante }}</h3>
+            <dl class="cita-print-grid">
+                <div><dt>Grado y grupo</dt><dd>{% if grado %}Grado {{ grado }}{% if grado.isdigit() %}°{% endif %}{% else %}Sin grado asignado{% endif %}{% if grupo %} · {{ grupo.zfill(2) if grupo.isdigit() else grupo }}{% endif %}</dd></div>
+                <div><dt>Jornada</dt><dd>{{ cita.jornada or 'Sin jornada asignada' }}</dd></div>
+            </dl>
+        </section>
+        <section class="cita-print-section">
+            <h2>Información del encuentro</h2>
+            <dl class="cita-print-grid">
+                <div><dt>Fecha</dt><dd>{{ cita.fecha.day }} de {{ meses[cita.fecha.month - 1] }} de {{ cita.fecha.year }}</dd></div>
+                <div><dt>Hora</dt><dd>{{ cita.hora|hora_ampm }}</dd></div>
+                <div><dt>Lugar</dt><dd>{{ cita.lugar }}</dd></div>
+                <div><dt>Sede</dt><dd>{{ cita.sede or 'Sin sede asignada' }}</dd></div>
+                <div><dt>Responsable</dt><dd>{{ cita.docente }}</dd></div>
+                <div><dt>Acudiente</dt><dd>{{ cita.acudiente }}</dd></div>
+                <div><dt>Motivo</dt><dd>{{ cita.motivo }}</dd></div>
+            </dl>
+        </section>
+        <section class="cita-print-section"><h2>Observaciones</h2><p class="cita-print-text">{{ cita.observaciones or 'Sin observaciones registradas.' }}</p></section>
+        {% set seguimiento = detalles_escolares.get(cita.id, {}) %}
+        {% if puede_anotar and seguimiento.get('cierre') %}
+        <section class="cita-print-section"><h2>Resultado de la citación</h2><p><strong>Asistencia:</strong> {{ seguimiento.cierre.asistencia }}</p><p class="cita-print-text">{{ seguimiento.cierre.resultado }}</p></section>
+        {% endif %}
+        <section class="cita-print-section"><h2>Historial de seguimiento</h2>
+            {% for nota in seguimiento.get('notas', []) %}
+            <article class="cita-print-history"><strong>{{ nota.fecha_seguimiento.strftime('%d/%m/%Y') }} · {{ nota.fecha_seguimiento|hora_ampm }}</strong><p>{{ nota.autor }} · {{ nota.estado_actual }} · {{ nota.asistencia }}</p><p class="cita-print-text">{{ nota.observaciones or 'Sin observaciones.' }}</p></article>
+            {% else %}<p>{{ 'Aún no hay acciones registradas.' if puede_anotar else 'Historial disponible para el personal institucional.' }}</p>{% endfor %}
+        </section>
+        <footer class="cita-print-footer">EDUTURNOS · Citación #{{ cita.id }} · {{ cita.sede or 'Institución Educativa José Joaquín Flórez Hernández' }}</footer>
+    </section>
+</dialog>
+{% endfor %}
+
+<section class="page-head">
+
+    <div>
+
+        <div class="page-navigation">
+            <a
+                class="link-back eduturnos-atras"
+                href="{{ url_for('auth.dashboard') }}">← Atrás</a>
+        </div>
+
+        <h1>Citas</h1>
+
+        <p>
+            Consulta y administra las citaciones según tu rol.
+        </p>
+
+    </div>
+
+
+    {% if puede_crear %}
+
+    <a
+        class="boton"
+        href="{{ url_for('citas.nueva', origen='citas') }}">
+        + Nueva citación
+    </a>
+
+    {% endif %}
+
+</section>
+
+
+<div class="table-wrap">
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Estudiante</th>
+                <th>Docente</th>
+                <th>Acudiente</th>
+                <th>Motivo</th>
+                <th>Estado</th>
+                <th>Lugar</th>
+                <th>Observaciones</th>
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for c in citas %}
+
+            <tr class="cita-mobile-summary-row">
+                <td colspan="9">
+                    <div class="cita-mobile-summary">
+                            <strong>{{ c.estudiante }}</strong>
+                            <time>{{ c.fecha }} · {{ c.hora|hora_ampm }}</time>
+                            <a class="cita-mobile-open" href="#cita-dialog-{{ c.id }}" data-mobile-dialog="cita-dialog-{{ c.id }}" aria-haspopup="dialog">Ver detalles</a>
+                    </div>
+                </td>
+            </tr>
+
+            <tr class="cita-desktop-row">
+
+                <td>{{ c.fecha }}</td>
+
+                <td>{{ c.hora|hora_ampm }}</td>
+
+                <td>{{ c.estudiante }}</td>
+
+                <td>{{ c.docente }}</td>
+
+                <td>{{ c.acudiente }}</td>
+
+                <td>{{ c.motivo }}</td>
+
+                <td>
+                    <span class="badge">
+                        {{ c.estado }}
+                    </span>
+                </td>
+
+                <td>{{ c.lugar }}</td>
+
+
+                <td>
+
+                    {% if rol in [
+                        'Super Admin',
+                        'Rector',
+                        'Administrador / Coordinador',
+                        'Docente'
+                    ] %}
+
+                    <a
+                        href="{{ url_for(
+                            'seguimiento.registrar',
+                            id=c.id
+                        ) }}"
+                    >
+                        Seguimiento
+                    </a>
+
+                    {% endif %}
+
+
+                    {% if rol == 'Acudiente'
+                          and c.estado == 'Pendiente' %}
+
+                    <form
+                        method="post"
+                        action="{{ url_for(
+                            'citas.cambiar_estado',
+                            cita_id=c.id
+                        ) }}"
+                        class="inline-form"
+                    >
+
+                        {{ csrf_field()|safe }}
+
+                        <input
+                            type="hidden"
+                            name="estado"
+                            value="Confirmada"
+                        >
+
+                        <button type="submit">
+                            Confirmar
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr class="cita-empty-row">
+
+                <td colspan="9">
+                    No hay citas para mostrar.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<style id="eduturnos-citas-page">
+.cita-mobile-summary-row{display:none;}
+.citas-page .page-head h1{color:#111111!important;}
+#contenido .citas-page .page-head:has(a[href*="/citas/nueva"]){margin:0 0 24px!important;padding:0!important;border:0!important;}
+#contenido .citas-page .page-head:has(a[href*="/citas/nueva"]) h1{margin:0 0 8px!important;padding:0!important;color:#111111!important;font-size:30px!important;font-weight:700!important;line-height:1.2!important;}
+#contenido .citas-page .page-head:has(a[href*="/citas/nueva"]) h1::before{content:none!important;display:none!important;}
+#contenido .citas-page .page-head:has(a[href*="/citas/nueva"]) p{margin:0!important;padding:0!important;color:#5f7895!important;font-size:14px!important;line-height:1.55!important;}
+#contenido .citas-page .page-head:has(a[href*="/citas/nueva"]) .page-navigation .link-back{min-height:34px;padding:7px 12px;border:1px solid #1769aa;border-radius:8px;background:#1769aa!important;color:#fff!important;}
+#contenido .citas-page .page-head:has(a[href*="/citas/nueva"]) .page-navigation .link-back:hover{background:#145b91!important;border-color:#145b91!important;color:#fff!important;}
+.citas-page .table-wrap{border-color:#dce7f4;border-radius:12px;box-shadow:0 8px 22px rgba(18,59,104,.06);}
+.citas-page table{min-width:980px;}
+.citas-page th{background:#eaf3ff!important;color:#17365d!important;font-weight:700;}
+.citas-page td{color:#425b73;}
+@media(max-width:750px){.citas-page .page-head{align-items:stretch!important;}}
+</style>
+
+{% for c in citas %}
+<dialog id="cita-dialog-{{ c.id }}" class="mobile-record-dialog" aria-labelledby="cita-dialog-title-{{ c.id }}">
+    <header>
+        <span class="badge">{{ c.estado }}</span>
+        <h2 id="cita-dialog-title-{{ c.id }}">{{ c.estudiante }}</h2>
+        <p>{{ c.fecha }} · {{ c.hora|hora_ampm }}</p>
+    </header>
+    {% set escolar = detalles_escolares.get(c.id, {}) %}
+    {% if puede_anotar %}
+    <div class="cita-tablist" role="tablist" aria-label="Detalle de la cita">
+        <button id="cita-info-tab-{{ c.id }}" type="button" role="tab" aria-selected="true" aria-controls="cita-info-panel-{{ c.id }}" data-cita-tab="info">Información</button>
+        <button id="cita-notes-tab-{{ c.id }}" type="button" role="tab" aria-selected="false" aria-controls="cita-notes-panel-{{ c.id }}" tabindex="-1" data-cita-tab="notas">Durante la cita</button>
+    </div>
+    {% endif %}
+    <div id="cita-info-panel-{{ c.id }}" data-cita-panel="info" {% if puede_anotar %}role="tabpanel" aria-labelledby="cita-info-tab-{{ c.id }}"{% endif %}>
+    <dl>
+        <div><dt>Motivo</dt><dd>{{ c.motivo }}</dd></div>
+        <div><dt>Lugar</dt><dd>{{ c.lugar or 'Sin lugar asignado' }}</dd></div>
+        <div><dt>Docente</dt><dd>{{ c.docente }}</dd></div>
+        <div><dt>Acudiente</dt><dd>{{ c.acudiente }}</dd></div>
+        <div class="mobile-dialog-notes"><dt>Observaciones</dt><dd>{{ c.observaciones or 'Sin observaciones' }}</dd></div>
+    </dl>
+    {% if puede_anotar and eventos_google_por_cita.get(c.id) %}
+    <section class="cita-google-status" aria-label="Estado de sincronización Google Calendar">
+        <h3>Google Calendar</h3>
+        {% for evento in eventos_google_por_cita[c.id] %}
+        <div><span>{{ 'Agenda institucional' if evento.scope_key == 'institucional' else 'Calendario personal' }}</span><strong>{{ evento.estado }}</strong>
+            {% if evento.estado == 'Fallido' %}<form method="post" action="{{ url_for('integraciones_google.reintentar', cita_id=c.id) }}">{{ csrf_field()|safe }}<button class="cita-text-action" type="submit">Reintentar</button></form>{% endif %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+    </div>
+    {% if puede_anotar %}
+    <section class="cita-notes" id="cita-notes-panel-{{ c.id }}" role="tabpanel" aria-labelledby="cita-notes-tab-{{ c.id }}" data-cita-panel="notas" hidden>
+        <form method="post" action="{{ url_for('citas.guardar_nota', cita_id=c.id) }}" class="cita-notes-form">
+            {{ csrf_field()|safe }}
+            <label for="cita-note-{{ c.id }}">Aspectos importantes de la cita</label>
+            <textarea id="cita-note-{{ c.id }}" name="nota" rows="4" maxlength="10000" required></textarea>
+            <output class="cita-note-count" for="cita-note-{{ c.id }}" aria-label="Caracteres escritos">0 / 10000</output>
+            <div class="mobile-dialog-actions">
+                <button class="boton" type="submit" disabled>Guardar nota</button>
+                <button class="boton" type="button" data-mobile-dialog-close>Cancelar</button>
+            </div>
+        </form>
+        {% if notas_por_cita.get(c.id) %}
+        {% set ultima_nota = notas_por_cita[c.id][0] %}
+        <div class="cita-latest-note">
+            <h3>Última nota</h3>
+            <p>{{ ultima_nota.observaciones }}</p>
+            <small>{{ ultima_nota.autor }} · <time>{{ ultima_nota.fecha_seguimiento.strftime('%d/%m/%Y') }} {{ ultima_nota.fecha_seguimiento|hora_ampm }}</time></small>
+        </div>
+        {% if notas_por_cita[c.id]|length > 1 %}
+        <details class="cita-history-disclosure">
+        <summary>Notas anteriores ({{ notas_por_cita[c.id]|length - 1 }})</summary>
+        <ol class="cita-note-history">
+            {% for nota in notas_por_cita[c.id][1:] %}
+            <li>
+                <p>{{ nota.observaciones }}</p>
+                <small>{{ nota.autor }} · <time>{{ nota.fecha_seguimiento.strftime('%d/%m/%Y') }} {{ nota.fecha_seguimiento|hora_ampm }}</time></small>
+            </li>
+            {% endfor %}
+        </ol>
+        </details>
+        {% endif %}
+        {% endif %}
+        {% if puede_anotar %}
+        {% if c.estado == 'Realizada' %}
+        <details class="cita-workflow-panel">
+            <summary>Reprogramar</summary>
+            <form method="post" action="{{ url_for('citas.reprogramar_cita', cita_id=c.id) }}" class="cita-workflow-form">
+                {{ csrf_field()|safe }}
+                <label>Nueva fecha<input type="date" name="fecha" min="{{ fecha_minima }}" required></label>
+                {% from '_hora_cita.html' import selector_hora %}
+                <label>Nueva hora{{ selector_hora('hora') }}</label>
+                <label>Motivo del cambio<textarea name="motivo" maxlength="2000" rows="2" required></textarea></label>
+                <button class="boton" type="submit">Guardar nueva fecha</button>
+            </form>
+        </details>
+        {% endif %}
+        {% if c.estado == 'Confirmada' and not escolar.get('cierre') %}
+        <details class="cita-workflow-panel">
+            <summary>Cerrar cita</summary>
+            <form method="post" action="{{ url_for('citas.cerrar_cita', cita_id=c.id) }}" class="cita-workflow-form">
+                {{ csrf_field()|safe }}
+                <label>Asistencia<select name="asistencia" required><option value="" selected disabled>Selecciona</option><option>Asistió</option><option>No asistió</option></select></label>
+                <label>Resultado<textarea name="resultado" maxlength="10000" rows="3" required></textarea></label>
+                <button class="boton" type="submit">Guardar cierre</button>
+            </form>
+        </details>
+        {% endif %}
+        {% endif %}
+    </section>
+    {% endif %}
+    <div class="mobile-dialog-actions cita-info-actions">
+        {% if rol == 'Acudiente' and c.estado == 'Pendiente' %}
+        <form method="post" action="{{ url_for('citas.cambiar_estado', cita_id=c.id) }}" class="inline-form">
+            {{ csrf_field()|safe }}
+            <input type="hidden" name="estado" value="Confirmada">
+            <button class="boton" type="submit">Confirmar</button>
+        </form>
+        {% endif %}
+        <button class="boton" type="button" data-mobile-dialog-close>Cancelar</button>
+    </div>
+</dialog>
+{% endfor %}
+
+</div>
+
+{% endblock %}

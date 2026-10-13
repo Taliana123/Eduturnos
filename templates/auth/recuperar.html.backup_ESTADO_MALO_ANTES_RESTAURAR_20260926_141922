@@ -1,0 +1,547 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Recuperar acceso - EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<style id="RECUPERAR_HEADER_ABSOLUTO">
+
+/* ============================================================
+   RECUPERAR ACCESO
+   HEADER AISLADO
+   ============================================================ */
+
+.eduturnos-recuperar-absoluto{
+
+    width:100% !important;
+    min-height:100vh !important;
+
+    margin:0 !important;
+    padding:0 !important;
+
+    background:#f4f7fa !important;
+
+    color:#202938 !important;
+
+    box-sizing:border-box !important;
+}
+
+
+/* ============================================================
+   FRANJA AZUL OSCURO
+   ============================================================ */
+
+.eduturnos-recuperar-absoluto .eduturnos-header-absoluto{
+
+    width:100% !important;
+
+    height:76px !important;
+    min-height:76px !important;
+
+    margin:0 !important;
+
+    padding:0 46px !important;
+
+    display:flex !important;
+    align-items:center !important;
+
+    background:#172942 !important;
+
+    border:0 !important;
+    border-top:0 !important;
+    border-right:0 !important;
+    border-bottom:0 !important;
+    border-left:0 !important;
+
+    outline:0 !important;
+
+    box-shadow:0 4px 18px rgba(15,32,55,.16) !important;
+
+    box-sizing:border-box !important;
+
+    position:relative !important;
+
+}
+
+
+/* ============================================================
+   TITULO EDUTURNOS
+   ============================================================ */
+
+.eduturnos-recuperar-absoluto .eduturnos-logo-absoluto{
+
+    display:block !important;
+
+    margin:0 !important;
+    padding:0 !important;
+
+    font-family:"Public Sans","Segoe UI",Arial,sans-serif !important;
+
+    font-size:26px !important;
+    font-weight:800 !important;
+
+    line-height:1 !important;
+
+    letter-spacing:.02em !important;
+
+    color:#ffffff !important;
+
+    background:transparent !important;
+
+    border:0 !important;
+
+    box-shadow:none !important;
+
+}
+
+
+/* PUNTO DORADO */
+
+.eduturnos-recuperar-absoluto .eduturnos-logo-absoluto span{
+
+    color:#eab64a !important;
+
+    margin-left:2px !important;
+
+}
+
+
+/* ============================================================
+   ELIMINAR LINEAS AUTOMATICAS
+   ============================================================ */
+
+.eduturnos-recuperar-absoluto .eduturnos-header-absoluto::before,
+.eduturnos-recuperar-absoluto .eduturnos-header-absoluto::after,
+.eduturnos-recuperar-absoluto .eduturnos-logo-absoluto::before,
+.eduturnos-recuperar-absoluto .eduturnos-logo-absoluto::after{
+
+    content:none !important;
+
+    display:none !important;
+
+    border:0 !important;
+
+    box-shadow:none !important;
+
+}
+
+
+/* ============================================================
+   CONTENIDO
+   ============================================================ */
+
+.eduturnos-recuperar-absoluto .eduturnos-recuperar-contenido{
+
+    width:100% !important;
+
+    min-height:calc(100vh - 76px) !important;
+
+    margin:0 !important;
+
+    padding:34px 20px 50px !important;
+
+    display:flex !important;
+
+    justify-content:center !important;
+
+    align-items:flex-start !important;
+
+    background:#f4f7fa !important;
+
+    box-sizing:border-box !important;
+
+}
+
+
+/* ============================================================
+   TARJETA
+   ============================================================ */
+
+.eduturnos-recuperar-absoluto .eduturnos-recuperar-card{
+
+    width:min(900px,100%) !important;
+
+    min-height:410px !important;
+
+    margin:0 !important;
+
+    padding:34px 46px !important;
+
+    display:grid !important;
+
+    grid-template-columns:1fr 1fr !important;
+
+    align-items:center !important;
+
+    gap:44px !important;
+
+    background:#ffffff !important;
+
+    border:1px solid rgba(24,50,75,.08) !important;
+
+    border-radius:18px !important;
+
+    box-shadow:0 16px 38px rgba(25,48,75,.10) !important;
+
+    box-sizing:border-box !important;
+
+}
+
+
+/* ============================================================
+   PARTE DEL FORMULARIO
+   ============================================================ */
+
+.eduturnos-recuperar-absoluto .eduturnos-recuperar-form{
+
+    width:100% !important;
+
+}
+
+
+/* TITULO */
+
+.eduturnos-recuperar-absoluto h1{
+
+    margin:0 0 18px !important;
+
+    color:#172235 !important;
+
+    font-family:"Source Serif 4",Georgia,serif !important;
+
+    font-size:30px !important;
+
+    line-height:1.1 !important;
+
+}
+
+
+/* TEXTO */
+
+.eduturnos-recuperar-absoluto .eduturnos-descripcion{
+
+    margin:0 0 24px !important;
+
+    color:#64748b !important;
+
+    font-family:"Public Sans","Segoe UI",Arial,sans-serif !important;
+
+    line-height:1.55 !important;
+
+}
+
+
+/* LABEL */
+
+.eduturnos-recuperar-absoluto label{
+
+    display:block !important;
+
+    margin:0 0 12px !important;
+
+    color:#202938 !important;
+
+    font-family:"Public Sans","Segoe UI",Arial,sans-serif !important;
+
+    font-size:14px !important;
+
+    font-weight:600 !important;
+
+}
+
+
+/* INPUT */
+
+.eduturnos-recuperar-absoluto input[type="email"]{
+
+    width:100% !important;
+
+    height:46px !important;
+
+    margin:0 0 18px !important;
+
+    padding:0 14px !important;
+
+    background:#ffffff !important;
+
+    color:#202938 !important;
+
+    border:1px solid #dbe3ec !important;
+
+    border-radius:10px !important;
+
+    box-sizing:border-box !important;
+
+    outline:none !important;
+
+}
+
+
+/* BOTON */
+
+.eduturnos-recuperar-absoluto button{
+
+    width:100% !important;
+
+    min-height:46px !important;
+
+    margin:0 !important;
+
+    padding:11px 18px !important;
+
+    background:#2875c7 !important;
+
+    color:#ffffff !important;
+
+    border:0 !important;
+
+    border-radius:10px !important;
+
+    font-family:"Public Sans","Segoe UI",Arial,sans-serif !important;
+
+    font-weight:700 !important;
+
+    cursor:pointer !important;
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media(max-width:700px){
+
+    .eduturnos-recuperar-absoluto .eduturnos-header-absoluto{
+
+        padding:0 22px !important;
+
+    }
+
+    .eduturnos-recuperar-absoluto .eduturnos-recuperar-card{
+
+        grid-template-columns:1fr !important;
+
+        min-height:auto !important;
+
+        padding:28px 24px !important;
+
+    }
+
+}
+
+</style>
+
+
+<div class="eduturnos-recuperar-absoluto">
+
+    <!-- =====================================================
+         HEADER EXCLUSIVO DE RECUPERAR
+         ===================================================== -->
+
+    <header class="eduturnos-header-absoluto">
+
+        <div class="eduturnos-logo-absoluto">
+            EDUTURNOS<span>.</span>
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         CONTENIDO
+         ===================================================== -->
+
+    <main class="eduturnos-recuperar-contenido">
+
+        <section class="eduturnos-recuperar-card">
+
+            <div class="eduturnos-recuperar-form">
+
+                <h1>Recuperar acceso</h1>
+
+                <p class="eduturnos-descripcion">
+                    Ingresa el correo asociado a tu cuenta y te enviaremos
+                    un código de recuperación de 6 dígitos.
+                </p>
+
+
+                {% with mensajes = get_flashed_messages(with_categories=true) %}
+
+                    {% if mensajes %}
+
+                        <div class="mensajes">
+
+                            {% for categoria, mensaje in mensajes %}
+
+                                <div class="mensaje mensaje-{{ categoria }}">
+                                    {{ mensaje }}
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+                {% endwith %}
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for('passwords.recuperar') }}"
+                    autocomplete="off"
+                >
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+
+                    <label for="correo">
+                        Correo electrónico
+                    </label>
+
+
+                    <input
+                        type="email"
+                        id="correo"
+                        name="correo"
+                        value="{{ request.form.get('correo', '') }}"
+                        autocomplete="email"
+                        required
+                        autofocus
+                    >
+
+
+                    <button type="submit">
+                        Enviar código de recuperación
+                    </button>
+
+                </form>
+
+
+                <p style="
+                    margin:18px 0 0;
+                    color:#64748b;
+                    font-size:12px;
+                    line-height:1.5;
+                ">
+                    Recibirás un código de 6 dígitos válido durante 10 minutos.
+                </p>
+
+            </div>
+
+
+            <!-- =================================================
+                 ILUSTRACION
+                 ================================================= -->
+
+            <div style="
+                width:100%;
+                min-height:260px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                background:transparent;
+                border:0;
+            ">
+
+                <svg
+                    width="270"
+                    height="230"
+                    viewBox="0 0 270 230"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                >
+
+                    <!-- sobre -->
+
+                    <rect
+                        x="35"
+                        y="55"
+                        width="200"
+                        height="125"
+                        rx="18"
+                        fill="#eef4fb"
+                        stroke="#2875c7"
+                        stroke-width="4"
+                    />
+
+                    <path
+                        d="M39 70 L135 140 L231 70"
+                        fill="none"
+                        stroke="#2875c7"
+                        stroke-width="4"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+
+                    <!-- solapa -->
+
+                    <path
+                        d="M40 170 L104 112"
+                        fill="none"
+                        stroke="#2875c7"
+                        stroke-width="4"
+                        stroke-linecap="round"
+                    />
+
+                    <path
+                        d="M230 170 L166 112"
+                        fill="none"
+                        stroke="#2875c7"
+                        stroke-width="4"
+                        stroke-linecap="round"
+                    />
+
+                    <!-- candado -->
+
+                    <rect
+                        x="101"
+                        y="25"
+                        width="68"
+                        height="70"
+                        rx="12"
+                        fill="#ffffff"
+                        stroke="#eab64a"
+                        stroke-width="5"
+                    />
+
+                    <path
+                        d="M116 55 V45
+                           C116 29 154 29 154 45
+                           V55"
+                        fill="none"
+                        stroke="#eab64a"
+                        stroke-width="7"
+                        stroke-linecap="round"
+                    />
+
+                    <circle
+                        cx="135"
+                        cy="70"
+                        r="7"
+                        fill="#2875c7"
+                    />
+
+                    <path
+                        d="M135 77 V87"
+                        stroke="#2875c7"
+                        stroke-width="5"
+                        stroke-linecap="round"
+                    />
+
+                </svg>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+{% endblock %}

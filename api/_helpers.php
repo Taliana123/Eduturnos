@@ -199,7 +199,7 @@ function obtenerEstadoNombre($conexion, $idEstado)
     return $fila["nombre"] ?? "";
 }
 
-ffunction notificarCita(
+function notificarCita(
     $conexion,
     $idCita,
     $titulo,

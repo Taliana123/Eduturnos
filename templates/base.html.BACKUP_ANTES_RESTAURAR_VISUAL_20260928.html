@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EDUTURNOS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+<header class="barra">
+    <a class="logo" href="{{ url_for('inicio') }}">EDUTURNOS</a>
+    <nav>
+        {% if usuario_sesion %}
+            <a href="{{ url_for('auth.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('citas.index') }}">Citas</a>
+            <a href="{{ url_for('calendario.index') }}">Calendario</a>
+            <a href="{{ url_for('notificaciones.index') }}">🔔{% if notificaciones_no_leidas %}<span class="contador">{{ notificaciones_no_leidas }}</span>{% endif %} Notificaciones</a>
+            {% if usuario_sesion and usuario_sesion.rol_nombre in ['Rector', 'Administrador / Coordinador'] %}
+                <a href="{{ url_for('reportes.index') }}">Reportes</a>
+            {% endif %}
+            <a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}">Ingresar</a>
+            <a href="{{ url_for('auth.registro') }}">Registrarse</a>
+        {% endif %}
+    </nav>
+</header>
+<main class="contenedor">
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% for categoria, mensaje in mensajes %}
+            <div class="alerta {{ categoria }}">{{ mensaje }}</div>
+        {% endfor %}
+    {% endwith %}
+    {% block contenido %}{% endblock %}
+</main>
+</body>
+</html>

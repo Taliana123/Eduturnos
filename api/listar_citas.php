@@ -114,3 +114,38 @@ switch ($usuario["rol"]) {
     $tipos .= "i";
 
     break;
+}
+
+if (!empty($condiciones)) {
+    $sql .= " WHERE " . implode(" AND ", $condiciones);
+}
+
+$sql .= " ORDER BY c.fecha DESC, c.hora DESC";
+
+$stmt = $conexion->prepare($sql);
+
+if (!$stmt) {
+    responder(false, "No se pudo preparar la consulta de citas.", [], 500);
+}
+
+if (!empty($parametros)) {
+    $referencias = [$tipos];
+
+    foreach ($parametros as $indice => $parametro) {
+        $referencias[] = &$parametros[$indice];
+    }
+
+    call_user_func_array([$stmt, "bind_param"], $referencias);
+}
+
+$stmt->execute();
+$resultado = $stmt->get_result();
+$citas = [];
+
+while ($fila = $resultado->fetch_assoc()) {
+    $citas[] = $fila;
+}
+
+$stmt->close();
+
+responder(true, "Citas encontradas.", $citas);

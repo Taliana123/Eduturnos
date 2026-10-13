@@ -1,0 +1,97 @@
+{% extends 'base.html' %}{% block content %}<h1>{{ 'Editar' if docente else 'Nuevo' }} docente</h1><form method="post" class="panel form-grid">{{ csrf_field()|safe }}<label>Tipo documento<select name="tipo_documento">
+<option value="" selected disabled hidden></option>
+<option value="CC">Cédula de ciudadanía</option><option value="TI">Tarjeta de identidad</option><option value="CE">Cédula de extranjería</option></select></label><label>Documento<input name="documento" value="{{ docente.documento if docente else '' }}" required></label><label>Nombres<input name="nombres" value="{{ docente.nombres if docente else '' }}" required></label><label>Apellidos<input name="apellidos" value="{{ docente.apellidos if docente else '' }}" required></label><label>Correo institucional<input type="email" name="correo" value="{{ docente.correo_institucional if docente else '' }}" required></label><label>Teléfono<input name="telefono" value="{{ docente.telefono if docente else '' }}"></label><label>Sede<select name="sede">
+<option value="" selected disabled hidden></option>
+{% for x in catalogos.sedes %}<option value="{{ x.id }}" {% if docente and docente.id_sede==x.id %}selected{% endif %}>{{ x.nombre }}</option>{% endfor %}</select></label><label>Jornada<select name="jornada">
+<option value="" selected disabled hidden></option>
+{% for x in catalogos.jornadas %}<option value="{{ x.id }}" {% if docente and docente.id_jornada==x.id %}selected{% endif %}>{{ x.nombre }}</option>{% endfor %}</select></label><label>Área<input name="area" value="{{ docente.area if docente else '' }}"></label><label>Asignatura<input name="asignatura" value="{{ docente.asignatura if docente else '' }}"></label><div class="full-field"><button class="boton">Guardar</button> <a class="boton secundario" href="{{ url_for('docentes.lista') }}">Cancelar</a></div></form>
+
+<style id="EDUTURNOS_BOTONES_V4">
+/* =========================================================
+   EDUTURNOS
+   SOLO BOTONES
+   Mismo azul y letra que "+ Nueva citación" de Citas
+   ========================================================= */
+
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a[class*="boton"],
+a.btn,
+a[class*="btn-"],
+a.link-back,
+a.edc-back,
+.boton,
+.btn,
+[class*="boton-"],
+[class*="btn-"],
+.link-back,
+.edc-back {
+
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+
+    color: #ffffff !important;
+
+    border-color: #1769aa !important;
+
+    text-decoration: none !important;
+}
+
+/* Texto dentro de botones */
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a[class*="boton"] *,
+a.btn *,
+a[class*="btn-"] *,
+.link-back *,
+.edc-back * {
+    color: #ffffff !important;
+}
+
+/* Hover */
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a[class*="boton"]:hover,
+a.btn:hover,
+a[class*="btn-"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.boton:hover,
+.btn:hover,
+[class*="boton-"]:hover,
+[class*="btn-"]:hover,
+.link-back:hover,
+.edc-back:hover {
+
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+
+    color: #ffffff !important;
+
+    border-color: #145b91 !important;
+
+    text-decoration: none !important;
+}
+
+/* Elementos hijos durante hover */
+button:hover *,
+a.boton:hover *,
+a[class*="boton"]:hover *,
+a.btn:hover *,
+a[class*="btn-"]:hover *,
+.link-back:hover *,
+.edc-back:hover * {
+    color: #ffffff !important;
+}
+</style>
+
+{% endblock %}

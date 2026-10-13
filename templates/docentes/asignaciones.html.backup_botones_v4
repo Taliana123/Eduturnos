@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block content %}<h1>Asignaciones: {{ docente.nombres }} {{ docente.apellidos }}</h1><div class="panel"><form method="post" class="form-grid">{{ csrf_field()|safe }}<label>Estudiante<select name="estudiante">
+<option value="" selected disabled hidden></option>
+{% for e in catalogos.estudiantes %}<option value="{{ e.id_estudiante }}">{{ e.apellidos }} {{ e.nombres }} · {{ e.documento }}</option>{% endfor %}</select></label><label>Grupo<select name="grupo">
+<option value="" selected disabled hidden></option>
+{% for g in catalogos.grupos %}<option value="{{ g.id }}">{{ g.grado }} - {{ g.nombre }}</option>{% endfor %}</select></label><button class="boton">Guardar asignación</button></form></div><div class="table-wrap"><table><tr><th>Estudiante</th><th>Grupo</th><th>Estado</th></tr>{% for a in asignaciones %}<tr><td>{{ (a.estudiante_n or '') }} {{ (a.estudiante_a or '') }}</td><td>{{ (a.grado or '') }} {{ (a.grupo or '') }}</td><td>{{ 'Activa' if a.estado else 'Inactiva' }}</td></tr>{% else %}<tr><td colspan="3">No hay asignaciones.</td></tr>{% endfor %}</table></div>{% endblock %}

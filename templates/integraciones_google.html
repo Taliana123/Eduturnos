@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Calendarios conectados · EDUTURNOS{% endblock %}
+{% block content %}
+<section class="integraciones-page">
+    <header class="page-head">
+        <div>
+            <a class="link-back" href="{{ url_for('cuenta.index') }}">← Mi cuenta</a>
+            <h1>Calendarios conectados</h1>
+            <p class="muted">Las citas se guardan primero en EDUTURNOS. Google Calendar es una copia adicional.</p>
+        </div>
+    </header>
+
+    <div class="alerta info" role="note">
+        Al conectar Google, EDUTURNOS guarda el correo de la cuenta y tokens cifrados para sincronizar eventos genéricos con fecha, hora y lugar. No envía nombres de estudiantes, acudientes ni observaciones. Puedes detener futuras sincronizaciones desconectando el calendario; los eventos que ya se copiaron se administran desde Google Calendar. Consulta la <a href="{{ url_for('privacidad') }}">Política de Privacidad</a>.
+    </div>
+
+    {% if not configuracion_lista %}
+    <div class="alerta info" role="status">
+        Google Calendar está desactivado hasta configurar OAuth y un dominio HTTPS público en el servidor. La dirección local HTTP no puede recibir el retorno seguro de Google.
+    </div>
+    <p class="muted">Cuando tengas dominio HTTPS, registra esta URI de retorno en el cliente OAuth web de Google Cloud: <code>{{ callback_url }}</code></p>
+    {% endif %}
+
+    {% if puede_institucional %}
+    <section class="integracion-row">
+        <div>
+            <h2>Agenda institucional</h2>
+            <p class="muted">Al conectar, copia las citas futuras al calendario escolar compartido y sincroniza las nuevas, con recordatorios 24 h y 2 h antes.</p>
+            {% if institucional %}<small>Conectada: {{ institucional.correo_google or 'Cuenta Google' }}</small>{% else %}<small>Sin conectar</small>{% endif %}
+        </div>
+        <div class="integracion-actions">
+            {% if configuracion_lista %}<a class="boton" href="{{ url_for('integraciones_google.conectar', scope='institucional') }}">{% if institucional %}Volver a conectar{% else %}Conectar{% endif %}</a>{% endif %}
+            {% if institucional %}<form method="post" action="{{ url_for('integraciones_google.desconectar', scope='institucional') }}">{{ csrf_field()|safe }}<button class="boton secundario" type="submit">Desconectar</button></form>{% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if puede_personal %}
+    <section class="integracion-row">
+        <div>
+            <h2>Mi calendario personal</h2>
+            {% if usuario.rol_nombre in ['Super Admin','Rector','Administrador / Coordinador'] %}
+            <p class="muted">Al conectar, copia las citas futuras que puedes consultar y sincroniza las nuevas, con recordatorios 24 h y 2 h antes.</p>
+            {% else %}
+            <p class="muted">Al conectar, copia las citas futuras asignadas a tu cuenta y sincroniza las nuevas, con recordatorios 24 h y 2 h antes.</p>
+            {% endif %}
+            {% if personal %}<small>Conectado: {{ personal.correo_google or 'Cuenta Google' }}</small>{% else %}<small>Sin conectar</small>{% endif %}
+        </div>
+        <div class="integracion-actions">
+            {% if configuracion_lista %}<a class="boton" href="{{ url_for('integraciones_google.conectar', scope='personal') }}">{% if personal %}Volver a conectar{% else %}Conectar{% endif %}</a>{% endif %}
+            {% if personal %}<form method="post" action="{{ url_for('integraciones_google.desconectar', scope='personal') }}">{{ csrf_field()|safe }}<button class="boton secundario" type="submit">Desconectar</button></form>{% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if usuario.rol_nombre in ['Estudiante','Acudiente'] %}
+    <section class="integracion-row"><div><h2>Citas en EDUTURNOS</h2><p class="muted">Consulta aquí las citas asignadas a tu cuenta, además de sincronizarlas con tu Google Calendar personal.</p></div><a class="boton" href="{{ url_for('calendario.index') }}">Abrir calendario</a></section>
+    {% endif %}
+</section>
+<style>
+.integraciones-page{width:100%;max-width:940px;margin:0 auto;padding:18px 0 40px;}
+.integraciones-page .page-head h1{margin:8px 0;font-size:26px;color:#172942;}
+.integraciones-page .page-head .link-back{display:inline-flex;margin-bottom:8px;}
+.integracion-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0;border-bottom:1px solid #dce4eb;}
+.integracion-row h2{margin:0 0 5px;color:#172942;font-size:17px;}
+.integracion-row p{margin:0 0 6px;}
+.integracion-row small{color:#66788a;}
+.integracion-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
+.integracion-actions form{margin:0;}
+@media(max-width:600px){.integraciones-page{padding-top:8px}.integracion-row{align-items:flex-start;flex-direction:column;gap:12px}.integracion-actions{width:100%}}
+</style>
+{% endblock %}

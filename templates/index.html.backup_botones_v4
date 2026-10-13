@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}EDUTURNOS · Gestión de citaciones escolares{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="tarjeta hero-card">
+    <span class="badge">Portal institucional</span>
+    <h1>EDUTURNOS</h1>
+    <p>Un solo lugar para crear, confirmar y hacer seguimiento a las citaciones escolares, con calendario, notificaciones y reportes.</p>
+    <div class="acciones">
+      <a class="boton" href="{{ url_for('auth.login') }}">Iniciar sesión</a>
+      <a class="boton secundario" href="{{ url_for('auth.registro') }}">Crear cuenta</a>
+    </div>
+  </div>
+  <div class="hero-visual hero-card">
+    <span class="badge">Portal institucional</span>
+    <h2>Multiusuario</h2>
+    <p>Estudiantes, acudientes, docentes, coordinación y rectoría trabajan sobre la misma información institucional.</p>
+    <p class="muted">Segura · centralizada · multiusuario</p>
+  </div>
+</section>
+<div class="grid equal-cards feature-grid">
+  <div class="tarjeta feature-card"><h3>Citaciones</h3><p>Agenda y consulta reuniones sin duplicar horarios.</p></div>
+  <div class="tarjeta feature-card"><h3>Seguimiento</h3><p>Registra asistencia, resultados y justificaciones.</p></div>
+  <div class="tarjeta feature-card"><h3>Comunicación</h3><p>Notificaciones y eventos de calendario en un solo sitio.</p></div>
+</div>
+{% endblock %}

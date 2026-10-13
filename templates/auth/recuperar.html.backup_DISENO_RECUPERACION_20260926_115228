@@ -1,0 +1,266 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Recuperar acceso - EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   EDUTURNOS - RECUPERAR ACCESO
+   Estilos exclusivos.
+   No utiliza .formulario, .form-card ni .btn-primary.
+   ========================================================= */
+
+html body .eduturnos-recuperar {
+    width: 100%;
+    min-height: calc(100vh - 90px);
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 54px 24px 70px;
+    background: #f7f9fb !important;
+}
+
+html body .eduturnos-recuperar__card {
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
+    background: #ffffff !important;
+    border: 1px solid #e4eaf1 !important;
+    border-radius: 18px !important;
+    padding: 34px 36px 30px !important;
+    margin: 0 auto !important;
+    box-shadow: 0 14px 38px rgba(24, 50, 80, 0.10) !important;
+}
+
+html body .eduturnos-recuperar__back {
+    margin: 0 0 26px;
+}
+
+html body .eduturnos-recuperar__back a {
+    color: #2875c7 !important;
+    font-family: "Public Sans", Arial, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+
+html body .eduturnos-recuperar__back a:hover {
+    color: #155da5 !important;
+    text-decoration: underline !important;
+}
+
+html body .eduturnos-recuperar__header {
+    margin: 0 0 25px;
+}
+
+html body .eduturnos-recuperar__header h1 {
+    margin: 0 0 9px !important;
+    color: #172b45 !important;
+    font-family: "Source Serif 4", Georgia, serif !important;
+    font-size: 30px !important;
+    line-height: 1.12 !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.3px !important;
+}
+
+html body .eduturnos-recuperar__header p {
+    margin: 0 !important;
+    color: #5f6f82 !important;
+    font-family: "Public Sans", Arial, sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+html body .eduturnos-recuperar__messages {
+    margin: 0 0 20px;
+}
+
+html body .eduturnos-recuperar__message {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 11px 13px;
+    border-radius: 9px;
+    font-family: "Public Sans", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+html body .eduturnos-recuperar__field {
+    margin: 0 0 21px;
+}
+
+html body .eduturnos-recuperar__field label {
+    display: block !important;
+    margin: 0 0 7px !important;
+    color: #27384c !important;
+    font-family: "Public Sans", Arial, sans-serif !important;
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+    font-weight: 600 !important;
+}
+
+html body .eduturnos-recuperar__field input {
+    display: block !important;
+    width: 100% !important;
+    height: 44px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 13px !important;
+    border: 1px solid #cfd9e5 !important;
+    border-radius: 9px !important;
+    background: #ffffff !important;
+    color: #26384b !important;
+    font-family: "Public Sans", Arial, sans-serif !important;
+    font-size: 14px !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+html body .eduturnos-recuperar__field input::placeholder {
+    color: #98a5b4 !important;
+    opacity: 1 !important;
+}
+
+html body .eduturnos-recuperar__field input:focus {
+    border-color: #2875c7 !important;
+    box-shadow: 0 0 0 3px rgba(40, 117, 199, 0.12) !important;
+}
+
+html body .eduturnos-recuperar__button {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 44px !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 11px 18px !important;
+    border: 0 !important;
+    border-radius: 9px !important;
+    background: #2875c7 !important;
+    color: #ffffff !important;
+    font-family: "Public Sans", Arial, sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    box-shadow: 0 6px 14px rgba(40, 117, 199, 0.20) !important;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease !important;
+}
+
+html body .eduturnos-recuperar__button:hover {
+    background: #1f67b2 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 18px rgba(40, 117, 199, 0.25) !important;
+}
+
+html body .eduturnos-recuperar__button:active {
+    transform: translateY(0) !important;
+}
+
+html body .eduturnos-recuperar__footer {
+    margin: 20px 0 0;
+    padding-top: 17px;
+    border-top: 1px solid #edf1f5;
+}
+
+html body .eduturnos-recuperar__footer p {
+    margin: 0 !important;
+    color: #7a8796 !important;
+    font-family: "Public Sans", Arial, sans-serif !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+    text-align: center !important;
+}
+
+/* Responsive */
+@media (max-width: 560px) {
+    html body .eduturnos-recuperar {
+        padding: 30px 16px 50px;
+    }
+
+    html body .eduturnos-recuperar__card {
+        padding: 28px 22px 25px !important;
+        border-radius: 15px !important;
+    }
+
+    html body .eduturnos-recuperar__header h1 {
+        font-size: 27px !important;
+    }
+}
+</style>
+
+<section class="eduturnos-recuperar">
+
+    <div class="eduturnos-recuperar__card">
+
+        <div class="eduturnos-recuperar__back">
+            <a href="{{ url_for('auth.login') }}">
+                ← Volver al inicio de sesión
+            </a>
+        </div>
+
+        <div class="eduturnos-recuperar__header">
+            <h1>Recuperar acceso</h1>
+            <p>
+                Ingresa el correo asociado a tu cuenta y te enviaremos
+                un código de recuperación de 6 dígitos.
+            </p>
+        </div>
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                <div class="eduturnos-recuperar__messages">
+                    {% for categoria, mensaje in mensajes %}
+                        <div class="eduturnos-recuperar__message mensaje-{{ categoria }}">
+                            {{ mensaje }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST"
+              action="{{ url_for('passwords.recuperar') }}"
+              autocomplete="off">
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <div class="eduturnos-recuperar__field">
+                <label for="correo">Correo electrónico</label>
+
+                <input
+                    type="email"
+                    id="correo"
+                    name="correo"
+                    value="{{ request.form.get('correo', '') }}"
+                    placeholder="correo@ejemplo.com"
+                    autocomplete="email"
+                    required
+                    autofocus>
+            </div>
+
+            <button type="submit"
+                    class="eduturnos-recuperar__button">
+                Enviar código de recuperación
+            </button>
+
+        </form>
+
+        <div class="eduturnos-recuperar__footer">
+            <p>
+                Recibirás un código de 6 dígitos válido durante 10 minutos.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

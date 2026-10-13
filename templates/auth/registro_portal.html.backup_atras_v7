@@ -1,0 +1,1375 @@
+{% extends "base.html" %}
+
+{% block title %}
+Registro - EDUTURNOS
+{% endblock %}
+
+{% block content %}
+
+<div class="container" style="max-width: 1000px; margin: 30px auto;">
+
+    <div class="card" style="padding: 30px;">
+
+        <div style="margin-bottom: 25px;">
+
+            <h1>Crear cuenta</h1>
+
+            {% if info %}
+                <p>{{ info.descripcion }}</p>
+            {% endif %}
+
+            {% if portal == "estudiante" %}
+
+                <p>Registro de estudiante</p>
+
+            {% elif portal == "acudiente" %}
+
+                <p>Registro de padre, madre o acudiente</p>
+
+            {% elif portal == "docente" %}
+
+                <p>Registro de docente</p>
+
+            {% elif portal == "coordinador" %}
+
+                <p>Registro de coordinador</p>
+
+            {% elif portal == "rector" %}
+
+                <p>Registro de rector</p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- MENSAJES -->
+        <!-- ================================================= -->
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+
+            {% if mensajes %}
+
+                <div style="margin-bottom: 20px;">
+
+                    {% for categoria, mensaje in mensajes %}
+
+                        <div class="alert alert-{{ categoria }}">
+                            {{ mensaje }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <form method="POST" action="{{ request.path }}">
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+
+            <!-- ================================================= -->
+            <!-- ESTUDIANTE -->
+            <!-- ================================================= -->
+
+            {% if portal == "estudiante" %}
+
+                <h2>Datos del estudiante</h2>
+
+
+                <div class="form-group">
+
+                    <label for="tipo_documento">
+                        Tipo de documento
+                    </label>
+
+                    <select
+                        name="tipo_documento"
+                        id="tipo_documento"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        <option value="TI">
+                            Tarjeta de identidad
+                        </option>
+
+                        <option value="CC">
+                            Cédula de ciudadanía
+                        </option>
+
+                        <option value="RC">
+                            Registro civil
+                        </option>
+
+                        <option value="CE">
+                            Cédula de extranjería
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="documento">
+                        Número de documento
+                    </label>
+
+                    <input
+                        type="text"
+                        name="documento"
+                        id="documento"
+                        required
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="nombres">
+                        Nombres
+                    </label>
+
+                    <input
+                        type="text"
+                        name="nombres"
+                        id="nombres"
+                        required
+                        autocomplete="given-name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="apellidos">
+                        Apellidos
+                    </label>
+
+                    <input
+                        type="text"
+                        name="apellidos"
+                        id="apellidos"
+                        required
+                        autocomplete="family-name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="correo">
+                        Correo electrónico
+                    </label>
+
+                    <input
+                        type="email"
+                        name="correo"
+                        id="correo"
+                        required
+                        autocomplete="email"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Contraseña
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        required
+                        minlength="8"
+                        autocomplete="new-password"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="telefono">
+                        Teléfono
+                    </label>
+
+                    <input
+                        type="text"
+                        name="telefono"
+                        id="telefono"
+                        autocomplete="tel"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="id_sede">
+                        Sede
+                    </label>
+
+                    <select
+                        name="id_sede"
+                        id="id_sede"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        {% for sede in sedes %}
+
+                            <option value="{{ sede.id }}">
+
+                                {{ sede.nombre }}
+
+                                {% if sede.codigo %}
+                                    - {{ sede.codigo }}
+                                {% endif %}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="id_jornada">
+                        Jornada
+                    </label>
+
+                    <select
+                        name="id_jornada"
+                        id="id_jornada"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        {% for jornada in jornadas %}
+
+                            <option value="{{ jornada.id }}">
+                                {{ jornada.nombre }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- GRADO -->
+                <!-- ================================================= -->
+
+                <div class="form-group">
+
+                    <label for="id_grado">
+                        Grado
+                    </label>
+
+                    <select
+                        name="id_grado"
+                        id="id_grado"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        {% for grado in grados %}
+
+                            {% if grado.nombre|string in ["6", "7", "8", "9", "10", "11"] %}
+
+                                <option value="{{ grado.id }}">
+                                    {{ grado.nombre }}
+                                </option>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- ================================================= -->
+                <!-- GRUPO -->
+                <!-- ================================================= -->
+
+                <div class="form-group">
+
+                    <label for="id_grupo">
+                        Grupo
+                    </label>
+
+                    <select
+                        name="id_grupo"
+                        id="id_grupo"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+
+                    </select>
+
+                </div>
+
+
+            <!-- ================================================= -->
+            <!-- ACUDIENTE -->
+            <!-- ================================================= -->
+
+            {% elif portal == "acudiente" %}
+
+                <h2>Datos del acudiente</h2>
+
+
+                <div class="form-group">
+
+                    <label for="tipo_documento">
+                        Tipo de documento
+                    </label>
+
+                    <select
+                        name="tipo_documento"
+                        id="tipo_documento"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        <option value="CC">
+                            Cédula de ciudadanía
+                        </option>
+
+                        <option value="CE">
+                            Cédula de extranjería
+                        </option>
+
+                        <option value="TI">
+                            Tarjeta de identidad
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="documento">
+                        Número de documento
+                    </label>
+
+                    <input
+                        type="text"
+                        name="documento"
+                        id="documento"
+                        required
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="nombres">
+                        Nombres
+                    </label>
+
+                    <input
+                        type="text"
+                        name="nombres"
+                        id="nombres"
+                        required
+                        autocomplete="given-name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="apellidos">
+                        Apellidos
+                    </label>
+
+                    <input
+                        type="text"
+                        name="apellidos"
+                        id="apellidos"
+                        required
+                        autocomplete="family-name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="correo">
+                        Correo electrónico
+                    </label>
+
+                    <input
+                        type="email"
+                        name="correo"
+                        id="correo"
+                        required
+                        autocomplete="email"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="telefono">
+                        Teléfono
+                    </label>
+
+                    <input
+                        type="text"
+                        name="telefono"
+                        id="telefono"
+                        autocomplete="tel"
+                    >
+
+                </div>
+
+
+                <hr>
+
+                <h2>Datos del estudiante</h2>
+
+
+                <div class="form-group">
+
+                    <label for="estudiante_tipo_documento">
+                        Tipo de documento del estudiante
+                    </label>
+
+                    <select
+                        name="estudiante_tipo_documento"
+                        id="estudiante_tipo_documento"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        <option value="TI">
+                            Tarjeta de identidad
+                        </option>
+
+                        <option value="CC">
+                            Cédula de ciudadanía
+                        </option>
+
+                        <option value="RC">
+                            Registro civil
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="estudiante_documento">
+                        Documento del estudiante
+                    </label>
+
+                    <input
+                        type="text"
+                        name="estudiante_documento"
+                        id="estudiante_documento"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="estudiante_nombres">
+                        Nombres del estudiante
+                    </label>
+
+                    <input
+                        type="text"
+                        name="estudiante_nombres"
+                        id="estudiante_nombres"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="estudiante_apellidos">
+                        Apellidos del estudiante
+                    </label>
+
+                    <input
+                        type="text"
+                        name="estudiante_apellidos"
+                        id="estudiante_apellidos"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="id_sede">
+                        Sede
+                    </label>
+
+                    <select
+                        name="id_sede"
+                        id="id_sede"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        {% for sede in sedes %}
+
+                            <option value="{{ sede.id }}">
+
+                                {{ sede.nombre }}
+
+                                {% if sede.codigo %}
+                                    - {{ sede.codigo }}
+                                {% endif %}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="id_jornada">
+                        Jornada
+                    </label>
+
+                    <select
+                        name="id_jornada"
+                        id="id_jornada"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        {% for jornada in jornadas %}
+
+                            <option value="{{ jornada.id }}">
+                                {{ jornada.nombre }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="id_grado">
+                        Grado del estudiante
+                    </label>
+
+                    <select
+                        name="id_grado"
+                        id="id_grado"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        {% for grado in grados %}
+
+                            {% if grado.nombre|string in ["6", "7", "8", "9", "10", "11"] %}
+
+                                <option value="{{ grado.id }}">
+                                    {{ grado.nombre }}
+                                </option>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="id_grupo">
+                        Grupo
+                    </label>
+
+                    <select
+                        name="id_grupo"
+                        id="id_grupo"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="parentesco">
+                        Parentesco
+                    </label>
+
+                    <input
+                        type="text"
+                        name="parentesco"
+                        id="parentesco"
+                        placeholder="Ejemplo: Padre, Madre, Tío"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Contraseña
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        required
+                        minlength="8"
+                        autocomplete="new-password"
+                    >
+
+                </div>
+
+
+            <!-- ================================================= -->
+            <!-- DOCENTE / COORDINADOR / RECTOR -->
+            <!-- ================================================= -->
+
+            {% else %}
+
+                <h2>Datos institucionales</h2>
+
+
+                <div class="form-group">
+
+                    <label for="tipo_documento">
+                        Tipo de documento
+                    </label>
+
+                    <select
+                        name="tipo_documento"
+                        id="tipo_documento"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        <option value="CC">
+                            Cédula de ciudadanía
+                        </option>
+
+                        <option value="CE">
+                            Cédula de extranjería
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="documento">
+                        Número de documento
+                    </label>
+
+                    <input
+                        type="text"
+                        name="documento"
+                        id="documento"
+                        required
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="nombres">
+                        Nombres
+                    </label>
+
+                    <input
+                        type="text"
+                        name="nombres"
+                        id="nombres"
+                        required
+                        autocomplete="given-name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="apellidos">
+                        Apellidos
+                    </label>
+
+                    <input
+                        type="text"
+                        name="apellidos"
+                        id="apellidos"
+                        required
+                        autocomplete="family-name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="correo">
+                        Correo institucional
+                    </label>
+
+                    <input
+                        type="email"
+                        name="correo"
+                        id="correo"
+                        placeholder="usuario@jjfh.edu.co"
+                        required
+                        autocomplete="email"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="telefono">
+                        Teléfono
+                    </label>
+
+                    <input
+                        type="text"
+                        name="telefono"
+                        id="telefono"
+                        autocomplete="tel"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="id_sede">
+                        Sede
+                    </label>
+
+                    <select
+                        name="id_sede"
+                        id="id_sede"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        {% for sede in sedes %}
+
+                            <option value="{{ sede.id }}">
+
+                                {{ sede.nombre }}
+
+                                {% if sede.codigo %}
+                                    - {{ sede.codigo }}
+                                {% endif %}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="id_jornada">
+                        Jornada
+                    </label>
+
+                    <select
+                        name="id_jornada"
+                        id="id_jornada"
+                        required
+                    >
+<option value="" selected disabled hidden></option>
+
+
+                        
+
+                        {% for jornada in jornadas %}
+
+                            <option value="{{ jornada.id }}">
+                                {{ jornada.nombre }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="codigo_institucional">
+                        Código institucional
+                    </label>
+
+                    <input
+                        type="text"
+                        name="codigo_institucional"
+                        id="codigo_institucional"
+                        inputmode="numeric"
+                        pattern="[0-9]{6}"
+                        maxlength="6"
+                        minlength="6"
+                        required
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Contraseña
+                    </label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        required
+                        minlength="8"
+                        autocomplete="new-password"
+                    >
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- ================================================= -->
+            <!-- BOTONES -->
+            <!-- ================================================= -->
+
+            <div style="margin-top: 30px;">
+
+                <button type="submit" style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">
+                    Crear cuenta
+                </button>
+
+                <a
+                    href="{{ url_for('auth.login') }}"
+                    style="margin-left: 15px;"
+                >
+                    Volver al inicio de sesión
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+
+
+{% endblock %}
+
+
+<style id="EDUTURNOS_BOTONES_REALES_V6">
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a.btn,
+a[class*="boton"],
+a[class*="button"],
+a[class*="btn-"],
+a[role="button"],
+a.link-back,
+a.edc-back,
+.edc-header-actions a,
+.edc-header-actions button,
+.edc-buttons a,
+.edc-buttons button,
+.edc-month-toolbar a,
+.edc-month-toolbar button,
+.citas-actions a,
+.citas-actions button,
+.form-actions a,
+.form-actions button,
+.acciones a,
+.acciones button,
+.page-actions a,
+.page-actions button,
+.dashboard-actions a,
+.dashboard-actions button,
+.dashboard-card a.boton,
+.dashboard-card button,
+.quick-card a.boton,
+.quick-card button,
+.account-actions a.boton,
+.account-actions button {
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+    color: #ffffff !important;
+    border-color: #1769aa !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a.btn:hover,
+a[class*="boton"]:hover,
+a[class*="button"]:hover,
+a[class*="btn-"]:hover,
+a[role="button"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.edc-header-actions a:hover,
+.edc-header-actions button:hover,
+.edc-buttons a:hover,
+.edc-buttons button:hover,
+.edc-month-toolbar a:hover,
+.edc-month-toolbar button:hover,
+.citas-actions a:hover,
+.citas-actions button:hover,
+.form-actions a:hover,
+.form-actions button:hover,
+.acciones a:hover,
+.acciones button:hover,
+.page-actions a:hover,
+.page-actions button:hover,
+.dashboard-actions a:hover,
+.dashboard-actions button:hover,
+.dashboard-card a.boton:hover,
+.dashboard-card button:hover,
+.quick-card a.boton:hover,
+.quick-card button:hover,
+.account-actions a.boton:hover,
+.account-actions button:hover {
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+    color: #ffffff !important;
+    border-color: #145b91 !important;
+}
+
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a.btn *,
+a[role="button"] *,
+a.link-back *,
+a.edc-back *,
+.edc-header-actions a *,
+.edc-header-actions button *,
+.edc-buttons a *,
+.edc-buttons button *,
+.edc-month-toolbar a *,
+.edc-month-toolbar button *,
+.citas-actions a *,
+.citas-actions button *,
+.form-actions a *,
+.form-actions button *,
+.acciones a *,
+.acciones button *,
+.page-actions a *,
+.page-actions button *,
+.dashboard-actions a *,
+.dashboard-actions button *,
+.dashboard-card a.boton *,
+.dashboard-card button *,
+.quick-card a.boton *,
+.quick-card button *,
+.account-actions a.boton *,
+.account-actions button * {
+    color: #ffffff !important;
+}
+</style>
+
+<script id="EDUTURNOS_BOTONES_REALES_V6">
+(function() {
+    "use strict";
+
+    const azul = "#1769aa";
+    const hover = "#145b91";
+    const blanco = "#ffffff";
+
+    const selectores = [
+        "button",
+        "input[type='submit']",
+        "input[type='button']",
+        "input[type='reset']",
+
+        "a.boton",
+        "a.btn",
+        "a[class*='boton']",
+        "a[class*='button']",
+        "a[class*='btn-']",
+        "a[class*='accion']",
+        "a[class*='action']",
+        "a[role='button']",
+
+        "a.link-back",
+        "a.edc-back",
+
+        ".edc-header-actions a",
+        ".edc-header-actions button",
+
+        ".edc-buttons a",
+        ".edc-buttons button",
+
+        ".edc-month-toolbar a",
+        ".edc-month-toolbar button",
+
+        ".citas-actions a",
+        ".citas-actions button",
+
+        ".form-actions a",
+        ".form-actions button",
+
+        ".acciones a",
+        ".acciones button",
+
+        ".page-actions a",
+        ".page-actions button",
+
+        ".dashboard-actions a",
+        ".dashboard-actions button",
+
+        ".account-actions a",
+        ".account-actions button",
+
+        ".quick-card a.boton",
+        ".quick-card button",
+
+        ".dashboard-card a.boton",
+        ".dashboard-card button"
+    ].join(",");
+
+
+    function aplicar(elemento) {
+        if (!elemento) return;
+
+        elemento.style.setProperty(
+            "background",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "background-color",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "color",
+            blanco,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "border-color",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "text-decoration",
+            "none",
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "box-shadow",
+            "none",
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "opacity",
+            "1",
+            "important"
+        );
+
+        elemento.querySelectorAll("*").forEach(function(hijo) {
+            hijo.style.setProperty(
+                "color",
+                blanco,
+                "important"
+            );
+        });
+
+        if (!elemento.dataset.eduturnosBotonV6) {
+            elemento.dataset.eduturnosBotonV6 = "1";
+
+            elemento.addEventListener("mouseenter", function() {
+                elemento.style.setProperty(
+                    "background",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "background-color",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "border-color",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "color",
+                    blanco,
+                    "important"
+                );
+            });
+
+            elemento.addEventListener("mouseleave", function() {
+                elemento.style.setProperty(
+                    "background",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "background-color",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "border-color",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "color",
+                    blanco,
+                    "important"
+                );
+            });
+        }
+    }
+
+
+    function buscarBotonesPorTexto() {
+        document.querySelectorAll("a").forEach(function(a) {
+            const texto = (a.textContent || "")
+                .trim()
+                .toLowerCase();
+
+            const href = (a.getAttribute("href") || "")
+                .toLowerCase();
+
+            const palabras = [
+                "atrás",
+                "atras",
+                "nueva citación",
+                "nueva cita",
+                "ver citas",
+                "filtrar",
+                "limpiar",
+                "editar",
+                "eliminar",
+                "confirmar",
+                "cancelar",
+                "reprogramar",
+                "descargar",
+                "exportar",
+                "importar",
+                "guardar",
+                "enviar",
+                "volver",
+                "marcar",
+                "crear",
+                "solicitar"
+            ];
+
+            const coincideTexto = palabras.some(function(p) {
+                return texto === p || texto.includes(p);
+            });
+
+            const coincideRuta =
+                href.includes("/citas/") ||
+                href.includes("/calendario") ||
+                href.includes("/notificaciones/") ||
+                href.includes("/solicitudes/") ||
+                href.includes("/reportes/") ||
+                href.includes("/usuarios/") ||
+                href.includes("/auth/recuperar");
+
+            const contenedor = a.closest(
+                ".edc-header-actions," +
+                ".edc-buttons," +
+                ".edc-month-toolbar," +
+                ".citas-actions," +
+                ".form-actions," +
+                ".acciones," +
+                ".page-actions," +
+                ".dashboard-actions," +
+                ".dashboard-card," +
+                ".quick-card," +
+                ".account-actions"
+            );
+
+            if (coincideTexto || coincideRuta || contenedor) {
+                aplicar(a);
+            }
+        });
+    }
+
+
+    function ejecutar() {
+        document.querySelectorAll(selectores).forEach(aplicar);
+        buscarBotonesPorTexto();
+    }
+
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", ejecutar);
+    } else {
+        ejecutar();
+    }
+
+
+    const observador = new MutationObserver(function() {
+        ejecutar();
+    });
+
+    observador.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
+
+})();
+</script>
+

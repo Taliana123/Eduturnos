@@ -1,0 +1,686 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Recuperar acceso - EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<style id="eduturnos-recuperar-pagina-definitiva">
+
+/* ============================================================
+   RECUPERAR ACCESO
+   DISEÑO AISLADO
+   ============================================================ */
+
+html:has(.eduturnos-recuperar-page),
+body:has(.eduturnos-recuperar-page) {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-top: 0 !important;
+    outline: 0 !important;
+}
+
+/* El fondo pertenece a toda la página de recuperación */
+body:has(.eduturnos-recuperar-page) {
+    background: #f4f7fa !important;
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+
+.eduturnos-recuperar-page {
+    width: 100% !important;
+    min-height: calc(100vh - 76px) !important;
+
+    margin: 0 !important;
+    padding: 28px 24px 44px !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            #f4f7fa 0%,
+            #edf2f6 100%
+        ) !important;
+}
+
+/* ============================================================
+   TARJETA
+   ============================================================ */
+
+.eduturnos-recuperar-card {
+    width: min(900px, 100%) !important;
+    min-height: 410px !important;
+
+    margin: 0 !important;
+    padding: 34px 46px !important;
+
+    box-sizing: border-box !important;
+
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+
+    align-items: center !important;
+
+    column-gap: 44px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid rgba(24,50,75,.08) !important;
+    border-radius: 18px !important;
+
+    box-shadow:
+        0 16px 38px rgba(25,48,75,.10) !important;
+
+    overflow: visible !important;
+}
+
+/* ============================================================
+   ILUSTRACION
+   ============================================================ */
+
+.eduturnos-recuperar-visual {
+    min-width: 0 !important;
+
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+
+    padding: 4px !important;
+}
+
+.eduturnos-recuperar-illustration {
+    width: min(100%, 330px) !important;
+    height: auto !important;
+
+    display: block !important;
+
+    overflow: visible !important;
+}
+
+/* Sobre */
+.eduturnos-envelope {
+    fill: #eaf1f8 !important;
+    stroke: #2875c7 !important;
+    stroke-width: 3 !important;
+}
+
+.eduturnos-envelope-flap {
+    fill: #ffffff !important;
+    stroke: #2875c7 !important;
+    stroke-width: 3 !important;
+    stroke-linejoin: round !important;
+}
+
+/* Hojas del sobre */
+.eduturnos-envelope-paper {
+    fill: #ffffff !important;
+    stroke: #9fb5ca !important;
+    stroke-width: 2 !important;
+}
+
+/* Candado */
+.eduturnos-lock-body {
+    fill: #172942 !important;
+}
+
+.eduturnos-lock-shackle {
+    fill: none !important;
+    stroke: #172942 !important;
+    stroke-width: 7 !important;
+    stroke-linecap: round !important;
+}
+
+.eduturnos-lock-keyhole {
+    fill: #eab64a !important;
+}
+
+/* Punto de brillo */
+.eduturnos-recovery-spark {
+    fill: #eab64a !important;
+}
+
+/* Animación suave */
+.eduturnos-envelope-group {
+    transform-origin: center !important;
+    animation: eduturnos-recuperar-float 4.8s ease-in-out infinite !important;
+}
+
+.eduturnos-lock-group {
+    transform-origin: center !important;
+    animation: eduturnos-recuperar-lock 4.8s ease-in-out infinite !important;
+}
+
+.eduturnos-recovery-spark {
+    transform-origin: center !important;
+    animation: eduturnos-recuperar-spark 2.8s ease-in-out infinite !important;
+}
+
+@keyframes eduturnos-recuperar-float {
+    0%,100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes eduturnos-recuperar-lock {
+    0%,100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes eduturnos-recuperar-spark {
+    0%,100% {
+        opacity: .35;
+        transform: scale(.9);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.08);
+    }
+}
+
+/* ============================================================
+   CONTENIDO
+   ============================================================ */
+
+.eduturnos-recuperar-content {
+    min-width: 0 !important;
+}
+
+.eduturnos-recuperar-back {
+    display: inline-flex !important;
+    align-items: center !important;
+
+    margin: 0 0 20px !important;
+
+    color: #2875c7 !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 13px !important;
+    font-weight: 600 !important;
+
+    text-decoration: none !important;
+}
+
+.eduturnos-recuperar-back:hover {
+    text-decoration: underline !important;
+}
+
+/* ============================================================
+   TITULO
+   ============================================================ */
+
+.eduturnos-recuperar-title {
+    margin: 0 !important;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif !important;
+
+    font-size: 30px !important;
+    line-height: 1.1 !important;
+
+    font-weight: 700 !important;
+
+    color: #172942 !important;
+}
+
+.eduturnos-recuperar-description {
+    margin: 11px 0 0 !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+
+    color: #5f6b78 !important;
+}
+
+/* ============================================================
+   MENSAJES
+   ============================================================ */
+
+.eduturnos-recuperar-messages {
+    margin: 18px 0 0 !important;
+}
+
+.eduturnos-recuperar-message {
+    padding: 10px 12px !important;
+
+    border-radius: 8px !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+}
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+
+.eduturnos-recuperar-form {
+    margin: 24px 0 0 !important;
+}
+
+.eduturnos-recuperar-field {
+    margin: 0 !important;
+}
+
+.eduturnos-recuperar-field label {
+    display: block !important;
+
+    margin: 0 0 12px !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 14px !important;
+    font-weight: 600 !important;
+
+    line-height: 1.2 !important;
+
+    color: #202938 !important;
+}
+
+.eduturnos-recuperar-field input {
+    width: 100% !important;
+    height: 46px !important;
+
+    display: block !important;
+
+    box-sizing: border-box !important;
+
+    padding: 0 14px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #cbd5df !important;
+    border-radius: 9px !important;
+
+    color: #202938 !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 14px !important;
+
+    outline: none !important;
+
+    box-shadow: none !important;
+}
+
+.eduturnos-recuperar-field input::placeholder {
+    color: transparent !important;
+}
+
+.eduturnos-recuperar-field input:focus {
+    border-color: #2875c7 !important;
+
+    box-shadow:
+        0 0 0 3px rgba(40,117,199,.12) !important;
+}
+
+/* ============================================================
+   BOTON
+   ============================================================ */
+
+.eduturnos-recuperar-button {
+    width: 100% !important;
+
+    min-height: 44px !important;
+
+    margin: 18px 0 0 !important;
+
+    padding: 10px 18px !important;
+
+    box-sizing: border-box !important;
+
+    border: 0 !important;
+    border-radius: 9px !important;
+
+    background: #2875c7 !important;
+
+    color: #ffffff !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 14px !important;
+    font-weight: 700 !important;
+
+    cursor: pointer !important;
+
+    transition:
+        transform .16s ease,
+        box-shadow .16s ease,
+        background .16s ease !important;
+}
+
+.eduturnos-recuperar-button:hover {
+    background: #2369b2 !important;
+
+    transform: translateY(-1px) !important;
+
+    box-shadow:
+        0 6px 16px rgba(40,117,199,.18) !important;
+}
+
+/* ============================================================
+   PIE
+   ============================================================ */
+
+.eduturnos-recuperar-footer {
+    margin: 18px 0 0 !important;
+
+    font-family:
+        "Public Sans",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+
+    color: #74808c !important;
+}
+
+/* ============================================================
+   MOVIL
+   ============================================================ */
+
+@media (max-width: 760px) {
+
+    .eduturnos-recuperar-page {
+        padding: 24px 16px 40px !important;
+    }
+
+    .eduturnos-recuperar-card {
+        grid-template-columns: 1fr !important;
+
+        row-gap: 22px !important;
+
+        padding: 30px 28px !important;
+    }
+
+    .eduturnos-recuperar-visual {
+        order: 1 !important;
+    }
+
+    .eduturnos-recuperar-content {
+        order: 2 !important;
+    }
+
+    .eduturnos-recuperar-illustration {
+        width: min(270px, 80vw) !important;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .eduturnos-recuperar-page {
+        padding: 18px 12px 30px !important;
+    }
+
+    .eduturnos-recuperar-card {
+        padding: 26px 20px !important;
+        border-radius: 14px !important;
+    }
+
+    .eduturnos-recuperar-title {
+        font-size: 27px !important;
+    }
+
+    .eduturnos-recuperar-illustration {
+        width: min(235px, 78vw) !important;
+    }
+}
+
+</style>
+
+<section class="eduturnos-recuperar-page">
+
+    <div class="eduturnos-recuperar-card">
+
+        <!-- =================================================
+             ILUSTRACION
+             ================================================= -->
+
+        <div class="eduturnos-recuperar-visual">
+
+            <svg
+                class="eduturnos-recuperar-illustration"
+                viewBox="0 0 420 330"
+                role="img"
+                aria-label="Ilustración de recuperación de acceso">
+
+                <!-- brillo decorativo -->
+                <circle
+                    class="eduturnos-recovery-spark"
+                    cx="92"
+                    cy="66"
+                    r="7">
+                </circle>
+
+                <circle
+                    class="eduturnos-recovery-spark"
+                    cx="330"
+                    cy="78"
+                    r="5">
+                </circle>
+
+                <!-- sobre -->
+                <g class="eduturnos-envelope-group">
+
+                    <rect
+                        class="eduturnos-envelope"
+                        x="50"
+                        y="95"
+                        width="270"
+                        height="165"
+                        rx="18">
+                    </rect>
+
+                    <path
+                        class="eduturnos-envelope-paper"
+                        d="M64 111 L185 208 L306 111 L306 243 Q306 250 299 250 L71 250 Q64 250 64 243 Z">
+                    </path>
+
+                    <path
+                        class="eduturnos-envelope-flap"
+                        d="M53 108 L185 213 L317 108 Q314 96 300 96 L70 96 Q56 96 53 108 Z">
+                    </path>
+
+                    <path
+                        d="M58 244 L151 167"
+                        fill="none"
+                        stroke="#9fb5ca"
+                        stroke-width="2">
+                    </path>
+
+                    <path
+                        d="M312 244 L219 167"
+                        fill="none"
+                        stroke="#9fb5ca"
+                        stroke-width="2">
+                    </path>
+
+                </g>
+
+                <!-- candado -->
+                <g class="eduturnos-lock-group">
+
+                    <rect
+                        class="eduturnos-lock-body"
+                        x="250"
+                        y="178"
+                        width="92"
+                        height="91"
+                        rx="16">
+                    </rect>
+
+                    <path
+                        class="eduturnos-lock-shackle"
+                        d="M270 180 V154 C270 124 322 124 322 154 V180">
+                    </path>
+
+                    <circle
+                        class="eduturnos-lock-keyhole"
+                        cx="296"
+                        cy="216"
+                        r="9">
+                    </circle>
+
+                    <rect
+                        class="eduturnos-lock-keyhole"
+                        x="292"
+                        y="221"
+                        width="8"
+                        height="22"
+                        rx="4">
+                    </rect>
+
+                </g>
+
+                <!-- línea decorativa inferior -->
+                <path
+                    d="M98 286 H322"
+                    fill="none"
+                    stroke="#d8e1e9"
+                    stroke-width="3"
+                    stroke-linecap="round">
+                </path>
+
+                <circle
+                    cx="82"
+                    cy="286"
+                    r="4"
+                    fill="#eab64a">
+                </circle>
+
+            </svg>
+
+        </div>
+
+        <!-- =================================================
+             CONTENIDO
+             ================================================= -->
+
+        <div class="eduturnos-recuperar-content">
+
+            <a
+                class="eduturnos-recuperar-back"
+                href="{{ url_for('auth.login') }}">
+                ← Volver al inicio de sesión
+            </a>
+
+            <h1 class="eduturnos-recuperar-title">
+                Recuperar acceso
+            </h1>
+
+            <p class="eduturnos-recuperar-description">
+                Ingresa el correo asociado a tu cuenta y te enviaremos un código de recuperación de 6 dígitos.
+            </p>
+
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+                {% if mensajes %}
+
+                    <div class="eduturnos-recuperar-messages">
+
+                        {% for categoria, mensaje in mensajes %}
+
+                            <div class="eduturnos-recuperar-message mensaje mensaje-{{ categoria }}">
+                                {{ mensaje }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+            {% endwith %}
+
+            <form
+                method="POST"
+                action="{{ url_for('passwords.recuperar') }}"
+                class="eduturnos-recuperar-form"
+                autocomplete="off">
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}">
+
+                <div class="eduturnos-recuperar-field">
+
+                    <label for="correo">
+                        Correo electrónico
+                    </label>
+
+                    <input
+                        type="email"
+                        id="correo"
+                        name="correo"
+                        value="{{ request.form.get('correo', '') }}"
+                        autocomplete="email"
+                        required
+                        autofocus>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="eduturnos-recuperar-button">
+                    Enviar código de recuperación
+                </button>
+
+            </form>
+
+            <div class="eduturnos-recuperar-footer">
+                Recibirás un código de 6 dígitos válido durante 10 minutos.
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

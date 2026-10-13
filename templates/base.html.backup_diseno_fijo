@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#165dca"><meta name="description" content="EDUTURNOS: gestión institucional de citaciones escolares">
+<link rel="manifest" href="{{ url_for('static',filename='manifest.webmanifest') }}"><title>{% block title %}EDUTURNOS{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static',filename='css/estilos.css') }}">
+</head>
+<body><a class="skip-link" href="#contenido">Saltar al contenido</a>
+<header class="barra"><a class="logo" href="{{ url_for('inicio') }}">EDUTURNOS</a>
+<nav class="nav-principal">
+{% if usuario_sesion %}
+  <a href="{{ url_for('auth.dashboard') }}">Inicio</a>
+  <a href="{{ url_for('citas.index') }}">Citas</a>
+  <a href="{{ url_for('solicitudes.index') }}">Solicitudes</a>
+  <a href="{{ url_for('calendario.index') }}">Calendario</a>
+  <a href="{{ url_for('notificaciones.index') }}">Notificaciones{% if notificaciones_no_leidas %} ({{ notificaciones_no_leidas }}){% endif %}</a>
+  {% if usuario_sesion.rol_nombre in ['Super Admin','Rector','Administrador / Coordinador'] %}<a href="{{ url_for('reportes.index') }}">Reportes</a>{% endif %}
+  {% if usuario_sesion.rol_nombre in ['Super Admin','Rector','Administrador / Coordinador'] %}<a href="{{ url_for('estudiantes.lista') }}">Estudiantes</a><a href="{{ url_for('acudientes.lista') }}">Acudientes</a><a href="{{ url_for('docentes.lista') }}">Docentes</a>{% endif %}
+  {% if usuario_sesion.rol_nombre in ['Super Admin','Rector','Administrador / Coordinador','Docente'] %}<a href="{{ url_for('seguimiento.lista') }}">Seguimiento</a>{% endif %}
+  {% if usuario_sesion.rol_nombre in ['Estudiante','Acudiente','Super Admin','Rector','Administrador / Coordinador'] %}<a href="{{ url_for('justificaciones.index') }}">Justificaciones</a>{% endif %}
+  {% if usuario_sesion.rol_nombre in ['Super Admin','Rector','Administrador / Coordinador'] %}<a href="{{ url_for('configuracion.index') }}">Configuración</a>{% endif %}
+  <a href="{{ url_for('passwords.cambiar_password') }}">Seguridad</a>
+  <form method="post" action="{{ url_for('auth.logout') }}" class="inline-form logout-form">{{ csrf_field()|safe }}<button class="nav-button" type="submit">Salir</button></form>
+{% else %}
+{% endif %}
+</nav></header>
+<main class="contenedor" id="contenido">{% with mensajes=get_flashed_messages(with_categories=true) %}{% for categoria,mensaje in mensajes %}<div class="alerta {{ categoria }}">{{ mensaje }}</div>{% endfor %}{% endwith %}{% block content %}{% endblock %}</main>
+</body></html>

@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<section class="page-head dashboard-head">
+
+    <div class="dashboard-title">
+
+        <span class="badge">
+            {{ usuario.rol_nombre }}
+        </span>
+
+        <h1>
+            Hola, {{ usuario.nombres }} {{ usuario.apellidos }}
+        </h1>
+
+        <p class="muted">
+            Información y accesos según tu rol institucional.
+        </p>
+
+    </div>
+
+    <div class="dashboard-navigation">
+
+        <a class="boton boton-danger" href="{{ url_for('auth.logout') }}">
+            Cerrar sesión
+        </a>
+
+    </div>
+
+</section>
+
+
+<div class="kpi-grid">
+
+    <div class="kpi">
+        <span>Total de citas</span>
+        <strong>{{ datos.total_citas }}</strong>
+    </div>
+
+    <div class="kpi">
+        <span>Pendientes</span>
+        <strong>{{ datos.pendientes }}</strong>
+    </div>
+
+    <div class="kpi">
+        <span>Confirmadas</span>
+        <strong>{{ datos.confirmadas }}</strong>
+    </div>
+
+    <div class="kpi">
+        <span>Notificaciones sin leer</span>
+        <strong>{{ notificaciones_no_leidas }}</strong>
+    </div>
+
+</div>
+
+
+<div class="dashboard-grid">
+
+    <section class="tarjeta dashboard-card">
+
+        <div class="card-heading">
+
+            <div>
+
+                <span class="badge">Accesos</span>
+
+                <h2>Acciones rápidas</h2>
+
+                <p class="muted">
+                    Accede directamente a las funciones disponibles para tu rol.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="action-grid">
+
+
+            <!-- CITAS: TODOS LOS ROLES -->
+
+            <a class="quick-card" href="{{ url_for('citas.index') }}">
+
+                <span class="quick-icon">Citas</span>
+
+                <strong>Citas</strong>
+
+                <span>
+                    Consultar y gestionar citaciones.
+                </span>
+
+                <small>
+                    Ver citas →
+                </small>
+
+            </a>
+
+
+            <!-- CALENDARIO: TODOS LOS ROLES -->
+
+            <a class="quick-card" href="{{ url_for('calendario.index') }}">
+
+                <span class="quick-icon">Calendario</span>
+
+                <strong>Calendario</strong>
+
+                <span>
+                    Revisar fechas y horarios.
+                </span>
+
+                <small>
+                    Abrir calendario →
+                </small>
+
+            </a>
+
+
+            <!-- NOTIFICACIONES: TODOS LOS ROLES -->
+
+            <a class="quick-card" href="{{ url_for('notificaciones.index') }}">
+
+                <span class="quick-icon">Avisos</span>
+
+                <strong>Notificaciones</strong>
+
+                <span>
+                    Ver avisos y novedades del sistema.
+                </span>
+
+                {% if notificaciones_no_leidas > 0 %}
+
+                <small>
+                    {{ notificaciones_no_leidas }} sin leer →
+                </small>
+
+                {% else %}
+
+                <small>
+                    Ver notificaciones →
+                </small>
+
+                {% endif %}
+
+            </a>
+
+
+            <!-- SOLICITUDES: PERSONAL INSTITUCIONAL -->
+
+            {% if usuario.rol_nombre in [
+                'Docente',
+                'Administrador / Coordinador',
+                'Rector',
+                'Super Admin'
+            ] %}
+
+            <a class="quick-card" href="{{ url_for('solicitudes.index') }}">
+
+                <span class="quick-icon">Solicitudes</span>
+
+                <strong>Solicitudes</strong>
+
+                <span>
+                    Gestionar reuniones y propuestas.
+                </span>
+
+                <small>
+                    Ver solicitudes →
+                </small>
+
+            </a>
+
+            {% endif %}
+
+
+            <!-- REPORTES: COORDINADOR, RECTOR Y SUPER ADMIN -->
+
+            {% if usuario.rol_nombre in [
+                'Administrador / Coordinador',
+                'Rector',
+                'Super Admin'
+            ] %}
+
+            <a class="quick-card" href="{{ url_for('reportes.index') }}">
+
+                <span class="quick-icon">Reportes</span>
+
+                <strong>Reportes</strong>
+
+                <span>
+                    Consultar indicadores institucionales.
+                </span>
+
+                <small>
+                    Ver reportes →
+                </small>
+
+            </a>
+
+            {% endif %}
+
+
+            <!-- JUSTIFICACIONES: ESTUDIANTE Y ACUDIENTE -->
+
+            {% if usuario.rol_nombre in [
+                'Estudiante',
+                'Acudiente'
+            ] %}
+
+            <a class="quick-card" href="{{ url_for('justificaciones.index') }}">
+
+                <span class="quick-icon">Justificaciones</span>
+
+                <strong>Justificaciones</strong>
+
+                <span>
+                    Consultar o presentar solicitudes.
+                </span>
+
+                <small>
+                    Ver justificaciones →
+                </small>
+
+            </a>
+
+            {% endif %}
+
+
+        </div>
+
+    </section>
+
+
+    <!-- CUENTA -->
+
+    <section class="tarjeta dashboard-card">
+
+        <div class="card-heading">
+
+            <div>
+
+                <span class="badge">Cuenta</span>
+
+                <h2>Mi cuenta</h2>
+
+            </div>
+
+        </div>
+
+        <p class="muted">
+            Mantén una contraseña personal segura y actualizada.
+        </p>
+
+        <div class="account-actions">
+
+            <a
+                class="boton boton-full"
+                href="{{ url_for('passwords.cambiar_password') }}"
+            >
+                Cambiar contraseña
+            </a>
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

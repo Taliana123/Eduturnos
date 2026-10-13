@@ -1,0 +1,50 @@
+@layer eduturnos-controls {
+    button:not([hidden], .password-toggle, .cita-text-action, .edc-availability-remove, [role="tab"]),
+    input[type="submit"],
+    input[type="button"],
+    input[type="reset"],
+    .boton,
+    .btn,
+    .boton-full,
+    .registro-boton,
+    .mobile-back-link,
+    .edc-buttons > a,
+    .edc-back,
+    .edc-hoy,
+    .edc-day-agenda-close,
+    .menu > a.login {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex: 0 0 128px !important;
+        box-sizing: border-box !important;
+        width: 128px !important;
+        min-width: 128px !important;
+        max-width: 128px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+        padding: 5px 10px !important;
+        border: 1px solid #1769aa !important;
+        border-radius: 6px !important;
+        background: #1769aa !important;
+        color: #ffffff !important;
+        box-shadow: none !important;
+        font-family: inherit !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        line-height: 14px !important;
+        letter-spacing: 0 !important;
+        text-align: center !important;
+        text-decoration: none !important;
+        white-space: normal !important;
+        overflow-wrap: normal !important;
+        cursor: pointer !important;
+    }
+
+    button:disabled:not(.password-toggle),
+    input[type="submit"]:disabled {
+        opacity: .55 !important;
+        cursor: not-allowed !important;
+    }
+}

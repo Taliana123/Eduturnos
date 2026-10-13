@@ -1,0 +1,30 @@
+{% set titulo = "Política de Privacidad" %}
+{% set contenido %}
+<span class="etiqueta">Privacidad</span>
+<h1>Política de Privacidad</h1>
+<p class="intro">EDUTURNOS es el sistema institucional de gestión de citaciones de la Institución Educativa José Joaquín Flórez Hernández. Esta política explica qué información se trata al usar EDUTURNOS y al conectar Google Calendar.</p>
+
+<section class="legal-content">
+    <h2>Información que trata EDUTURNOS</h2>
+    <p>EDUTURNOS trata los datos de cuenta, rol e identificación necesarios para autenticar a sus usuarios y gestionar citaciones escolares, incluidas fechas, horas, personas relacionadas, motivos, seguimiento y observaciones. La institución utiliza estos datos para prestar y administrar el servicio educativo.</p>
+
+    <h2>Conexión con Google Calendar</h2>
+    <p>La conexión es opcional y solo se inicia cuando el usuario la solicita. Google informa los permisos antes de autorizar. EDUTURNOS recibe el correo principal de la cuenta Google y credenciales OAuth para mantener la conexión. Las credenciales se almacenan cifradas en la base de datos de EDUTURNOS usando la clave secreta del servidor.</p>
+    <p>Para copiar una cita, EDUTURNOS crea en el calendario autorizado un evento genérico con el título “Citación escolar”, la fecha, la hora y el lugar. La descripción indica consultar los detalles en EDUTURNOS. No se envían a Google nombres de estudiantes o acudientes, motivos específicos ni observaciones de la cita.</p>
+    <p>La integración usa los datos de Google únicamente para crear o actualizar esos eventos solicitados por el usuario. EDUTURNOS no vende los datos de Google ni los usa para publicidad o entrenamiento de modelos de inteligencia artificial.</p>
+
+    <h2>Conservación y desconexión</h2>
+    <p>Las credenciales permanecen guardadas mientras la conexión esté activa. Al desconectar un calendario desde EDUTURNOS, se elimina la credencial guardada y se detienen futuras sincronizaciones para esa conexión. La desconexión no elimina eventos que ya se copiaron en Google Calendar; el usuario puede borrarlos desde Google Calendar. También puede revocar el acceso desde la configuración de seguridad de su Cuenta de Google.</p>
+    <p>Las citaciones y registros escolares de EDUTURNOS se conservan según las necesidades de operación y las obligaciones de archivo de la institución; desconectar Google no elimina los registros institucionales.</p>
+
+    <h2>Servicios de terceros y seguridad</h2>
+    <p>Cuando se conecta Google Calendar, Google trata los datos de acuerdo con sus propias condiciones y políticas de privacidad. EDUTURNOS aplica controles de acceso por rol y cifra las credenciales OAuth almacenadas. La clave secreta del servidor se mantiene en configuración privada y debe conservarse estable y protegida.</p>
+
+    <h2>Contacto</h2>
+    <p>Para consultas sobre datos personales o esta política, comunícate con la Institución Educativa José Joaquín Flórez Hernández en <a href="mailto:coliejjfh@hotmail.com">coliejjfh@hotmail.com</a> o al teléfono (608) 2697083.</p>
+</section>
+<style>
+.legal-content{max-width:900px;color:#42526b;line-height:1.75}.legal-content h2{margin:30px 0 9px;color:#102a56;font-size:1.35rem}.legal-content p{margin:0 0 14px}.legal-content a{color:#1d4ed8;text-decoration:underline;text-underline-offset:3px}
+</style>
+{% endset %}
+{% include "publico/base_publica.html" %}

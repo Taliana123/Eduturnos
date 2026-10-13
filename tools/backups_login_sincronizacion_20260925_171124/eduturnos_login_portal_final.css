@@ -1,0 +1,204 @@
+﻿/* =========================================================
+   EDUTURNOS
+   PORTAL INSTITUCIONAL - AJUSTE FINAL
+   ========================================================= */
+
+/*
+   Los tres campos quedan organizados así:
+
+   Código institucional | Sede institucional | Jornada
+
+   No modifica los valores ni las opciones de los selects.
+*/
+
+/* ---------------------------------------------------------
+   CONTENEDOR PERSONAL INSTITUCIONAL
+   --------------------------------------------------------- */
+
+html body .personal-login {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+/* ---------------------------------------------------------
+   FILA DE LOS TRES CAMPOS
+   --------------------------------------------------------- */
+
+html body .personal-login .personal-fields-grid,
+html body .personal-login .form-grid.personal-fields-grid {
+    display: grid !important;
+
+    /*
+       Código: 94px
+       Sede: 250px
+       Jornada: 92px
+
+       Total:
+       94 + 10 + 250 + 10 + 92 = 456px
+    */
+
+    grid-template-columns: 94px 250px 92px !important;
+
+    column-gap: 10px !important;
+    row-gap: 0 !important;
+
+    width: 456px !important;
+    max-width: 100% !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    justify-content: center !important;
+    align-items: end !important;
+
+    box-sizing: border-box !important;
+}
+
+/* ---------------------------------------------------------
+   CADA CAMPO
+   --------------------------------------------------------- */
+
+html body .personal-login .personal-field {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+
+    box-sizing: border-box !important;
+}
+
+/* ---------------------------------------------------------
+   TÍTULOS
+   --------------------------------------------------------- */
+
+html body .personal-login .personal-field-title {
+    display: block !important;
+
+    width: 100% !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+
+    margin-bottom: 7px !important;
+
+    box-sizing: border-box !important;
+}
+
+/* ---------------------------------------------------------
+   INPUT DEL CÓDIGO
+   --------------------------------------------------------- */
+
+html body .personal-login input[name="codigo_institucional"] {
+    width: 94px !important;
+    max-width: 94px !important;
+    min-width: 0 !important;
+
+    box-sizing: border-box !important;
+
+    text-align: center !important;
+
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+}
+
+/* ---------------------------------------------------------
+   SELECT SEDE
+   --------------------------------------------------------- */
+
+html body .personal-login select[name="sede_id"] {
+    width: 250px !important;
+    max-width: 250px !important;
+    min-width: 0 !important;
+
+    box-sizing: border-box !important;
+
+    /*
+       Permite que la opción larga tenga espacio suficiente.
+    */
+
+    padding-left: 10px !important;
+    padding-right: 28px !important;
+
+    white-space: nowrap !important;
+}
+
+/* ---------------------------------------------------------
+   SELECT JORNADA
+   --------------------------------------------------------- */
+
+html body .personal-login select[name="jornada_id"] {
+    width: 92px !important;
+    max-width: 92px !important;
+    min-width: 0 !important;
+
+    box-sizing: border-box !important;
+
+    padding-left: 8px !important;
+    padding-right: 24px !important;
+
+    white-space: nowrap !important;
+}
+
+/* ---------------------------------------------------------
+   INGRESAR
+   --------------------------------------------------------- */
+
+html body .personal-login ~ .boton-full,
+html body .stack-form .boton-full {
+    display: block !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    box-sizing: border-box !important;
+}
+
+/* ---------------------------------------------------------
+   TEXTO EXPLICATIVO
+   --------------------------------------------------------- */
+
+html body .personal-login p {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+
+@media (max-width: 620px) {
+
+    html body .personal-login .personal-fields-grid,
+    html body .personal-login .form-grid.personal-fields-grid {
+        grid-template-columns: minmax(72px, 82px) minmax(0, 1fr) minmax(72px, 82px) !important;
+
+        width: 100% !important;
+
+        column-gap: 7px !important;
+    }
+
+    html body .personal-login input[name="codigo_institucional"] {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    html body .personal-login select[name="sede_id"] {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    html body .personal-login select[name="jornada_id"] {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    html body .personal-login .personal-field-title {
+        font-size: 12px !important;
+    }
+}

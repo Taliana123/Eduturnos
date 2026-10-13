@@ -1,0 +1,39 @@
+from datetime import datetime,timedelta
+from flask import Blueprint,Response,render_template,abort
+from database.db import consultar
+from routes.helpers import usuario_actual,login_requerido
+
+calendario_bp=Blueprint("calendario",__name__,url_prefix="/calendario")
+
+def _filtro_usuario(usuario):
+    rol=usuario["rol_nombre"]
+    if rol in ("Super Admin","Rector","Administrador / Coordinador"): return "1=1", []
+    if rol=="Docente": return "c.id_docente=(SELECT d.id_docente FROM docentes d WHERE d.id_usuario=%s)", [usuario["id_usuario"]]
+    if rol=="Estudiante": return "c.id_estudiante=(SELECT e.id_estudiante FROM estudiantes e WHERE e.documento=%s)", [usuario["documento"]]
+    if rol=="Acudiente": return "c.id_acudiente=(SELECT a.id_acudiente FROM acudientes a WHERE a.id_usuario=%s)", [usuario["id_usuario"]]
+    return "1=0", []
+
+
+def citas_visibles(u):
+    filtros=[]; params=[]; rol=u["rol_nombre"]
+    if rol=="Docente": filtros.append("c.id_docente=(SELECT d.id_docente FROM docentes d WHERE d.id_usuario=%s)"); params.append(u["id_usuario"])
+    elif rol=="Estudiante": filtros.append("c.id_estudiante=(SELECT e.id_estudiante FROM estudiantes e WHERE e.documento=%s)"); params.append(u["documento"])
+    elif rol=="Acudiente": filtros.append("c.id_acudiente=(SELECT a.id_acudiente FROM acudientes a WHERE a.id_usuario=%s)"); params.append(u["id_usuario"])
+    elif rol not in ("Super Admin","Rector","Administrador / Coordinador"): filtros.append("1=0")
+    where=(" WHERE "+" AND ".join(filtros)) if filtros else ""
+    return consultar(f"""SELECT c.id,c.fecha,c.hora,c.lugar,c.observaciones,e.nombres estudiante_n,e.apellidos estudiante_a,d.nombres docente_n,d.apellidos docente_a,a.nombres acudiente_n,a.apellidos acudiente_a,m.nombre motivo,ec.nombre estado FROM citas c JOIN estudiantes e ON e.id_estudiante=c.id_estudiante JOIN docentes d ON d.id_docente=c.id_docente JOIN acudientes a ON a.id_acudiente=c.id_acudiente JOIN motivos m ON m.id=c.id_motivo JOIN estados_cita ec ON ec.id=c.id_estado {where} ORDER BY c.fecha,c.hora,c.id LIMIT 500""",tuple(params))
+
+@calendario_bp.route("/")
+@login_requerido
+def index(): return render_template("calendario/index.html",citas=citas_visibles(usuario_actual()))
+
+@calendario_bp.route("/<int:cita_id>.ics")
+@login_requerido
+def descargar_ics(cita_id):
+    u=usuario_actual(); visibles={c["id"] for c in citas_visibles(u)}
+    if cita_id not in visibles: abort(404)
+    f=consultar("""SELECT c.id,c.fecha,c.hora,c.observaciones,m.nombre motivo,ec.nombre estado,CONCAT(e.nombres,' ',e.apellidos) estudiante,CONCAT(d.nombres,' ',d.apellidos) docente,CONCAT(a.nombres,' ',a.apellidos) acudiente,c.lugar FROM citas c JOIN estudiantes e ON e.id_estudiante=c.id_estudiante JOIN docentes d ON d.id_docente=c.id_docente JOIN acudientes a ON a.id_acudiente=c.id_acudiente JOIN motivos m ON m.id=c.id_motivo JOIN estados_cita ec ON ec.id=c.id_estado WHERE c.id=%s""",(cita_id,),uno=True)
+    inicio=datetime.combine(f["fecha"],f["hora"]); fin=inicio+timedelta(minutes=45)
+    def esc(v): return str(v or "").replace("\\","\\\\").replace(";","\\;").replace(",","\\,").replace("\n","\\n")
+    body="\r\n".join(["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//EDUTURNOS//ES","CALSCALE:GREGORIAN","BEGIN:VEVENT",f"UID:eduturnos-{f['id']}@eduturnos",f"DTSTAMP:{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}",f"DTSTART:{inicio.strftime('%Y%m%dT%H%M%S')}",f"DTEND:{fin.strftime('%Y%m%dT%H%M%S')}",f"SUMMARY:{esc('EDUTURNOS - '+f['motivo'])}",f"LOCATION:{esc(f['lugar'])}",f"DESCRIPTION:{esc('Estado: '+f['estado']+' | Estudiante: '+f['estudiante']+' | Docente: '+f['docente']+' | Acudiente: '+f['acudiente']+' | '+(f['observaciones'] or ''))}","END:VEVENT","END:VCALENDAR"])+'\r\n'
+    return Response(body,mimetype="text/calendar",headers={"Content-Disposition":f'attachment; filename="eduturnos_cita_{cita_id}.ics"'})

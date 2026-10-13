@@ -1,0 +1,45 @@
+﻿EDUTURNOS
+REVISION FUNCIONAL CONTROLADA
+
+Fecha:
+09/21/2026 15:13:01
+
+Proyecto:
+D:\edu_Final
+
+Backup:
+D:\BACKUPS_EDUTURNOS\BACKUP_CORRECCION_20260921_151259
+
+MYSQL:
+NO MODIFICADO
+
+GMAIL:
+NO MODIFICADO
+
+CALENDARIO:
+NO MODIFICADO INTENCIONALMENTE.
+SE PROTEGIO templates\calendario\index.html.
+
+AREAS:
+- Autenticacion
+- Registro
+- Roles
+- Sedes
+- Jornadas
+- Codigo institucional
+- Citas
+- Duplicados
+- Notificaciones
+- Recordatorios
+- Calendario
+- Solicitudes
+- Justificaciones
+- Reportes
+- Recuperacion interna
+- Compatibilidad MySQL
+
+RESULTADO:
+Se corrigio la ejecucion del smoke test para que Python
+importe app.py desde D:\edu_Final.
+
+No se hicieron reemplazos automaticos ciegos en rutas criticas.

@@ -1,0 +1,579 @@
+{% extends 'base.html' %}
+{% block title %}EDUTURNOS · Gestión de citaciones escolares{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="tarjeta hero-card">
+    <span class="badge">Portal institucional</span>
+    <h1>EDUTURNOS</h1>
+    <p>Un solo lugar para crear, confirmar y hacer seguimiento a las citaciones escolares, con calendario, notificaciones y reportes.</p>
+    <div class="acciones">
+      <a class="boton" href="{{ url_for('auth.login') }}" style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">Iniciar sesión</a>
+      <a class="boton secundario" href="{{ url_for('auth.registro') }}" style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">Crear cuenta</a>
+    </div>
+  </div>
+  <div class="hero-visual hero-card">
+    <span class="badge">Portal institucional</span>
+    <h2>Multiusuario</h2>
+    <p>Estudiantes, acudientes, docentes, coordinación y rectoría trabajan sobre la misma información institucional.</p>
+    <p class="muted">Segura · centralizada · multiusuario</p>
+  </div>
+</section>
+<div class="grid equal-cards feature-grid">
+  <div class="tarjeta feature-card"><h3>Citaciones</h3><p>Agenda y consulta reuniones sin duplicar horarios.</p></div>
+  <div class="tarjeta feature-card"><h3>Seguimiento</h3><p>Registra asistencia, resultados y justificaciones.</p></div>
+  <div class="tarjeta feature-card"><h3>Comunicación</h3><p>Notificaciones y eventos de calendario en un solo sitio.</p></div>
+</div>
+
+
+
+
+{% endblock %}
+
+
+<style id="EDUTURNOS_BOTONES_REALES_V6">
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a.btn,
+a[class*="boton"],
+a[class*="button"],
+a[class*="btn-"],
+a[role="button"],
+a.link-back,
+a.edc-back,
+.edc-header-actions a,
+.edc-header-actions button,
+.edc-buttons a,
+.edc-buttons button,
+.edc-month-toolbar a,
+.edc-month-toolbar button,
+.citas-actions a,
+.citas-actions button,
+.form-actions a,
+.form-actions button,
+.acciones a,
+.acciones button,
+.page-actions a,
+.page-actions button,
+.dashboard-actions a,
+.dashboard-actions button,
+.dashboard-card a.boton,
+.dashboard-card button,
+.quick-card a.boton,
+.quick-card button,
+.account-actions a.boton,
+.account-actions button {
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+    color: #ffffff !important;
+    border-color: #1769aa !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a.btn:hover,
+a[class*="boton"]:hover,
+a[class*="button"]:hover,
+a[class*="btn-"]:hover,
+a[role="button"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.edc-header-actions a:hover,
+.edc-header-actions button:hover,
+.edc-buttons a:hover,
+.edc-buttons button:hover,
+.edc-month-toolbar a:hover,
+.edc-month-toolbar button:hover,
+.citas-actions a:hover,
+.citas-actions button:hover,
+.form-actions a:hover,
+.form-actions button:hover,
+.acciones a:hover,
+.acciones button:hover,
+.page-actions a:hover,
+.page-actions button:hover,
+.dashboard-actions a:hover,
+.dashboard-actions button:hover,
+.dashboard-card a.boton:hover,
+.dashboard-card button:hover,
+.quick-card a.boton:hover,
+.quick-card button:hover,
+.account-actions a.boton:hover,
+.account-actions button:hover {
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+    color: #ffffff !important;
+    border-color: #145b91 !important;
+}
+
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a.btn *,
+a[role="button"] *,
+a.link-back *,
+a.edc-back *,
+.edc-header-actions a *,
+.edc-header-actions button *,
+.edc-buttons a *,
+.edc-buttons button *,
+.edc-month-toolbar a *,
+.edc-month-toolbar button *,
+.citas-actions a *,
+.citas-actions button *,
+.form-actions a *,
+.form-actions button *,
+.acciones a *,
+.acciones button *,
+.page-actions a *,
+.page-actions button *,
+.dashboard-actions a *,
+.dashboard-actions button *,
+.dashboard-card a.boton *,
+.dashboard-card button *,
+.quick-card a.boton *,
+.quick-card button *,
+.account-actions a.boton *,
+.account-actions button * {
+    color: #ffffff !important;
+}
+</style>
+
+<script id="EDUTURNOS_BOTONES_REALES_V6">
+(function() {
+    "use strict";
+
+    const azul = "#1769aa";
+    const hover = "#145b91";
+    const blanco = "#ffffff";
+
+    const selectores = [
+        "button",
+        "input[type='submit']",
+        "input[type='button']",
+        "input[type='reset']",
+
+        "a.boton",
+        "a.btn",
+        "a[class*='boton']",
+        "a[class*='button']",
+        "a[class*='btn-']",
+        "a[class*='accion']",
+        "a[class*='action']",
+        "a[role='button']",
+
+        "a.link-back",
+        "a.edc-back",
+
+        ".edc-header-actions a",
+        ".edc-header-actions button",
+
+        ".edc-buttons a",
+        ".edc-buttons button",
+
+        ".edc-month-toolbar a",
+        ".edc-month-toolbar button",
+
+        ".citas-actions a",
+        ".citas-actions button",
+
+        ".form-actions a",
+        ".form-actions button",
+
+        ".acciones a",
+        ".acciones button",
+
+        ".page-actions a",
+        ".page-actions button",
+
+        ".dashboard-actions a",
+        ".dashboard-actions button",
+
+        ".account-actions a",
+        ".account-actions button",
+
+        ".quick-card a.boton",
+        ".quick-card button",
+
+        ".dashboard-card a.boton",
+        ".dashboard-card button"
+    ].join(",");
+
+
+    function aplicar(elemento) {
+        if (!elemento) return;
+
+        elemento.style.setProperty(
+            "background",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "background-color",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "color",
+            blanco,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "border-color",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "text-decoration",
+            "none",
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "box-shadow",
+            "none",
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "opacity",
+            "1",
+            "important"
+        );
+
+        elemento.querySelectorAll("*").forEach(function(hijo) {
+            hijo.style.setProperty(
+                "color",
+                blanco,
+                "important"
+            );
+        });
+
+        if (!elemento.dataset.eduturnosBotonV6) {
+            elemento.dataset.eduturnosBotonV6 = "1";
+
+            elemento.addEventListener("mouseenter", function() {
+                elemento.style.setProperty(
+                    "background",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "background-color",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "border-color",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "color",
+                    blanco,
+                    "important"
+                );
+            });
+
+            elemento.addEventListener("mouseleave", function() {
+                elemento.style.setProperty(
+                    "background",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "background-color",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "border-color",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "color",
+                    blanco,
+                    "important"
+                );
+            });
+        }
+    }
+
+
+    function buscarBotonesPorTexto() {
+        document.querySelectorAll("a").forEach(function(a) {
+            const texto = (a.textContent || "")
+                .trim()
+                .toLowerCase();
+
+            const href = (a.getAttribute("href") || "")
+                .toLowerCase();
+
+            const palabras = [
+                "atrás",
+                "atras",
+                "nueva citación",
+                "nueva cita",
+                "ver citas",
+                "filtrar",
+                "limpiar",
+                "editar",
+                "eliminar",
+                "confirmar",
+                "cancelar",
+                "reprogramar",
+                "descargar",
+                "exportar",
+                "importar",
+                "guardar",
+                "enviar",
+                "volver",
+                "marcar",
+                "crear",
+                "solicitar"
+            ];
+
+            const coincideTexto = palabras.some(function(p) {
+                return texto === p || texto.includes(p);
+            });
+
+            const coincideRuta =
+                href.includes("/citas/") ||
+                href.includes("/calendario") ||
+                href.includes("/notificaciones/") ||
+                href.includes("/solicitudes/") ||
+                href.includes("/reportes/") ||
+                href.includes("/usuarios/") ||
+                href.includes("/auth/recuperar");
+
+            const contenedor = a.closest(
+                ".edc-header-actions," +
+                ".edc-buttons," +
+                ".edc-month-toolbar," +
+                ".citas-actions," +
+                ".form-actions," +
+                ".acciones," +
+                ".page-actions," +
+                ".dashboard-actions," +
+                ".dashboard-card," +
+                ".quick-card," +
+                ".account-actions"
+            );
+
+            if (coincideTexto || coincideRuta || contenedor) {
+                aplicar(a);
+            }
+        });
+    }
+
+
+    function ejecutar() {
+        document.querySelectorAll(selectores).forEach(aplicar);
+        buscarBotonesPorTexto();
+    }
+
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", ejecutar);
+    } else {
+        ejecutar();
+    }
+
+
+    const observador = new MutationObserver(function() {
+        ejecutar();
+    });
+
+    observador.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
+
+})();
+</script>
+
+
+
+<style id="EDUTURNOS_ATRAS_TODOS_V7">
+
+/* SOLO LOS BOTONES ATRÁS */
+a.eduturnos-atras,
+a.link-back,
+a.edc-back {
+    background:#1769aa !important;
+    background-color:#1769aa !important;
+    color:#ffffff !important;
+    border:1px solid #1769aa !important;
+    border-radius:7px !important;
+    text-decoration:none !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    min-height:34px !important;
+    padding:7px 12px !important;
+    font-weight:600 !important;
+    box-shadow:none !important;
+}
+
+a.eduturnos-atras:hover,
+a.link-back:hover,
+a.edc-back:hover {
+    background:#145b91 !important;
+    background-color:#145b91 !important;
+    color:#ffffff !important;
+    border-color:#145b91 !important;
+}
+
+a.eduturnos-atras *,
+a.link-back *,
+a.edc-back * {
+    color:#ffffff !important;
+}
+
+</style>
+
+
+<style id="EDUTURNOS_LAYOUT_ATRAS_V8">
+
+/* =========================================================
+   EDUTURNOS - ORGANIZACIÓN DEL BOTÓN ATRÁS
+   El botón queda separado del título.
+   ========================================================= */
+
+/* Contenedor de navegación superior */
+.page-navigation,
+.form-top-actions,
+.edc-header-actions {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin-bottom: 14px !important;
+}
+
+/* Botón atrás */
+.page-navigation .link-back,
+.form-top-actions .link-back,
+a.eduturnos-atras,
+a.link-back,
+a.edc-back {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    float: none !important;
+    clear: both !important;
+
+    margin: 0 0 10px 0 !important;
+
+    min-height: 34px !important;
+    height: 34px !important;
+
+    padding: 7px 12px !important;
+
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+
+    color: #ffffff !important;
+
+    border: 1px solid #1769aa !important;
+    border-radius: 7px !important;
+
+    text-decoration: none !important;
+
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+
+    box-shadow: none !important;
+}
+
+/* Título debajo del botón */
+.page-navigation + h1,
+.page-navigation + .section-heading,
+.form-top-actions + .section-heading,
+.edc-header-info {
+    clear: both !important;
+}
+
+/* Cuando el botón está directamente antes del título */
+a.eduturnos-atras + h1,
+a.link-back + h1,
+a.edc-back + h1 {
+    margin-top: 8px !important;
+}
+
+/* Evitar superposición */
+.page-head {
+    position: relative !important;
+}
+
+.page-head .page-navigation {
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+.page-head h1 {
+    position: relative !important;
+    z-index: 1 !important;
+    clear: both !important;
+}
+
+/* En formularios */
+.form-card .form-top-actions {
+    margin-bottom: 16px !important;
+}
+
+.form-card .section-heading {
+    clear: both !important;
+}
+
+/* En solicitudes, citas, calendario y páginas similares */
+.edc-header {
+    position: relative !important;
+}
+
+.edc-header .edc-header-actions {
+    margin-bottom: 12px !important;
+}
+
+/* En pantallas pequeñas */
+@media (max-width: 700px) {
+    .page-navigation,
+    .form-top-actions {
+        margin-bottom: 12px !important;
+    }
+
+    .page-navigation .link-back,
+    .form-top-actions .link-back,
+    a.eduturnos-atras,
+    a.link-back,
+    a.edc-back {
+        margin-bottom: 8px !important;
+    }
+}
+
+</style>

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Crear cuenta · {{ info.label }} · EDUTURNOS{% endblock %}
+{% block content %}
+<section class="formulario">
+<div class="tarjeta form-card">
+  <div class="form-top-actions"><a class="link-back" href="{{ url_for('auth.registro') }}">← Volver a tipos de cuenta</a><a class="link-back" href="{{ url_for('auth.login') }}">Iniciar sesión</a></div>
+  <div class="section-heading"><span class="badge">Registro institucional</span><h1>Crear cuenta: {{ info.label }}</h1><p>{{ info.descripcion }}</p></div>
+  <div class="info-box">Los datos se comparan con el registro institucional. El rol real se determina en MySQL.</div>
+  <form method="post" autocomplete="off" class="stack-form form-uniform">{{ csrf_field()|safe }}
+    <div class="form-grid">
+      <label>Tipo de documento
+        <select name="tipo_documento" required><option value="CC">Cédula de ciudadanía</option><option value="TI">Tarjeta de identidad</option><option value="CE">Cédula de extranjería</option></select>
+      </label>
+      <label>Número de documento<input name="documento" required inputmode="numeric" autocomplete="off"></label>
+      <label>Nombres<input name="nombres" required autocomplete="given-name"></label>
+      <label>Apellidos<input name="apellidos" required autocomplete="family-name"></label>
+      {% if info.requiere_codigo %}
+      <label>Correo institucional<input type="email" name="correo" placeholder="nombre@jjfh.edu.co" required autocomplete="email"></label>
+      <label>Sede institucional<select name="sede_id" required><option value="">Selecciona tu sede</option>{% for sede in sedes %}<option value="{{ sede.id }}">{{ sede.nombre }}</option>{% endfor %}</select></label>
+      <label>Jornada<select name="jornada_id" required><option value="">Selecciona tu jornada</option>{% for jornada in jornadas %}<option value="{{ jornada.id }}">{{ jornada.nombre }}</option>{% endfor %}</select></label>
+      <label>Código institucional <small>Exactamente 6 dígitos</small><input name="codigo_institucional" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" placeholder="Código de 6 dígitos" required autocomplete="one-time-code"></label>
+      {% else %}
+      <label>Correo electrónico<input type="email" name="correo" required autocomplete="email"></label>
+      {% if portal == 'estudiante' %}<label>Jornada<select name="jornada_id" required><option value="">Selecciona tu jornada</option>{% for jornada in jornadas %}<option value="{{ jornada.id }}">{{ jornada.nombre }}</option>{% endfor %}</select></label>{% endif %}
+      {% endif %}
+      {% if portal=='estudiante' %}<label>Curso / grado<input name="curso" placeholder="Ej. 11A"></label>{% endif %}
+      <label>Teléfono<input name="telefono" autocomplete="tel"></label>
+      <label>Contraseña <small>Mínimo 12 caracteres, con mayúscula, minúscula y número</small><input type="password" name="password" minlength="12" required autocomplete="new-password"></label>
+    </div>
+    <div class="form-actions"><button class="boton boton-full" type="submit">Validar y crear cuenta</button></div>
+  </form>
+  <div class="form-links"><a href="{{ url_for('auth.login') }}">← Ya tengo una cuenta</a><a href="{{ url_for('auth.registro') }}">Elegir otro tipo de cuenta</a></div>
+</div></section>
+{% endblock %}

@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /auth/
+Disallow: /citas/
+Disallow: /reportes/
+Disallow: /configuracion/
+Disallow: /justificaciones/

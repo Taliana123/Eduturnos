@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% block content %}<h1>Estudiantes de {{ acudiente.nombres }} {{ acudiente.apellidos }}</h1><div class="panel"><form method="post" action="{{ url_for('acudientes.relacionar',id=acudiente.id_acudiente) }}" class="form-grid">{{ csrf_field()|safe }}<label>Estudiante<select name="estudiante" required>
+<option value="" selected disabled hidden></option>
+{% for e in todos %}<option value="{{ e.id_estudiante }}">{{ e.apellidos }} {{ e.nombres }} · {{ e.documento }}</option>{% endfor %}</select></label><label>Parentesco<input name="parentesco" required></label><label><input type="checkbox" name="principal"> Principal</label><div><button class="boton">Relacionar</button></div></form></div><div class="table-wrap"><table><tr><th>Estudiante</th><th>Parentesco</th><th>Principal</th></tr>{% for e in estudiantes %}<tr><td>{{ e.nombres }} {{ e.apellidos }}</td><td>{{ e.parentesco }}</td><td>{{ 'Sí' if e.principal else 'No' }}</td></tr>{% else %}<tr><td colspan="3">No hay relaciones.</td></tr>{% endfor %}</table></div>
+
+
+
+{% endblock %}

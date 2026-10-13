@@ -1,0 +1,353 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}EDUTURNOS | Sistema de citaciones escolares{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   EDUTURNOS - PORTADA EDITORIAL
+   ========================================================= */
+
+.eduturnos-home {
+    position: relative;
+    min-height: calc(100vh - 80px);
+    margin: -32px -24px -40px;
+    padding: 80px 7vw 70px;
+    overflow: hidden;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at 78% 18%, rgba(77,145,245,.18), transparent 28%),
+        radial-gradient(circle at 18% 82%, rgba(77,145,245,.10), transparent 30%),
+        linear-gradient(135deg, #071B33 0%, #0D2D4D 52%, #12395F 100%);
+    color: #fff;
+}
+
+.eduturnos-home::before {
+    content: "";
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    right: -180px;
+    top: -190px;
+    border-radius: 50%;
+    border: 1px solid rgba(143,193,255,.13);
+    box-shadow:
+        0 0 0 70px rgba(143,193,255,.025),
+        0 0 0 140px rgba(143,193,255,.018);
+    pointer-events: none;
+}
+
+.eduturnos-home::after {
+    content: "";
+    position: absolute;
+    width: 360px;
+    height: 360px;
+    left: -190px;
+    bottom: -180px;
+    border-radius: 50%;
+    background: rgba(77,145,245,.07);
+    filter: blur(10px);
+    pointer-events: none;
+}
+
+.eduturnos-hero {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.eduturnos-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 22px;
+    padding: 8px 13px;
+    border: 1px solid rgba(143,193,255,.28);
+    border-radius: 999px;
+    background: rgba(255,255,255,.055);
+    color: #BFD9F5;
+    font-family: "Public Sans", sans-serif;
+    font-size: .76rem;
+    font-weight: 700;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+}
+
+.eduturnos-eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #D6A52C;
+    box-shadow: 0 0 14px rgba(214,165,44,.55);
+}
+
+.eduturnos-title {
+    max-width: 850px;
+    margin: 0;
+    color: #fff;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: clamp(3.5rem, 8vw, 7.2rem);
+    font-weight: 600;
+    letter-spacing: -.055em;
+    line-height: .92;
+}
+
+.eduturnos-title span {
+    display: block;
+    color: #73ACFF;
+}
+
+.eduturnos-rule {
+    width: 92px;
+    height: 4px;
+    margin: 27px 0 24px;
+    border-radius: 999px;
+    background: #D6A52C;
+}
+
+.eduturnos-description {
+    max-width: 650px;
+    margin: 0;
+    color: #D5E2F0;
+    font-family: "Public Sans", sans-serif;
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    line-height: 1.75;
+}
+
+.eduturnos-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 13px;
+    margin-top: 34px;
+}
+
+.eduturnos-home .eduturnos-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    padding: 0 24px;
+    border-radius: 11px;
+    text-decoration: none;
+    font-family: "Public Sans", sans-serif;
+    font-size: .92rem;
+    font-weight: 700;
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        background .25s ease;
+}
+
+.eduturnos-action-primary {
+    background: #4D91F5;
+    color: #fff;
+    box-shadow: 0 12px 30px rgba(0,0,0,.18);
+}
+
+.eduturnos-action-primary:hover {
+    transform: translateY(-3px);
+    background: #73ACFF;
+    color: #fff;
+    box-shadow: 0 17px 34px rgba(0,0,0,.25);
+}
+
+.eduturnos-action-secondary {
+    border: 1px solid rgba(255,255,255,.23);
+    background: rgba(255,255,255,.055);
+    color: #fff;
+    backdrop-filter: blur(8px);
+}
+
+.eduturnos-action-secondary:hover {
+    transform: translateY(-3px);
+    background: rgba(255,255,255,.11);
+    color: #fff;
+}
+
+.eduturnos-features {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    max-width: 1180px;
+    margin: 86px auto 0;
+}
+
+.eduturnos-feature {
+    min-height: 190px;
+    padding: 26px;
+    border: 1px solid rgba(255,255,255,.105);
+    border-radius: 18px;
+    background: rgba(255,255,255,.055);
+    box-shadow: 0 18px 45px rgba(0,0,0,.12);
+    backdrop-filter: blur(12px);
+    transition:
+        transform .28s ease,
+        background .28s ease,
+        border-color .28s ease;
+}
+
+.eduturnos-feature:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,.085);
+    border-color: rgba(115,172,255,.32);
+}
+
+.eduturnos-feature-number {
+    display: block;
+    margin-bottom: 25px;
+    color: #D6A52C;
+    font-family: "Public Sans", sans-serif;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+}
+
+.eduturnos-feature h2 {
+    margin: 0 0 10px;
+    color: #fff;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.55rem;
+    font-weight: 600;
+}
+
+.eduturnos-feature p {
+    margin: 0;
+    color: #BFD0E2;
+    font-family: "Public Sans", sans-serif;
+    font-size: .91rem;
+    line-height: 1.65;
+}
+
+.eduturnos-bottom {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 45px auto 0;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255,255,255,.10);
+    color: #9FB5CB;
+    font-family: "Public Sans", sans-serif;
+    font-size: .78rem;
+    letter-spacing: .04em;
+}
+
+@media (max-width: 800px) {
+    .eduturnos-home {
+        margin: -20px -14px -30px;
+        padding: 58px 25px 55px;
+    }
+
+    .eduturnos-title {
+        font-size: clamp(3rem, 16vw, 5rem);
+    }
+
+    .eduturnos-features {
+        grid-template-columns: 1fr;
+        margin-top: 60px;
+    }
+}
+
+@media (max-width: 520px) {
+    .eduturnos-actions {
+        flex-direction: column;
+    }
+
+    .eduturnos-home .eduturnos-action {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .eduturnos-feature,
+    .eduturnos-home .eduturnos-action {
+        transition: none;
+    }
+}
+</style>
+
+<section class="eduturnos-home">
+
+    <div class="eduturnos-hero">
+
+        <div class="eduturnos-eyebrow">
+            Portal institucional
+        </div>
+
+        <h1 class="eduturnos-title">
+            EDUTURNOS
+            <span>Cada citación.</span>
+            En su lugar.
+        </h1>
+
+        <div class="eduturnos-rule"></div>
+
+        <p class="eduturnos-description">
+            Un solo lugar para crear, confirmar y hacer seguimiento
+            a las citaciones escolares, con calendario, notificaciones
+            e historial institucional.
+        </p>
+
+        <div class="eduturnos-actions">
+
+            <a
+                class="eduturnos-action eduturnos-action-primary"
+                href="{{ url_for('auth.login') }}"
+            >
+                Iniciar sesión
+            </a>
+
+            <a
+                class="eduturnos-action eduturnos-action-secondary"
+                href="{{ url_for('auth.registro') }}"
+            >
+                Crear una cuenta
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="eduturnos-features">
+
+        <article class="eduturnos-feature">
+            <span class="eduturnos-feature-number">01 · ORGANIZACIÓN</span>
+            <h2>Citaciones</h2>
+            <p>
+                Agenda reuniones y organiza cada citación
+                sin duplicar horarios.
+            </p>
+        </article>
+
+        <article class="eduturnos-feature">
+            <span class="eduturnos-feature-number">02 · CONEXIÓN</span>
+            <h2>Multiusuario</h2>
+            <p>
+                Estudiantes, acudientes, docentes y directivos
+                trabajan sobre la misma información institucional.
+            </p>
+        </article>
+
+        <article class="eduturnos-feature">
+            <span class="eduturnos-feature-number">03 · SEGUIMIENTO</span>
+            <h2>Seguimiento</h2>
+            <p>
+                Consulta estados, notificaciones e historial
+                para mantener cada proceso bajo control.
+            </p>
+        </article>
+
+    </div>
+
+    <div class="eduturnos-bottom">
+        Sistema de gestión de citaciones escolares · EDUTURNOS
+    </div>
+
+</section>
+
+{% endblock %}

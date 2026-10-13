@@ -1,0 +1,735 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Panel Â· EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<style>
+.ed-dashboard{
+    max-width:1180px;
+    margin:0 auto 28px;
+}
+
+.ed-dashboard *{
+    box-sizing:border-box;
+}
+
+/* =========================
+   ENCABEZADO
+========================= */
+
+.ed-welcome{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    padding:28px 30px;
+    margin-bottom:20px;
+    background:#fff;
+    border:1px solid var(--borde);
+    border-radius:18px;
+    box-shadow:0 8px 24px rgba(17,37,63,.06);
+}
+
+.ed-welcome-main{
+    min-width:0;
+}
+
+.ed-welcome .badge{
+    margin-bottom:8px;
+}
+
+.ed-welcome h1{
+    margin:0;
+    font-size:30px;
+    line-height:1.2;
+    color:var(--azul2);
+}
+
+.ed-welcome p{
+    margin:8px 0 0;
+    color:var(--gris);
+    font-size:14px;
+}
+
+.ed-welcome-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:10px;
+    flex-wrap:wrap;
+    flex:0 0 auto;
+}
+
+.ed-welcome-actions .boton{
+    margin:0;
+    min-height:44px;
+}
+
+.ed-logout{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:44px;
+    padding:10px 16px;
+    border:1px solid var(--borde);
+    border-radius:10px;
+    background:#fff;
+    color:var(--texto);
+    font-weight:700;
+    cursor:pointer;
+}
+
+.ed-logout:hover{
+    border-color:#b9c8dc;
+    background:#f7f9fc;
+    color:var(--azul2);
+}
+
+/* =========================
+   INDICADORES
+========================= */
+
+.ed-kpis{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:20px;
+}
+
+.ed-kpi{
+    padding:20px 18px;
+    background:#fff;
+    border:1px solid var(--borde);
+    border-radius:15px;
+    box-shadow:0 5px 18px rgba(17,37,63,.04);
+}
+
+.ed-kpi-label{
+    display:block;
+    color:var(--gris);
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+}
+
+.ed-kpi-value{
+    display:block;
+    margin-top:7px;
+    font-size:30px;
+    line-height:1;
+    font-weight:800;
+    color:var(--texto);
+}
+
+.ed-kpi-note{
+    display:block;
+    margin-top:8px;
+    color:var(--gris);
+    font-size:12px;
+}
+
+/* =========================
+   ACCIONES RAPIDAS
+========================= */
+
+.ed-section{
+    background:#fff;
+    border:1px solid var(--borde);
+    border-radius:18px;
+    box-shadow:0 8px 24px rgba(17,37,63,.06);
+    padding:26px;
+    margin-bottom:20px;
+}
+
+.ed-section-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:18px;
+}
+
+.ed-section-head .badge{
+    margin-bottom:7px;
+}
+
+.ed-section-head h2{
+    margin:0;
+    font-size:21px;
+    color:var(--texto);
+}
+
+.ed-section-head p{
+    margin:6px 0 0;
+    color:var(--gris);
+    font-size:13px;
+}
+
+.ed-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+}
+
+.ed-action{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    min-height:118px;
+    padding:18px;
+    border:1px solid var(--borde);
+    border-radius:14px;
+    background:#fbfdff;
+    color:var(--texto);
+    text-decoration:none;
+    transition:background .15s ease,border-color .15s ease;
+}
+
+.ed-action:hover{
+    background:#f7faff;
+    border-color:#bfd0e6;
+}
+
+.ed-action-icon{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 42px;
+    width:42px;
+    height:42px;
+    border-radius:11px;
+    background:#eef5ff;
+    color:var(--azul2);
+    font-size:13px;
+    font-weight:800;
+}
+
+.ed-action-body{
+    min-width:0;
+}
+
+.ed-action-title{
+    display:block;
+    margin:1px 0 4px;
+    font-size:16px;
+    font-weight:800;
+    color:var(--azul2);
+}
+
+.ed-action-text{
+    display:block;
+    color:var(--gris);
+    font-size:13px;
+    line-height:1.45;
+}
+
+.ed-action-link{
+    display:inline-block;
+    margin-top:9px;
+    font-size:12px;
+    font-weight:800;
+    color:var(--azul);
+}
+
+/* =========================
+   CUENTA
+========================= */
+
+.ed-account{
+    margin-top:28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding:22px 24px;
+    background:#fff;
+    border:1px solid var(--borde);
+    border-radius:16px;
+    box-shadow:0 6px 20px rgba(17,37,63,.05);
+}
+
+.ed-account h2{
+    margin:8px 0 0;
+    font-size:19px;
+    color:var(--texto);
+}
+
+.ed-account p{
+    margin:5px 0 0;
+    color:var(--gris);
+    font-size:13px;
+}
+
+.ed-account .boton{
+    margin:0;
+    min-width:190px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:900px){
+
+    .ed-kpis{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    .ed-welcome{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .ed-welcome-actions{
+        justify-content:flex-start;
+    }
+
+    .ed-section-head{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+}
+
+@media(max-width:680px){
+
+    .ed-kpis,
+    .ed-actions{
+        grid-template-columns:1fr;
+    }
+
+    .ed-welcome,
+    .ed-section{
+        padding:20px;
+    }
+
+    .ed-welcome h1{
+        font-size:25px;
+    }
+
+    .ed-welcome-actions{
+        width:100%;
+    }
+
+    .ed-welcome-actions .boton,
+    .ed-logout{
+        width:100%;
+    }
+
+    .ed-account{
+        align-items:stretch;
+        flex-direction:column;
+        padding:20px;
+    }
+
+    .ed-account .boton{
+        width:100%;
+    }
+}
+</style>
+
+<div class="ed-dashboard">
+
+    <!-- ENCABEZADO -->
+
+    <section class="ed-welcome">
+
+        <div class="ed-welcome-main">
+
+            <span class="badge">
+                {{ usuario.rol_nombre }}
+            </span>
+
+            <h1>
+                Hola, {{ usuario.nombres }} {{ usuario.apellidos }}
+            </h1>
+
+            <p>
+                InformaciÃ³n y accesos disponibles segÃºn tu rol institucional.
+            </p>
+
+        </div>
+
+        <div class="ed-welcome-actions">
+
+            <form
+                method="post"
+                action="{{ url_for('auth.logout') }}"
+                class="inline-form"
+            >
+
+                {{ csrf_field()|safe }}
+
+                <button
+                    class="ed-logout"
+                    type="submit"
+                >
+                    Cerrar sesiÃ³n
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <!-- INDICADORES -->
+
+    <section
+        class="ed-kpis"
+        aria-label="Resumen de actividad"
+    >
+
+        <div class="ed-kpi">
+
+            <span class="ed-kpi-label">
+                Total de citas
+            </span>
+
+            <span class="ed-kpi-value">
+                {{ datos.total_citas }}
+            </span>
+
+            <span class="ed-kpi-note">
+                Citaciones registradas
+            </span>
+
+        </div>
+
+
+        <div class="ed-kpi">
+
+            <span class="ed-kpi-label">
+                Pendientes
+            </span>
+
+            <span class="ed-kpi-value">
+                {{ datos.pendientes }}
+            </span>
+
+            <span class="ed-kpi-note">
+                Requieren atenciÃ³n
+            </span>
+
+        </div>
+
+
+        <div class="ed-kpi">
+
+            <span class="ed-kpi-label">
+                Confirmadas
+            </span>
+
+            <span class="ed-kpi-value">
+                {{ datos.confirmadas }}
+            </span>
+
+            <span class="ed-kpi-note">
+                Citas confirmadas
+            </span>
+
+        </div>
+
+
+        <div class="ed-kpi">
+
+            <span class="ed-kpi-label">
+                Sin leer
+            </span>
+
+            <span class="ed-kpi-value">
+                {{ notificaciones_no_leidas }}
+            </span>
+
+            <span class="ed-kpi-note">
+                Notificaciones nuevas
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- ACCIONES RAPIDAS -->
+
+    <section class="ed-section">
+
+        <div class="ed-section-head">
+
+            <div>
+
+                <span class="badge">
+                    Accesos
+                </span>
+
+                <h2>
+                    Acciones rÃ¡pidas
+                </h2>
+
+                <p>
+                    Accede directamente a las funciones disponibles para tu rol.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="ed-actions">
+
+
+            <!-- CITAS -->
+
+            <a
+                class="ed-action"
+                href="{{ url_for('citas.index') }}"
+            >
+
+                <span class="ed-action-icon">
+                    CT
+                </span>
+
+                <span class="ed-action-body">
+
+                    <span class="ed-action-title">
+                        Citas
+                    </span>
+
+                    <span class="ed-action-text">
+                        Consultar y gestionar citaciones.
+                    </span>
+
+                    <span class="ed-action-link">
+                        Ver citas â†’
+                    </span>
+
+                </span>
+
+            </a>
+
+
+            <!-- CALENDARIO -->
+
+            <a
+                class="ed-action"
+                href="{{ url_for('calendario.index') }}"
+            >
+
+                <span class="ed-action-icon">
+                    CA
+                </span>
+
+                <span class="ed-action-body">
+
+                    <span class="ed-action-title">
+                        Calendario
+                    </span>
+
+                    <span class="ed-action-text">
+                        Revisar fechas y horarios de tus citas.
+                    </span>
+
+                    <span class="ed-action-link">
+                        Abrir calendario â†’
+                    </span>
+
+                </span>
+
+            </a>
+
+
+            <!-- NOTIFICACIONES -->
+
+            <a
+                class="ed-action"
+                href="{{ url_for('notificaciones.index') }}"
+            >
+
+                <span class="ed-action-icon">
+                    NT
+                </span>
+
+                <span class="ed-action-body">
+
+                    <span class="ed-action-title">
+                        Notificaciones
+                    </span>
+
+                    <span class="ed-action-text">
+                        Consulta avisos y novedades del sistema.
+                    </span>
+
+                    <span class="ed-action-link">
+                        Ver notificaciones â†’
+                    </span>
+
+                </span>
+
+            </a>
+
+
+            <!-- JUSTIFICACIONES -->
+
+            {% if usuario.rol_nombre in [
+                'Estudiante',
+                'Acudiente'
+            ] %}
+
+            <a
+                class="ed-action"
+                href="{{ url_for('justificaciones.index') }}"
+            >
+
+                <span class="ed-action-icon">
+                    JS
+                </span>
+
+                <span class="ed-action-body">
+
+                    <span class="ed-action-title">
+                        Justificaciones
+                    </span>
+
+                    <span class="ed-action-text">
+                        Consultar o presentar solicitudes.
+                    </span>
+
+                    <span class="ed-action-link">
+                        Ver justificaciones â†’
+                    </span>
+
+                </span>
+
+            </a>
+
+            {% endif %}
+
+
+            <!-- SOLICITUDES -->
+
+            {% if usuario.rol_nombre in [
+                'Docente',
+                'Administrador / Coordinador',
+                'Rector',
+                'Super Admin'
+            ] %}
+
+            <a
+                class="ed-action"
+                href="{{ url_for('solicitudes.index') }}"
+            >
+
+                <span class="ed-action-icon">
+                    SO
+                </span>
+
+                <span class="ed-action-body">
+
+                    <span class="ed-action-title">
+                        Solicitudes
+                    </span>
+
+                    <span class="ed-action-text">
+                        Gestionar reuniones y propuestas.
+                    </span>
+
+                    <span class="ed-action-link">
+                        Ver solicitudes â†’
+                    </span>
+
+                </span>
+
+            </a>
+
+            {% endif %}
+
+
+            <!-- REPORTES -->
+
+            {% if usuario.rol_nombre in [
+                'Rector',
+                'Administrador / Coordinador',
+                'Super Admin'
+            ] %}
+
+            <a
+                class="ed-action"
+                href="{{ url_for('reportes.index') }}"
+            >
+
+                <span class="ed-action-icon">
+                    RP
+                </span>
+
+                <span class="ed-action-body">
+
+                    <span class="ed-action-title">
+                        Reportes
+                    </span>
+
+                    <span class="ed-action-text">
+                        Consultar indicadores institucionales.
+                    </span>
+
+                    <span class="ed-action-link">
+                        Ver reportes â†’
+                    </span>
+
+                </span>
+
+            </a>
+
+            {% endif %}
+
+
+        </div>
+
+    </section>
+
+
+    <!-- MI CUENTA -->
+
+    <section class="ed-account">
+
+        <div>
+
+            <span class="badge">
+                Cuenta
+            </span>
+
+            <h2>
+                Mi cuenta
+            </h2>
+
+            <p>
+                MantÃ©n tu contraseÃ±a personal segura y actualizada.
+            </p>
+
+        </div>
+
+        <a
+            class="boton"
+            href="{{ url_for('passwords.cambiar_password') }}"
+        >
+            Cambiar contraseÃ±a
+        </a>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+

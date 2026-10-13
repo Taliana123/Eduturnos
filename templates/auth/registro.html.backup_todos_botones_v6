@@ -1,0 +1,758 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear cuenta · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<section class="formulario ancho-medio registro-pagina">
+
+    <div class="tarjeta form-card registro-contenedor">
+
+        <div class="section-heading registro-encabezado">
+
+            <span class="badge">Registro</span>
+
+            <h1>Crear cuenta</h1>
+
+            <p>
+                Elige el tipo de registro. Esto no asigna el rol:
+                el sistema lo valida contra la información institucional.
+            </p>
+
+        </div>
+
+        <div class="registro-grid">
+
+            {% for slug, info in portales.items() %}
+
+            <article class="registro-opcion">
+
+                <div class="registro-opcion-contenido">
+
+                    <h3>
+                        {{ info.label }}
+                    </h3>
+
+                    <p>
+                        {{ info.descripcion }}
+                    </p>
+
+                </div>
+
+                <a
+                    class="boton boton-full registro-boton"
+                    href="{{ url_for('auth.registro_portal', portal=slug) }}"
+                >
+                    Registrarme
+                </a>
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="registro-volver">
+
+            <a
+                class="link-back"
+                href="{{ url_for('auth.login') }}"
+            >
+                ← Volver a iniciar sesión
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<style>
+
+    /* =====================================================
+       EDUTURNOS - REGISTRO ORGANIZADO
+       ===================================================== */
+
+    .registro-pagina {
+        width: 100%;
+        padding: 20px 0;
+    }
+
+    /* Tarjeta exterior */
+
+    .registro-contenedor {
+        width: 100%;
+        max-width: 1050px;
+        margin: 0 auto;
+        padding: 32px;
+        box-sizing: border-box;
+    }
+
+    /* Encabezado */
+
+    .registro-encabezado {
+        width: 100%;
+        margin: 0 0 28px 0;
+        text-align: left;
+    }
+
+    .registro-encabezado h1 {
+        margin: 0 0 10px 0;
+        line-height: 1.2;
+    }
+
+    .registro-encabezado p {
+        margin: 0;
+        line-height: 1.55;
+        max-width: 760px;
+    }
+
+    /* =====================================================
+       CUADRÍCULA
+       ===================================================== */
+
+    .registro-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap: 20px;
+
+        width: 100%;
+
+        margin: 0;
+        padding: 0;
+
+        align-items: stretch;
+
+        box-sizing: border-box;
+    }
+
+    /* =====================================================
+       TARJETAS DE OPCIONES
+       ===================================================== */
+
+    .registro-opcion {
+        display: flex;
+
+        flex-direction: column;
+
+        justify-content: space-between;
+
+        width: 100%;
+        min-width: 0;
+
+        min-height: 190px;
+
+        margin: 0;
+        padding: 22px;
+
+        box-sizing: border-box;
+
+        background: #ffffff;
+
+        border: 1px solid #dbe3ec;
+        border-radius: 12px;
+
+        box-shadow:
+            0 2px 7px rgba(15, 23, 42, 0.05);
+
+        transition:
+            transform 0.15s ease,
+            box-shadow 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    .registro-opcion:hover {
+        transform: translateY(-2px);
+
+        border-color: #c3d4ea;
+
+        box-shadow:
+            0 7px 18px rgba(15, 23, 42, 0.09);
+    }
+
+    /* Contenido superior */
+
+    .registro-opcion-contenido {
+        flex: 1;
+
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Títulos alineados */
+
+    .registro-opcion h3 {
+        width: 100%;
+
+        min-height: 42px;
+
+        margin: 0 0 10px 0;
+        padding: 0;
+
+        color: #0f172a;
+
+        font-size: 18px;
+        font-weight: 700;
+
+        line-height: 1.25;
+    }
+
+    /* Descripciones alineadas */
+
+    .registro-opcion p {
+        width: 100%;
+
+        min-height: 66px;
+
+        margin: 0;
+
+        color: #64748b;
+
+        font-size: 14px;
+
+        line-height: 1.5;
+    }
+
+    /* =====================================================
+       BOTONES
+       ===================================================== */
+
+    .registro-boton {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+
+        min-height: 46px;
+
+        margin-top: 20px;
+
+        box-sizing: border-box;
+
+        text-align: center;
+
+        text-decoration: none;
+    }
+
+    /* =====================================================
+       VOLVER
+       ===================================================== */
+
+    .registro-volver {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        width: 100%;
+
+        margin-top: 28px;
+        padding-top: 22px;
+
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .registro-volver .link-back {
+        display: inline-flex;
+
+        align-items: center;
+
+        text-decoration: none;
+    }
+
+    .registro-volver .link-back:hover {
+        text-decoration: underline;
+    }
+
+    /* =====================================================
+       TABLET
+       ===================================================== */
+
+    @media (max-width: 900px) {
+
+        .registro-contenedor {
+            max-width: 100%;
+            padding: 26px;
+        }
+
+        .registro-grid {
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    /* =====================================================
+       CELULAR
+       ===================================================== */
+
+    @media (max-width: 620px) {
+
+        .registro-contenedor {
+            padding: 20px;
+        }
+
+        .registro-grid {
+            grid-template-columns: 1fr;
+
+            gap: 16px;
+        }
+
+        .registro-opcion {
+            min-height: 0;
+        }
+
+        .registro-opcion h3,
+        .registro-opcion p {
+            min-height: 0;
+        }
+    }
+
+</style>
+
+
+
+<!-- EDUTURNOS_MEJORA_FINAL_REGISTRO -->
+
+<style>
+
+    /* =====================================================
+       MEJORA FINAL - REGISTRO
+       ===================================================== */
+
+    .registro-pagina {
+        padding-top: 12px !important;
+        padding-bottom: 30px !important;
+    }
+
+    .registro-contenedor {
+        max-width: 1080px !important;
+
+        padding: 34px !important;
+    }
+
+    .registro-encabezado {
+        margin-bottom: 30px !important;
+    }
+
+    .registro-encabezado h1 {
+        font-size: 30px !important;
+        margin-bottom: 9px !important;
+    }
+
+    .registro-encabezado p {
+        max-width: 820px !important;
+        line-height: 1.55 !important;
+    }
+
+    /* =====================================================
+       DISTRIBUCIÓN DE LAS 5 TARJETAS
+       ===================================================== */
+
+    .registro-grid {
+        display: grid !important;
+
+        grid-template-columns:
+            repeat(6, minmax(0, 1fr)) !important;
+
+        gap: 22px !important;
+
+        width: 100% !important;
+
+        align-items: stretch !important;
+    }
+
+    .registro-opcion {
+        grid-column: span 2 !important;
+
+        min-height: 205px !important;
+
+        padding: 22px !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        justify-content: space-between !important;
+
+        margin: 0 !important;
+    }
+
+    /* Centrar las dos últimas */
+    .registro-opcion:nth-child(4) {
+        grid-column: 2 / span 2 !important;
+    }
+
+    .registro-opcion:nth-child(5) {
+        grid-column: 4 / span 2 !important;
+    }
+
+    /* =====================================================
+       TÍTULOS
+       ===================================================== */
+
+    .registro-opcion h3 {
+        min-height: 46px !important;
+
+        margin: 0 0 10px 0 !important;
+
+        font-size: 18px !important;
+
+        line-height: 1.25 !important;
+    }
+
+    /* =====================================================
+       DESCRIPCIONES
+       ===================================================== */
+
+    .registro-opcion p {
+        min-height: 70px !important;
+
+        margin: 0 !important;
+
+        line-height: 1.5 !important;
+    }
+
+    /* =====================================================
+       BOTONES
+       ===================================================== */
+
+    .registro-boton {
+        min-height: 46px !important;
+
+        margin-top: 18px !important;
+    }
+
+    /* =====================================================
+       VOLVER
+       ===================================================== */
+
+    .registro-volver {
+        margin-top: 30px !important;
+
+        padding-top: 22px !important;
+    }
+
+    /* =====================================================
+       TABLET
+       ===================================================== */
+
+    @media (max-width: 900px) {
+
+        .registro-grid {
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr)) !important;
+
+            gap: 18px !important;
+        }
+
+        .registro-opcion,
+        .registro-opcion:nth-child(4),
+        .registro-opcion:nth-child(5) {
+            grid-column: auto !important;
+        }
+
+        .registro-opcion {
+            min-height: 200px !important;
+        }
+    }
+
+    /* =====================================================
+       CELULAR
+       ===================================================== */
+
+    @media (max-width: 620px) {
+
+        .registro-contenedor {
+            padding: 22px !important;
+        }
+
+        .registro-grid {
+            grid-template-columns: 1fr !important;
+
+            gap: 16px !important;
+        }
+
+        .registro-opcion,
+        .registro-opcion:nth-child(4),
+        .registro-opcion:nth-child(5) {
+            grid-column: auto !important;
+
+            min-height: 0 !important;
+        }
+
+        .registro-opcion h3,
+        .registro-opcion p {
+            min-height: 0 !important;
+        }
+
+        .registro-encabezado h1 {
+            font-size: 27px !important;
+        }
+    }
+
+</style>
+
+<!-- FIN EDUTURNOS_MEJORA_FINAL_REGISTRO -->
+
+
+
+<!-- EDUTURNOS_ROLES_COMPACTOS -->
+
+<style id="eduturnos-roles-compactos">
+
+/* =========================================================
+   EDUTURNOS - ROLES COMPACTOS
+   ========================================================= */
+
+/* Contenedor */
+.registro-contenedor {
+    max-width: 980px !important;
+    padding: 28px !important;
+}
+
+/* Encabezado */
+.registro-encabezado {
+    margin-bottom: 22px !important;
+}
+
+/* Cuadrícula */
+.registro-grid {
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(6, minmax(0, 1fr)) !important;
+
+    gap: 16px !important;
+
+    align-items: stretch !important;
+}
+
+/* Tarjetas */
+.registro-opcion {
+    grid-column: span 2 !important;
+
+    min-height: 155px !important;
+
+    padding: 18px !important;
+
+    border-radius: 11px !important;
+
+    box-shadow:
+        0 2px 6px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* Cuarta tarjeta */
+.registro-opcion:nth-child(4) {
+    grid-column: 2 / span 2 !important;
+}
+
+/* Quinta tarjeta */
+.registro-opcion:nth-child(5) {
+    grid-column: 4 / span 2 !important;
+}
+
+/* Contenido */
+.registro-opcion-contenido {
+    width: 100% !important;
+}
+
+/* Títulos */
+.registro-opcion h3 {
+    min-height: 0 !important;
+
+    margin: 0 0 7px 0 !important;
+
+    font-size: 17px !important;
+
+    line-height: 1.2 !important;
+}
+
+/* Descripciones */
+.registro-opcion p {
+    min-height: 48px !important;
+
+    margin: 0 !important;
+
+    font-size: 13.5px !important;
+
+    line-height: 1.4 !important;
+}
+
+/* Botones */
+.registro-boton {
+    min-height: 40px !important;
+
+    margin-top: 12px !important;
+
+    padding: 9px 14px !important;
+
+    font-size: 14px !important;
+
+    border-radius: 8px !important;
+}
+
+/* Volver */
+.registro-volver {
+    margin-top: 22px !important;
+
+    padding-top: 18px !important;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+    .registro-contenedor {
+        padding: 24px !important;
+    }
+
+    .registro-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+
+        gap: 14px !important;
+    }
+
+    .registro-opcion,
+    .registro-opcion:nth-child(4),
+    .registro-opcion:nth-child(5) {
+        grid-column: auto !important;
+    }
+
+    .registro-opcion {
+        min-height: 150px !important;
+    }
+}
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .registro-contenedor {
+        padding: 20px !important;
+    }
+
+    .registro-grid {
+        grid-template-columns: 1fr !important;
+
+        gap: 13px !important;
+    }
+
+    .registro-opcion,
+    .registro-opcion:nth-child(4),
+    .registro-opcion:nth-child(5) {
+        grid-column: auto !important;
+
+        min-height: 0 !important;
+    }
+
+    .registro-opcion p {
+        min-height: 0 !important;
+    }
+}
+
+</style>
+
+<!-- FIN EDUTURNOS_ROLES_COMPACTOS -->
+
+
+
+<style id="EDUTURNOS_BOTONES_V4">
+/* =========================================================
+   EDUTURNOS
+   SOLO BOTONES
+   Mismo azul y letra que "+ Nueva citación" de Citas
+   ========================================================= */
+
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a[class*="boton"],
+a.btn,
+a[class*="btn-"],
+a.link-back,
+a.edc-back,
+.boton,
+.btn,
+[class*="boton-"],
+[class*="btn-"],
+.link-back,
+.edc-back {
+
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+
+    color: #ffffff !important;
+
+    border-color: #1769aa !important;
+
+    text-decoration: none !important;
+}
+
+/* Texto dentro de botones */
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a[class*="boton"] *,
+a.btn *,
+a[class*="btn-"] *,
+.link-back *,
+.edc-back * {
+    color: #ffffff !important;
+}
+
+/* Hover */
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a[class*="boton"]:hover,
+a.btn:hover,
+a[class*="btn-"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.boton:hover,
+.btn:hover,
+[class*="boton-"]:hover,
+[class*="btn-"]:hover,
+.link-back:hover,
+.edc-back:hover {
+
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+
+    color: #ffffff !important;
+
+    border-color: #145b91 !important;
+
+    text-decoration: none !important;
+}
+
+/* Elementos hijos durante hover */
+button:hover *,
+a.boton:hover *,
+a[class*="boton"]:hover *,
+a.btn:hover *,
+a[class*="btn-"]:hover *,
+.link-back:hover *,
+.edc-back:hover * {
+    color: #ffffff !important;
+}
+</style>
+
+{% endblock %}

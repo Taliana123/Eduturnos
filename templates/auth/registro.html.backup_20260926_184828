@@ -1,0 +1,981 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear cuenta · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<section class="registro-pagina">
+
+    <div class="registro-layout">
+
+        <!-- =================================================
+             ILUSTRACIÓN
+             ================================================= -->
+
+        <aside class="registro-ilustracion" aria-hidden="true">
+
+            <div class="registro-ilustracion-brillo"></div>
+
+            <div class="registro-personaje">
+
+                <div class="personaje-cabeza">
+                    <div class="personaje-cabello"></div>
+
+                    <div class="personaje-oreja personaje-oreja-izq"></div>
+                    <div class="personaje-oreja personaje-oreja-der"></div>
+
+                    <div class="personaje-ojo personaje-ojo-izq"></div>
+                    <div class="personaje-ojo personaje-ojo-der"></div>
+
+                    <div class="personaje-sonrisa"></div>
+                </div>
+
+                <div class="personaje-cuello"></div>
+
+                <div class="personaje-cuerpo">
+
+                    <div class="personaje-camisa"></div>
+
+                    <div class="personaje-brazo personaje-brazo-izq"></div>
+                    <div class="personaje-brazo personaje-brazo-der"></div>
+
+                </div>
+
+                <div class="personaje-tarjeta">
+
+                    <div class="tarjeta-linea tarjeta-linea-1"></div>
+                    <div class="tarjeta-linea tarjeta-linea-2"></div>
+                    <div class="tarjeta-linea tarjeta-linea-3"></div>
+
+                </div>
+
+            </div>
+
+            <div class="registro-ilustracion-sombra"></div>
+
+            <div class="registro-burbujas">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="registro-ilustracion-texto">
+                <strong>Tu cuenta</strong>
+                <span>Empieza aquí</span>
+            </div>
+
+        </aside>
+
+
+        <!-- =================================================
+             CONTENIDO
+             ================================================= -->
+
+        <div class="registro-contenedor">
+
+            <div class="registro-encabezado">
+
+                <div>
+                    <p class="registro-etiqueta">EDUTURNOS</p>
+
+                    <h1>Crear cuenta</h1>
+
+                    <p class="registro-descripcion">
+                        Selecciona el tipo de cuenta que deseas crear
+                        para continuar con tu registro.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="registro-grid">
+
+{% for slug, info in portales.items() %}
+
+            <article class="registro-opcion">
+
+                <div class="registro-opcion-contenido">
+
+                    <h3>{{ info.label }}</h3>
+
+                    <p>{{ info.descripcion }}</p>
+
+                </div>
+
+                <a
+                    class="registro-boton"
+                    href="{{ url_for('auth.registro_portal', portal=slug) }}"
+                >
+                    Crear cuenta
+                </a>
+
+            </article>
+
+            {% endfor %}
+
+            </div>
+
+
+            <div class="registro-retorno">
+
+                <a
+                    href="{{ url_for('auth.login') }}"
+                    class="link-back"
+                >
+                    <span aria-hidden="true">←</span>
+                    <span>Volver al inicio de sesión</span>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<style id="EDUTURNOS_REGISTRO_FINAL_2026">
+
+/* =========================================================
+   CREAR CUENTA · EDUTURNOS
+   ========================================================= */
+
+.registro-pagina {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 30px 20px 40px;
+}
+
+
+/* =========================================================
+   DISTRIBUCIÓN
+   ========================================================= */
+
+.registro-layout {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: minmax(300px, .78fr) minmax(430px, 1fr);
+
+    align-items: center;
+
+    gap: 42px;
+}
+
+
+/* =========================================================
+   ILUSTRACIÓN IZQUIERDA
+   ========================================================= */
+
+.registro-ilustracion {
+    position: relative;
+
+    min-height: 455px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border-radius: 24px;
+
+    background:
+        radial-gradient(
+            circle at 50% 38%,
+            #eaf3ff 0%,
+            #f4f8fd 46%,
+            #edf3f9 100%
+        );
+
+    border: 1px solid #dce7f4;
+
+    box-shadow:
+        0 18px 45px rgba(18, 59, 104, .08);
+}
+
+
+/* brillo decorativo */
+
+.registro-ilustracion-brillo {
+    position: absolute;
+
+    width: 230px;
+    height: 230px;
+
+    top: 55px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    border-radius: 50%;
+
+    background: rgba(47, 120, 255, .08);
+
+    filter: blur(2px);
+
+    animation: registro-brillo 4s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   PERSONAJE
+   ========================================================= */
+
+.registro-personaje {
+    position: relative;
+
+    width: 210px;
+    height: 310px;
+
+    z-index: 3;
+
+    animation: registro-personaje-flotar 4s ease-in-out infinite;
+}
+
+
+/* cabeza */
+
+.personaje-cabeza {
+    position: absolute;
+
+    width: 112px;
+    height: 120px;
+
+    top: 20px;
+    left: 49px;
+
+    border-radius: 48% 48% 45% 45%;
+
+    background: #ffd8bd;
+
+    border: 3px solid #123b68;
+
+    box-sizing: border-box;
+}
+
+
+/* cabello */
+
+.personaje-cabello {
+    position: absolute;
+
+    width: 116px;
+    height: 58px;
+
+    top: -7px;
+    left: -5px;
+
+    border-radius: 55px 55px 25px 25px;
+
+    background: #123b68;
+
+    border: 3px solid #123b68;
+}
+
+
+/* orejas */
+
+.personaje-oreja {
+    position: absolute;
+
+    width: 17px;
+    height: 28px;
+
+    top: 55px;
+
+    border-radius: 50%;
+
+    background: #ffd8bd;
+
+    border: 3px solid #123b68;
+}
+
+.personaje-oreja-izq {
+    left: -12px;
+}
+
+.personaje-oreja-der {
+    right: -12px;
+}
+
+
+/* ojos */
+
+.personaje-ojo {
+    position: absolute;
+
+    width: 8px;
+    height: 11px;
+
+    top: 61px;
+
+    border-radius: 50%;
+
+    background: #123b68;
+}
+
+.personaje-ojo-izq {
+    left: 32px;
+}
+
+.personaje-ojo-der {
+    right: 32px;
+}
+
+
+/* sonrisa */
+
+.personaje-sonrisa {
+    position: absolute;
+
+    width: 27px;
+    height: 12px;
+
+    left: 39px;
+    bottom: 25px;
+
+    border-bottom: 3px solid #123b68;
+
+    border-radius: 0 0 25px 25px;
+}
+
+
+/* cuello */
+
+.personaje-cuello {
+    position: absolute;
+
+    width: 34px;
+    height: 32px;
+
+    top: 128px;
+    left: 88px;
+
+    background: #ffd8bd;
+
+    border-left: 3px solid #123b68;
+    border-right: 3px solid #123b68;
+}
+
+
+/* cuerpo */
+
+.personaje-cuerpo {
+    position: absolute;
+
+    width: 145px;
+    height: 135px;
+
+    top: 150px;
+    left: 32px;
+
+    border-radius: 35px 35px 22px 22px;
+
+    background: #2f78ff;
+
+    border: 3px solid #123b68;
+}
+
+
+/* camisa */
+
+.personaje-camisa {
+    position: absolute;
+
+    width: 70px;
+    height: 70px;
+
+    left: 35px;
+    top: 2px;
+
+    background: #ffffff;
+
+    clip-path: polygon(
+        20% 0,
+        80% 0,
+        100% 100%,
+        0 100%
+    );
+
+    opacity: .95;
+}
+
+
+/* brazos */
+
+.personaje-brazo {
+    position: absolute;
+
+    width: 34px;
+    height: 90px;
+
+    top: 35px;
+
+    border-radius: 20px;
+
+    background: #2f78ff;
+
+    border: 3px solid #123b68;
+}
+
+.personaje-brazo-izq {
+    left: -25px;
+
+    transform: rotate(18deg);
+}
+
+.personaje-brazo-der {
+    right: -25px;
+
+    transform: rotate(-18deg);
+}
+
+
+/* =========================================================
+   TARJETA QUE SOSTIENE EL PERSONAJE
+   ========================================================= */
+
+.personaje-tarjeta {
+    position: absolute;
+
+    width: 95px;
+    height: 68px;
+
+    left: 57px;
+    top: 185px;
+
+    z-index: 5;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    border: 2px solid #123b68;
+
+    box-shadow:
+        0 8px 18px rgba(18, 59, 104, .15);
+
+    transform: rotate(-3deg);
+}
+
+
+.tarjeta-linea {
+    position: absolute;
+
+    height: 5px;
+
+    left: 12px;
+
+    border-radius: 5px;
+
+    background: #dce7f4;
+}
+
+.tarjeta-linea-1 {
+    width: 36px;
+    top: 14px;
+}
+
+.tarjeta-linea-2 {
+    width: 58px;
+    top: 29px;
+}
+
+.tarjeta-linea-3 {
+    width: 45px;
+    top: 44px;
+}
+
+
+/* =========================================================
+   SOMBRA
+   ========================================================= */
+
+.registro-ilustracion-sombra {
+    position: absolute;
+
+    width: 190px;
+    height: 24px;
+
+    bottom: 72px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    border-radius: 50%;
+
+    background: rgba(18, 59, 104, .12);
+
+    filter: blur(7px);
+
+    animation: registro-sombra 4s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   BURBUJAS
+   ========================================================= */
+
+.registro-burbujas span {
+    position: absolute;
+
+    display: block;
+
+    border-radius: 50%;
+
+    border: 2px solid rgba(47, 120, 255, .20);
+
+    animation: registro-burbuja 4s ease-in-out infinite;
+}
+
+.registro-burbujas span:nth-child(1) {
+    width: 18px;
+    height: 18px;
+
+    top: 70px;
+    left: 50px;
+}
+
+.registro-burbujas span:nth-child(2) {
+    width: 11px;
+    height: 11px;
+
+    top: 125px;
+    right: 55px;
+
+    animation-delay: .7s;
+}
+
+.registro-burbujas span:nth-child(3) {
+    width: 15px;
+    height: 15px;
+
+    bottom: 130px;
+    right: 42px;
+
+    animation-delay: 1.2s;
+}
+
+
+/* =========================================================
+   TEXTO ILUSTRACIÓN
+   ========================================================= */
+
+.registro-ilustracion-texto {
+    position: absolute;
+
+    bottom: 30px;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+}
+
+
+.registro-ilustracion-texto strong {
+    color: #123b68;
+
+    font-family: "Source Serif 4", Georgia, serif;
+
+    font-size: 22px;
+}
+
+
+.registro-ilustracion-texto span {
+    margin-top: 2px;
+
+    color: #6b8098;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   CONTENEDOR DE REGISTRO
+   ========================================================= */
+
+.registro-contenedor {
+    width: 100%;
+
+    max-width: 560px;
+
+    padding: 28px;
+
+    background: #ffffff;
+
+    border: 1px solid #dce7f4;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 16px 40px rgba(18, 59, 104, .09);
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+   ========================================================= */
+
+.registro-encabezado {
+    margin-bottom: 20px;
+}
+
+
+.registro-etiqueta {
+    margin: 0 0 3px;
+
+    color: #2f78ff;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: .14em;
+
+    text-transform: uppercase;
+}
+
+
+.registro-encabezado h1 {
+    margin: 0;
+
+    color: #123b68;
+
+    font-family: "Source Serif 4", Georgia, serif;
+
+    font-size: 34px;
+
+    line-height: 1.05;
+}
+
+
+.registro-descripcion {
+    max-width: 470px;
+
+    margin: 7px 0 0;
+
+    color: #5f7895;
+
+    font-size: 13px;
+
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   ROLES MÁS PEQUEÑOS
+   ========================================================= */
+
+.registro-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 9px;
+}
+
+
+.registro-opcion {
+    min-height: 70px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 9px;
+
+    padding: 10px 11px;
+
+    background: #f8fbff;
+
+    border: 1px solid #dce7f4;
+
+    border-radius: 10px;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease;
+}
+
+
+.registro-opcion:hover {
+    transform: translateY(-1px);
+
+    border-color: #bdd7f8;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 6px 15px rgba(18, 59, 104, .08);
+}
+
+
+.registro-opcion h3 {
+    margin: 0 0 2px;
+
+    color: #123b68;
+
+    font-size: 13px;
+
+    font-weight: 750;
+
+    line-height: 1.15;
+}
+
+
+.registro-opcion p {
+    margin: 0;
+
+    color: #6b8098;
+
+    font-size: 10px;
+
+    line-height: 1.25;
+}
+
+
+/* =========================================================
+   BOTONES DE ROL
+   ========================================================= */
+
+.registro-opcion .registro-boton {
+    flex: 0 0 auto;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 30px;
+
+    padding: 6px 9px;
+
+    background: #2f78ff;
+
+    color: #ffffff;
+
+    border: 1px solid #2f78ff;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    line-height: 1;
+
+    text-decoration: none;
+
+    box-shadow: 0 3px 8px rgba(47, 120, 255, .14);
+
+    transition:
+        transform .18s ease,
+        background-color .18s ease;
+}
+
+
+.registro-opcion .registro-boton:hover {
+    background: #2368eb;
+
+    border-color: #2368eb;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   VOLVER AL LOGIN
+   ========================================================= */
+
+.registro-retorno {
+    margin-top: 17px;
+
+    text-align: left;
+
+    border-top: 0 !important;
+
+    padding-top: 0 !important;
+}
+
+
+.registro-retorno a {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 2px 0 !important;
+
+    background: transparent !important;
+
+    border: 0 !important;
+
+    box-shadow: none !important;
+
+    color: #2f78ff !important;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition:
+        color .18s ease,
+        transform .18s ease;
+}
+
+
+.registro-retorno a:hover {
+    background: transparent !important;
+
+    border: 0 !important;
+
+    box-shadow: none !important;
+
+    color: #123b68 !important;
+
+    transform: translateX(-2px);
+}
+
+
+/* =========================================================
+   ANIMACIONES
+   ========================================================= */
+
+@keyframes registro-personaje-flotar {
+
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+
+}
+
+
+@keyframes registro-sombra {
+
+    0%, 100% {
+        transform: translateX(-50%) scaleX(1);
+        opacity: .55;
+    }
+
+    50% {
+        transform: translateX(-50%) scaleX(.86);
+        opacity: .35;
+    }
+
+}
+
+
+@keyframes registro-brillo {
+
+    0%, 100% {
+        transform: translateX(-50%) scale(1);
+        opacity: .8;
+    }
+
+    50% {
+        transform: translateX(-50%) scale(1.08);
+        opacity: 1;
+    }
+
+}
+
+
+@keyframes registro-burbuja {
+
+    0%, 100% {
+        transform: translateY(0);
+        opacity: .55;
+    }
+
+    50% {
+        transform: translateY(-8px);
+        opacity: 1;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+    .registro-layout {
+        grid-template-columns: 1fr;
+
+        gap: 20px;
+    }
+
+    .registro-ilustracion {
+        min-height: 300px;
+
+        max-width: 600px;
+
+        margin: 0 auto;
+    }
+
+    .registro-personaje {
+        transform: scale(.78);
+    }
+
+    .registro-contenedor {
+        max-width: 600px;
+
+        margin: 0 auto;
+    }
+
+}
+
+
+@media (max-width: 540px) {
+
+    .registro-pagina {
+        padding: 16px 10px 28px;
+    }
+
+    .registro-ilustracion {
+        min-height: 260px;
+    }
+
+    .registro-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .registro-opcion {
+        min-height: 68px;
+    }
+
+    .registro-contenedor {
+        padding: 21px 17px;
+    }
+
+    .registro-encabezado h1 {
+        font-size: 30px;
+    }
+
+}
+
+</style>
+
+{% endblock %}

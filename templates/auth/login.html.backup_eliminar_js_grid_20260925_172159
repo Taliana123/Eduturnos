@@ -1,0 +1,2116 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Iniciar sesión · EDUTURNOS</title>
+
+
+    <style>
+
+        /* =====================================================
+           BASE
+           ===================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+        }
+
+        body {
+            font-family:
+                "Public Sans",
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            color: #202938;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #eef3f8 0%,
+                    #f5f7fa 100%
+                );
+        }
+
+
+        /* =====================================================
+           CABECERA
+           ===================================================== */
+
+        .eduturnos-header {
+
+            width: 100%;
+
+            min-height: 76px;
+
+            padding:
+                0 46px;
+
+            display: flex;
+
+            align-items: center;
+
+            background:
+                #172942;
+
+            border: 0;
+
+            box-shadow:
+                0 4px 18px
+                rgba(15, 32, 55, .16);
+        }
+
+        .eduturnos-logo {
+
+            margin: 0;
+
+            color: #ffffff;
+
+            font-size: 28px;
+
+            line-height: 1;
+
+            font-weight: 900;
+
+            letter-spacing: .04em;
+        }
+
+        .eduturnos-logo span {
+
+            color: #f2c14e;
+        }
+
+
+        /* =====================================================
+           ZONA PRINCIPAL
+           ===================================================== */
+
+        .login-page {
+
+            width: 100%;
+
+            min-height:
+                calc(100vh - 76px);
+
+            display: flex;
+
+            align-items: flex-start;
+
+            justify-content: center;
+
+            padding:
+                30px 30px 42px;
+
+        }
+
+
+        .login-shell {
+
+            width: min(1080px, 100%);
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                minmax(500px, 560px);
+
+            align-items: center;
+
+            gap: 32px;
+
+            margin: 0 auto;
+        }
+
+
+        /* =====================================================
+           ILUSTRACIÓN
+           ===================================================== */
+
+        .login-visual {
+
+            min-width: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 14px;
+        }
+
+
+        .login-illustration {
+
+            width: min(430px, 100%);
+
+            aspect-ratio: 1 / 1;
+
+            position: relative;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+            border-radius: 30px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #1b3557 0%,
+                    #213f66 58%,
+                    #28527e 100%
+                );
+
+            box-shadow:
+                0 22px 50px
+                rgba(24, 45, 72, .18);
+        }
+
+
+        .login-illustration::before,
+        .login-illustration::after {
+
+            content: none !important;
+        }
+
+
+        .illustration-svg {
+
+            width: 88%;
+
+            height: 88%;
+
+            display: block;
+
+            overflow: visible;
+        }
+
+
+        /* Animaciones suaves */
+
+        .ill-float {
+
+            animation:
+                eduturnosFloat
+                5s
+                ease-in-out
+                infinite;
+        }
+
+
+        .ill-pulse {
+
+            transform-box: fill-box;
+
+            transform-origin: center;
+
+            animation:
+                eduturnosPulse
+                3.8s
+                ease-in-out
+                infinite;
+        }
+
+
+        @keyframes eduturnosFloat {
+
+            0%,
+            100% {
+                transform:
+                    translateY(0);
+            }
+
+            50% {
+                transform:
+                    translateY(-7px);
+            }
+        }
+
+
+        @keyframes eduturnosPulse {
+
+            0%,
+            100% {
+                transform:
+                    scale(1);
+            }
+
+            50% {
+                transform:
+                    scale(1.025);
+            }
+        }
+
+
+        /* =====================================================
+           TARJETA LOGIN
+           ===================================================== */
+
+        .login-card {
+
+            width: 100%;
+
+            padding:
+                28px 34px 26px;
+
+            background: #ffffff;
+
+            border:
+                1px solid #d9e1ea;
+
+            border-radius: 24px;
+
+            box-shadow:
+                0 18px 48px
+                rgba(22, 41, 64, .11);
+        }
+
+
+        /* =====================================================
+           ENCABEZADO
+           ===================================================== */
+
+        .section-heading {
+
+            margin: 0 0 21px;
+
+            padding: 0;
+
+            border: 0 !important;
+
+            box-shadow: none !important;
+
+            text-align: left;
+        }
+
+
+        .section-heading::before,
+        .section-heading::after {
+
+            content: none !important;
+
+            display: none !important;
+        }
+
+
+        .badge {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-height: 29px;
+
+            padding:
+                5px 11px;
+
+            margin: 0 0 9px;
+
+            border-radius: 999px;
+
+            background:
+                #e8f1fc;
+
+            color:
+                #245c96;
+
+            font-size: 11px;
+
+            line-height: 1;
+
+            font-weight: 800;
+
+            letter-spacing: .03em;
+
+            text-transform: uppercase;
+        }
+
+
+        .section-heading h1 {
+
+            margin: 0;
+
+            padding: 0;
+
+            border: 0 !important;
+
+            color:
+                #172942;
+
+            font-size: 30px;
+
+            line-height: 1.15;
+
+            font-weight: 850;
+        }
+
+
+        .section-heading p {
+
+            margin: 9px 0 0;
+
+            padding: 0;
+
+            border: 0 !important;
+
+            border-bottom: 0 !important;
+
+            box-shadow: none !important;
+
+            background: transparent !important;
+
+            background-image: none !important;
+
+            color:
+                #657386;
+
+            font-size: 13px;
+
+            line-height: 1.52;
+
+            text-decoration: none !important;
+        }
+
+
+        .section-heading p::before,
+        .section-heading p::after {
+
+            content: none !important;
+
+            display: none !important;
+        }
+
+
+        /* =====================================================
+           FORMULARIO
+           ===================================================== */
+
+        .stack-form {
+
+            margin: 0;
+
+            padding: 0;
+        }
+
+
+        .stack-form > label {
+
+            display: block;
+
+            margin: 0 0 14px;
+
+            padding: 0;
+
+            color:
+                #273244;
+
+            font-size: 13px;
+
+            line-height: 1.35;
+
+            font-weight: 750;
+        }
+
+
+        .stack-form > label input {
+
+            display: block;
+
+            width: 100%;
+
+            height: 43px;
+
+            margin-top: 7px;
+
+            padding:
+                0 12px;
+
+            border:
+                1px solid #c8d2de;
+
+            border-radius: 10px;
+
+            outline: none;
+
+            background:
+                #ffffff;
+
+            color:
+                #252d3a;
+
+            font-size: 14px;
+
+            font-weight: 500;
+
+            box-shadow: none;
+
+            transition:
+                border-color .16s ease,
+                box-shadow .16s ease;
+        }
+
+
+        .stack-form > label input::placeholder {
+
+            color:
+                #9aa6b4;
+        }
+
+
+        .stack-form > label input:focus {
+
+            border-color:
+                #4384c2;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(67, 132, 194, .12);
+        }
+
+
+        /* =====================================================
+           PERSONAL INSTITUCIONAL
+           ===================================================== */
+
+        .personal-login {
+
+            margin-top: 4px;
+
+            padding:
+                17px 16px 16px;
+
+            border:
+                1px solid #dbe5ef;
+
+            border-radius: 15px;
+
+            background:
+                #f7faff;
+        }
+
+
+        .personal-login h3 {
+
+            margin: 0 0 5px;
+
+            padding: 0;
+
+            color:
+                #233d5f;
+
+            font-size: 15px;
+
+            line-height: 1.25;
+
+            font-weight: 850;
+        }
+
+
+        .personal-login p {
+
+            margin: 0 0 13px;
+
+            padding: 0;
+
+            color:
+                #6b7888;
+
+            font-size: 12px;
+
+            line-height: 1.48;
+        }
+
+
+        
+
+
+        .personal-field {
+
+            display: block;
+
+            margin: 0;
+
+            padding: 0;
+
+            text-align: center;
+        }
+.personal-field input,
+        .personal-field select {
+
+            display: block;
+
+            width: 100%;
+
+            height: 40px;
+
+            margin: 0;
+
+            padding:
+                0 8px;
+
+            box-sizing: border-box;
+
+            border:
+                1px solid #c8d3df;
+
+            border-radius: 9px;
+
+            background:
+                #ffffff;
+
+            color:
+                #1e2938;
+
+            font-family: inherit;
+
+            font-size: 12px;
+
+            font-weight: 500;
+
+            outline: none;
+        }
+
+
+        /* IMPORTANTE:
+           NO appearance:none.
+           El desplegable nativo continúa funcionando. */
+
+        .personal-field select {
+
+            cursor: pointer;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        .personal-field input:focus,
+        .personal-field select:focus {
+
+            border-color:
+                #4384c2;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(67, 132, 194, .10);
+        }
+/* =====================================================
+           BOTÓN
+           ===================================================== */
+
+        .boton-full {
+
+            display: flex;
+
+            width: 100%;
+
+            height: 46px;
+
+            margin-top: 17px;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border: 0;
+
+            border-radius: 11px;
+
+            background:
+                #2769ad;
+
+            color:
+                #ffffff;
+
+            font-family: inherit;
+
+            font-size: 14px;
+
+            font-weight: 850;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 9px 20px
+                rgba(39, 105, 173, .19);
+
+            transition:
+                transform .16s ease,
+                box-shadow .16s ease,
+                background .16s ease;
+        }
+
+
+        .boton-full:hover {
+
+            background:
+                #225e9d;
+
+            transform:
+                translateY(-1px);
+
+            box-shadow:
+                0 12px 24px
+                rgba(39, 105, 173, .23);
+        }
+
+
+        .boton-full:active {
+
+            transform:
+                translateY(0);
+        }
+
+
+        /* =====================================================
+           ENLACES
+           ===================================================== */
+
+        .form-links {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 14px;
+
+            margin-top: 17px;
+
+            padding-top: 15px;
+
+            border-top:
+                1px solid #e4e9ef;
+        }
+
+
+        .form-links a {
+
+            color:
+                #386fa8;
+
+            font-size: 12px;
+
+            font-weight: 750;
+
+            text-decoration: none;
+        }
+
+
+        .form-links a:hover {
+
+            color:
+                #234f7d;
+
+            text-decoration:
+                underline;
+        }
+
+
+        /* =====================================================
+           MENSAJES
+           ===================================================== */
+
+        .login-message {
+
+            margin: 0 0 15px;
+
+            padding:
+                9px 11px;
+
+            border-radius: 9px;
+
+            font-size: 12px;
+
+            line-height: 1.4;
+        }
+
+
+        .login-message.error {
+
+            background:
+                #fff2f1;
+
+            border:
+                1px solid #f2cbc7;
+
+            color:
+                #9c3831;
+        }
+
+
+        .login-message.success {
+
+            background:
+                #eef9f1;
+
+            border:
+                1px solid #cbe8d1;
+
+            color:
+                #27683b;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 980px) {
+
+            .login-shell {
+
+                grid-template-columns:
+                    1fr;
+
+                max-width:
+                    650px;
+
+                gap:
+                    18px;
+            }
+
+
+            .login-visual {
+
+                padding: 0;
+            }
+
+
+            .login-illustration {
+
+                width:
+                    250px;
+            }
+        }
+
+
+        @media (max-width: 640px) {
+
+            .eduturnos-header {
+
+                min-height:
+                    64px;
+
+                padding:
+                    0 20px;
+            }
+
+
+            .eduturnos-logo {
+
+                font-size:
+                    23px;
+            }
+
+
+            .login-page {
+
+                min-height:
+                    calc(100vh - 64px);
+
+                padding:
+                    18px 14px 28px;
+            }
+
+
+            .login-card {
+
+                padding:
+                    24px 18px 20px;
+
+                border-radius:
+                    20px;
+            }
+
+
+            .login-illustration {
+
+                width:
+                    200px;
+
+                border-radius:
+                    24px;
+            }
+
+
+            .section-heading h1 {
+
+                font-size:
+                    26px;
+            }
+.personal-field input,
+            .personal-field select {
+
+                width:
+                    100%;
+            }
+
+
+            .form-links {
+
+                flex-direction:
+                    column;
+
+                align-items:
+                    stretch;
+
+                text-align:
+                    center;
+            }
+        }
+
+    </style>
+
+<style id="EDUTURNOS_LOGIN_UNICO">
+
+/* ==========================================================
+   EDUTURNOS — LOGIN FINAL
+   ESTE BLOQUE CONTROLA SOLAMENTE LA PRESENTACION DEL LOGIN
+   ========================================================== */
+
+/* ---------- FONDO GENERAL ---------- */
+
+html body .login-page {
+    background: #eef3f7 !important;
+}
+
+/* ---------- TARJETA ---------- */
+
+html body .login-page .login-card {
+    box-sizing: border-box !important;
+}
+
+/* ---------- PERSONAL INSTITUCIONAL ---------- */
+
+html body .login-page .personal-login {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+html body .login-page .personal-login .personal-field-code input {
+    display: block !important;
+    width: 112px !important;
+    min-width: 112px !important;
+    max-width: 112px !important;
+    box-sizing: border-box !important;
+    color: #344255 !important;
+}
+html body .login-page .personal-login .personal-field-sede select {
+    display: block !important;
+    width: 100% !important;
+    min-width: 300px !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    color: #344255 !important;
+    white-space: nowrap !important;
+}
+html body .login-page .personal-login .personal-field-jornada select {
+    display: block !important;
+    width: 92px !important;
+    min-width: 92px !important;
+    max-width: 92px !important;
+    box-sizing: border-box !important;
+    color: #344255 !important;
+    white-space: nowrap !important;
+}
+
+/* ---------- INPUTS DEL LOGIN ---------- */
+
+html body .login-page input,
+html body .login-page select {
+    color: #344255 !important;
+}
+
+html body .login-page input::placeholder {
+    color: #667382 !important;
+}
+
+/* ---------- ELIMINAR LINEA DORADA BAJO EL TEXTO ---------- */
+
+html body .login-page .section-heading p {
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+/* ---------- ENCABEZADO DE SECCION ---------- */
+
+html body .login-page .section-heading {
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+html body .login-page .section-heading h1 {
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+/* ---------- ENLACES ---------- */
+
+html body .login-page .form-links {
+    border-top: 0 !important;
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+/* ---------- ILUSTRACION ---------- */
+
+/*
+   Se elimina solamente el rectangulo de fondo.
+   No se modifica el SVG ni sus animaciones.
+*/
+
+html body .login-page .login-illustration {
+    background: transparent !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Evitar lineas decorativas externas del contenedor */
+
+html body .login-page .login-illustration::before {
+    border: 0 !important;
+    outline: 0 !important;
+}
+
+html body .login-page .login-illustration::after {
+    border: 0 !important;
+    outline: 0 !important;
+}
+
+/* ---------- BOTON ---------- */
+
+html body .login-page .boton-full {
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+/* ---------- MOVIL ---------- */
+
+@media (max-width: 700px) {
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+    <header class="eduturnos-header">
+
+        <div class="eduturnos-logo">
+            EDUTURNOS<span>.</span>
+        </div>
+
+    </header>
+
+
+    <main class="login-page">
+
+        <div class="login-shell">
+
+
+            <!-- =================================================
+                 DIBUJO ANIMADO
+                 ================================================= -->
+
+            <section class="login-visual">
+
+                <div class="login-illustration">
+
+                    <svg
+                class="login-illustration"
+                viewBox="0 0 460 350"
+                role="img"
+                aria-label="Ilustración animada de EDUTURNOS"
+                xmlns="http://www.w3.org/2000/svg">
+
+                <defs>
+
+                    <linearGradient id="edCompactBg" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#e8f4ff"/>
+                        <stop offset="100%" stop-color="#f7fbff"/>
+                    </linearGradient>
+
+                    <linearGradient id="edCompactBlue" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#3b91e4"/>
+                        <stop offset="100%" stop-color="#18599b"/>
+                    </linearGradient>
+
+                    <linearGradient id="edCompactAmber" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#6fa9d8"/>
+                        <stop offset="100%" stop-color="#367fbd"/>
+                    </linearGradient>
+
+                    <filter id="edCompactShadow" x="-30%" y="-30%" width="160%" height="170%">
+                        <feDropShadow
+                            dx="0"
+                            dy="10"
+                            stdDeviation="12"
+                            flood-color="#557899"
+                            flood-opacity=".16"/>
+                    </filter>
+
+                    <filter id="edCompactSoft" x="-30%" y="-30%" width="160%" height="170%">
+                        <feDropShadow
+                            dx="0"
+                            dy="5"
+                            stdDeviation="7"
+                            flood-color="#557899"
+                            flood-opacity=".11"/>
+                    </filter>
+
+                </defs>
+
+                <!-- Fondo compacto -->
+                <rect
+                    x="18"
+                    y="18"
+                    width="424"
+                    height="314"
+                    rx="38"
+                    fill="url(#edCompactBg)"/>
+
+                <circle
+                    cx="72"
+                    cy="72"
+                    r="35"
+                    fill="#ffffff"
+                    opacity=".7"/>
+
+                <circle
+                    cx="397"
+                    cy="88"
+                    r="45"
+                    fill="#ffffff"
+                    opacity=".55"/>
+
+                <circle
+                    cx="393"
+                    cy="278"
+                    r="30"
+                    fill="#d2e8fa"
+                    opacity=".72"/>
+
+                <!-- Pequeño detalle decorativo -->
+                <circle
+                    cx="57"
+                    cy="255"
+                    r="5"
+                    fill="#79afd8"/>
+
+                <circle
+                    cx="411"
+                    cy="224"
+                    r="4"
+                    fill="#438ac7"/>
+
+                <!-- PANEL PRINCIPAL EDUTURNOS -->
+                <g filter="url(#edCompactShadow)">
+
+                    <!-- tarjeta -->
+                    <rect
+                        x="108"
+                        y="78"
+                        width="244"
+                        height="178"
+                        rx="22"
+                        fill="transparent"/>
+
+                    <!-- encabezado -->
+                    <rect
+                        x="108"
+                        y="78"
+                        width="244"
+                        height="47"
+                        rx="22"
+                        fill="url(#edCompactBlue)"/>
+
+                    <rect
+                        x="108"
+                        y="103"
+                        width="244"
+                        height="22"
+                        fill="url(#edCompactBlue)"/>
+
+                    <!-- logo -->
+                    <circle
+                        cx="132"
+                        cy="101"
+                        r="11"
+                        fill="#6fa9d8"/>
+
+                    <path
+                        d="M127 101 L131 105 L138 97"
+                        fill="none"
+                        stroke="#ffffff"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                    <text
+                        x="151"
+                        y="106"
+                        font-family="Arial, sans-serif"
+                        font-size="16"
+                        font-weight="700"
+                        fill="#ffffff">
+                        EDUTURNOS
+                    </text>
+
+                    <!-- titulo -->
+                    <text
+                        x="131"
+                        y="151"
+                        font-family="Arial, sans-serif"
+                        font-size="11"
+                        font-weight="700"
+                        fill="#234563">
+                        Información escolar
+                    </text>
+
+                    <text
+                        x="131"
+                        y="166"
+                        font-family="Arial, sans-serif"
+                        font-size="8"
+                        fill="#7c8fa1">
+                        Todo organizado en un solo lugar
+                    </text>
+
+                    <!-- fila 1 -->
+                    <rect
+                        x="131"
+                        y="181"
+                        width="94"
+                        height="35"
+                        rx="10"
+                        fill="#f2f8fd"/>
+
+                    <circle
+                        cx="147"
+                        cy="198"
+                        r="9"
+                        fill="#d8ebfb"/>
+
+                    <path
+                        d="M143 198 L147 202 L153 194"
+                        fill="none"
+                        stroke="#2d79c1"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                    <rect
+                        x="162"
+                        y="192"
+                        width="48"
+                        height="5"
+                        rx="2.5"
+                        fill="#b9d1e4"/>
+
+                    <rect
+                        x="162"
+                        y="201"
+                        width="36"
+                        height="4"
+                        rx="2"
+                        fill="#d4e3ef"/>
+
+                    <!-- fila 2 -->
+                    <rect
+                        x="237"
+                        y="181"
+                        width="94"
+                        height="35"
+                        rx="10"
+                        fill="#fff8e8"/>
+
+                    <circle
+                        cx="253"
+                        cy="198"
+                        r="9"
+                        fill="#d9ebfa"/>
+
+                    <path
+                        d="M249 198 L253 202 L259 194"
+                        fill="none"
+                        stroke="#2878c2"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                    <rect
+                        x="268"
+                        y="192"
+                        width="47"
+                        height="5"
+                        rx="2.5"
+                        fill="#e2c883"/>
+
+                    <rect
+                        x="268"
+                        y="201"
+                        width="32"
+                        height="4"
+                        rx="2"
+                        fill="#eee0bc"/>
+
+                    <!-- botón visual -->
+                    <rect
+                        x="131"
+                        y="228"
+                        width="200"
+                        height="15"
+                        rx="7.5"
+                        fill="#edf5fc"/>
+
+                    <rect
+                        x="131"
+                        y="228"
+                        width="126"
+                        height="15"
+                        rx="7.5"
+                        fill="#2f6fae"/>
+
+                    <!-- brillo que pasa por la tarjeta -->
+                    <rect
+                        class="compact-sweep"
+                        x="165"
+                        y="78"
+                        width="10"
+                        height="178"
+                        rx="5"
+                        fill="transparent"
+                        opacity=".28"/>
+
+                </g>
+
+                <!-- LIBRO -->
+                <g
+                    class="compact-book"
+                    filter="url(#edCompactSoft)">
+
+                    <path
+                        d="M55 128 Q73 115 91 126 L91 168 Q73 157 55 168 Z"
+                        fill="#ffffff"/>
+
+                    <path
+                        d="M91 126 Q109 115 127 128 L127 168 Q109 157 91 168 Z"
+                        fill="#ffffff"/>
+
+                    <path
+                        d="M63 137 Q75 130 85 136"
+                        fill="none"
+                        stroke="#438ac7"
+                        stroke-width="3"
+                        stroke-linecap="round"/>
+
+                    <path
+                        d="M97 136 Q108 130 119 137"
+                        fill="none"
+                        stroke="#5d9bcf"
+                        stroke-width="3"
+                        stroke-linecap="round"/>
+
+                    <line
+                        x1="91"
+                        y1="126"
+                        x2="91"
+                        y2="168"
+                        stroke="#d7e2ec"
+                        stroke-width="2"/>
+
+                </g>
+
+                <!-- CAMPANA -->
+                <g
+                    class="compact-bell"
+                    filter="url(#edCompactSoft)">
+
+                    <circle
+                        cx="382"
+                        cy="142"
+                        r="32"
+                        fill="#ffffff"/>
+
+                    <path
+                        d="
+                        M370 150
+                        V137
+                        C370 129 375 123 382 123
+                        C389 123 394 129 394 137
+                        V150
+                        L399 154
+                        H365
+                        Z"
+                        fill="#2f6fae"/>
+
+                    <circle
+                        cx="382"
+                        cy="158"
+                        r="5"
+                        fill="#3d86c1"/>
+
+                </g>
+
+                <!-- CHECK ANIMADO -->
+                <g
+                    class="compact-check"
+                    filter="url(#edCompactSoft)">
+
+                    <circle
+                        cx="80"
+                        cy="226"
+                        r="23"
+                        fill="#ffffff"/>
+
+                    <circle
+                        cx="80"
+                        cy="226"
+                        r="15"
+                        fill="#e1f2ff"/>
+
+                    <path
+                        d="M72 226 L78 232 L90 218"
+                        fill="none"
+                        stroke="#2878c2"
+                        stroke-width="5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                </g>
+
+                <!-- PEQUEÑA ESTRELLA DECORATIVA -->
+                <path
+                    d="
+                    M362 235
+                    L367 245
+                    L378 247
+                    L370 255
+                    L372 266
+                    L362 261
+                    L352 266
+                    L354 255
+                    L346 247
+                    L357 245
+                    Z"
+                    fill="#6fa9d8"
+                    opacity=".86"/>
+
+            </svg>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 LOGIN
+                 ================================================= -->
+
+            <section class="login-card">
+
+
+                <div class="section-heading">
+
+                    <span class="badge">
+                        Acceso seguro
+                    </span>
+
+                    <h1>
+                        Iniciar sesión
+                    </h1>
+
+                    <p>
+                        El sistema determina tu rol desde la información institucional.
+                        No debes escogerlo.
+                    </p>
+
+                </div>
+
+
+                <!-- Mensajes Flask -->
+
+                {% with mensajes = get_flashed_messages(with_categories=true) %}
+
+                    {% if mensajes %}
+
+                        {% for categoria, mensaje in mensajes %}
+
+                            <div
+                                class="login-message {% if categoria in ['error','danger'] %}error{% else %}success{% endif %}"
+                            >
+                                {{ mensaje }}
+                            </div>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                {% endwith %}
+
+
+                <form
+                    method="post"
+                    autocomplete="off"
+                    class="stack-form"
+                >
+
+                    {{ csrf_field()|safe }}
+
+
+                    <!-- Documento -->
+
+                    <label>
+
+                        Documento o correo
+
+                        <input
+                            type="text"
+                            name="identificador"
+                            autocomplete="username"
+                            placeholder="Documento o correo"
+                        >
+
+                    </label>
+
+
+                    <!-- Contraseña -->
+
+                    <label>
+
+                        Contraseña
+
+                        <input
+                            type="password"
+                            name="password"
+                            autocomplete="current-password"
+                            placeholder="Contraseña"
+                        >
+
+                    </label>
+
+
+                    <!-- Personal institucional -->
+
+                    <div class="personal-login">
+
+                        <h3>
+                            Personal institucional
+                        </h3>
+
+                        <p>
+                            Docentes, Coordinadores y Rectoría deben usar su correo
+                            <strong>@jjfh.edu.co</strong>, código de 6 dígitos,
+                            sede y jornada.
+                        </p>
+
+
+                        <div class="personal-fields-grid">
+
+
+                            <!-- Código -->
+
+                            <label class="personal-field personal-field-code">
+
+                                <span class="personal-field-title">
+                                    Código institucional
+                                </span>
+
+                                <input
+                                    type="text"
+                                    name="codigo_institucional"
+                                    inputmode="numeric"
+                                    maxlength="6"
+                                    pattern="[0-9]{6}"
+                                    autocomplete="off"
+                                   
+                                >
+
+                            </label>
+
+
+                            <!-- Sede -->
+
+                            <label class="personal-field personal-field-sede">
+
+                                <span class="personal-field-title">
+                                    Sede institucional
+                                </span>
+
+                                <select
+                                    name="sede_id"
+                                >
+
+                                    {% for sede in sedes %}
+
+                                        {% if sede is mapping %}
+
+                                            <option
+                                                value="{{ sede.get('id_sede', sede.get('id')) }}"
+                                            >
+                                                {{ sede.get('nombre_sede', sede.get('nombre')) }}
+                                            </option>
+
+                                        {% else %}
+
+                                            <option
+                                                value="{{ sede[0] }}"
+                                            >
+                                                {{ sede[1] }}
+                                            </option>
+
+                                        {% endif %}
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </label>
+
+
+                            <!-- Jornada -->
+
+                            <label class="personal-field personal-field-jornada">
+
+                                <span class="personal-field-title">
+                                    Jornada
+                                </span>
+
+                                <select
+                                    name="jornada_id"
+                                >
+
+                                    {% for jornada in jornadas %}
+
+                                        {% if jornada is mapping %}
+
+                                            <option
+                                                value="{{ jornada.get('id_jornada', jornada.get('id')) }}"
+                                            >
+                                                {{ jornada.get('nombre_jornada', jornada.get('nombre')) }}
+                                            </option>
+
+                                        {% else %}
+
+                                            <option
+                                                value="{{ jornada[0] }}"
+                                            >
+                                                {{ jornada[1] }}
+                                            </option>
+
+                                        {% endif %}
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </label>
+
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        class="boton-full"
+                        type="submit"
+                    >
+                        Ingresar
+                    </button>
+
+
+                </form>
+
+
+                <div class="form-links">
+
+                    <a
+                        href="{{ url_for('passwords.recuperar') }}"
+                    >
+                        ¿Olvidaste tu contraseña?
+                    </a>
+
+                    <a
+                        href="{{ url_for('auth.registro') }}"
+                    >
+                        Crear una cuenta
+                    </a>
+
+                </div>
+
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script id="EDUTURNOS_LOGIN_FINAL_REAL_JS">
+
+(function () {
+
+    function eduturnosLoginFinal() {
+
+        var grid = document.querySelector(
+            '.login-page .personal-login .personal-fields-grid'
+        );
+
+        if (!grid) {
+            return;
+        }
+
+        grid.style.setProperty(
+            'display',
+            'grid',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'grid-template-columns',
+            '90px minmax(215px, 1fr) 85px',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'gap',
+            '10px',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'width',
+            '100%',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'max-width',
+            '415px',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'margin-left',
+            'auto',
+            'important'
+        );
+
+        grid.style.setProperty(
+            'margin-right',
+            'auto',
+            'important'
+        );
+
+        var codigo = document.querySelector(
+            '.login-page input[name="codigo_institucional"]'
+        );
+
+        var sede = document.querySelector(
+            '.login-page select[name="sede_id"]'
+        );
+
+        var jornada = document.querySelector(
+            '.login-page select[name="jornada_id"]'
+        );
+
+        if (codigo) {
+            codigo.style.setProperty(
+                'width',
+                '90px',
+                'important'
+            );
+
+            codigo.style.setProperty(
+                'min-width',
+                '90px',
+                'important'
+            );
+
+            codigo.style.setProperty(
+                'max-width',
+                '90px',
+                'important'
+            );
+        }
+
+        if (sede) {
+            sede.style.setProperty(
+                'width',
+                '100%',
+                'important'
+            );
+
+            sede.style.setProperty(
+                'min-width',
+                '0',
+                'important'
+            );
+
+            sede.style.setProperty(
+                'max-width',
+                'none',
+                'important'
+            );
+        }
+
+        if (jornada) {
+            jornada.style.setProperty(
+                'width',
+                '85px',
+                'important'
+            );
+
+            jornada.style.setProperty(
+                'min-width',
+                '85px',
+                'important'
+            );
+
+            jornada.style.setProperty(
+                'max-width',
+                '85px',
+                'important'
+            );
+        }
+    }
+
+    if (document.readyState === 'loading') {
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            eduturnosLoginFinal
+        );
+
+    } else {
+
+        eduturnosLoginFinal();
+
+    }
+
+    setTimeout(eduturnosLoginFinal, 100);
+    setTimeout(eduturnosLoginFinal, 500);
+
+})();
+
+</script>
+
+
+
+.login-illustration,
+.login-illustration::before,
+.login-illustration::after,
+.login-illustration svg,
+.login-illustration svg::before,
+.login-illustration svg::after {
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Evita líneas producidas por fondos o pseudo-elementos */
+.login-illustration {
+    background: transparent !important;
+}
+
+/* El SVG conserva su dibujo y animaciones */
+.login-illustration svg {
+    background: transparent !important;
+    overflow: visible !important;
+}
+
+/* Quita únicamente rectángulos que actúen como fondo */
+.login-illustration svg rect:first-child {
+    fill: transparent !important;
+    stroke: none !important;
+}
+
+/* Elimina líneas exteriores causadas por el wrapper */
+.login-illustration > div {
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+
+
+
+
+
+
+
+/* El label no debe ocupar la columna de Sede */
+
+<style id="eduturnos-login-campos-definitivo">
+
+/*
+ EDUTURNOS
+ ÚNICA REGLA VISUAL DEFINITIVA
+ PARA LOS CAMPOS INSTITUCIONALES.
+
+ NO MODIFICA LOS SELECT NI SUS OPCIONES.
+*/
+
+/* CONTENEDOR */
+
+html body .personal-fields-grid {
+    display: grid !important;
+
+    grid-template-columns:
+        120px
+        minmax(300px, 1fr)
+        100px !important;
+
+    gap: 0 16px !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    align-items: end !important;
+}
+
+
+/* CAMPOS */
+
+html body .personal-fields-grid > .personal-field {
+    display: block !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* CÓDIGO */
+
+html body .personal-fields-grid > .personal-field-code {
+    grid-column: 1 !important;
+
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+}
+
+
+/* SEDE */
+
+html body .personal-fields-grid > .personal-field-sede {
+    grid-column: 2 !important;
+
+    width: auto !important;
+    min-width: 300px !important;
+    max-width: none !important;
+}
+
+
+/* JORNADA */
+
+html body .personal-fields-grid > .personal-field-jornada {
+    grid-column: 3 !important;
+
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
+
+
+/* TITULOS */
+
+html body .personal-fields-grid .personal-field-title {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    margin: 0 0 6px 0 !important;
+    padding: 0 !important;
+
+    white-space: nowrap !important;
+    text-align: left !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* INPUT CÓDIGO */
+
+html body .personal-fields-grid
+.personal-field-code input {
+    display: block !important;
+
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* SELECT SEDE */
+
+html body .personal-fields-grid
+.personal-field-sede select {
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 300px !important;
+    max-width: 100% !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* SELECT JORNADA */
+
+html body .personal-fields-grid
+.personal-field-jornada select {
+    display: block !important;
+
+    width: 100px !important;
+    min-width: 100px !important;
+    max-width: 100px !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* BOTÓN */
+
+html body .login-page .boton-full {
+    display: block !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+
+/* MÓVIL */
+
+@media (max-width: 700px) {
+
+    html body .personal-fields-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px 0 !important;
+    }
+
+    html body .personal-fields-grid > .personal-field-code,
+    html body .personal-fields-grid > .personal-field-sede,
+    html body .personal-fields-grid > .personal-field-jornada {
+        grid-column: 1 !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+    }
+
+    html body .personal-fields-grid
+    .personal-field-code input,
+    html body .personal-fields-grid
+    .personal-field-sede select,
+    html body .personal-fields-grid
+    .personal-field-jornada select {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+}
+
+</style>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

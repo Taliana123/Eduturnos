@@ -1,0 +1,735 @@
+{% extends "base.html" %}
+
+{% block title %}Solicitudes de cita{% endblock %}
+
+{% block content %}
+
+<div class="pagina-contenido">
+
+    <div class="encabezado-seccion">
+
+        <div>
+
+            <a href="{{ url_for('auth.dashboard') }}" class="enlace-atras">
+                ← Atrás
+            </a>
+
+            <h1>Solicitudes de cita</h1>
+
+            <p class="descripcion-seccion">
+                Flujo formal de solicitud, revisión, propuesta y confirmación.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if solicitudes %}
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+
+                <h2>Solicitudes registradas</h2>
+
+                <p>
+                    Consulta el estado y la información de cada solicitud.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Solicitud</th>
+
+                        <th>Estudiante</th>
+
+                        <th>Docente</th>
+
+                        <th>Solicitante</th>
+
+                        <th>Fecha</th>
+
+                        <th>Hora</th>
+
+                        <th>Estado</th>
+
+                        {% if rol in ["Super Admin", "Rector", "Administrador / Coordinador"] %}
+                            <th>Acciones</th>
+                        {% endif %}
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for s in solicitudes %}
+
+                    <tr>
+
+                        <td>
+                            <strong>#{{ s.id }}</strong>
+                        </td>
+
+
+                        <td>
+                            {{ s.estudiante }}
+                        </td>
+
+
+                        <td>
+                            {{ s.docente or "Por asignar" }}
+                        </td>
+
+
+                        <td>
+
+                            {{ s.rol_solicitante }}
+
+                            {% if s.acudiente %}
+                                <br>
+                                <small>{{ s.acudiente }}</small>
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+                            {{ s.fecha_solicitada }}
+                        </td>
+
+
+                        <td>
+                            {{ s.hora_solicitada }}
+                        </td>
+
+
+                        <td>
+
+                            {% if s.estado == "Pendiente" %}
+
+                                <span class="badge badge-warning">
+                                    Pendiente
+                                </span>
+
+
+                            {% elif s.estado == "Propuesta" %}
+
+                                <span class="badge badge-info">
+                                    Propuesta
+                                </span>
+
+                                {% if s.fecha_propuesta %}
+
+                                    <br>
+
+                                    <small>
+                                        {{ s.fecha_propuesta }}
+                                        {{ s.hora_propuesta }}
+                                    </small>
+
+                                {% endif %}
+
+
+                            {% elif s.estado == "Aceptada" %}
+
+                                <span class="badge badge-success">
+                                    Aceptada
+                                </span>
+
+
+                            {% elif s.estado == "Rechazada" %}
+
+                                <span class="badge badge-danger">
+                                    Rechazada
+                                </span>
+
+
+                            {% elif s.estado == "Cancelada" %}
+
+                                <span class="badge">
+                                    Cancelada
+                                </span>
+
+
+                            {% else %}
+
+                                <span class="badge">
+                                    {{ s.estado }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        {% if rol in ["Super Admin", "Rector", "Administrador / Coordinador"] %}
+
+                        <td>
+
+                            {% if s.estado in ["Pendiente", "Propuesta"] %}
+
+                            <div class="acciones-tabla">
+
+                                <form
+                                    method="post"
+                                    action="{{ url_for('solicitudes.resolver', solicitud_id=s.id) }}"
+                                >
+
+                                    {% if csrf_token is defined %}
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+                                    {% endif %}
+
+
+                                    <input
+                                        type="hidden"
+                                        name="accion"
+                                        value="aceptar"
+                                    >
+
+
+                                    <input
+                                        type="hidden"
+                                        name="fecha_propuesta"
+                                        value="{{ s.fecha_propuesta or s.fecha_solicitada }}"
+                                    >
+
+
+                                    <input
+                                        type="hidden"
+                                        name="hora_propuesta"
+                                        value="{{ s.hora_propuesta or s.hora_solicitada }}"
+                                    >
+
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-success btn-sm"
+                                     style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">
+                                        Aceptar
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="post"
+                                    action="{{ url_for('solicitudes.resolver', solicitud_id=s.id) }}"
+                                >
+
+                                    {% if csrf_token is defined %}
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+                                    {% endif %}
+
+
+                                    <input
+                                        type="hidden"
+                                        name="accion"
+                                        value="rechazar"
+                                    >
+
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-danger btn-sm"
+                                     style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">
+                                        Rechazar
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+
+                            {% else %}
+
+                                <span class="texto-secundario">
+                                    Sin acciones
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        {% endif %}
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="card">
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                📋
+            </div>
+
+
+            <h2>
+                No hay solicitudes
+            </h2>
+
+
+            <p>
+                Cuando se registre una solicitud, aparecerá aquí.
+            </p>
+
+
+            {% if rol == "Acudiente" %}
+
+                <a
+                    href="{{ url_for('solicitudes.nueva_acudiente') }}"
+                    class="btn btn-primary"
+                 style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">
+                    + Solicitar cita
+                </a>
+
+
+            {% elif rol == "Docente" %}
+
+                <a
+                    href="{{ url_for('solicitudes.nueva_docente') }}"
+                    class="btn btn-primary"
+                 style="background:#1769aa !important;background-color:#1769aa !important;color:#ffffff !important;border-color:#1769aa !important;text-decoration:none !important;box-shadow:none !important;opacity:1 !important;cursor:pointer !important;">
+                    + Solicitar seguimiento
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    {% endif %}
+
+</div>
+
+
+
+
+
+{% endblock %}
+
+<style id="EDUTURNOS_BOTONES_REALES_V6">
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a.btn,
+a[class*="boton"],
+a[class*="button"],
+a[class*="btn-"],
+a[role="button"],
+a.link-back,
+a.edc-back,
+.edc-header-actions a,
+.edc-header-actions button,
+.edc-buttons a,
+.edc-buttons button,
+.edc-month-toolbar a,
+.edc-month-toolbar button,
+.citas-actions a,
+.citas-actions button,
+.form-actions a,
+.form-actions button,
+.acciones a,
+.acciones button,
+.page-actions a,
+.page-actions button,
+.dashboard-actions a,
+.dashboard-actions button,
+.dashboard-card a.boton,
+.dashboard-card button,
+.quick-card a.boton,
+.quick-card button,
+.account-actions a.boton,
+.account-actions button {
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+    color: #ffffff !important;
+    border-color: #1769aa !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a.btn:hover,
+a[class*="boton"]:hover,
+a[class*="button"]:hover,
+a[class*="btn-"]:hover,
+a[role="button"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.edc-header-actions a:hover,
+.edc-header-actions button:hover,
+.edc-buttons a:hover,
+.edc-buttons button:hover,
+.edc-month-toolbar a:hover,
+.edc-month-toolbar button:hover,
+.citas-actions a:hover,
+.citas-actions button:hover,
+.form-actions a:hover,
+.form-actions button:hover,
+.acciones a:hover,
+.acciones button:hover,
+.page-actions a:hover,
+.page-actions button:hover,
+.dashboard-actions a:hover,
+.dashboard-actions button:hover,
+.dashboard-card a.boton:hover,
+.dashboard-card button:hover,
+.quick-card a.boton:hover,
+.quick-card button:hover,
+.account-actions a.boton:hover,
+.account-actions button:hover {
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+    color: #ffffff !important;
+    border-color: #145b91 !important;
+}
+
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a.btn *,
+a[role="button"] *,
+a.link-back *,
+a.edc-back *,
+.edc-header-actions a *,
+.edc-header-actions button *,
+.edc-buttons a *,
+.edc-buttons button *,
+.edc-month-toolbar a *,
+.edc-month-toolbar button *,
+.citas-actions a *,
+.citas-actions button *,
+.form-actions a *,
+.form-actions button *,
+.acciones a *,
+.acciones button *,
+.page-actions a *,
+.page-actions button *,
+.dashboard-actions a *,
+.dashboard-actions button *,
+.dashboard-card a.boton *,
+.dashboard-card button *,
+.quick-card a.boton *,
+.quick-card button *,
+.account-actions a.boton *,
+.account-actions button * {
+    color: #ffffff !important;
+}
+</style>
+
+<script id="EDUTURNOS_BOTONES_REALES_V6">
+(function() {
+    "use strict";
+
+    const azul = "#1769aa";
+    const hover = "#145b91";
+    const blanco = "#ffffff";
+
+    const selectores = [
+        "button",
+        "input[type='submit']",
+        "input[type='button']",
+        "input[type='reset']",
+
+        "a.boton",
+        "a.btn",
+        "a[class*='boton']",
+        "a[class*='button']",
+        "a[class*='btn-']",
+        "a[class*='accion']",
+        "a[class*='action']",
+        "a[role='button']",
+
+        "a.link-back",
+        "a.edc-back",
+
+        ".edc-header-actions a",
+        ".edc-header-actions button",
+
+        ".edc-buttons a",
+        ".edc-buttons button",
+
+        ".edc-month-toolbar a",
+        ".edc-month-toolbar button",
+
+        ".citas-actions a",
+        ".citas-actions button",
+
+        ".form-actions a",
+        ".form-actions button",
+
+        ".acciones a",
+        ".acciones button",
+
+        ".page-actions a",
+        ".page-actions button",
+
+        ".dashboard-actions a",
+        ".dashboard-actions button",
+
+        ".account-actions a",
+        ".account-actions button",
+
+        ".quick-card a.boton",
+        ".quick-card button",
+
+        ".dashboard-card a.boton",
+        ".dashboard-card button"
+    ].join(",");
+
+
+    function aplicar(elemento) {
+        if (!elemento) return;
+
+        elemento.style.setProperty(
+            "background",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "background-color",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "color",
+            blanco,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "border-color",
+            azul,
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "text-decoration",
+            "none",
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "box-shadow",
+            "none",
+            "important"
+        );
+
+        elemento.style.setProperty(
+            "opacity",
+            "1",
+            "important"
+        );
+
+        elemento.querySelectorAll("*").forEach(function(hijo) {
+            hijo.style.setProperty(
+                "color",
+                blanco,
+                "important"
+            );
+        });
+
+        if (!elemento.dataset.eduturnosBotonV6) {
+            elemento.dataset.eduturnosBotonV6 = "1";
+
+            elemento.addEventListener("mouseenter", function() {
+                elemento.style.setProperty(
+                    "background",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "background-color",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "border-color",
+                    hover,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "color",
+                    blanco,
+                    "important"
+                );
+            });
+
+            elemento.addEventListener("mouseleave", function() {
+                elemento.style.setProperty(
+                    "background",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "background-color",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "border-color",
+                    azul,
+                    "important"
+                );
+
+                elemento.style.setProperty(
+                    "color",
+                    blanco,
+                    "important"
+                );
+            });
+        }
+    }
+
+
+    function buscarBotonesPorTexto() {
+        document.querySelectorAll("a").forEach(function(a) {
+            const texto = (a.textContent || "")
+                .trim()
+                .toLowerCase();
+
+            const href = (a.getAttribute("href") || "")
+                .toLowerCase();
+
+            const palabras = [
+                "atrás",
+                "atras",
+                "nueva citación",
+                "nueva cita",
+                "ver citas",
+                "filtrar",
+                "limpiar",
+                "editar",
+                "eliminar",
+                "confirmar",
+                "cancelar",
+                "reprogramar",
+                "descargar",
+                "exportar",
+                "importar",
+                "guardar",
+                "enviar",
+                "volver",
+                "marcar",
+                "crear",
+                "solicitar"
+            ];
+
+            const coincideTexto = palabras.some(function(p) {
+                return texto === p || texto.includes(p);
+            });
+
+            const coincideRuta =
+                href.includes("/citas/") ||
+                href.includes("/calendario") ||
+                href.includes("/notificaciones/") ||
+                href.includes("/solicitudes/") ||
+                href.includes("/reportes/") ||
+                href.includes("/usuarios/") ||
+                href.includes("/auth/recuperar");
+
+            const contenedor = a.closest(
+                ".edc-header-actions," +
+                ".edc-buttons," +
+                ".edc-month-toolbar," +
+                ".citas-actions," +
+                ".form-actions," +
+                ".acciones," +
+                ".page-actions," +
+                ".dashboard-actions," +
+                ".dashboard-card," +
+                ".quick-card," +
+                ".account-actions"
+            );
+
+            if (coincideTexto || coincideRuta || contenedor) {
+                aplicar(a);
+            }
+        });
+    }
+
+
+    function ejecutar() {
+        document.querySelectorAll(selectores).forEach(aplicar);
+        buscarBotonesPorTexto();
+    }
+
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", ejecutar);
+    } else {
+        ejecutar();
+    }
+
+
+    const observador = new MutationObserver(function() {
+        ejecutar();
+    });
+
+    observador.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
+
+})();
+</script>
+

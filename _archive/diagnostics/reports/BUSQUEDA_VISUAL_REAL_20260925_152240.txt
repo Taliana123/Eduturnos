@@ -1,0 +1,1284 @@
+﻿EDUTURNOS - BUSQUEDA VISUAL REAL
+Fecha: 20260925_152240
+
+
+===== F:\edu_Final\templates\auth\login.html =====
+LINEA 43: linear-gradient(
+LINEA 73: box-shadow:
+LINEA 177: linear-gradient(
+LINEA 184: box-shadow:
+LINEA 211: .ill-float {
+LINEA 213: animation:
+LINEA 214: eduturnosFloat
+LINEA 221: .ill-pulse {
+LINEA 227: animation:
+LINEA 228: eduturnosPulse
+LINEA 235: @keyframes eduturnosFloat {
+LINEA 239: transform:
+LINEA 244: transform:
+LINEA 250: @keyframes eduturnosPulse {
+LINEA 254: transform:
+LINEA 259: transform:
+LINEA 283: box-shadow:
+LINEA 301: box-shadow: none !important;
+LINEA 347: text-transform: uppercase;
+LINEA 380: box-shadow: none !important;
+LINEA 467: box-shadow: none;
+LINEA 487: box-shadow:
+LINEA 708: box-shadow:
+LINEA 768: box-shadow:
+LINEA 779: .boton-full:hover {
+LINEA 784: transform:
+LINEA 787: box-shadow:
+LINEA 795: transform:
+LINEA 836: .form-links a:hover {
+LINEA 1063: class="illustration-svg ill-float"
+LINEA 1084: class="ill-pulse"
+LINEA 1092: class="ill-pulse"
+LINEA 1098: <g class="ill-float">
+LINEA 1973: parseFloat(ps.width || "0");
+LINEA 1976: parseFloat(ps.height || "0");
+
+===== F:\edu_Final\templates\auth\registro.html =====
+LINEA 27: box-shadow:
+LINEA 48: text-transform: uppercase !important;
+LINEA 84: box-shadow: 0 5px 16px rgba(30,64,175,.06) !important;
+LINEA 88: .registro-pagina .registro-opcion:hover {
+LINEA 89: transform: translateY(-3px) !important;
+LINEA 91: box-shadow: 0 14px 28px rgba(30,64,175,.12) !important;
+LINEA 125: background: linear-gradient(135deg,#2563eb,#3b82f6) !important;
+LINEA 129: box-shadow: 0 9px 22px rgba(37,99,235,.18) !important;
+LINEA 133: .registro-pagina .registro-boton:hover {
+LINEA 134: transform: translateY(-2px) !important;
+LINEA 135: box-shadow: 0 13px 27px rgba(37,99,235,.25) !important;
+LINEA 152: .registro-pagina .link-back:hover {
+LINEA 342: box-shadow:
+LINEA 351: .registro-opcion:hover {
+LINEA 352: transform: translateY(-2px);
+LINEA 356: box-shadow:
+LINEA 453: .registro-volver .link-back:hover {
+LINEA 729: box-shadow:
+LINEA 879: box-shadow:
+LINEA 900: text-transform: uppercase !important;
+LINEA 936: box-shadow: 0 5px 16px rgba(30,64,175,.06) !important;
+LINEA 940: .registro-pagina .registro-opcion:hover {
+LINEA 941: transform: translateY(-3px) !important;
+LINEA 943: box-shadow: 0 14px 28px rgba(30,64,175,.12) !important;
+LINEA 977: background: linear-gradient(135deg,#2563eb,#3b82f6) !important;
+LINEA 981: box-shadow: 0 9px 22px rgba(37,99,235,.18) !important;
+LINEA 985: .registro-pagina .registro-boton:hover {
+LINEA 986: transform: translateY(-2px) !important;
+LINEA 987: box-shadow: 0 13px 27px rgba(37,99,235,.25) !important;
+LINEA 1004: .registro-pagina .link-back:hover {
+
+===== F:\edu_Final\templates\calendario\index.html =====
+LINEA 32: text-transform:capitalize !important;
+LINEA 48: transform:translateY(-50%) !important;
+LINEA 57: .edc-month-toolbar .eduturnos-hoy { position:static !important; transform:none !important; margin-left:10px !important; }
+LINEA 167: .edc-header-actions a:hover {
+LINEA 201: .edc-back:hover {
+LINEA 365: box-shadow:
+LINEA 407: box-shadow:
+LINEA 459: .edc-buttons button:hover,
+LINEA 460: .edc-buttons a:hover {
+LINEA 532: .edc-month-toolbar a:hover {
+LINEA 546: text-transform: capitalize;
+LINEA 643: box-shadow:
+LINEA 721: .edc-cita a:hover {
+LINEA 1899: /* Hover */
+LINEA 1900: .edc-header-actions a:hover,
+LINEA 1901: .edc-header-actions .boton:hover,
+LINEA 1902: .edc-header-actions .edc-back:hover {
+LINEA 1992: /* Hover Hoy */
+LINEA 1993: .edc-month-toolbar a.eduturnos-hoy:hover {
+LINEA 2148: /* Hover */
+LINEA 2149: .edc-header-actions a:hover,
+LINEA 2150: .edc-header-actions .boton:hover {
+LINEA 2257: /* Hover Hoy */
+LINEA 2258: .edc-month-toolbar a.eduturnos-hoy:hover {
+LINEA 2368: transform:translate(-50%,-50%) !important;
+LINEA 2427: transform:translateY(-50%) !important;
+
+===== F:\edu_Final\templates\notificaciones\index.html =====
+LINEA 227: float:right !important;
+
+===== F:\edu_Final\templates\publico\base_publica.html =====
+LINEA 24: linear-gradient(135deg, #dbeafe 0%, #eff6ff 48%, #ffffff 100%);
+LINEA 75: .menu a:hover {
+LINEA 105: text-transform: uppercase;
+LINEA 137: box-shadow: 0 18px 50px rgba(30,64,175,.10);
+LINEA 141: .card:hover {
+LINEA 142: transform: translateY(-4px);
+LINEA 143: box-shadow: 0 24px 60px rgba(30,64,175,.15);
+
+===== F:\edu_Final\templates\solicitudes\index.html =====
+LINEA 427: box-shadow:0 8px 18px rgba(23,105,170,.14);
+
+===== F:\edu_Final\templates\base.html =====
+LINEA 761: box-shadow:
+LINEA 770: .dashboard-action:hover,
+LINEA 771: .quick-card:hover {
+LINEA 772: transform: translateY(-3px) !important;
+LINEA 776: box-shadow:
+LINEA 912: #contenido .page-head .link-back:hover {
+LINEA 965: box-shadow:
+LINEA 1011: #contenido table tbody tr:hover td {
+LINEA 1095: box-shadow:
+LINEA 1197: .page-navigation .link-back:hover {
+LINEA 1280: box-shadow:
+LINEA 1289: a[href*="/citas/nueva"]:hover {
+LINEA 1290: transform: translateY(-1px) !important;
+LINEA 1292: box-shadow:
+LINEA 1322: box-shadow:
+LINEA 1338: linear-gradient(
+LINEA 1362: box-shadow:
+LINEA 1379: ~ table tbody tr:hover {
+LINEA 1642: linear-gradient(
+LINEA 1672: linear-gradient(
+LINEA 1681: box-shadow:
+LINEA 1723: box-shadow:0 0 0 4px rgba(234,182,74,.12) !important;
+LINEA 1775: .nav-principal a:hover,
+LINEA 1776: .nav-principal .nav-button:hover{
+LINEA 1783: transform:translateY(-1px) !important;
+LINEA 1840: #contenido .ed-dashboard{
+LINEA 1850: #contenido .ed-welcome{
+LINEA 1867: linear-gradient(
+LINEA 1878: box-shadow:var(--ed-shadow-lg) !important;
+LINEA 1881: #contenido .ed-welcome::after{
+LINEA 1896: #contenido .ed-welcome h1{
+LINEA 1904: #contenido .ed-welcome p{
+LINEA 1913: #contenido .ed-welcome .badge{
+LINEA 1924: text-transform:uppercase !important;
+LINEA 1933: #contenido .ed-kpis{
+LINEA 1939: #contenido .ed-kpi{
+LINEA 1950: box-shadow:var(--ed-shadow-sm) !important;
+LINEA 1958: #contenido .ed-kpi:hover{
+LINEA 1959: transform:translateY(-3px) !important;
+LINEA 1961: box-shadow:var(--ed-shadow-md) !important;
+LINEA 1966: #contenido .ed-kpi-label{
+LINEA 1970: #contenido .ed-kpi-value{
+LINEA 1981: #contenido .ed-kpi-note{
+LINEA 1990: #contenido .ed-section{
+LINEA 1997: box-shadow:var(--ed-shadow-sm) !important;
+LINEA 2004: #contenido .ed-section-head{
+LINEA 2008: #contenido .ed-section-head h2{
+LINEA 2014: #contenido .ed-section-head p{
+LINEA 2023: #contenido .ed-action{
+LINEA 2037: box-shadow:none !important;
+LINEA 2045: #contenido .ed-action::before{
+LINEA 2058: transform:scaleY(0) !important;
+LINEA 2064: #contenido .ed-action:hover{
+LINEA 2069: transform:translateY(-4px) !important;
+LINEA 2071: box-shadow:var(--ed-shadow-md) !important;
+LINEA 2074: #contenido .ed-action:hover::before{
+LINEA 2075: transform:scaleY(1) !important;
+LINEA 2078: #contenido .ed-action-icon{
+LINEA 2085: #contenido .ed-action-title{
+LINEA 2096: #contenido .ed-action-text{
+LINEA 2100: #contenido .ed-action-link{
+LINEA 2109: #contenido .ed-account{
+LINEA 2111: linear-gradient(
+LINEA 2121: box-shadow:none !important;
+LINEA 2124: #contenido .ed-account h2{
+LINEA 2150: linear-gradient(
+LINEA 2160: box-shadow:
+LINEA 2169: #contenido .boton:hover,
+LINEA 2170: #contenido button.boton:hover,
+LINEA 2171: #contenido input[type="submit"].boton:hover{
+LINEA 2172: transform:translateY(-2px) !important;
+LINEA 2176: box-shadow:
+LINEA 2192: box-shadow:none !important;
+LINEA 2195: #contenido .ed-logout:hover{
+LINEA 2256: box-shadow:
+LINEA 2270: box-shadow:var(--ed-shadow-sm) !important;
+LINEA 2284: text-transform:uppercase !important;
+LINEA 2295: #contenido table tbody tr:hover td{
+LINEA 2314: box-shadow:var(--ed-shadow-sm) !important;
+LINEA 2353: box-shadow:var(--ed-shadow-sm) !important;
+LINEA 2397: #contenido .ed-welcome{
+LINEA 2431: #contenido .ed-section{
+LINEA 2435: #contenido .ed-welcome{
+LINEA 2439: #contenido .ed-welcome h1{
+LINEA 2755: #contenido .ed-dashboard {
+LINEA 2767: #contenido .ed-dashboard .ed-welcome {
+LINEA 2794: linear-gradient(
+LINEA 2803: box-shadow:
+LINEA 2809: #contenido .ed-dashboard .ed-welcome::after {
+LINEA 2830: #contenido .ed-dashboard .ed-welcome,
+LINEA 2831: #contenido .ed-dashboard .ed-welcome * {
+LINEA 2835: #contenido .ed-dashboard .ed-welcome h1,
+LINEA 2836: #contenido .ed-dashboard .ed-welcome h2,
+LINEA 2837: #contenido .ed-dashboard .ed-welcome .ed-welcome-title {
+LINEA 2842: #contenido .ed-dashboard .ed-welcome p,
+LINEA 2843: #contenido .ed-dashboard .ed-welcome .ed-welcome-text {
+LINEA 2847: #contenido .ed-dashboard .ed-welcome-main {
+LINEA 2856: #contenido .ed-dashboard .ed-logout {
+LINEA 2881: #contenido .ed-dashboard .ed-logout:hover {
+LINEA 2882: transform: translateY(-2px) !important;
+LINEA 2884: box-shadow: 0 10px 22px rgba(0,0,0,.12) !important;
+LINEA 2891: #contenido .ed-dashboard .ed-kpis {
+LINEA 2902: #contenido .ed-dashboard .ed-kpi {
+LINEA 2915: box-shadow:
+LINEA 2923: #contenido .ed-dashboard .ed-kpi:hover {
+LINEA 2924: transform: translateY(-3px) !important;
+LINEA 2926: box-shadow:
+LINEA 2930: #contenido .ed-dashboard .ed-kpi-label {
+LINEA 2934: text-transform: uppercase !important;
+LINEA 2938: #contenido .ed-dashboard .ed-kpi-value {
+LINEA 2947: #contenido .ed-dashboard .ed-kpi-note {
+LINEA 2955: #contenido .ed-dashboard .ed-section {
+LINEA 2966: box-shadow:
+LINEA 2970: #contenido .ed-dashboard .ed-section-head {
+LINEA 2974: #contenido .ed-dashboard .ed-section-head h2,
+LINEA 2975: #contenido .ed-dashboard .ed-section-head h3 {
+LINEA 2983: #contenido .ed-dashboard .ed-actions {
+LINEA 2992: #contenido .ed-dashboard .ed-action {
+LINEA 3014: #contenido .ed-dashboard .ed-action:hover {
+LINEA 3015: transform: translateY(-3px) !important;
+LINEA 3021: box-shadow:
+LINEA 3025: #contenido .ed-dashboard .ed-action-icon {
+LINEA 3042: #contenido .ed-dashboard .ed-action-title {
+LINEA 3048: #contenido .ed-dashboard .ed-action-text {
+LINEA 3052: #contenido .ed-dashboard .ed-action-link {
+LINEA 3062: #contenido .ed-dashboard .ed-account {
+LINEA 3076: #contenido .ed-dashboard .boton {
+LINEA 3085: box-shadow:
+LINEA 3093: #contenido .ed-dashboard .boton:hover {
+LINEA 3094: transform: translateY(-2px) !important;
+LINEA 3096: box-shadow:
+LINEA 3106: linear-gradient(
+LINEA 3120: #contenido .ed-dashboard .ed-kpis {
+LINEA 3125: #contenido .ed-dashboard .ed-actions {
+LINEA 3133: #contenido .ed-dashboard {
+LINEA 3137: #contenido .ed-dashboard .ed-welcome {
+LINEA 3142: #contenido .ed-dashboard .ed-kpis {
+LINEA 3146: #contenido .ed-dashboard .ed-actions {
+LINEA 3150: #contenido .ed-dashboard .ed-section {
+
+===== F:\edu_Final\templates\dashboard.html =====
+LINEA 422: box-shadow:
+LINEA 478: box-shadow:
+LINEA 559: .dashboard-action:hover {
+LINEA 560: transform: translateY(-2px);
+LINEA 566: box-shadow:
+LINEA 850: linear-gradient(
+LINEA 856: box-shadow:
+LINEA 861: transform: translateY(0) !important;
+LINEA 869: animation:
+LINEA 901: @keyframes entradaAcceso {
+LINEA 905: transform: translateY(14px) scale(0.98);
+LINEA 910: transform: translateY(0) scale(1);
+LINEA 930: linear-gradient(
+LINEA 937: transform: rotate(18deg) translateX(-220%);
+LINEA 947: .dashboard-action:hover::before {
+LINEA 948: transform:
+LINEA 954: HOVER
+LINEA 957: .dashboard-action:hover {
+LINEA 959: transform:
+LINEA 966: linear-gradient(
+LINEA 972: box-shadow:
+LINEA 1008: linear-gradient(
+LINEA 1022: box-shadow:
+LINEA 1031: .dashboard-action:hover
+LINEA 1034: transform:
+LINEA 1039: linear-gradient(
+LINEA 1045: box-shadow:
+LINEA 1072: .dashboard-action:hover h3 {
+LINEA 1074: transform: translateX(2px);
+LINEA 1123: .dashboard-action:hover
+LINEA 1126: transform: translateX(5px);
+LINEA 1150: linear-gradient(
+LINEA 1158: transform: scaleX(0.35);
+LINEA 1167: .dashboard-action:hover::after {
+LINEA 1169: transform: scaleX(1);
+LINEA 1204: animation: none !important;
+
+===== F:\edu_Final\templates\index.html =====
+LINEA 88: box-shadow: 0 8px 20px rgba(23,105,170,.20);
+LINEA 105: .nav a:hover {
+LINEA 116: box-shadow: 0 7px 18px rgba(23,105,170,.20);
+LINEA 119: .nav-login:hover {
+LINEA 121: transform: translateY(-1px);
+LINEA 131: linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);
+LINEA 213: .boton:hover {
+LINEA 214: transform: translateY(-2px);
+LINEA 221: box-shadow: 0 12px 25px rgba(23,105,170,.23);
+LINEA 240: box-shadow:
+LINEA 381: box-shadow: 0 10px 30px rgba(31,73,107,.06);
+
+===== F:\edu_Final\static\css\BACKUP_ESTILOS_GLOBAL_20260922_151559.css =====
+LINEA 4: .barra{background:var(--blanco);border-bottom:1px solid var(--borde);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;gap:18px;position:sticky;top:0;z-index:20;box-shadow:0 1px 0 rgba(17,37,63,.03)}.logo{font-size:22px;font-weight:800;color:var(--azul2)!important;white-s
+LINEA 5: .contenedor{width:min(1180px,92%);margin:32px auto}.tarjeta,.panel{background:var(--blanco);border:1px solid var(--borde);border-radius:var(--radio);padding:26px;box-shadow:var(--sombra);margin-bottom:18px}.grid,.kpi-grid{display:grid;gap:18px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi
+LINEA 6: .page-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:18px}.acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.boton{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border:0;border-radius:10px;background:var(--azul);
+LINEA 7: .formulario{max-width:720px;margin:0 auto}.form-card{padding:30px}.section-heading{margin-bottom:22px}.section-heading h1{margin:10px 0 8px}.section-heading p{margin:0;color:var(--gris)}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.stack-form{display:flex;flex-direc
+LINEA 8: .hero{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch}.hero-card{min-height:300px;height:100%;padding:28px}.hero-visual{padding:28px;border-radius:var(--radio);background:linear-gradient(135deg,#eef5ff,#f7fbff);border:1px solid var(--borde);display:flex;flex-direction:column;
+LINEA 11: .dashboard-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}.dashboard-card{height:100%}.action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.quick-card{min-height:112px;border:1px solid var(--borde);border-radius:12px;padding:18px;background:#fbfdff;display:flex;
+LINEA 43: .boton-secondary:hover {
+LINEA 53: .boton-danger:hover {
+LINEA 270: select:hover {
+LINEA 277: box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+LINEA 435: box-shadow:
+LINEA 549: .boton:hover {
+LINEA 550: transform: translateY(-1px);
+LINEA 554: transform: translateY(0);
+LINEA 622: .link-back:hover,
+LINEA 623: .enlace-atras:hover {
+LINEA 839: box-shadow:
+LINEA 1035: box-shadow: none !important;
+LINEA 1175: box-shadow: none !important;
+LINEA 1205: box-shadow: none !important;
+LINEA 1286: box-shadow: none !important;
+LINEA 1412: text-transform: capitalize !important;
+LINEA 1631: /* Hover */
+LINEA 1633: button:hover,
+LINEA 1634: .boton:hover,
+LINEA 1635: a.boton:hover {
+LINEA 1672: .page-navigation .link-back:hover,
+LINEA 1673: .link-back:hover {
+LINEA 1694: /* Hover del dashboard */
+LINEA 1696: .dashboard-card .boton:hover,
+LINEA 1697: .dashboard-card button:hover,
+LINEA 1698: .account-actions .boton:hover,
+LINEA 1699: .quick-card .boton:hover {
+LINEA 1714: .edc-header-actions .boton:hover {
+LINEA 1730: .edc-buttons button:hover,
+LINEA 1731: .edc-buttons a:hover,
+LINEA 1732: .edc-month-toolbar a:hover {
+LINEA 1745: --eduturnos-boton-hover: #145b91;
+LINEA 1787: box-shadow: none !important;
+LINEA 1796: /* HOVER GENERAL */
+LINEA 1797: button:hover,
+LINEA 1798: input[type="submit"]:hover,
+LINEA 1799: input[type="button"]:hover,
+LINEA 1800: input[type="reset"]:hover,
+LINEA 1801: .boton:hover,
+LINEA 1802: a.boton:hover,
+LINEA 1803: .edc-back:hover,
+LINEA 1804: .link-back:hover,
+LINEA 1805: .edc-header-actions a:hover,
+LINEA 1806: .edc-buttons button:hover,
+LINEA 1807: .edc-buttons a:hover,
+LINEA 1808: .edc-month-toolbar a:hover {
+LINEA 1809: background: var(--eduturnos-boton-hover) !important;
+LINEA 1811: border-color: var(--eduturnos-boton-hover) !important;
+LINEA 1825: /* HOVER DEL BOTÓN ATRÁS */
+LINEA 1826: .edc-back:hover,
+LINEA 1827: .link-back:hover,
+LINEA 1828: .page-navigation .link-back:hover {
+LINEA 1849: .dashboard-card .boton:hover,
+LINEA 1850: .dashboard-card button:hover,
+LINEA 1851: .dashboard-card a.boton:hover,
+LINEA 1852: .quick-card .boton:hover,
+LINEA 1853: .quick-card button:hover,
+LINEA 1854: .quick-card a.boton:hover,
+LINEA 1855: .account-actions .boton:hover,
+LINEA 1856: .account-actions button:hover,
+LINEA 1857: .account-actions a.boton:hover {
+LINEA 1874: .citas-container button:hover,
+LINEA 1875: .citas-container .boton:hover,
+LINEA 1876: .citas-container a.boton:hover,
+LINEA 1877: .citas-actions button:hover,
+LINEA 1878: .citas-actions a:hover {
+LINEA 1895: .edc-header-actions .boton:hover,
+LINEA 1896: .edc-header-actions a:hover,
+LINEA 1897: .edc-buttons button:hover,
+LINEA 1898: .edc-buttons a:hover,
+LINEA 1899: .edc-month-toolbar a:hover {
+LINEA 1914: form button:hover,
+LINEA 1915: form input[type="submit"]:hover,
+LINEA 1916: form input[type="button"]:hover {
+LINEA 1937: .action-button:hover,
+LINEA 1938: .accion:hover,
+LINEA 1939: .boton-accion:hover,
+LINEA 1940: .btn:hover,
+LINEA 1941: .btn-primary:hover,
+LINEA 1942: .btn-secondary:hover,
+LINEA 1943: .btn-success:hover,
+LINEA 1944: .btn-danger:hover,
+LINEA 1945: .btn-warning:hover {
+LINEA 1990: box-shadow:0 2px 8px rgba(0,0,0,.05);
+LINEA 1996: .action-grid .quick-card:hover{
+LINEA 2000: box-shadow:0 4px 12px rgba(0,0,0,.08);
+LINEA 2080: .quick-card:hover{
+LINEA 2216: .ed-dashboard {
+LINEA 2236: .ed-dashboard > * {
+LINEA 2237: animation: edDashboardAppear .45s ease both;
+LINEA 2240: @keyframes edDashboardAppear {
+LINEA 2243: transform: translateY(10px);
+LINEA 2248: transform: translateY(0);
+LINEA 2254: .ed-dashboard .ed-welcome {
+LINEA 2266: box-shadow: 0 8px 24px rgba(18,59,112,.07);
+LINEA 2269: .ed-dashboard .ed-welcome-main {
+LINEA 2273: .ed-dashboard .ed-welcome-main h1 {
+LINEA 2281: .ed-dashboard .ed-welcome-main p {
+LINEA 2287: .ed-dashboard .ed-badge,
+LINEA 2288: .ed-dashboard .role-badge {
+LINEA 2306: .ed-dashboard .ed-welcome-actions {
+LINEA 2310: .ed-dashboard .ed-logout {
+LINEA 2333: .ed-dashboard .ed-logout:hover {
+LINEA 2337: transform: translateY(-1px);
+LINEA 2339: box-shadow: 0 5px 14px rgba(18,59,112,.16);
+LINEA 2344: .ed-dashboard .ed-kpis {
+LINEA 2352: .ed-dashboard .ed-kpi {
+LINEA 2363: box-shadow: 0 6px 18px rgba(18,59,112,.055);
+LINEA 2371: .ed-dashboard .ed-kpi::before {
+LINEA 2382: .ed-dashboard .ed-kpi:hover {
+LINEA 2383: transform: translateY(-3px);
+LINEA 2387: box-shadow: 0 10px 24px rgba(18,59,112,.09);
+LINEA 2390: .ed-dashboard .ed-kpi strong {
+LINEA 2403: .ed-dashboard .ed-kpi span {
+LINEA 2412: .ed-dashboard .ed-kpi small {
+LINEA 2424: .ed-dashboard .ed-section {
+LINEA 2434: box-shadow: 0 7px 20px rgba(18,59,112,.055);
+LINEA 2437: .ed-dashboard .ed-section h2 {
+LINEA 2446: .ed-dashboard .ed-section > p {
+LINEA 2456: .ed-dashboard .ed-actions {
+LINEA 2464: .ed-dashboard .ed-action {
+LINEA 2489: .ed-dashboard .ed-action:hover {
+LINEA 2490: transform: translateY(-3px);
+LINEA 2496: box-shadow: 0 8px 20px rgba(18,59,112,.08);
+LINEA 2499: .ed-dashboard .ed-action-icon {
+LINEA 2521: .ed-dashboard .ed-action strong {
+LINEA 2528: .ed-dashboard .ed-action span {
+LINEA 2540: .ed-dashboard .ed-account {
+LINEA 2556: .ed-dashboard .ed-account h2 {
+LINEA 2564: .ed-dashboard .ed-account p {
+LINEA 2572: .ed-dashboard .boton,
+LINEA 2573: .ed-dashboard button.boton,
+LINEA 2574: .ed-dashboard a.boton {
+LINEA 2586: .ed-dashboard .boton:hover,
+LINEA 2587: .ed-dashboard button.boton:hover,
+LINEA 2588: .ed-dashboard a.boton:hover {
+LINEA 2589: transform: translateY(-1px);
+LINEA 2592: .ed-dashboard .boton-primario,
+LINEA 2593: .ed-dashboard .boton.primary {
+LINEA 2601: .ed-dashboard .boton-primario:hover,
+LINEA 2602: .ed-dashboard .boton.primary:hover {
+LINEA 2608: .ed-dashboard .boton-verde,
+LINEA 2609: .ed-dashboard .boton.success {
+LINEA 2619: .ed-dashboard a:focus-visible,
+LINEA 2620: .ed-dashboard button:focus-visible {
+LINEA 2629: .ed-dashboard .ed-kpis {
+LINEA 2633: .ed-dashboard .ed-actions {
+LINEA 2640: .ed-dashboard {
+LINEA 2646: .ed-dashboard .ed-welcome {
+LINEA 2654: .ed-dashboard .ed-welcome-actions {
+LINEA 2658: .ed-dashboard .ed-logout {
+LINEA 2662: .ed-dashboard .ed-kpis {
+LINEA 2668: .ed-dashboard .ed-actions {
+LINEA 2672: .ed-dashboard .ed-section {
+LINEA 2676: .ed-dashboard .ed-account {
+LINEA 2687: .ed-dashboard {
+LINEA 2693: .ed-dashboard .ed-welcome-main h1 {
+LINEA 2697: .ed-dashboard .ed-kpi {
+LINEA 2701: .ed-dashboard .ed-section {
+LINEA 2707: .ed-dashboard .ed-action {
+LINEA 2718: .ed-dashboard > * {
+LINEA 2719: animation: none !important;
+LINEA 2722: .ed-dashboard .ed-action,
+LINEA 2723: .ed-dashboard .ed-kpi,
+LINEA 2724: .ed-dashboard .ed-logout,
+LINEA 2725: .ed-dashboard .boton {
+LINEA 2802: .ed-dashboard {
+LINEA 2813: .ed-welcome {
+LINEA 2826: box-shadow: 0 5px 18px rgba(18, 59, 112, 0.08) !important;
+LINEA 2831: .ed-welcome-main {
+LINEA 2836: .ed-welcome-main h1 {
+LINEA 2840: .ed-welcome-main p {
+LINEA 2875: .ed-welcome-actions {
+LINEA 2906: .ed-logout:hover {
+LINEA 2909: transform: translateY(-1px) !important;
+LINEA 2910: box-shadow: 0 4px 10px rgba(18, 59, 112, 0.16) !important;
+LINEA 2917: .ed-kpis {
+LINEA 2924: .ed-kpi,
+LINEA 2933: box-shadow: 0 4px 14px rgba(18, 59, 112, 0.06) !important;
+LINEA 2938: .ed-kpi strong,
+LINEA 2950: .ed-kpi span,
+LINEA 2959: .ed-kpi small,
+LINEA 2974: .ed-section {
+LINEA 2984: box-shadow: 0 4px 15px rgba(18, 59, 112, 0.06) !important;
+LINEA 2987: .ed-section h2,
+LINEA 2988: .ed-section h3 {
+LINEA 2992: .ed-section > p {
+LINEA 3002: .ed-actions,
+LINEA 3010: .ed-action,
+LINEA 3011: .ed-actions a,
+LINEA 3040: .ed-action:hover,
+LINEA 3041: .ed-actions a:hover,
+LINEA 3042: .dashboard-grid a:hover {
+LINEA 3045: transform: translateY(-2px) !important;
+LINEA 3046: box-shadow: 0 6px 15px rgba(30, 99, 181, 0.10) !important;
+LINEA 3049: .ed-action strong,
+LINEA 3050: .ed-actions a strong,
+LINEA 3058: .ed-action span,
+LINEA 3059: .ed-actions a span,
+LINEA 3066: .ed-action small,
+LINEA 3067: .ed-actions a small,
+LINEA 3108: .quick-card:hover {
+LINEA 3111: transform: translateY(-2px) !important;
+LINEA 3112: box-shadow: 0 6px 15px rgba(30, 99, 181, 0.10) !important;
+LINEA 3137: .ed-account {
+LINEA 3153: .ed-account > div:first-child {
+LINEA 3158: .ed-account h2,
+LINEA 3159: .ed-account h3 {
+LINEA 3163: .ed-account p {
+LINEA 3170: .ed-account a,
+LINEA 3171: .ed-account button {
+LINEA 3179: .ed-account a,
+LINEA 3180: .ed-account button,
+LINEA 3195: .ed-account a {
+LINEA 3209: .ed-account a:hover {
+LINEA 3263: .ed-kpis {
+LINEA 3267: .ed-actions,
+LINEA 3274: .ed-dashboard {
+LINEA 3278: .ed-welcome {
+LINEA 3284: .ed-welcome-actions {
+LINEA 3292: .ed-section {
+LINEA 3296: .ed-account {
+LINEA 3301: .ed-account a,
+LINEA 3302: .ed-account button {
+LINEA 3308: .ed-dashboard {
+LINEA 3312: .ed-kpis,
+LINEA 3313: .ed-actions,
+LINEA 3326: .ed-kpi,
+LINEA 3331: .ed-section {
+LINEA 3341: .ed-action,
+LINEA 3342: .ed-actions a,
+LINEA 3347: transform: none !important;
+LINEA 3385: .ed-dashboard {
+LINEA 3396: .ed-welcome {
+LINEA 3410: linear-gradient(
+LINEA 3420: box-shadow:
+LINEA 3429: .ed-welcome::before {
+LINEA 3440: linear-gradient(
+LINEA 3452: .ed-welcome::after {
+LINEA 3469: .ed-welcome-main {
+LINEA 3477: .ed-welcome-main h1 {
+LINEA 3489: .ed-welcome-main p {
+LINEA 3519: text-transform: uppercase !important;
+LINEA 3522: box-shadow: 0 3px 9px rgba(63,166,107,.10) !important;
+LINEA 3529: .ed-welcome-actions {
+LINEA 3555: box-shadow:
+LINEA 3564: .ed-logout:hover {
+LINEA 3568: transform: translateY(-2px) !important;
+LINEA 3570: box-shadow:
+LINEA 3578: .ed-kpis {
+LINEA 3587: .ed-kpi,
+LINEA 3601: box-shadow:
+LINEA 3612: .ed-kpi::before,
+LINEA 3627: .ed-kpi:hover,
+LINEA 3628: .dashboard-stat:hover {
+LINEA 3629: transform: translateY(-3px) !important;
+LINEA 3633: box-shadow:
+LINEA 3637: .ed-kpi strong,
+LINEA 3653: .ed-kpi span,
+LINEA 3663: .ed-kpi small,
+LINEA 3678: .ed-section {
+LINEA 3688: box-shadow:
+LINEA 3692: .ed-section h2,
+LINEA 3693: .ed-section h3 {
+LINEA 3702: .ed-section > p {
+LINEA 3714: .ed-actions,
+LINEA 3726: .ed-action,
+LINEA 3727: .ed-actions a,
+LINEA 3762: .ed-action::before,
+LINEA 3763: .ed-actions a::before,
+LINEA 3777: transform: scaleY(.35) !important;
+LINEA 3783: .ed-action:hover,
+LINEA 3784: .ed-actions a:hover,
+LINEA 3785: .dashboard-grid a:hover {
+LINEA 3790: transform: translateY(-3px) !important;
+LINEA 3792: box-shadow:
+LINEA 3796: .ed-action:hover::before,
+LINEA 3797: .ed-actions a:hover::before,
+LINEA 3798: .dashboard-grid a:hover::before {
+LINEA 3799: transform: scaleY(1) !important;
+LINEA 3802: .ed-action strong,
+LINEA 3803: .ed-actions a strong,
+LINEA 3813: .ed-action span,
+LINEA 3814: .ed-actions a span,
+LINEA 3822: .ed-action small,
+LINEA 3823: .ed-actions a small,
+LINEA 3859: .quick-card:hover {
+LINEA 3863: transform: translateY(-3px) !important;
+LINEA 3865: box-shadow:
+LINEA 3892: .ed-account {
+LINEA 3907: linear-gradient(
+LINEA 3916: box-shadow:
+LINEA 3922: .ed-account::before {
+LINEA 3936: .ed-account h2,
+LINEA 3937: .ed-account h3 {
+LINEA 3943: .ed-account p {
+LINEA 3951: .ed-account a,
+LINEA 3952: .ed-account button {
+LINEA 3963: .ed-account a,
+LINEA 3979: .ed-account a {
+LINEA 3993: box-shadow:
+LINEA 4002: .ed-account a:hover {
+LINEA 4005: transform: translateY(-2px) !important;
+LINEA 4007: box-shadow:
+LINEA 4061: .ed-kpis {
+LINEA 4066: .ed-actions,
+LINEA 4075: .ed-dashboard {
+LINEA 4079: .ed-welcome {
+LINEA 4086: .ed-welcome-main h1 {
+LINEA 4090: .ed-welcome-actions {
+LINEA 4098: .ed-section {
+LINEA 4102: .ed-account {
+LINEA 4107: .ed-account a,
+LINEA 4108: .ed-account button {
+LINEA 4115: .ed-dashboard {
+LINEA 4119: .ed-kpis,
+LINEA 4120: .ed-actions,
+LINEA 4125: .ed-welcome {
+LINEA 4129: .ed-welcome-main h1 {
+LINEA 4133: .ed-section {
+LINEA 4137: .ed-kpi,
+LINEA 4149: .ed-action,
+LINEA 4150: .ed-actions a,
+LINEA 4153: .ed-kpi,
+LINEA 4156: .ed-account a {
+LINEA 4158: transform: none !important;
+LINEA 4236: .ed-dashboard {
+LINEA 4257: .ed-dashboard::before {
+LINEA 4299: .ed-welcome {
+LINEA 4337: linear-gradient(
+LINEA 4350: box-shadow:
+LINEA 4364: .ed-welcome::before {
+LINEA 4378: linear-gradient(
+LINEA 4393: .ed-welcome::after {
+LINEA 4410: box-shadow:
+LINEA 4422: .ed-welcome-main {
+LINEA 4436: .ed-welcome-main h1 {
+LINEA 4453: animation:
+LINEA 4457: .ed-welcome-main p {
+LINEA 4468: animation:
+LINEA 4473: @keyframes edFutureTitle {
+LINEA 4477: transform: translateY(12px);
+LINEA 4482: transform: translateY(0);
+LINEA 4487: @keyframes edFutureText {
+LINEA 4491: transform: translateY(8px);
+LINEA 4496: transform: translateY(0);
+LINEA 4534: text-transform: uppercase !important;
+LINEA 4546: .ed-welcome-actions {
+LINEA 4589: box-shadow:
+LINEA 4600: .ed-logout:hover {
+LINEA 4605: transform:
+LINEA 4608: box-shadow:
+LINEA 4618: .ed-kpis {
+LINEA 4631: .ed-kpi,
+LINEA 4655: box-shadow:
+LINEA 4670: .ed-kpi::before,
+LINEA 4690: .ed-kpi::after,
+LINEA 4710: .ed-kpi:hover,
+LINEA 4711: .dashboard-stat:hover {
+LINEA 4713: transform:
+LINEA 4719: box-shadow:
+LINEA 4725: .ed-kpi strong,
+LINEA 4749: .ed-kpi span,
+LINEA 4767: .ed-kpi small,
+LINEA 4789: .ed-section {
+LINEA 4808: box-shadow:
+LINEA 4814: .ed-section h2,
+LINEA 4815: .ed-section h3 {
+LINEA 4833: .ed-section > p {
+LINEA 4851: .ed-actions,
+LINEA 4865: .ed-action,
+LINEA 4866: .ed-actions a,
+LINEA 4902: box-shadow:
+LINEA 4916: .ed-action::before,
+LINEA 4917: .ed-actions a::before,
+LINEA 4941: transform:
+LINEA 4951: .ed-action::after,
+LINEA 4952: .ed-actions a::after,
+LINEA 4977: .ed-action:hover,
+LINEA 4978: .ed-actions a:hover,
+LINEA 4979: .dashboard-grid a:hover {
+LINEA 4987: transform:
+LINEA 4990: box-shadow:
+LINEA 4996: .ed-action:hover::before,
+LINEA 4997: .ed-actions a:hover::before,
+LINEA 4998: .dashboard-grid a:hover::before {
+LINEA 5000: transform:
+LINEA 5005: .ed-action:hover::after,
+LINEA 5006: .ed-actions a:hover::after,
+LINEA 5007: .dashboard-grid a:hover::after {
+LINEA 5009: transform:
+LINEA 5014: .ed-action strong,
+LINEA 5015: .ed-actions a strong,
+LINEA 5036: .ed-action span,
+LINEA 5037: .ed-actions a span,
+LINEA 5055: .ed-action small,
+LINEA 5056: .ed-actions a small,
+LINEA 5104: box-shadow:
+LINEA 5116: .quick-card:hover {
+LINEA 5124: transform:
+LINEA 5127: box-shadow:
+LINEA 5170: .ed-account {
+LINEA 5201: box-shadow:
+LINEA 5212: .ed-account::before {
+LINEA 5238: .ed-account h2,
+LINEA 5239: .ed-account h3 {
+LINEA 5251: .ed-account p {
+LINEA 5264: .ed-account a,
+LINEA 5265: .ed-account button {
+LINEA 5282: .ed-account a,
+LINEA 5302: .ed-account a {
+LINEA 5329: box-shadow:
+LINEA 5340: .ed-account a:hover {
+LINEA 5345: transform:
+LINEA 5348: box-shadow:
+LINEA 5424: .ed-kpis {
+LINEA 5430: .ed-actions,
+LINEA 5441: .ed-dashboard {
+LINEA 5449: .ed-welcome {
+LINEA 5462: .ed-welcome-main h1 {
+LINEA 5468: .ed-welcome-actions {
+LINEA 5480: .ed-section {
+LINEA 5487: .ed-account {
+LINEA 5496: .ed-account a,
+LINEA 5497: .ed-account button {
+LINEA 5507: .ed-dashboard {
+LINEA 5515: .ed-kpis,
+LINEA 5516: .ed-actions,
+LINEA 5523: .ed-welcome-main h1 {
+LINEA 5532: .ed-welcome {
+LINEA 5538: .ed-section {
+LINEA 5552: .ed-welcome-main h1,
+LINEA 5553: .ed-welcome-main p,
+LINEA 5554: .ed-action,
+LINEA 5555: .ed-actions a,
+LINEA 5558: .ed-kpi,
+LINEA 5561: .ed-account a {
+LINEA 5563: animation:
+LINEA 5569: transform:
+LINEA 5632: linear-gradient(
+LINEA 5653: .ed-dashboard {
+LINEA 5675: .ed-dashboard::before {
+LINEA 5712: .ed-welcome {
+LINEA 5744: linear-gradient(
+LINEA 5758: box-shadow:
+LINEA 5773: .ed-welcome::before {
+LINEA 5795: linear-gradient(
+LINEA 5808: .ed-welcome::after {
+LINEA 5830: linear-gradient(
+LINEA 5836: transform:
+LINEA 5848: .ed-welcome-main {
+LINEA 5864: .ed-welcome-main h1 {
+LINEA 5886: animation:
+LINEA 5891: .ed-welcome-main p {
+LINEA 5905: animation:
+LINEA 5910: @keyframes edTitleIn {
+LINEA 5914: transform: translateY(10px);
+LINEA 5919: transform: translateY(0);
+LINEA 5924: @keyframes edTextIn {
+LINEA 5928: transform: translateY(7px);
+LINEA 5933: transform: translateY(0);
+LINEA 5980: text-transform:
+LINEA 5995: .ed-welcome-actions {
+LINEA 6056: .ed-logout:hover {
+LINEA 6061: transform:
+LINEA 6064: box-shadow:
+LINEA 6074: .ed-kpis {
+LINEA 6092: .ed-kpi,
+LINEA 6121: box-shadow:
+LINEA 6137: .ed-kpi::before,
+LINEA 6167: .ed-kpi:hover,
+LINEA 6168: .dashboard-stat:hover {
+LINEA 6170: transform:
+LINEA 6176: box-shadow:
+LINEA 6182: .ed-kpi strong,
+LINEA 6208: .ed-kpi span,
+LINEA 6225: .ed-kpi small,
+LINEA 6246: .ed-section {
+LINEA 6266: box-shadow:
+LINEA 6272: .ed-section h2,
+LINEA 6273: .ed-section h3 {
+LINEA 6294: .ed-section > p {
+LINEA 6313: .ed-actions,
+LINEA 6330: .ed-action,
+LINEA 6331: .ed-actions a,
+LINEA 6377: box-shadow:
+LINEA 6391: .ed-action::before,
+LINEA 6392: .ed-actions a::before,
+LINEA 6422: transform:
+LINEA 6430: .ed-action:hover,
+LINEA 6431: .ed-actions a:hover,
+LINEA 6432: .dashboard-grid a:hover {
+LINEA 6440: transform:
+LINEA 6443: box-shadow:
+LINEA 6449: .ed-action:hover::before,
+LINEA 6450: .ed-actions a:hover::before,
+LINEA 6451: .dashboard-grid a:hover::before {
+LINEA 6453: transform:
+LINEA 6458: .ed-action strong,
+LINEA 6459: .ed-actions a strong,
+LINEA 6479: .ed-action span,
+LINEA 6480: .ed-actions a span,
+LINEA 6500: .ed-action small,
+LINEA 6501: .ed-actions a small,
+LINEA 6557: .quick-card:hover {
+LINEA 6565: transform:
+LINEA 6568: box-shadow:
+LINEA 6611: .ed-account {
+LINEA 6648: box-shadow:
+LINEA 6659: .ed-account::before {
+LINEA 6687: .ed-account h2,
+LINEA 6688: .ed-account h3 {
+LINEA 6700: .ed-account p {
+LINEA 6713: .ed-account a,
+LINEA 6714: .ed-account button {
+LINEA 6731: .ed-account a {
+LINEA 6768: box-shadow:
+LINEA 6779: .ed-account a:hover {
+LINEA 6787: transform:
+LINEA 6790: box-shadow:
+LINEA 6835: .ed-kpis {
+LINEA 6841: .ed-actions,
+LINEA 6852: .ed-dashboard {
+LINEA 6860: .ed-welcome {
+LINEA 6873: .ed-welcome-main h1 {
+LINEA 6879: .ed-welcome-actions {
+LINEA 6891: .ed-section {
+LINEA 6898: .ed-account {
+LINEA 6907: .ed-account a,
+LINEA 6908: .ed-account button {
+LINEA 6918: .ed-dashboard {
+LINEA 6926: .ed-kpis,
+LINEA 6927: .ed-actions,
+LINEA 6934: .ed-welcome-main h1 {
+LINEA 6940: .ed-section {
+LINEA 6954: .ed-welcome-main h1,
+LINEA 6955: .ed-welcome-main p,
+LINEA 6956: .ed-action,
+LINEA 6957: .ed-actions a,
+LINEA 6960: .ed-kpi,
+LINEA 6963: .ed-account a {
+LINEA 6965: animation:
+LINEA 6971: transform:
+LINEA 7029: --ed-shadow-hover:
+LINEA 7059: linear-gradient(
+LINEA 7074: .ed-kpi::before,
+LINEA 7075: .ed-kpi::after,
+LINEA 7105: .ed-dashboard {
+LINEA 7117: .ed-welcome {
+LINEA 7128: linear-gradient(
+LINEA 7137: box-shadow:
+LINEA 7145: .ed-welcome::before,
+LINEA 7146: .ed-welcome::after {
+LINEA 7154: .ed-welcome h1,
+LINEA 7155: .ed-welcome h2,
+LINEA 7156: .ed-welcome p {
+LINEA 7163: .ed-welcome p {
+LINEA 7170: .ed-welcome-main {
+LINEA 7178: .ed-welcome-badge,
+LINEA 7229: button:hover,
+LINEA 7230: .boton:hover,
+LINEA 7231: a.boton:hover,
+LINEA 7232: input[type="submit"]:hover,
+LINEA 7233: input[type="button"]:hover {
+LINEA 7239: transform: translateY(-2px) !important;
+LINEA 7241: box-shadow:
+LINEA 7251: transform: translateY(0) !important;
+LINEA 7267: .ed-logout:hover {
+LINEA 7280: .ed-kpis {
+LINEA 7289: .ed-kpi {
+LINEA 7301: box-shadow: var(--ed-shadow) !important;
+LINEA 7313: .ed-kpi:hover {
+LINEA 7315: transform: translateY(-4px) !important;
+LINEA 7319: box-shadow: var(--ed-shadow-hover) !important;
+LINEA 7324: .ed-kpi h3,
+LINEA 7325: .ed-kpi strong,
+LINEA 7326: .ed-kpi-value {
+LINEA 7333: .ed-kpi p,
+LINEA 7334: .ed-kpi small,
+LINEA 7335: .ed-kpi-note {
+LINEA 7346: .ed-section {
+LINEA 7354: box-shadow: var(--ed-shadow) !important;
+LINEA 7366: .ed-section:hover {
+LINEA 7370: box-shadow:
+LINEA 7376: .ed-section h2,
+LINEA 7377: .ed-section h3 {
+LINEA 7384: .ed-section p {
+LINEA 7395: .ed-actions {
+LINEA 7404: .ed-actions a,
+LINEA 7405: .ed-actions .boton {
+LINEA 7408: linear-gradient(
+LINEA 7420: box-shadow:
+LINEA 7426: .ed-actions a:hover,
+LINEA 7427: .ed-actions .boton:hover {
+LINEA 7430: linear-gradient(
+LINEA 7440: transform: translateY(-3px) !important;
+LINEA 7442: box-shadow:
+LINEA 7463: box-shadow:
+LINEA 7471: .tarjeta:hover,
+LINEA 7472: .card:hover,
+LINEA 7473: .ed-card:hover,
+LINEA 7474: .panel:hover {
+LINEA 7526: a:hover {
+LINEA 7559: linear-gradient(
+LINEA 7583: tbody tr:hover td {
+LINEA 7621: box-shadow:
+LINEA 7680: box-shadow:
+LINEA 7686: .notification:hover,
+LINEA 7687: .notificacion:hover {
+LINEA 7710: box-shadow:
+LINEA 7726: .sol-follow:hover,
+LINEA 7727: .eduturnos-final-follow-up:hover {
+LINEA 7746: box-shadow:
+LINEA 7776: .eduturnos-final-cal-nav a:hover,
+LINEA 7777: .eduturnos-final-cal-nav button:hover,
+LINEA 7778: .edc-month-toolbar a:hover,
+LINEA 7779: .edc-month-toolbar button:hover {
+LINEA 7817: .calendar-day:hover,
+LINEA 7818: .cal-day:hover,
+LINEA 7819: .edc-day:hover {
+LINEA 7830: .ed-account {
+LINEA 7833: linear-gradient(
+LINEA 7845: box-shadow:
+LINEA 7851: .ed-account::before,
+LINEA 7852: .ed-account::after {
+LINEA 7859: .ed-account h2,
+LINEA 7860: .ed-account h3,
+LINEA 7861: .ed-account p {
+LINEA 7868: .ed-account p {
+LINEA 7875: .ed-account .boton {
+LINEA 7886: .ed-account .boton:hover {
+LINEA 7932: linear-gradient(
+LINEA 7983: nav a:hover,
+LINEA 7984: .navbar a:hover,
+LINEA 7985: .sidebar a:hover,
+LINEA 7986: .menu a:hover {
+LINEA 8011: @keyframes edFadeUp {
+LINEA 8017: transform: translateY(12px);
+LINEA 8025: transform: translateY(0);
+LINEA 8032: @keyframes edGlow {
+LINEA 8037: box-shadow:
+LINEA 8044: box-shadow:
+LINEA 8052: .ed-welcome {
+LINEA 8054: animation:
+LINEA 8060: .ed-kpi {
+LINEA 8062: animation:
+LINEA 8068: .ed-kpi:nth-child(2) {
+LINEA 8075: .ed-kpi:nth-child(3) {
+LINEA 8082: .ed-kpi:nth-child(4) {
+LINEA 8089: .ed-section {
+LINEA 8091: animation:
+LINEA 8097: .ed-actions > * {
+LINEA 8099: animation:
+LINEA 8105: .ed-actions > *:nth-child(2) {
+LINEA 8112: .ed-actions > *:nth-child(3) {
+LINEA 8119: .ed-actions > *:nth-child(4) {
+LINEA 8130: .ed-kpi,
+LINEA 8131: .ed-section,
+LINEA 8132: .ed-account,
+LINEA 8133: .ed-welcome,
+LINEA 8175: .ed-kpis {
+LINEA 8181: .ed-actions {
+LINEA 8192: .ed-welcome,
+LINEA 8193: .ed-section,
+LINEA 8194: .ed-account {
+LINEA 8200: .ed-welcome {
+LINEA 8206: .ed-kpi {
+
+===== F:\edu_Final\static\css\estilos.css =====
+LINEA 4: .barra{background:var(--blanco);border-bottom:1px solid var(--borde);padding:14px 5%;display:flex;justify-content:space-between;align-items:center;gap:18px;position:sticky;top:0;z-index:20;box-shadow:0 1px 0 rgba(17,37,63,.03)}.logo{font-size:22px;font-weight:800;color:var(--azul2)!important;white-s
+LINEA 5: .contenedor{width:min(1180px,92%);margin:32px auto}.tarjeta,.panel{background:var(--blanco);border:1px solid var(--borde);border-radius:var(--radio);padding:26px;box-shadow:var(--sombra);margin-bottom:18px}.grid,.kpi-grid{display:grid;gap:18px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi
+LINEA 6: .page-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:18px}.acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.boton{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border:0;border-radius:10px;background:var(--azul);
+LINEA 7: .formulario{max-width:720px;margin:0 auto}.form-card{padding:30px}.section-heading{margin-bottom:22px}.section-heading h1{margin:10px 0 8px}.section-heading p{margin:0;color:var(--gris)}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.stack-form{display:flex;flex-direc
+LINEA 8: .hero{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch}.hero-card{min-height:300px;height:100%;padding:28px}.hero-visual{padding:28px;border-radius:var(--radio);background:linear-gradient(135deg,#EAF3FF,#f7fbff);border:1px solid var(--borde);display:flex;flex-direction:column;
+LINEA 11: .dashboard-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}.dashboard-card{height:100%}.action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.quick-card{min-height:112px;border:1px solid var(--borde);border-radius:12px;padding:18px;background:#EAF3FF;display:flex;
+LINEA 43: .boton-secondary:hover {
+LINEA 53: .boton-danger:hover {
+LINEA 270: select:hover {
+LINEA 277: box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+LINEA 435: box-shadow:
+LINEA 549: .boton:hover {
+LINEA 550: transform: translateY(-1px);
+LINEA 554: transform: translateY(0);
+LINEA 622: .link-back:hover,
+LINEA 623: .enlace-atras:hover {
+LINEA 839: box-shadow:
+LINEA 1035: box-shadow: none !important;
+LINEA 1175: box-shadow: none !important;
+LINEA 1205: box-shadow: none !important;
+LINEA 1286: box-shadow: none !important;
+LINEA 1412: text-transform: capitalize !important;
+LINEA 1631: /* Hover */
+LINEA 1633: button:hover,
+LINEA 1634: .boton:hover,
+LINEA 1635: a.boton:hover {
+LINEA 1672: .page-navigation .link-back:hover,
+LINEA 1673: .link-back:hover {
+LINEA 1694: /* Hover del dashboard */
+LINEA 1696: .dashboard-card .boton:hover,
+LINEA 1697: .dashboard-card button:hover,
+LINEA 1698: .account-actions .boton:hover,
+LINEA 1699: .quick-card .boton:hover {
+LINEA 1714: .edc-header-actions .boton:hover {
+LINEA 1730: .edc-buttons button:hover,
+LINEA 1731: .edc-buttons a:hover,
+LINEA 1732: .edc-month-toolbar a:hover {
+LINEA 1780: box-shadow: 0 6px 16px rgba(18,57,95,.10);
+LINEA 1790: /* Hover general */
+LINEA 1791: button:hover,
+LINEA 1792: input[type="submit"]:hover,
+LINEA 1793: input[type="button"]:hover,
+LINEA 1794: input[type="reset"]:hover,
+LINEA 1795: .boton:hover,
+LINEA 1796: a.boton:hover,
+LINEA 1797: .btn:hover,
+LINEA 1798: .btn-primary:hover,
+LINEA 1799: .btn-secondary:hover,
+LINEA 1800: .btn-success:hover,
+LINEA 1801: .btn-danger:hover,
+LINEA 1802: .btn-warning:hover,
+LINEA 1803: .action-button:hover,
+LINEA 1804: .accion:hover,
+LINEA 1805: .boton-accion:hover {
+LINEA 1809: transform: translateY(-2px);
+LINEA 1810: box-shadow: 0 10px 24px rgba(18,57,95,.16);
+LINEA 1820: transform: translateY(0) scale(.98);
+LINEA 1845: transform: none;
+LINEA 1846: box-shadow: none;
+LINEA 1865: .edc-header-actions .boton:hover,
+LINEA 1866: .edc-header-actions a:hover,
+LINEA 1867: .edc-buttons button:hover,
+LINEA 1868: .edc-buttons a:hover,
+LINEA 1869: .edc-month-toolbar a:hover {
+LINEA 1883: .edc-back:hover,
+LINEA 1884: .link-back:hover,
+LINEA 1885: .page-navigation .link-back:hover {
+LINEA 1910: box-shadow:0 2px 8px rgba(0,0,0,.05);
+LINEA 1916: .action-grid .quick-card:hover{
+LINEA 1920: box-shadow:0 4px 12px rgba(0,0,0,.08);
+LINEA 2000: .quick-card:hover{
+LINEA 2137: .entrada-hero,.palabra-hero,.revelar,.boton,.boton::before,.hero-visual::after{animation:none!important;transition:none!important}
+LINEA 2142: .boton::before{content:"";position:absolute;inset:0;z-index:-1;transform:translateX(-120%) skewX(-20deg);background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transition:transform .6s ease}
+LINEA 2143: .boton:hover::before{transform:translateX(120%) skewX(-20deg)}
+LINEA 2144: .boton:hover{transform:translateY(-3px);box-shadow:0 14px 26px -12px rgba(15,63,143,.45)}
+LINEA 2145: .boton:active{transform:translateY(-1px) scale(.97);transition-duration:.12s}
+LINEA 2148: .entrada-hero{opacity:0;transform:translateY(16px);animation:eduHeroEntrar .6s ease forwards}
+LINEA 2149: .palabra-hero{display:inline-block;opacity:0;transform:translateY(14px);animation:eduHeroEntrar .6s ease forwards}
+LINEA 2150: @keyframes eduHeroEntrar{to{opacity:1;transform:translateY(0)}}
+LINEA 2153: .hero-visual{position:relative;background:linear-gradient(135deg,#EAF3FF,#e3f0ff)!important;overflow:hidden}
+LINEA 2154: .hero-visual::after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(22,93,202,.12),transparent 70%);top:-90px;right:-60px;animation:eduFlotar 9s ease-in-out infinite}
+LINEA 2155: @keyframes eduFlotar{0%,100%{transform:translateY(0)}50%{transform:translateY(18px)}}
+LINEA 2158: .revelar{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease,box-shadow .3s ease,border-color .3s ease}
+LINEA 2159: .revelar.visible{opacity:1;transform:translateY(0)}
+LINEA 2163: .revelar:hover{transform:translateY(-6px);box-shadow:0 16px 28px -16px rgba(15,37,63,.28);border-color:#6EA8FF}
+LINEA 2248: linear-gradient(
+LINEA 2280: animation:
+LINEA 2287: @keyframes edu-luz-flotante {
+LINEA 2291: transform: translate3d(0,0,0);
+LINEA 2295: transform: translate3d(-18px,14px,0);
+LINEA 2307: box-shadow:
+LINEA 2349: linear-gradient(
+LINEA 2365: linear-gradient(
+LINEA 2371: box-shadow:
+LINEA 2395: box-shadow:
+LINEA 2404: .feature-grid .feature-card:hover {
+LINEA 2405: transform:
+LINEA 2411: box-shadow:
+LINEA 2455: .boton:hover {
+LINEA 2456: transform:
+LINEA 2459: box-shadow:
+LINEA 2464: transform:
+LINEA 2474: .ed-dashboard {
+LINEA 2481: .ed-dashboard .ed-welcome {
+LINEA 2488: box-shadow:
+LINEA 2494: .ed-dashboard .ed-welcome h1,
+LINEA 2495: .ed-dashboard .ed-section h2,
+LINEA 2496: .ed-dashboard .ed-account h2 {
+LINEA 2503: .ed-dashboard .ed-kpi {
+LINEA 2510: box-shadow:
+LINEA 2519: .ed-dashboard .ed-kpi:hover {
+LINEA 2520: transform:
+LINEA 2526: box-shadow:
+LINEA 2530: .ed-dashboard .ed-kpi-value {
+LINEA 2535: .ed-dashboard .ed-kpi-label {
+LINEA 2542: .ed-dashboard .ed-action {
+LINEA 2553: .ed-dashboard .ed-action:hover {
+LINEA 2554: transform:
+LINEA 2560: box-shadow:
+LINEA 2567: .ed-dashboard .ed-action-icon {
+LINEA 2576: .ed-dashboard .ed-account {
+LINEA 2602: @keyframes edu-aparecer-suave {
+LINEA 2606: transform:
+LINEA 2612: transform:
+LINEA 2618: animation:
+LINEA 2635: .ed-dashboard .ed-kpi,
+LINEA 2636: .ed-dashboard .ed-action {
+LINEA 2637: animation: none !important;
+LINEA 2650: linear-gradient(
+LINEA 2685: --edu-shadow-hover: 0 16px 38px rgba(47,120,255,.14);
+LINEA 2737: box-shadow: var(--edu-shadow);
+LINEA 2740: /* Hover únicamente para tarjetas interactivas */
+LINEA 2751: .quick-card:hover,
+LINEA 2752: .dashboard-card:hover,
+LINEA 2753: .ed-card:hover,
+LINEA 2754: .feature-card:hover {
+LINEA 2755: transform: translateY(-2px);
+LINEA 2756: box-shadow: var(--edu-shadow-hover);
+LINEA 2775: .boton:hover,
+LINEA 2776: .btn:hover,
+LINEA 2777: button[type="submit"]:hover,
+LINEA 2778: input[type="submit"]:hover {
+LINEA 2779: transform: translateY(-2px);
+LINEA 2786: transform: translateY(0) scale(.98);
+LINEA 2805: box-shadow: 0 0 0 3px rgba(77,145,245,.16);
+LINEA 2829: box-shadow: var(--edu-shadow);
+LINEA 2848: tbody tr:hover {
+LINEA 2867: box-shadow: 0 6px 20px rgba(18,57,95,.055);
+LINEA 2894: a:hover {
+LINEA 2906: box-shadow: var(--edu-shadow);
+LINEA 2920: .notification-card:hover {
+LINEA 2921: transform: translateY(-1px);
+LINEA 2922: box-shadow: 0 10px 24px rgba(18,57,95,.09);
+LINEA 3117: linear-gradient(
+LINEA 3146: box-shadow:
+LINEA 3177: text-transform: uppercase;
+LINEA 3224: .login-page .stack-form input:hover,
+LINEA 3225: .login-page .stack-form select:hover {
+LINEA 3233: box-shadow: 0 0 0 4px rgba(77,145,245,.14);
+LINEA 3245: linear-gradient(
+LINEA 3305: box-shadow: 0 10px 24px rgba(18,57,95,.16);
+LINEA 3308: .login-page .boton-full:hover {
+LINEA 3311: transform: translateY(-2px);
+LINEA 3330: .login-page .form-links a:hover {
+LINEA 3425: linear-gradient(180deg, #f8fbff 0%, var(--ed-bg) 100%) !important;
+LINEA 3495: box-shadow: 0 4px 25px rgba(11,29,51,.045) !important;
+LINEA 3514: box-shadow: var(--ed-shadow-sm) !important;
+LINEA 3521: .card:hover,
+LINEA 3522: .panel:hover,
+LINEA 3523: .widget:hover,
+LINEA 3524: .dashboard-card:hover,
+LINEA 3525: .content-card:hover {
+LINEA 3526: transform: translateY(-2px);
+LINEA 3528: box-shadow: var(--ed-shadow-md) !important;
+LINEA 3553: .btn:hover,
+LINEA 3554: button.btn:hover,
+LINEA 3555: a.btn:hover {
+LINEA 3556: transform: translateY(-2px);
+LINEA 3557: box-shadow: 0 10px 24px rgba(11,29,51,.12) !important;
+LINEA 3563: background: linear-gradient(135deg, #2f78ff, #2464dc) !important;
+LINEA 3568: .btn-primary:hover,
+LINEA 3569: button.btn-primary:hover,
+LINEA 3570: a.btn-primary:hover {
+LINEA 3571: background: linear-gradient(135deg, #3c82ff, #1f5dcc) !important;
+LINEA 3615: box-shadow: 0 0 0 4px rgba(47,120,255,.11) !important;
+LINEA 3629: box-shadow: var(--ed-shadow-sm) !important;
+LINEA 3651: tbody tr:hover {
+LINEA 3708: background: linear-gradient(90deg, var(--ed-blue), var(--ed-amber));
+LINEA 3721: linear-gradient(180deg, #0b1d33 0%, #102c4b 100%) !important;
+LINEA 3737: aside a:hover,
+LINEA 3738: .sidebar a:hover,
+LINEA 3739: .app-sidebar a:hover,
+LINEA 3740: .side-menu a:hover {
+LINEA 3743: transform: translateX(2px);
+LINEA 3789: box-shadow: none !important;
+LINEA 3792: .fc .fc-button:hover {
+LINEA 3806: .fc .fc-daygrid-day:hover {
+LINEA 3821: linear-gradient(135deg, #08192d 0%, #123b68 58%, #0b2e55 100%) !important;
+LINEA 3829: box-shadow: 0 30px 90px rgba(0,0,0,.22) !important;
+LINEA 3856: linear-gradient(135deg, #071728 0%, #0b2440 48%, #123b68 100%) !important;
+LINEA 3866: linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+LINEA 3867: linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px);
+LINEA 3869: mask-image: linear-gradient(to bottom, black, transparent 88%);
+LINEA 3893: text-transform: uppercase;
+LINEA 3910: box-shadow: 0 38px 100px rgba(0,0,0,.28) !important;
+LINEA 3919: box-shadow: 0 18px 45px rgba(0,0,0,.24) !important;
+LINEA 3923: background: linear-gradient(135deg, #2f78ff, #174fae) !important;
+LINEA 3927: background: linear-gradient(135deg, #f5c15d, #df9a22) !important;
+LINEA 3959: box-shadow: 0 10px 35px rgba(11,29,51,.06) !important;
+LINEA 3967: .ed-v6-service:hover {
+LINEA 3968: transform: translateY(-5px) !important;
+LINEA 3970: box-shadow: 0 24px 55px rgba(11,29,51,.11) !important;
+LINEA 3976: linear-gradient(135deg, #071728, #123b68) !important;
+LINEA 3998: .ed-v6-footer a:hover {
+LINEA 4106: box-shadow:
+LINEA 4191: #contenido.login-page .stack-form input:hover,
+LINEA 4192: #contenido.login-page .stack-form select:hover {
+LINEA 4201: box-shadow:
+LINEA 4261: box-shadow: 0 9px 22px rgba(47,120,255,.18) !important;
+LINEA 4264: #contenido.login-page .boton-full:hover {
+LINEA 4267: transform: translateY(-2px) !important;
+LINEA 4285: #contenido.login-page .form-links a:hover {
+LINEA 4340: box-shadow: none !important;
+LINEA 4377: box-shadow: none !important;
+LINEA 4508: box-shadow: none !important;
+LINEA 4516: box-shadow: none !important;
+LINEA 4529: box-shadow: none !important;
+LINEA 4540: box-shadow: none !important;
+LINEA 4647: box-shadow: none !important;
+LINEA 4658: box-shadow: none !important;
+LINEA 4669: box-shadow: none !important;
+LINEA 4680: box-shadow: none !important;
+LINEA 4776: box-shadow: none !important;
+LINEA 4788: box-shadow: none !important;
+LINEA 4803: box-shadow: none !important;
+
+===== F:\edu_Final\static\css\listas_eduturnos.css =====
+LINEA 72: transform: translateY(-50%);
+LINEA 83: transform:
+LINEA 117: box-shadow:
+LINEA 152: .eduturnos-dropdown-opcion:hover {
+
+===== F:\edu_Final\static\css\style.css =====
+LINEA 4: .layout{display:flex;min-height:calc(100vh - 70px)}.sidebar{width:230px;background:#fff;border-right:1px solid var(--borde);padding:18px 12px}.sidebar a{display:block;padding:12px 14px;border-radius:10px;color:#39455a;margin-bottom:5px}.sidebar a:hover{background:#eef5ff;color:var(--azul)}.content{f
+LINEA 5: .hero{background:linear-gradient(135deg,#eaf3ff,#fff);border:1px solid var(--borde);border-radius:22px;padding:45px;display:flex;gap:25px;align-items:center}.hero-logo{width:80px;height:80px;font-size:35px;border-radius:22px}.hero h1{font-size:52px;margin:4px 0;color:var(--azul2)}.lead{font-size:18p
+LINEA 6: .actions{display:flex;gap:10px;align-items:center}.btn{border:0;background:var(--azul);color:#fff;padding:11px 17px;border-radius:9px;font-weight:bold;display:inline-block}.btn:hover{background:var(--azul2)}.btn.outline{background:#fff;color:var(--azul);border:1px solid #aac6ef}.btn.small{padding:8p
+LINEA 46: .eduturnos-select-button:hover {
+LINEA 52: box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+LINEA 64: transform: translateY(-50%);
+LINEA 71: transform: translateY(-50%) rotate(180deg);
+LINEA 86: box-shadow: 0 10px 25px rgba(15, 23, 42, .15);
+LINEA 107: .eduturnos-select-option:hover {
+
+===== F:\edu_Final\static\vendor\fullcalendar\themes\classic\global.js =====
+LINEA 19: const mutedHoverClass = "fc-classic-4yP";
+LINEA 20: const mutedHoverPressableClass = `${mutedHoverClass} fc-classic-tCP fc-classic-8gz`;
+LINEA 21: const faintHoverClass = "fc-classic-Ubk";
+LINEA 22: const faintHoverPressableClass = `${faintHoverClass} fc-classic-OIx fc-classic-28F`;
+LINEA 40: : (info.isInteractive ? mutedHoverPressableClass : mutedHoverClass)),
+LINEA 55: : "fc-classic-sI7 fc-classic-cKZ fc-classic-d0j", mutedHoverPressableClass),
+LINEA 262: ? joinClassNames(faintHoverPressableClass, outlineInsetClass)
+LINEA 263: : faintHoverClass),
+
+===== F:\edu_Final\static\vendor\fullcalendar\themes\classic\theme.css =====
+LINEA 740: box-shadow: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a
+LINEA 744: box-shadow: 0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a
+LINEA 748: box-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a
+LINEA 752: box-shadow: 0 0 0 1px var(--fc-classic-ring-color, currentcolor)
+LINEA 786: background: linear-gradient(var(--fc-classic-muted), var(--fc-classic-muted))var(--fc-classic-background)
+LINEA 790: background: linear-gradient(var(--fc-classic-strong), var(--fc-classic-strong))var(--fc-classic-background)
+LINEA 793: .fc-classic-mAY:not(:is(:where(.fc-classic-bCs):hover *)) {
+LINEA 797: @media not all and (hover:hover) {
+LINEA 809: @media (hover:hover) {
+LINEA 810: .fc-classic-vs6:is(:where(.fc-classic-bCs):hover *) {
+LINEA 814: .fc-classic-Ogp:is(:where(.fc-classic-bCs):hover *) {
+LINEA 829: @media (hover:hover) {
+LINEA 830: .fc-classic-bqK:hover {
+LINEA 834: .fc-classic-9Rj:hover {
+LINEA 838: .fc-classic-Ubk:hover {
+LINEA 842: .fc-classic-4yP:hover {
+LINEA 846: .fc-classic-Eu0:hover {
+
+===== F:\edu_Final\static\vendor\fullcalendar\fullcalendar.global.js =====
+LINEA 1448: // Diffing (all return floats)
+LINEA 2599: function listenToHoverBySelector(container, selector, onMouseEnter, onMouseLeave) {
+LINEA 3102: eventDataTransform: identity,
+LINEA 5507: eventDataTransform: identity,
+LINEA 5533: eventDataTransform: refined.eventDataTransform,
+LINEA 8934: class EventHovering extends Interaction {
+LINEA 8944: if (getElEventRange(segEl)) { // TODO: better way to make sure not hovering over more+ link or its wrapper
+LINEA 8955: this.removeHoverListeners = listenToHoverBySelector(settings.el, `.${classNames.internalEvent}`, // on both fg and bg events
+LINEA 8959: this.removeHoverListeners();
+LINEA 8987: EventHovering,
+LINEA 14141: let nearCoord = segRect.levelCoord; // the left side if LTR. the right side if RTL. floating-point
+LINEA 14142: let farCoord = segRect.levelCoord + segRect.thickness; // the right side if LTR. the left side if RTL. floating-point
+LINEA 14210: const partial = (positionTop - slatTop) / slatHeight; // floating point number between 0 and 1
+
+===== F:\edu_Final\static\vendor\fullcalendar\skeleton.css =====
+LINEA 54: float: left !important;
+LINEA 59: float: right !important;

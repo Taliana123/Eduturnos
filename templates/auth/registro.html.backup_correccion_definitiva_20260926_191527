@@ -1,0 +1,1370 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear cuenta · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<section class="registro-pagina">
+
+    <div class="registro-layout">
+
+        <!-- =================================================
+             ILUSTRACIÓN CREAR CUENTA
+             SIN PERSONAS
+             SIN CUADRO
+             ================================================= -->
+
+        <div class="registro-ilustracion" aria-hidden="true">
+
+            <svg
+                class="registro-dibujo"
+                viewBox="0 0 460 430"
+            >
+
+                <!-- Decoración -->
+
+                <circle
+                    class="decor-punto punto-1"
+                    cx="65"
+                    cy="92"
+                    r="5"
+                />
+
+                <circle
+                    class="decor-punto punto-2"
+                    cx="386"
+                    cy="112"
+                    r="4"
+                />
+
+                <circle
+                    class="decor-punto punto-3"
+                    cx="355"
+                    cy="334"
+                    r="6"
+                />
+
+                <path
+                    class="decor-estrella estrella-1"
+                    d="M82 154
+                       L87 166
+                       L99 171
+                       L87 176
+                       L82 188
+                       L77 176
+                       L65 171
+                       L77 166 Z"
+                />
+
+                <path
+                    class="decor-estrella estrella-2"
+                    d="M366 205
+                       L370 215
+                       L380 219
+                       L370 223
+                       L366 233
+                       L362 223
+                       L352 219
+                       L362 215 Z"
+                />
+
+
+                <!-- Línea decorativa -->
+
+                <path
+                    class="decor-trazo"
+                    d="M55 260
+                       C42 230 51 195 77 178"
+                />
+
+
+                <!-- Sombra -->
+
+                <ellipse
+                    class="dibujo-sombra"
+                    cx="229"
+                    cy="372"
+                    rx="132"
+                    ry="17"
+                />
+
+
+                <!-- =================================================
+                     CALENDARIO
+                     ================================================= -->
+
+                <g class="dibujo-calendario">
+
+                    <rect
+                        x="88"
+                        y="91"
+                        width="225"
+                        height="205"
+                        rx="18"
+                    />
+
+                    <!-- parte superior -->
+
+                    <rect
+                        x="88"
+                        y="91"
+                        width="225"
+                        height="55"
+                        rx="18"
+                    />
+
+                    <rect
+                        x="88"
+                        y="125"
+                        width="225"
+                        height="21"
+                    />
+
+                    <!-- anillos -->
+
+                    <rect
+                        x="126"
+                        y="72"
+                        width="13"
+                        height="45"
+                        rx="6"
+                    />
+
+                    <rect
+                        x="262"
+                        y="72"
+                        width="13"
+                        height="45"
+                        rx="6"
+                    />
+
+
+                    <!-- título -->
+
+                    <line
+                        x1="121"
+                        y1="169"
+                        x2="181"
+                        y2="169"
+                    />
+
+                    <line
+                        x1="121"
+                        y1="182"
+                        x2="163"
+                        y2="182"
+                    />
+
+
+                    <!-- cuadricula -->
+
+                    <line x1="120" y1="207" x2="281" y2="207" />
+                    <line x1="120" y1="239" x2="281" y2="239" />
+                    <line x1="120" y1="271" x2="281" y2="271" />
+
+                    <line x1="152" y1="197" x2="152" y2="281" />
+                    <line x1="184" y1="197" x2="184" y2="281" />
+                    <line x1="216" y1="197" x2="216" y2="281" />
+                    <line x1="248" y1="197" x2="248" y2="281" />
+
+
+                    <!-- día seleccionado -->
+
+                    <circle
+                        class="dia-seleccionado"
+                        cx="200"
+                        cy="223"
+                        r="12"
+                    />
+
+                </g>
+
+
+                <!-- =================================================
+                     DOCUMENTO
+                     ================================================= -->
+
+                <g class="dibujo-documento">
+
+                    <rect
+                        x="274"
+                        y="157"
+                        width="101"
+                        height="132"
+                        rx="13"
+                    />
+
+                    <path
+                        d="M346 157
+                           L375 186
+                           L346 186 Z"
+                    />
+
+                    <line
+                        x1="292"
+                        y1="211"
+                        x2="350"
+                        y2="211"
+                    />
+
+                    <line
+                        x1="292"
+                        y1="229"
+                        x2="341"
+                        y2="229"
+                    />
+
+                    <line
+                        x1="292"
+                        y1="247"
+                        x2="353"
+                        y2="247"
+                    />
+
+                    <circle
+                        cx="305"
+                        cy="270"
+                        r="6"
+                    />
+
+                </g>
+
+
+                <!-- =================================================
+                     CHECK
+                     ================================================= -->
+
+                <g class="dibujo-check">
+
+                    <circle
+                        cx="334"
+                        cy="321"
+                        r="31"
+                    />
+
+                    <path
+                        d="M317 321
+                           L329 333
+                           L353 305"
+                    />
+
+                </g>
+
+
+                <!-- =================================================
+                     LÁPIZ
+                     ================================================= -->
+
+                <g class="dibujo-lapiz">
+
+                    <rect
+                        x="285"
+                        y="278"
+                        width="17"
+                        height="83"
+                        rx="7"
+                        transform="rotate(25 285 278)"
+                    />
+
+                    <path
+                        d="M318 354
+                           L326 369
+                           L311 363 Z"
+                    />
+
+                    <line
+                        x1="294"
+                        y1="292"
+                        x2="307"
+                        y2="298"
+                    />
+
+                </g>
+
+            </svg>
+
+
+            <div class="registro-ilustracion-texto">
+
+                <strong>Crear tu cuenta</strong>
+
+                <span>Organiza tus citas en EDUTURNOS</span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CONTENIDO DE REGISTRO
+             ================================================= -->
+
+        <div class="registro-contenedor">
+
+            <div class="registro-encabezado">
+
+                <p class="registro-etiqueta">EDUTURNOS</p>
+
+                <h1>Crear cuenta</h1>
+
+                <p class="registro-descripcion">
+                    Selecciona el tipo de cuenta que deseas crear
+                    para continuar.
+                </p>
+
+            </div>
+
+
+            <div class="registro-grid">
+
+{% for slug, info in portales.items() %}
+
+            <article class="registro-opcion">
+
+                <div class="registro-opcion-contenido">
+
+                    <h3>{{ info.label }}</h3>
+
+                    <p>{{ info.descripcion }}</p>
+
+                </div>
+
+                <a
+                    class="registro-boton"
+                    href="{{ url_for('auth.registro_portal', portal=slug) }}"
+                >
+                    Crear cuenta
+                </a>
+
+            </article>
+
+            {% endfor %}
+
+            </div>
+
+
+            <div class="registro-retorno">
+
+                <a
+                    href="{{ url_for('auth.login') }}"
+                    class="link-back"
+                >
+                    <span aria-hidden="true">←</span>
+                    <span>Volver al inicio de sesión</span>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<style id="EDUTURNOS_REGISTRO_UNICO_2026">
+
+/* =========================================================
+   FONDO
+   ========================================================= */
+
+/*
+   El usuario encontró en F12 que #contenido tenía:
+
+   linear-gradient(
+       180deg,
+       #f5f9ff 0%,
+       #eef5fc 48%,
+       #f8fbff 100%
+   )
+
+   Se mantiene ESE MISMO fondo.
+   El contenedor no tendrá otro color.
+*/
+
+#contenido {
+    background:
+        linear-gradient(
+            180deg,
+            #f5f9ff 0%,
+            #eef5fc 48%,
+            #f8fbff 100%
+        ) !important;
+}
+
+
+#contenido main.contenedor,
+#contenido .contenedor,
+#contenido main.container,
+#contenido .container {
+    background: transparent !important;
+
+    background-color: transparent !important;
+}
+
+
+/* =========================================================
+   PAGINA
+   ========================================================= */
+
+.registro-pagina {
+    width: 100%;
+
+    max-width: 1080px;
+
+    margin: 0 auto;
+
+    padding: 38px 20px 46px;
+
+    background: transparent !important;
+}
+
+
+/* =========================================================
+   DISTRIBUCIÓN
+   ========================================================= */
+
+.registro-layout {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(330px, .92fr)
+        minmax(440px, 1fr);
+
+    align-items: center;
+
+    gap: 42px;
+}
+
+
+/* =========================================================
+   ILUSTRACIÓN
+   TOTALMENTE TRANSPARENTE
+   ========================================================= */
+
+.registro-ilustracion {
+    position: relative;
+
+    width: 100%;
+
+    min-height: 455px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: transparent !important;
+
+    background-color: transparent !important;
+
+    border: 0 !important;
+
+    border-radius: 0 !important;
+
+    box-shadow: none !important;
+
+    overflow: visible;
+}
+
+
+.registro-dibujo {
+    width: min(100%, 440px);
+
+    height: auto;
+
+    overflow: visible;
+
+    animation:
+        dibujo-flotar 5s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   CALENDARIO
+   ========================================================= */
+
+.dibujo-calendario rect {
+    fill: #ffffff;
+
+    stroke: #123b68;
+
+    stroke-width: 4;
+}
+
+
+.dibujo-calendario > rect:nth-child(2) {
+    fill: #2f78ff;
+}
+
+
+.dibujo-calendario line {
+    stroke: #b7c9dc;
+
+    stroke-width: 4;
+
+    stroke-linecap: round;
+}
+
+
+.dibujo-calendario rect:nth-of-type(3),
+.dibujo-calendario rect:nth-of-type(4) {
+    fill: #123b68;
+
+    stroke: none;
+}
+
+
+.dia-seleccionado {
+    fill: #f4bd4f !important;
+
+    stroke: #123b68 !important;
+
+    stroke-width: 3 !important;
+
+    animation:
+        dia-pulso 2.5s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   DOCUMENTO
+   ========================================================= */
+
+.dibujo-documento rect {
+    fill: #ffffff;
+
+    stroke: #123b68;
+
+    stroke-width: 4;
+}
+
+
+.dibujo-documento path {
+    fill: #eaf3ff;
+
+    stroke: #123b68;
+
+    stroke-width: 4;
+}
+
+
+.dibujo-documento line {
+    stroke: #9db4cd;
+
+    stroke-width: 5;
+
+    stroke-linecap: round;
+}
+
+
+.dibujo-documento circle {
+    fill: #2f78ff;
+}
+
+
+/* =========================================================
+   CHECK
+   ========================================================= */
+
+.dibujo-check circle {
+    fill: #ffffff;
+
+    stroke: #2f78ff;
+
+    stroke-width: 5;
+
+    filter:
+        drop-shadow(
+            0 5px 10px rgba(47,120,255,.15)
+        );
+}
+
+
+.dibujo-check path {
+    fill: none;
+
+    stroke: #2f78ff;
+
+    stroke-width: 7;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+
+    stroke-dasharray: 60;
+
+    stroke-dashoffset: 60;
+
+    animation:
+        check-aparece 3s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   LÁPIZ
+   ========================================================= */
+
+.dibujo-lapiz rect {
+    fill: #f4bd4f;
+
+    stroke: #123b68;
+
+    stroke-width: 3;
+}
+
+
+.dibujo-lapiz path {
+    fill: #ffd9c2;
+
+    stroke: #123b68;
+
+    stroke-width: 3;
+}
+
+
+.dibujo-lapiz line {
+    stroke: #ffffff;
+
+    stroke-width: 3;
+
+    stroke-linecap: round;
+}
+
+
+/* =========================================================
+   DECORACIÓN
+   ========================================================= */
+
+.decor-punto {
+    fill: #2f78ff;
+
+    opacity: .30;
+
+    animation:
+        punto-flota 3.5s ease-in-out infinite;
+}
+
+
+.punto-2 {
+    animation-delay: .5s;
+}
+
+
+.punto-3 {
+    animation-delay: 1s;
+}
+
+
+.decor-estrella {
+    fill: #f4bd4f;
+
+    opacity: .70;
+
+    animation:
+        estrella-brilla 3.5s ease-in-out infinite;
+}
+
+
+.estrella-2 {
+    animation-delay: 1s;
+}
+
+
+.decor-trazo {
+    fill: none;
+
+    stroke: #2f78ff;
+
+    stroke-width: 3;
+
+    stroke-linecap: round;
+
+    stroke-dasharray: 8 12;
+
+    opacity: .30;
+}
+
+
+.dibujo-sombra {
+    fill: rgba(18,59,104,.10);
+
+    animation:
+        sombra-respira 5s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   TEXTO DE LA ILUSTRACIÓN
+   ========================================================= */
+
+.registro-ilustracion-texto {
+    position: absolute;
+
+    bottom: 23px;
+
+    left: 0;
+
+    right: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+}
+
+
+.registro-ilustracion-texto strong {
+    color: #123b68;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif;
+
+    font-size: 22px;
+
+    font-weight: 700;
+}
+
+
+.registro-ilustracion-texto span {
+    margin-top: 3px;
+
+    color: #6b8098;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   TARJETA CREAR CUENTA
+   UN POCO MÁS GRANDE
+   ========================================================= */
+
+.registro-contenedor {
+    width: 100%;
+
+    max-width: 570px;
+
+    padding: 31px;
+
+    background: #ffffff;
+
+    border: 1px solid #dce7f4;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 15px 38px rgba(18,59,104,.08);
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+   ========================================================= */
+
+.registro-encabezado {
+    margin-bottom: 21px;
+}
+
+
+.registro-etiqueta {
+    margin: 0 0 7px;
+
+    color: #2f78ff;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: .13em;
+
+    text-transform: uppercase;
+
+    /*
+       Un poco más abajo dentro de la zona superior.
+    */
+
+    transform: translateY(4px);
+}
+
+
+.registro-encabezado h1 {
+    margin: 0;
+
+    color: #123b68;
+
+    font-family:
+        "Source Serif 4",
+        Georgia,
+        serif;
+
+    font-size: 35px;
+
+    line-height: 1.05;
+}
+
+
+.registro-descripcion {
+    margin: 8px 0 0;
+
+    color: #5f7895;
+
+    font-size: 13px;
+
+    line-height: 1.48;
+}
+
+
+/* =========================================================
+   ROLES
+   UN POCO MÁS GRANDES
+   ========================================================= */
+
+.registro-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+}
+
+
+.registro-opcion {
+    min-height: 75px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 11px 12px;
+
+    background: #ffffff;
+
+    border: 1px solid #dfe8f2;
+
+    border-radius: 10px;
+
+    box-sizing: border-box;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease;
+}
+
+
+.registro-opcion:hover {
+    transform: translateY(-2px);
+
+    border-color: #bdd5f2;
+
+    box-shadow:
+        0 7px 16px rgba(18,59,104,.08);
+}
+
+
+.registro-opcion h3 {
+    margin: 0 0 3px;
+
+    color: #123b68;
+
+    font-size: 13px;
+
+    font-weight: 750;
+
+    line-height: 1.15;
+}
+
+
+.registro-opcion p {
+    margin: 0;
+
+    color: #71859a;
+
+    font-size: 10px;
+
+    line-height: 1.3;
+}
+
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+
+.registro-opcion .registro-boton {
+    flex: 0 0 auto;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 32px;
+
+    padding: 7px 10px;
+
+    background: #2f78ff;
+
+    color: #ffffff;
+
+    border: 1px solid #2f78ff;
+
+    border-radius: 7px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    line-height: 1;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 4px 9px rgba(47,120,255,.13);
+
+    transition:
+        transform .18s ease,
+        background-color .18s ease;
+}
+
+
+.registro-opcion .registro-boton:hover {
+    background: #2368eb;
+
+    border-color: #2368eb;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   VOLVER
+   ========================================================= */
+
+.registro-retorno {
+    margin-top: 18px;
+
+    padding: 0 !important;
+
+    border: 0 !important;
+
+    text-align: left;
+}
+
+
+.registro-retorno a {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 2px 0 !important;
+
+    background: transparent !important;
+
+    border: 0 !important;
+
+    box-shadow: none !important;
+
+    color: #2f78ff !important;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+
+.registro-retorno a:hover {
+    background: transparent !important;
+
+    border: 0 !important;
+
+    box-shadow: none !important;
+
+    color: #123b68 !important;
+}
+
+
+/* =========================================================
+   ANIMACIONES
+   ========================================================= */
+
+@keyframes dibujo-flotar {
+
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+}
+
+
+@keyframes sombra-respira {
+
+    0%, 100% {
+        transform: scaleX(1);
+
+        opacity: .40;
+    }
+
+    50% {
+        transform: scaleX(.88);
+
+        opacity: .22;
+    }
+
+}
+
+
+@keyframes check-aparece {
+
+    0%, 25% {
+        stroke-dashoffset: 60;
+    }
+
+    50%, 100% {
+        stroke-dashoffset: 0;
+    }
+
+}
+
+
+@keyframes dia-pulso {
+
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.12);
+    }
+
+}
+
+
+@keyframes punto-flota {
+
+    0%, 100% {
+        transform: translateY(0);
+
+        opacity: .30;
+    }
+
+    50% {
+        transform: translateY(-6px);
+
+        opacity: .60;
+    }
+
+}
+
+
+@keyframes estrella-brilla {
+
+    0%, 100% {
+        transform: scale(1);
+
+        opacity: .60;
+    }
+
+    50% {
+        transform: scale(1.15);
+
+        opacity: 1;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+    .registro-layout {
+        grid-template-columns: 1fr;
+
+        gap: 12px;
+    }
+
+
+    .registro-ilustracion {
+        min-height: 340px;
+    }
+
+
+    .registro-dibujo {
+        width: 350px;
+    }
+
+
+    .registro-ilustracion-texto {
+        bottom: 8px;
+    }
+
+
+    .registro-contenedor {
+        max-width: 620px;
+
+        margin: 0 auto;
+    }
+
+}
+
+
+@media (max-width: 540px) {
+
+    .registro-pagina {
+        padding: 18px 10px 30px;
+    }
+
+
+    .registro-ilustracion {
+        min-height: 285px;
+    }
+
+
+    .registro-dibujo {
+        width: 300px;
+    }
+
+
+    .registro-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .registro-contenedor {
+        padding: 23px 17px;
+    }
+
+
+    .registro-encabezado h1 {
+        font-size: 30px;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+<!-- EDUTURNOS_AJUSTE_FONDO_ROLES_20260926 -->
+<style id="EDUTURNOS_AJUSTE_FONDO_ROLES_20260926">
+
+/* ==========================================================
+   FONDO UNIFORME
+   ========================================================== */
+
+#contenido {
+    background: #f4f7fb !important;
+    background-color: #f4f7fb !important;
+}
+
+#contenido main.contenedor,
+#contenido .contenedor,
+#contenido main.container,
+#contenido .container,
+.registro-pagina {
+    background: #f4f7fb !important;
+    background-color: #f4f7fb !important;
+}
+
+
+/* ==========================================================
+   BLOQUE PRINCIPAL DE REGISTRO
+   Un poco más grande, sin exagerarlo.
+   ========================================================== */
+
+.registro-contenedor {
+    max-width: 600px !important;
+    padding: 34px !important;
+}
+
+
+/* ==========================================================
+   ROLES
+   Un poco más amplios y cómodos.
+   ========================================================== */
+
+.registro-opciones {
+    gap: 10px !important;
+}
+
+.registro-opcion {
+    min-height: 80px !important;
+    padding: 13px 14px !important;
+}
+
+
+/* Evita que aparezca otro fondo detrás del bloque */
+.registro-ilustracion {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+</style>
+<!-- FIN EDUTURNOS_AJUSTE_FONDO_ROLES_20260926 -->
+
+
+<!-- EDUTURNOS_ROLES_TODOS_IGUALES_20260926 -->
+<style id="EDUTURNOS_ROLES_TODOS_IGUALES_20260926">
+
+/* ==========================================================
+   FONDO
+   ========================================================== */
+
+#contenido,
+#contenido main.contenedor,
+#contenido .contenedor,
+#contenido main.container,
+#contenido .container,
+.registro-pagina {
+    background: #f4f7fb !important;
+    background-color: #f4f7fb !important;
+}
+
+
+/* ==========================================================
+   CONTENEDOR GENERAL
+   ========================================================== */
+
+.registro-contenedor {
+    max-width: 610px !important;
+    padding: 34px !important;
+}
+
+
+/* ==========================================================
+   TODOS LOS ROLES
+   MISMA ALTURA
+   MISMO ANCHO
+   MISMO ESPACIADO
+   ========================================================== */
+
+.registro-opciones {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+.registro-opcion {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 84px !important;
+    min-height: 84px !important;
+    max-height: 84px !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    padding: 13px 15px !important;
+
+    margin: 0 !important;
+
+    border-radius: 13px !important;
+}
+
+
+/* ==========================================================
+   CONTENIDO INTERNO DE CADA ROL
+   ========================================================== */
+
+.registro-opcion > div,
+.registro-opcion > section {
+    box-sizing: border-box !important;
+}
+
+
+/* Títulos de los cinco roles */
+.registro-opcion h3 {
+    margin-top: 0 !important;
+    margin-bottom: 4px !important;
+}
+
+
+/* Descripción */
+.registro-opcion p {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+
+/* Botones */
+.registro-opcion a,
+.registro-opcion .boton {
+    flex-shrink: 0 !important;
+}
+
+
+/* ==========================================================
+   ILUSTRACIÓN SIN PANEL
+   ========================================================== */
+
+.registro-ilustracion {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+
+/* ==========================================================
+   VOLVER AL LOGIN
+   ========================================================== */
+
+.registro-boton-volver,
+.link-back {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 700px) {
+
+    .registro-contenedor {
+        max-width: calc(100% - 24px) !important;
+        padding: 25px !important;
+    }
+
+    .registro-opcion {
+        height: 84px !important;
+        min-height: 84px !important;
+        max-height: 84px !important;
+    }
+
+}
+
+</style>
+<!-- FIN EDUTURNOS_ROLES_TODOS_IGUALES_20260926 -->

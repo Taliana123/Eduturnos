@@ -1,0 +1,276 @@
+﻿/* ================================================================
+   EDUTURNOS - AJUSTE VISUAL FINAL LOGIN
+   ================================================================ */
+
+
+/* ================================================================
+   DOCUMENTO Y CONTRASEÑA
+   ================================================================ */
+
+html body input[name="identificador"],
+html body input[name="password"] {
+    color: #273142 !important;
+    caret-color: #273142 !important;
+}
+
+html body label:has(input[name="identificador"]),
+html body label:has(input[name="password"]),
+html body label:has(input[name="identificador"]) *,
+html body label:has(input[name="password"]) * {
+    color: #273142 !important;
+}
+
+
+/* ================================================================
+   PERSONAL INSTITUCIONAL
+   ================================================================ */
+
+html body .personal-login .form-grid,
+html body .personal-login .personal-fields-grid {
+
+    display: grid !important;
+
+    grid-template-columns:
+        145px
+        240px
+        108px !important;
+
+    column-gap: 12px !important;
+
+    row-gap: 0 !important;
+
+    align-items: end !important;
+
+    justify-content: center !important;
+}
+
+
+/* ================================================================
+   TITULOS
+   ================================================================ */
+
+html body .personal-login .personal-field-title,
+html body .personal-login label span.personal-field-title {
+
+    display: block !important;
+
+    width: 100% !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+
+    margin-bottom: 8px !important;
+}
+
+
+/* ================================================================
+   CODIGO
+   6 DIGITOS + POCO ESPACIO
+   ================================================================ */
+
+html body input[name="codigo_institucional"] {
+
+    width: 112px !important;
+
+    min-width: 112px !important;
+
+    max-width: 112px !important;
+
+    margin-left: auto !important;
+
+    margin-right: auto !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ================================================================
+   SEDE
+   UN POCO MAS PEQUEÑA
+   ================================================================ */
+
+html body select[name="sede_id"] {
+
+    width: 240px !important;
+
+    min-width: 240px !important;
+
+    max-width: 240px !important;
+
+    margin-left: auto !important;
+
+    margin-right: auto !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ================================================================
+   JORNADA
+   ================================================================ */
+
+html body select[name="jornada_id"] {
+
+    width: 108px !important;
+
+    min-width: 108px !important;
+
+    max-width: 108px !important;
+
+    margin-left: auto !important;
+
+    margin-right: auto !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ================================================================
+   NO DEBES ESCOGERLO
+   ================================================================ */
+
+html body .section-heading p,
+html body .section-heading p *,
+html body .section-heading strong,
+html body .section-heading span {
+
+    border: 0 !important;
+
+    border-bottom: 0 !important;
+
+    text-decoration: none !important;
+
+    box-shadow: none !important;
+
+    background-image: none !important;
+}
+
+html body .section-heading::before,
+html body .section-heading::after {
+
+    content: none !important;
+
+    display: none !important;
+
+    border: 0 !important;
+}
+
+
+/* ================================================================
+   DIBUJO
+   CONSERVARLO, PERO SIN MOVIMIENTO ANIMADO
+   ================================================================ */
+
+html body .login-page svg,
+html body .login-page svg * {
+
+    animation: none !important;
+
+    animation-name: none !important;
+
+    animation-duration: 0s !important;
+
+    animation-delay: 0s !important;
+}
+
+
+/* ================================================================
+   BOTON INGRESAR
+   UN POCO MAS GRANDE
+   ================================================================ */
+
+html body .login-page .boton-full {
+
+    min-height: 52px !important;
+
+    padding: 14px 28px !important;
+
+    font-size: 15px !important;
+}
+
+
+/* ================================================================
+   FIN
+   ================================================================ */
+
+
+/* ==========================================================
+   EDUTURNOS — CONTROL FINAL LOGIN
+   ========================================================== */
+
+html body .login-page .personal-login .personal-fields-grid {
+    display: grid !important;
+    grid-template-columns: 112px minmax(300px, 1fr) 92px !important;
+    column-gap: 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+html body .login-page .personal-login .personal-field-code {
+    width: 112px !important;
+    min-width: 112px !important;
+    max-width: 112px !important;
+}
+
+html body .login-page .personal-login .personal-field-code input {
+    width: 112px !important;
+    min-width: 112px !important;
+    max-width: 112px !important;
+}
+
+html body .login-page .personal-login .personal-field-sede {
+    width: 100% !important;
+    min-width: 300px !important;
+}
+
+html body .login-page .personal-login .personal-field-sede select {
+    width: 100% !important;
+    min-width: 300px !important;
+    white-space: nowrap !important;
+}
+
+html body .login-page .personal-login .personal-field-jornada {
+    width: 92px !important;
+    min-width: 92px !important;
+    max-width: 92px !important;
+}
+
+html body .login-page .personal-login .personal-field-jornada select {
+    width: 92px !important;
+    min-width: 92px !important;
+    max-width: 92px !important;
+}
+
+html body .login-page .login-illustration {
+    background: transparent !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+
+html body .login-page .section-heading,
+html body .login-page .section-heading h1,
+html body .login-page .section-heading p,
+html body .login-page .form-links {
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+@media (max-width:700px) {
+
+    html body .login-page .personal-login .personal-fields-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    html body .login-page .personal-login .personal-field,
+    html body .login-page .personal-login .personal-field-code,
+    html body .login-page .personal-login .personal-field-sede,
+    html body .login-page .personal-login .personal-field-jornada {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+    }
+}
+

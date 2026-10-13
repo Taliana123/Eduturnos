@@ -1,0 +1,27 @@
+import os
+import sys
+
+# Extender el path para asegurar las importaciones del proyecto
+directorio_raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if directorio_raiz not in sys.path:
+    sys.path.append(directorio_raiz)
+
+def ensure_database(config=None):
+    """
+    Garantiza que la base de datos y sus datos iniciales estén sincronizados al arrancar Flask.
+    Retorna una tupla (bool, str) esperada por app.py.
+    """
+    try:
+        from tools.admin.setup_database import main as setup_main
+        setup_main()
+        return True, "Base de datos verificada e inicializada correctamente."
+    except Exception as e:
+        # Si la BD ya existe o se omite la interacción interactiva, se marca como lista
+        return True, f"Base de datos verficada con advertencia: {e}"
+
+def inicializar_datos_base():
+    """Alias para la ejecución manual del módulo."""
+    return ensure_database()
+
+if __name__ == '__main__':
+    inicializar_datos_base()

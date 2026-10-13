@@ -1,0 +1,22 @@
+EDUTURNOS - USO FACIL
+
+1. USO DIARIO
+   Doble clic en ABRIR_EDUTURNOS.vbs
+   o en tools/iniciar_eduturnos.bat
+
+2. PRIMERA VEZ EN UN PC NUEVO
+   El archivo detecta Python con 'py' o 'python', crea el entorno virtual
+   e instala las dependencias una sola vez.
+
+3. MYSQL LOCAL
+   Para el modo local, el PC necesita MySQL Server activo y la base eduturnos.
+   El iniciador intenta encender automaticamente el servicio si existe con
+   alguno de estos nombres: mysql, mysql80 o mysql84.
+
+4. SITIO PARA MUCHAS PERSONAS
+   Los usuarios finales NO deben instalar este proyecto. Para ellos EDUTURNOS
+   debe estar desplegado en un servidor central y se usa una URL publica HTTPS.
+   En ese escenario la base MySQL es central y no depende del PC del usuario.
+
+5. ENLACE LOCAL
+   http://127.0.0.1:5000 solo funciona en el PC donde corre EDUTURNOS.

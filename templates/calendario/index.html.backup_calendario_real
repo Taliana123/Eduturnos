@@ -1,0 +1,106 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Calendario Â· EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<div class="page-navigation">
+
+    <a
+        class="link-back"
+        href="{{ request.referrer or url_for('auth.dashboard') }}"
+    >
+        â† AtrÃ¡s
+    </a>
+
+</div>
+
+
+<section class="page-head">
+
+    <div>
+
+        <h1>Calendario</h1>
+
+        <p>
+            Consulta tus citaciones y actividades programadas.
+        </p>
+
+    </div>
+
+</section>
+
+
+<div class="table-wrap">
+
+    {% if citas %}
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Estudiante</th>
+                <th>Docente</th>
+                <th>Motivo</th>
+                <th>Estado</th>
+                <th>Lugar</th>
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for c in citas %}
+
+            <tr>
+
+                <td>{{ c.fecha }}</td>
+
+                <td>{{ c.hora }}</td>
+
+                <td>{{ c.estudiante }}</td>
+
+                <td>{{ c.docente }}</td>
+
+                <td>{{ c.motivo }}</td>
+
+                <td>
+                    <span class="badge">
+                        {{ c.estado }}
+                    </span>
+                </td>
+
+                <td>{{ c.lugar }}</td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <h3>
+            No tienes citas programadas
+        </h3>
+
+        <p>
+            Cuando tengas una citaciÃ³n registrada, aparecerÃ¡ aquÃ­.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

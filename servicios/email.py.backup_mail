@@ -1,0 +1,123 @@
+"""Servicio de correo de EDUTURNOS usando la biblioteca estándar de Python.
+
+No requiere instalar una biblioteca SMTP adicional: utiliza smtplib y email.
+La cuenta configurada en el servidor es únicamente el remitente del sistema;
+los destinatarios se toman del correo de cada usuario registrado.
+"""
+from __future__ import annotations
+
+import html
+import smtplib
+from email.message import EmailMessage
+from typing import Optional
+
+from flask import current_app
+
+
+def correo_configurado() -> bool:
+    """Indica si existe una configuración SMTP utilizable."""
+    mode = (current_app.config.get("MAIL_MODE") or "disabled").lower()
+    return mode == "console" or bool(
+        current_app.config.get("MAIL_USERNAME")
+        and current_app.config.get("MAIL_PASSWORD")
+        and current_app.config.get("MAIL_FROM")
+        and current_app.config.get("MAIL_HOST")
+    )
+
+
+def _mensaje_recuperacion(destinatario: str, token: str, codigo: str) -> EmailMessage:
+    base = (current_app.config.get("APP_ORIGIN") or "http://127.0.0.1:5000").rstrip("/")
+    enlace = f"{base}/auth/restablecer/{token}"
+
+    msg = EmailMessage()
+    msg["Subject"] = "Código de recuperación de acceso · EDUTURNOS"
+    msg["From"] = current_app.config["MAIL_FROM"]
+    msg["To"] = destinatario
+
+    texto = (
+        "EDUTURNOS\n\n"
+        f"Tu código de recuperación es: {codigo}\n\n"
+        "Este código vence en 10 minutos y solo puede utilizarse una vez.\n"
+        "También puedes utilizar el siguiente enlace:\n"
+        f"{enlace}\n\n"
+        "Si tú no solicitaste recuperar el acceso, ignora este mensaje."
+    )
+
+    safe_code = html.escape(codigo)
+    safe_link = html.escape(enlace, quote=True)
+    html_body = f"""
+    <html><body style=\"font-family:Arial,sans-serif;line-height:1.55;color:#1f2937\">
+      <h2>EDUTURNOS</h2>
+      <p>Recibimos una solicitud para recuperar el acceso a tu cuenta.</p>
+      <p style=\"font-size:24px;font-weight:700;letter-spacing:4px\">{safe_code}</p>
+      <p>El código vence en 10 minutos y solo puede utilizarse una vez.</p>
+      <p><a href=\"{safe_link}\">Restablecer mi contraseña</a></p>
+      <p>Si tú no solicitaste recuperar el acceso, ignora este mensaje.</p>
+    </body></html>
+    """
+    msg.set_content(texto)
+    msg.add_alternative(html_body, subtype="html")
+    return msg
+
+
+def enviar_correo_recuperacion(destinatario: str, token: str, codigo: str = "") -> bool:
+    """Envía el correo de recuperación al destinatario indicado.
+
+    Devuelve True solo cuando el servidor SMTP acepta el mensaje.
+    En desarrollo puede usarse MAIL_MODE=console para pruebas sin envío real.
+    """
+    destinatario = (destinatario or "").strip()
+    if not destinatario:
+        raise ValueError("El destinatario está vacío.")
+
+    mode = (current_app.config.get("MAIL_MODE") or "disabled").lower()
+    base = (current_app.config.get("APP_ORIGIN") or "http://127.0.0.1:5000").rstrip("/")
+    enlace = f"{base}/auth/restablecer/{token}"
+
+    if mode == "console":
+        # Modo DEMO: no realiza un envío real y jamás registra códigos o enlaces de recuperación.
+        current_app.logger.info("Modo de correo DEMO activo: no se envió correo de recuperación.")
+        return False
+
+    if mode != "smtp":
+        raise RuntimeError(
+            "El envío de correo está desactivado. Configura MAIL_MODE=smtp y las credenciales SMTP del sistema."
+        )
+
+    host = current_app.config.get("MAIL_HOST")
+    port = int(current_app.config.get("MAIL_PORT", 587))
+    user = current_app.config.get("MAIL_USERNAME")
+    password = current_app.config.get("MAIL_PASSWORD")
+    sender = current_app.config.get("MAIL_FROM") or user
+    use_tls = bool(current_app.config.get("MAIL_USE_TLS", True))
+    use_ssl = bool(current_app.config.get("MAIL_USE_SSL", False))
+    timeout = int(current_app.config.get("MAIL_TIMEOUT", 20))
+
+    if not all((host, port, user, password, sender)):
+        raise RuntimeError("Falta configurar el remitente SMTP de EDUTURNOS.")
+
+    msg = _mensaje_recuperacion(destinatario, token, codigo)
+
+    # Reintento corto para fallos transitorios de red.
+    ultimo_error: Optional[Exception] = None
+    for intento in range(2):
+        try:
+            if use_ssl or port == 465:
+                with smtplib.SMTP_SSL(host, port, timeout=timeout) as smtp:
+                    smtp.login(user, password)
+                    smtp.send_message(msg)
+            else:
+                with smtplib.SMTP(host, port, timeout=timeout) as smtp:
+                    smtp.ehlo()
+                    if use_tls:
+                        smtp.starttls()
+                        smtp.ehlo()
+                    smtp.login(user, password)
+                    smtp.send_message(msg)
+            current_app.logger.info("Correo de recuperación enviado a %s", destinatario)
+            return True
+        except (smtplib.SMTPException, OSError) as exc:
+            ultimo_error = exc
+            current_app.logger.warning("Intento %s de envío SMTP falló: %s", intento + 1, exc)
+
+    raise RuntimeError(f"No se pudo enviar el correo de recuperación: {ultimo_error}")

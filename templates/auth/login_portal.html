@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block contenido %}
+<div class="tarjeta formulario">
+    <p><a href="{{ url_for('auth.login') }}">← Cambiar tipo de acceso</a></p>
+    <h1>{{ info.label }}</h1>
+    <p>{{ info.instruccion }}</p>
+    <form method="post">{{ csrf_field()|safe }}
+        <label>
+            {% if info.identificador == 'correo' %}Correo institucional{% else %}Número de documento{% endif %}
+            <input name="identificador" type="{{ 'email' if info.identificador == 'correo' else 'text' }}" required>
+        </label>
+        <label>Contraseña<input type="password" name="password" required></label>
+        <button class="boton" type="submit">Ingresar</button>
+    </form>
+    <p style="margin-top:14px;">¿Todavía no tienes cuenta? <a href="{{ url_for('auth.registro_portal', portal=portal) }}">Crear cuenta</a></p>
+</div>
+
+
+
+
+{% endblock %}

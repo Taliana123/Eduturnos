@@ -1,0 +1,112 @@
+{% extends "base.html" %}{% block content %}<div class="page-head"><h1>Nueva citación</h1></div>
+<form method="post" class="panel form-grid">{{ csrf_field()|safe }}
+<label class="full-field">Estudiante<select name="estudiante" required>
+<option value="" selected disabled hidden></option>
+{% for e in catalogos.estudiantes %}<option value="{{ e.id }}">{{ e.apellidos }} {{ e.nombres }} · {{ e.documento }} · {{ e.grado }}-{{ e.grupo }} · {{ e.sede }}</option>{% endfor %}</select></label>
+<label>Acudiente<select name="acudiente" required>
+<option value="" selected disabled hidden></option>
+{% for e in catalogos.estudiantes %}{% set relaciones=[] %}{% endfor %}</select></label>
+<label>Docente<select name="docente">
+<option value="" selected disabled hidden></option>
+{% for d in catalogos.docentes %}<option value="{{ d.id }}">{{ d.apellidos }} {{ d.nombres }}</option>{% endfor %}</select></label>
+<label>Motivo<select name="motivo">
+<option value="" selected disabled hidden></option>
+{% for m in catalogos.motivos %}<option value="{{ m.id }}">{{ m.nombre }}</option>{% endfor %}</select></label>
+<label>Periodo<select name="periodo">
+<option value="" selected disabled hidden></option>
+{% for p in catalogos.periodos %}<option value="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</select></label>
+<label>Fecha<input type="date" name="fecha" required></label><label>Hora<input type="time" name="hora" required></label>
+<label>Lugar<input name="lugar" placeholder="Ej. Coordinación" required></label><label class="full-field">Observaciones<textarea name="observaciones"></textarea></label>
+<div class="full-field note">Importante: el acudiente debe estar relacionado previamente con el estudiante. La validación se hace también en el backend.</div>
+<div class="full-field actions"><button class="btn">Crear citación</button><a class="btn outline" href="{{ url_for('citaciones.lista') }}">Cancelar</a></div>
+</form>
+
+<style id="EDUTURNOS_BOTONES_V4">
+/* =========================================================
+   EDUTURNOS
+   SOLO BOTONES
+   Mismo azul y letra que "+ Nueva citación" de Citas
+   ========================================================= */
+
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a[class*="boton"],
+a.btn,
+a[class*="btn-"],
+a.link-back,
+a.edc-back,
+.boton,
+.btn,
+[class*="boton-"],
+[class*="btn-"],
+.link-back,
+.edc-back {
+
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+
+    color: #ffffff !important;
+
+    border-color: #1769aa !important;
+
+    text-decoration: none !important;
+}
+
+/* Texto dentro de botones */
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a[class*="boton"] *,
+a.btn *,
+a[class*="btn-"] *,
+.link-back *,
+.edc-back * {
+    color: #ffffff !important;
+}
+
+/* Hover */
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a[class*="boton"]:hover,
+a.btn:hover,
+a[class*="btn-"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.boton:hover,
+.btn:hover,
+[class*="boton-"]:hover,
+[class*="btn-"]:hover,
+.link-back:hover,
+.edc-back:hover {
+
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+
+    color: #ffffff !important;
+
+    border-color: #145b91 !important;
+
+    text-decoration: none !important;
+}
+
+/* Elementos hijos durante hover */
+button:hover *,
+a.boton:hover *,
+a[class*="boton"]:hover *,
+a.btn:hover *,
+a[class*="btn-"]:hover *,
+.link-back:hover *,
+.edc-back:hover * {
+    color: #ffffff !important;
+}
+</style>
+
+{% endblock %}

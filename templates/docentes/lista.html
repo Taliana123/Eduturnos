@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block content %}<div class="page-head"><h1>Docentes</h1><a class="boton" href="{{ url_for('docentes.nuevo') }}">+ Nuevo</a></div><div class="table-wrap"><table><tr><th>Docente</th><th>Correo institucional</th><th>Asignatura</th><th>Sede</th><th>Acciones</th></tr>{% for d in docentes %}<tr><td>{{ d.nombres }} {{ d.apellidos }}</td><td>{{ d.correo_institucional }}</td><td>{{ d.asignatura or '-' }}</td><td>{{ d.sede or '-' }}</td><td class="table-actions-cell"><a href="{{ url_for('docentes.editar',id=d.id_docente) }}">Editar</a></td></tr>{% else %}<tr><td colspan="5">No hay docentes.</td></tr>{% endfor %}</table></div>
+
+
+
+{% endblock %}

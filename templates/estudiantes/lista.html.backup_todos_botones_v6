@@ -1,0 +1,91 @@
+{% extends 'base.html' %}{% block content %}<div class="page-head"><div><h1>Estudiantes</h1></div><a class="boton" href="{{ url_for('estudiantes.nuevo') }}">+ Nuevo</a></div><form method="get" class="search">{{ csrf_field()|safe }}<input name="q" value="{{ q }}" placeholder="Nombre, apellido o documento"><button class="boton secundario">Buscar</button></form><div class="table-wrap"><table><tr><th>Estudiante</th><th>Documento</th><th>Curso</th><th>Sede</th><th>Estado</th><th>Acción</th></tr>{% for e in estudiantes %}<tr><td>{{ e.nombres }} {{ e.apellidos }}</td><td>{{ e.documento }}</td><td>{{ e.curso or '-' }}</td><td>{{ e.sede or '-' }}</td><td>{{ e.estado }}</td><td><a href="{{ url_for('estudiantes.editar',id=e.id_estudiante) }}">Editar</a></td></tr>{% else %}<tr><td colspan="6">No hay resultados.</td></tr>{% endfor %}</table></div>
+
+<style id="EDUTURNOS_BOTONES_V4">
+/* =========================================================
+   EDUTURNOS
+   SOLO BOTONES
+   Mismo azul y letra que "+ Nueva citación" de Citas
+   ========================================================= */
+
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+a.boton,
+a[class*="boton"],
+a.btn,
+a[class*="btn-"],
+a.link-back,
+a.edc-back,
+.boton,
+.btn,
+[class*="boton-"],
+[class*="btn-"],
+.link-back,
+.edc-back {
+
+    background: #1769aa !important;
+    background-color: #1769aa !important;
+
+    color: #ffffff !important;
+
+    border-color: #1769aa !important;
+
+    text-decoration: none !important;
+}
+
+/* Texto dentro de botones */
+button *,
+input[type="submit"] *,
+input[type="button"] *,
+input[type="reset"] *,
+a.boton *,
+a[class*="boton"] *,
+a.btn *,
+a[class*="btn-"] *,
+.link-back *,
+.edc-back * {
+    color: #ffffff !important;
+}
+
+/* Hover */
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+a.boton:hover,
+a[class*="boton"]:hover,
+a.btn:hover,
+a[class*="btn-"]:hover,
+a.link-back:hover,
+a.edc-back:hover,
+.boton:hover,
+.btn:hover,
+[class*="boton-"]:hover,
+[class*="btn-"]:hover,
+.link-back:hover,
+.edc-back:hover {
+
+    background: #145b91 !important;
+    background-color: #145b91 !important;
+
+    color: #ffffff !important;
+
+    border-color: #145b91 !important;
+
+    text-decoration: none !important;
+}
+
+/* Elementos hijos durante hover */
+button:hover *,
+a.boton:hover *,
+a[class*="boton"]:hover *,
+a.btn:hover *,
+a[class*="btn-"]:hover *,
+.link-back:hover *,
+.edc-back:hover * {
+    color: #ffffff !important;
+}
+</style>
+
+{% endblock %}

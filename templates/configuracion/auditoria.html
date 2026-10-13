@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block content %}<h1>Auditoría</h1><div class="table-wrap"><table><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Módulo</th><th>Registro</th><th>Detalle</th></tr>{% for a in datos %}<tr><td>{{ a.fecha_creacion.strftime('%d/%m/%Y') }} {{ a.fecha_creacion|hora_ampm }}</td><td>{{ a.nombres or '' }} {{ a.apellidos or '' }}</td><td>{{ a.accion }}</td><td>{{ a.modulo }}</td><td>{{ a.registro_id or '-' }}</td><td>{{ a.detalle or '' }}</td></tr>{% else %}<tr><td colspan="6">No hay registros.</td></tr>{% endfor %}</table></div>
+
+
+
+{% endblock %}

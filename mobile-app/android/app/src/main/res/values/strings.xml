@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EDUTURNOS</string>
+    <string name="title_activity_main">EDUTURNOS</string>
+    <string name="package_name">co.eduturnos.app</string>
+    <string name="custom_url_scheme">co.eduturnos.app</string>
+</resources>

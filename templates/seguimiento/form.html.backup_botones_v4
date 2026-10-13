@@ -1,0 +1,3 @@
+{% extends 'base.html' %}{% block content %}<h1>Registrar seguimiento</h1><div class="panel"><p><strong>Estudiante:</strong> {{ cita.estudiante_n }} {{ cita.estudiante_a }}</p><p><strong>Estado actual:</strong> {{ cita.estado }}</p><form method="post">{{ csrf_field()|safe }}<label>Asistencia<select name="asistencia">
+<option value="" selected disabled hidden></option>
+<option>Pendiente</option><option>Asistió</option><option>No asistió</option></select></label><label>Observaciones<textarea name="observaciones"></textarea></label><button class="boton">Guardar</button></form></div>{% endblock %}

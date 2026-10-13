@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Reportes · EDUTURNOS{% endblock %}
+{% block content %}
+<section class="page-head"><div><a class="link-back" href="{{ url_for('auth.dashboard') }}">← Inicio</a><h1>Reportes</h1><p>Consulta citaciones y genera archivos a partir de los datos reales de MySQL.</p></div></section>
+<section class="tarjeta">
+  <form method="get" class="form-grid">{{ csrf_field()|safe }}
+    <label>Desde<input type="date" name="desde" value="{{ desde }}"></label>
+    <label>Hasta<input type="date" name="hasta" value="{{ hasta }}"></label>
+    <label>Estado<select name="estado">
+<option value="" selected disabled hidden></option>
+<option value="">Todos</option>{% for e in estados %}<option value="{{ e.nombre }}" {% if estado==e.nombre %}selected{% endif %}>{{ e.nombre }}</option>{% endfor %}</select></label>
+    <div class="form-actions"><button class="boton" type="submit">Filtrar</button><a class="boton secundario" href="{{ url_for('reportes.index') }}">Limpiar</a></div>
+  </form>
+</section>
+<div class="kpi-grid">
+  <div class="kpi"><span>Total</span><strong>{{ resumen.total or 0 }}</strong></div>
+  <div class="kpi"><span>Pendientes</span><strong>{{ resumen.pendientes or 0 }}</strong></div>
+  <div class="kpi"><span>Confirmadas</span><strong>{{ resumen.confirmadas or 0 }}</strong></div>
+  <div class="kpi"><span>Realizadas</span><strong>{{ resumen.realizadas or 0 }}</strong></div>
+</div>
+<section class="tarjeta"><div class="acciones report-export"><a class="boton pequeno" href="{{ url_for('reportes.exportar_csv',desde=desde,hasta=hasta,estado=estado) }}">CSV</a><a class="boton pequeno" href="{{ url_for('reportes.exportar_xlsx',desde=desde,hasta=hasta,estado=estado) }}">Excel</a><a class="boton pequeno" href="{{ url_for('reportes.exportar_pdf',desde=desde,hasta=hasta,estado=estado) }}">PDF</a></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Hora</th><th>Estado</th><th>Motivo</th><th>Estudiante</th><th>Docente</th><th>Acudiente</th></tr></thead><tbody>{% for c in citas %}<tr><td>{{ c.fecha }}</td><td>{{ c.hora }}</td><td><span class="badge">{{ c.estado }}</span></td><td>{{ c.motivo }}</td><td>{{ c.estudiante }}</td><td>{{ c.docente }}</td><td>{{ c.acudiente }}</td></tr>{% else %}<tr><td colspan="7">No hay datos con esos filtros.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

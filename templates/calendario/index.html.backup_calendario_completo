@@ -1,0 +1,3152 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Calendario de citas | EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<style>
+    .ed-calendario {
+        width: 100%;
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .ed-cal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .ed-cal-header h1 {
+        margin: 0;
+        color: #123b68;
+        font-size: 30px;
+        font-weight: 800;
+    }
+
+    .ed-cal-header p {
+        margin: 6px 0 0;
+        color: #68778b;
+        font-size: 14px;
+    }
+
+    .ed-cal-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .ed-cal-btn {
+        height: 40px;
+        padding: 0 14px;
+        border: 1px solid #d5dee8;
+        border-radius: 8px;
+        background: #fff;
+        color: #24364f;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .ed-cal-btn:hover {
+        background: #f5f8fb;
+    }
+
+    .ed-cal-btn-primary {
+        background: #123b68;
+        border-color: #123b68;
+        color: #fff;
+    }
+
+    .ed-cal-btn-primary:hover {
+        background: #0d3158;
+    }
+
+    .ed-cal-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .ed-stat {
+        background: #fff;
+        border: 1px solid #e1e7ee;
+        border-radius: 10px;
+        padding: 14px 16px;
+    }
+
+    .ed-stat-label {
+        color: #77869a;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .ed-stat-value {
+        margin-top: 5px;
+        color: #123b68;
+        font-size: 25px;
+        font-weight: 800;
+    }
+
+    .ed-filtros {
+        background: #fff;
+        border: 1px solid #e1e7ee;
+        border-radius: 10px;
+        padding: 13px;
+        margin-bottom: 18px;
+    }
+
+    .ed-filtros-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+        gap: 8px;
+    }
+
+    .ed-filtros input,
+    .ed-filtros select {
+        width: 100%;
+        height: 39px;
+        padding: 0 10px;
+        border: 1px solid #cdd7e2;
+        border-radius: 7px;
+        background: #fff;
+        color: #26384f;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .ed-filtros input:focus,
+    .ed-filtros select:focus {
+        border-color: #3978b7;
+        box-shadow: 0 0 0 2px rgba(57,120,183,.1);
+    }
+
+    .ed-filtros-footer {
+        margin-top: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .ed-cal-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .ed-cal-navigation {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .ed-nav {
+        width: 37px;
+        height: 37px;
+        border: 1px solid #d3dde7;
+        border-radius: 7px;
+        background: #fff;
+        color: #20354e;
+        font-size: 21px;
+        cursor: pointer;
+    }
+
+    .ed-nav:hover {
+        background: #f3f7fa;
+    }
+
+    .ed-hoy {
+        height: 37px;
+        padding: 0 13px;
+        border: 1px solid #d3dde7;
+        border-radius: 7px;
+        background: #fff;
+        color: #20354e;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .ed-periodo {
+        margin-left: 8px;
+        color: #123b68;
+        font-size: 21px;
+        font-weight: 800;
+        text-transform: capitalize;
+    }
+
+    .ed-vistas {
+        display: flex;
+        gap: 5px;
+    }
+
+    .ed-vista {
+        height: 35px;
+        padding: 0 10px;
+        border: 1px solid #d3dde7;
+        border-radius: 7px;
+        background: #fff;
+        color: #58697e;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .ed-vista.activa {
+        background: #123b68;
+        border-color: #123b68;
+        color: white;
+    }
+
+    .ed-cal-card {
+        background: #fff;
+        border: 1px solid #dfe6ed;
+        border-radius: 12px;
+        padding: 10px;
+        overflow-x: auto;
+    }
+
+    /*
+       CALENDARIO REAL
+    */
+
+    .ed-month-table {
+        width: 100%;
+        min-width: 980px;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed;
+        border: 1px solid #d9e1e9;
+        border-radius: 9px;
+        overflow: hidden;
+    }
+
+    .ed-month-table th {
+        height: 44px;
+        padding: 8px;
+        background: #f3f6f9;
+        border-right: 1px solid #dce3ea;
+        border-bottom: 1px solid #dce3ea;
+        color: #526276;
+        font-size: 12px;
+        font-weight: 800;
+        text-align: center;
+    }
+
+    .ed-month-table th:last-child {
+        border-right: 0;
+    }
+
+    .ed-day-cell {
+        height: 145px;
+        vertical-align: top;
+        padding: 6px;
+        background: #fff;
+        border-right: 1px solid #e0e6ec;
+        border-bottom: 1px solid #e0e6ec;
+    }
+
+    .ed-day-cell:last-child {
+        border-right: 0;
+    }
+
+    .ed-day-cell.otro-mes {
+        background: #fafbfd;
+    }
+
+    .ed-day-number {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 5px;
+        color: #384a61;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .ed-day-cell.hoy {
+        background: #f3f8fd;
+    }
+
+    .ed-day-cell.hoy .ed-day-number {
+        background: #123b68;
+        color: #fff;
+    }
+
+    .ed-day-events {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .ed-cita {
+        width: 100%;
+        display: block;
+        padding: 5px 6px;
+        border: 0;
+        border-left: 4px solid #28659d;
+        border-radius: 5px;
+        background: #edf4fb;
+        color: #1c3e61;
+        text-align: left;
+        cursor: pointer;
+        font-size: 10px;
+        line-height: 1.25;
+        font-weight: 700;
+    }
+
+    .ed-cita:hover {
+        filter: brightness(.96);
+    }
+
+    .ed-cita.pendiente {
+        border-left-color: #d4931c;
+        background: #fff7e6;
+        color: #73500e;
+    }
+
+    .ed-cita.confirmada {
+        border-left-color: #26935d;
+        background: #edf8f1;
+        color: #195f3e;
+    }
+
+    .ed-cita.cancelada {
+        border-left-color: #c74a4a;
+        background: #fff0f0;
+        color: #772626;
+        opacity: .75;
+    }
+
+    .ed-cita.reprogramada {
+        border-left-color: #7652af;
+        background: #f4effc;
+        color: #573e82;
+    }
+
+    .ed-cita.completada {
+        border-left-color: #2f6fa6;
+        background: #edf5fc;
+        color: #245579;
+    }
+
+    .ed-cita-hora {
+        font-weight: 800;
+    }
+
+    .ed-mas {
+        padding: 2px 5px;
+        color: #64748b;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    /*
+       VISTAS SEMANA / DIA / AGENDA
+    */
+
+    .ed-vista-contenido {
+        display: none;
+    }
+
+    .ed-vista-contenido.activa {
+        display: block;
+    }
+
+    .ed-week-wrapper {
+        overflow-x: auto;
+    }
+
+    .ed-week-table {
+        width: 100%;
+        min-width: 1000px;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    .ed-week-table th {
+        height: 48px;
+        background: #f3f6f9;
+        border: 1px solid #dce3ea;
+        color: #526276;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .ed-week-table td {
+        border: 1px solid #e1e7ed;
+        height: 60px;
+        vertical-align: top;
+        padding: 4px;
+    }
+
+    .ed-hora {
+        width: 70px;
+        color: #7b899a;
+        font-size: 10px;
+        text-align: center;
+        font-weight: 700;
+        background: #fafbfd;
+    }
+
+    .ed-dia-hoy {
+        background: #f3f8fd;
+    }
+
+    .ed-day-detail {
+        border: 1px solid #dfe6ed;
+        border-radius: 9px;
+        overflow: hidden;
+    }
+
+    .ed-day-detail-head {
+        padding: 14px;
+        background: #f4f7fa;
+        border-bottom: 1px solid #dde5ec;
+    }
+
+    .ed-day-detail-head h3 {
+        margin: 0;
+        color: #123b68;
+        font-size: 18px;
+        text-transform: capitalize;
+    }
+
+    .ed-day-detail-row {
+        display: grid;
+        grid-template-columns: 80px 1fr;
+        min-height: 65px;
+        border-bottom: 1px solid #e3e8ee;
+    }
+
+    .ed-day-detail-row:last-child {
+        border-bottom: 0;
+    }
+
+    .ed-day-detail-time {
+        padding: 16px 8px;
+        color: #78879a;
+        background: #fafbfd;
+        border-right: 1px solid #e1e7ed;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .ed-day-detail-content {
+        padding: 9px;
+    }
+
+    .ed-agenda {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .ed-agenda-item {
+        display: grid;
+        grid-template-columns: 105px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 12px;
+        border: 1px solid #e0e6ed;
+        border-radius: 8px;
+        background: #fbfcfd;
+        cursor: pointer;
+    }
+
+    .ed-agenda-date {
+        color: #123b68;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .ed-agenda-main strong {
+        display: block;
+        color: #203149;
+        font-size: 12px;
+    }
+
+    .ed-agenda-main span {
+        display: block;
+        margin-top: 3px;
+        color: #758399;
+        font-size: 11px;
+    }
+
+    .ed-estado {
+        padding: 5px 8px;
+        border-radius: 999px;
+        background: #edf1f5;
+        color: #4a5a70;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    /*
+       PROXIMAS
+    */
+
+    .ed-proximas {
+        margin-top: 16px;
+        border: 1px solid #e0e6ed;
+        border-radius: 11px;
+        background: #fff;
+        padding: 15px;
+    }
+
+    .ed-proximas h2 {
+        margin: 0 0 11px;
+        color: #123b68;
+        font-size: 18px;
+    }
+
+    .ed-proximas-lista {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .ed-proxima {
+        display: grid;
+        grid-template-columns: 110px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #e5eaf0;
+        border-radius: 8px;
+        background: #fafcfd;
+        cursor: pointer;
+    }
+
+    .ed-proxima-fecha {
+        color: #123b68;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .ed-proxima-main strong {
+        display: block;
+        color: #243750;
+        font-size: 12px;
+    }
+
+    .ed-proxima-main span {
+        display: block;
+        margin-top: 2px;
+        color: #79879a;
+        font-size: 11px;
+    }
+
+    /*
+       MODAL
+    */
+
+    .ed-modal-fondo {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(10, 24, 41, .58);
+    }
+
+    .ed-modal {
+        width: min(720px, 100%);
+        max-height: 90vh;
+        overflow-y: auto;
+        background: #fff;
+        border-radius: 13px;
+        box-shadow: 0 24px 70px rgba(0,0,0,.25);
+    }
+
+    .ed-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 17px;
+        border-bottom: 1px solid #e0e6ed;
+    }
+
+    .ed-modal-head h3 {
+        margin: 0;
+        color: #123b68;
+        font-size: 19px;
+    }
+
+    .ed-modal-close {
+        width: 34px;
+        height: 34px;
+        border: 0;
+        border-radius: 7px;
+        background: #f1f4f7;
+        color: #44556b;
+        cursor: pointer;
+        font-size: 19px;
+    }
+
+    .ed-modal-body {
+        padding: 17px;
+    }
+
+    .ed-detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+    }
+
+    .ed-detail {
+        padding: 11px;
+        border: 1px solid #e1e7ed;
+        border-radius: 8px;
+        background: #f8fafc;
+    }
+
+    .ed-detail-full {
+        grid-column: 1 / -1;
+    }
+
+    .ed-detail-label {
+        margin-bottom: 3px;
+        color: #7c8999;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .ed-detail-value {
+        color: #263750;
+        font-size: 12px;
+        font-weight: 700;
+        word-break: break-word;
+    }
+
+    .ed-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 13px 17px;
+        border-top: 1px solid #e0e6ed;
+    }
+
+    .ed-sin-citas {
+        padding: 45px 20px;
+        text-align: center;
+        color: #7b899b;
+    }
+
+    .ed-sin-citas strong {
+        display: block;
+        margin-bottom: 5px;
+        color: #384a61;
+        font-size: 16px;
+    }
+
+    @media (max-width: 900px) {
+
+        .ed-cal-stats {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .ed-filtros-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+    }
+
+    @media (max-width: 600px) {
+
+        .ed-calendario {
+            padding: 10px;
+        }
+
+        .ed-cal-header h1 {
+            font-size: 25px;
+        }
+
+        .ed-filtros-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .ed-cal-stats {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .ed-cal-header-actions {
+            width: 100%;
+        }
+
+        .ed-cal-actions {
+            width: 100%;
+        }
+
+        .ed-cal-actions .ed-cal-btn {
+            flex: 1;
+        }
+
+        .ed-detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .ed-detail-full {
+            grid-column: auto;
+        }
+
+    }
+.ed-calendario-hoy{
+    margin-left:auto !important;
+    min-width:58px !important;
+    padding:7px 12px !important;
+}.ed-calendar-header{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    position:relative !important;
+    gap:12px !important;
+}
+
+.ed-calendar-header .ed-calendario-hoy{
+    position:absolute !important;
+    right:0 !important;
+}</style>
+
+
+<div class="ed-calendario">
+
+    <div class="ed-cal-header">
+
+        <div>
+
+            <h1>Calendario de citas</h1>
+
+            <p>
+                Consulta las citaciones programadas dentro del calendario institucional.
+            </p>
+
+        </div>
+
+
+        <div class="ed-cal-actions">
+
+            <a
+                href="{{ url_for('auth.dashboard') }}"
+                class="ed-cal-btn"
+            >
+                â† AtrÃ¡s
+            </a>
+
+            <a
+                href="{{ url_for('citas.index') }}"
+                class="ed-cal-btn"
+            >
+                Ver citas
+            </a>
+
+            {% if puede_crear %}
+
+            <a
+                href="{{ url_for('citas.nueva') }}"
+                class="ed-cal-btn ed-cal-btn-primary"
+            >
+                + Nueva cita
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="ed-cal-stats">
+
+        <div class="ed-stat">
+            <div class="ed-stat-label">Citas visibles</div>
+            <div
+                class="ed-stat-value"
+                id="ed-total"
+            >
+                0
+            </div>
+        </div>
+
+        <div class="ed-stat">
+            <div class="ed-stat-label">Citas de hoy</div>
+            <div
+                class="ed-stat-value"
+                id="ed-hoy-total"
+            >
+                0
+            </div>
+        </div>
+
+        <div class="ed-stat">
+            <div class="ed-stat-label">Pendientes</div>
+            <div
+                class="ed-stat-value"
+                id="ed-pendientes"
+            >
+                0
+            </div>
+        </div>
+
+        <div class="ed-stat">
+            <div class="ed-stat-label">Confirmadas</div>
+            <div
+                class="ed-stat-value"
+                id="ed-confirmadas"
+            >
+                0
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="ed-filtros">
+
+        <div class="ed-filtros-grid">
+
+            <input
+                id="ed-buscar"
+                type="search"
+                placeholder="Buscar estudiante, docente, acudiente o motivo..."
+            >
+
+
+            <select id="ed-sede">
+
+                <option value="">
+                    Todas las sedes
+                </option>
+
+                {% for sede in sedes %}
+
+                <option value="{{ sede.id }}">
+                    {{ sede.nombre }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <select id="ed-jornada">
+
+                <option value="">
+                    Todas las jornadas
+                </option>
+
+                {% for jornada in jornadas %}
+
+                <option value="{{ jornada.id }}">
+                    {{ jornada.nombre }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <select id="ed-estado">
+
+                <option value="">
+                    Todos los estados
+                </option>
+
+                <option value="Pendiente">Pendiente</option>
+                <option value="Confirmada">Confirmada</option>
+                <option value="Cancelada">Cancelada</option>
+                <option value="Reprogramada">Reprogramada</option>
+                <option value="Completada">Completada</option>
+
+            </select>
+
+
+            <input
+                id="ed-fecha-desde"
+                type="date"
+            >
+
+        </div>
+
+
+        <div class="ed-filtros-footer">
+
+            <button
+                type="button"
+                class="ed-cal-btn"
+                id="ed-limpiar"
+            >
+                Limpiar filtros
+            </button>
+
+            <span
+                id="ed-contador"
+                style="color:#758399;font-size:12px;font-weight:700;"
+            >
+                0 citas
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="ed-cal-toolbar">
+
+        <div class="ed-cal-navigation">
+
+            <button
+                type="button"
+                class="ed-nav"
+                id="ed-anterior"
+            >
+                â€¹
+            </button>
+
+            <button
+                type="button"
+                class="ed-nav"
+                id="ed-siguiente"
+            >
+                â€º
+            </button>
+
+            <button
+                type="button"
+                class="ed-hoy"
+                id="ed-ir-hoy"
+            >Hoy</button>
+
+            <span
+                class="ed-periodo"
+                id="ed-periodo"
+            >
+                Calendario
+            </span>
+
+        </div>
+
+
+        <div class="ed-vistas">
+
+            <button
+                type="button"
+                class="ed-vista activa"
+                data-vista="mes"
+            >
+                Mes
+            </button>
+
+            <button
+                type="button"
+                class="ed-vista"
+                data-vista="semana"
+            >
+                Semana
+            </button>
+
+            <button
+                type="button"
+                class="ed-vista"
+                data-vista="dia"
+            >
+                DÃ­a
+            </button>
+
+            <button
+                type="button"
+                class="ed-vista"
+                data-vista="agenda"
+            >
+                Agenda
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="ed-cal-card">
+
+        <div
+            id="ed-vista-mes"
+            class="ed-vista-contenido activa"
+        ></div>
+
+
+        <div
+            id="ed-vista-semana"
+            class="ed-vista-contenido"
+        ></div>
+
+
+        <div
+            id="ed-vista-dia"
+            class="ed-vista-contenido"
+        ></div>
+
+
+        <div
+            id="ed-vista-agenda"
+            class="ed-vista-contenido"
+        ></div>
+
+    </div>
+
+
+    <div class="ed-proximas">
+
+        <h2>
+            PrÃ³ximas citas
+        </h2>
+
+        <div
+            id="ed-proximas-lista"
+            class="ed-proximas-lista"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<div
+    id="ed-modal-fondo"
+    class="ed-modal-fondo"
+>
+
+    <div class="ed-modal">
+
+        <div class="ed-modal-head">
+
+            <h3 id="ed-modal-titulo">
+                Detalle de la cita
+            </h3>
+
+            <button
+                type="button"
+                class="ed-modal-close"
+                id="ed-modal-cerrar"
+            >
+                Ã—
+            </button>
+
+        </div>
+
+
+        <div class="ed-modal-body">
+
+            <div class="ed-detail-grid">
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">Fecha</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-fecha"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">Hora</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-hora"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">Estudiante</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-estudiante"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">Documento</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-documento"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">Docente</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-docente"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">Acudiente</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-acudiente"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">Motivo</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-motivo"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">Estado</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-estado"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">Sede</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-sede"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">Jornada</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-jornada"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">Lugar</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-lugar"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail">
+                    <div class="ed-detail-label">CÃ³digo estudiantil</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-codigo"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+                <div class="ed-detail ed-detail-full">
+                    <div class="ed-detail-label">Observaciones</div>
+                    <div
+                        class="ed-detail-value"
+                        id="det-observaciones"
+                    >
+                        â€”
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="ed-modal-footer">
+
+            <a
+                id="det-ics"
+                href="#"
+                class="ed-cal-btn"
+            >
+                Agregar al calendario
+            </a>
+
+            <button
+                type="button"
+                id="ed-modal-cerrar-footer"
+                class="ed-cal-btn ed-cal-btn-primary"
+            >
+                Cerrar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+(function () {
+
+    "use strict";
+
+
+    const CITAS = {{ citas|tojson }};
+
+
+    let citas = Array.isArray(CITAS)
+        ? CITAS.slice()
+        : [];
+
+
+    let fechaActual = new Date();
+
+    let vista = "mes";
+
+
+    const $ = function (id) {
+        return document.getElementById(id);
+    };
+
+
+    function txt(valor) {
+        return String(valor === null || valor === undefined ? "" : valor);
+    }
+
+
+    function escapar(valor) {
+
+        return txt(valor)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    function pad(valor) {
+        return String(valor).padStart(2, "0");
+    }
+
+
+    function isoFecha(fecha) {
+
+        return (
+            fecha.getFullYear() +
+            "-" +
+            pad(fecha.getMonth() + 1) +
+            "-" +
+            pad(fecha.getDate())
+        );
+
+    }
+
+
+    function fechaHumana(fecha) {
+
+        const partes =
+            txt(fecha).split("-");
+
+        if (partes.length !== 3) {
+            return txt(fecha);
+        }
+
+        return (
+            partes[2] +
+            "/" +
+            partes[1] +
+            "/" +
+            partes[0]
+        );
+
+    }
+
+
+    function horaHumana(hora) {
+
+        const partes =
+            txt(hora).split(":");
+
+        if (partes.length < 2) {
+            return txt(hora);
+        }
+
+        let horas =
+            parseInt(partes[0], 10);
+
+        const minutos =
+            partes[1];
+
+        if (isNaN(horas)) {
+            return txt(hora);
+        }
+
+        const periodo =
+            horas >= 12 ? "p. m." : "a. m.";
+
+        horas =
+            horas % 12 || 12;
+
+        return (
+            pad(horas) +
+            ":" +
+            minutos +
+            " " +
+            periodo
+        );
+
+    }
+
+
+    function nombreMes(numero) {
+
+        const meses = [
+            "enero",
+            "febrero",
+            "marzo",
+            "abril",
+            "mayo",
+            "junio",
+            "julio",
+            "agosto",
+            "septiembre",
+            "octubre",
+            "noviembre",
+            "diciembre"
+        ];
+
+        return meses[numero];
+
+    }
+
+
+    function nombreDia(numero) {
+
+        const dias = [
+            "domingo",
+            "lunes",
+            "martes",
+            "miÃ©rcoles",
+            "jueves",
+            "viernes",
+            "sÃ¡bado"
+        ];
+
+        return dias[numero];
+
+    }
+
+
+    function claseEstado(estado) {
+
+        const valor =
+            txt(estado).toLowerCase();
+
+        if (valor.indexOf("confirm") !== -1) {
+            return "confirmada";
+        }
+
+        if (valor.indexOf("cancel") !== -1) {
+            return "cancelada";
+        }
+
+        if (valor.indexOf("reprogram") !== -1) {
+            return "reprogramada";
+        }
+
+        if (valor.indexOf("complet") !== -1) {
+            return "completada";
+        }
+
+        return "pendiente";
+
+    }
+
+
+    function obtenerCitasFiltradas() {
+
+        const busqueda =
+            txt($("ed-buscar").value)
+                .toLowerCase()
+                .trim();
+
+
+        const sede =
+            txt($("ed-sede").value);
+
+
+        const jornada =
+            txt($("ed-jornada").value);
+
+
+        const estado =
+            txt($("ed-estado").value)
+                .toLowerCase();
+
+
+        const fechaDesde =
+            txt($("ed-fecha-desde").value);
+
+
+        return citas.filter(function (cita) {
+
+            if (busqueda) {
+
+                const contenido = [
+
+                    cita.estudiante,
+                    cita.docente,
+                    cita.acudiente,
+                    cita.motivo_nombre,
+                    cita.sede_nombre,
+                    cita.jornada_nombre,
+                    cita.lugar,
+                    cita.observaciones
+
+                ]
+                    .map(txt)
+                    .join(" ")
+                    .toLowerCase();
+
+
+                if (
+                    contenido.indexOf(
+                        busqueda
+                    ) === -1
+                ) {
+                    return false;
+                }
+
+            }
+
+
+            if (
+                sede &&
+                txt(cita.id_sede) !== sede
+            ) {
+                return false;
+            }
+
+
+            if (
+                jornada &&
+                txt(cita.id_jornada) !== jornada
+            ) {
+                return false;
+            }
+
+
+            if (
+                estado &&
+                txt(cita.estado_nombre)
+                    .toLowerCase() !== estado
+            ) {
+                return false;
+            }
+
+
+            if (
+                fechaDesde &&
+                txt(cita.fecha) < fechaDesde
+            ) {
+                return false;
+            }
+
+
+            return true;
+
+        });
+
+    }
+
+
+    function citasDelDia(fecha, lista) {
+
+        const iso =
+            isoFecha(fecha);
+
+
+        return lista
+
+            .filter(function (cita) {
+
+                return txt(cita.fecha) === iso;
+
+            })
+
+            .sort(function (a, b) {
+
+                return txt(a.hora)
+                    .localeCompare(
+                        txt(b.hora)
+                    );
+
+            });
+
+    }
+
+
+    function renderCita(cita) {
+
+        return (
+
+            '<button ' +
+            'type="button" ' +
+            'class="ed-cita ' +
+            claseEstado(
+                cita.estado_nombre
+            ) +
+            '" ' +
+            'data-cita="' +
+            escapar(cita.id) +
+            '">' +
+
+                '<span class="ed-cita-hora">' +
+                    escapar(
+                        horaHumana(
+                            cita.hora
+                        )
+                    ) +
+                '</span> ' +
+
+                escapar(
+                    cita.motivo_nombre ||
+                    "Cita"
+                ) +
+
+            '</button>'
+
+        );
+
+    }
+
+
+    function renderMes(lista) {
+
+        const contenedor =
+            $("ed-vista-mes");
+
+
+        const year =
+            fechaActual.getFullYear();
+
+
+        const month =
+            fechaActual.getMonth();
+
+
+        const primerDia =
+            new Date(
+                year,
+                month,
+                1
+            );
+
+
+        const ultimoDia =
+            new Date(
+                year,
+                month + 1,
+                0
+            );
+
+
+        let inicio =
+            primerDia.getDay();
+
+
+        inicio =
+            inicio === 0
+                ? 6
+                : inicio - 1;
+
+
+        const diasMes =
+            ultimoDia.getDate();
+
+
+        const celdas =
+            Math.ceil(
+                (inicio + diasMes) / 7
+            ) * 7;
+
+
+        const diasAnterior =
+            new Date(
+                year,
+                month,
+                0
+            ).getDate();
+
+
+        const hoy =
+            isoFecha(
+                new Date()
+            );
+
+
+        let html = "";
+
+        html +=
+            '<table class="ed-month-table">';
+
+
+        html +=
+            '<thead><tr>';
+
+
+        [
+            "Lunes",
+            "Martes",
+            "MiÃ©rcoles",
+            "Jueves",
+            "Viernes",
+            "SÃ¡bado",
+            "Domingo"
+        ].forEach(function (dia) {
+
+            html +=
+                "<th>" +
+                dia +
+                "</th>";
+
+        });
+
+
+        html +=
+            "</tr></thead><tbody>";
+
+
+        for (
+            let i = 0;
+            i < celdas;
+            i++
+        ) {
+
+            if (i % 7 === 0) {
+                html += "<tr>";
+            }
+
+
+            let fechaCelda;
+
+            let numero;
+
+            let otroMes = false;
+
+
+            if (i < inicio) {
+
+                numero =
+                    diasAnterior -
+                    inicio +
+                    i +
+                    1;
+
+                fechaCelda =
+                    new Date(
+                        year,
+                        month - 1,
+                        numero
+                    );
+
+                otroMes = true;
+
+            } else if (
+                i >= inicio + diasMes
+            ) {
+
+                numero =
+                    i -
+                    inicio -
+                    diasMes +
+                    1;
+
+                fechaCelda =
+                    new Date(
+                        year,
+                        month + 1,
+                        numero
+                    );
+
+                otroMes = true;
+
+            } else {
+
+                numero =
+                    i -
+                    inicio +
+                    1;
+
+                fechaCelda =
+                    new Date(
+                        year,
+                        month,
+                        numero
+                    );
+
+            }
+
+
+            const iso =
+                isoFecha(
+                    fechaCelda
+                );
+
+
+            const diaCitas =
+                citasDelDia(
+                    fechaCelda,
+                    lista
+                );
+
+
+            html +=
+                '<td class="ed-day-cell ' +
+                (otroMes ? "otro-mes " : "") +
+                (iso === hoy ? "hoy" : "") +
+                '" data-fecha="' +
+                iso +
+                '">';
+
+
+            html +=
+                '<div class="ed-day-number">' +
+                numero +
+                "</div>";
+
+
+            html +=
+                '<div class="ed-day-events">';
+
+
+            const max =
+                Math.min(
+                    diaCitas.length,
+                    4
+                );
+
+
+            for (
+                let j = 0;
+                j < max;
+                j++
+            ) {
+
+                html +=
+                    renderCita(
+                        diaCitas[j]
+                    );
+
+            }
+
+
+            if (
+                diaCitas.length > 4
+            ) {
+
+                html +=
+                    '<div class="ed-mas">' +
+                    "+ " +
+                    (
+                        diaCitas.length -
+                        4
+                    ) +
+                    " mÃ¡s" +
+                    "</div>";
+
+            }
+
+
+            html +=
+                "</div>";
+
+
+            html +=
+                "</td>";
+
+
+            if (
+                i % 7 === 6
+            ) {
+
+                html +=
+                    "</tr>";
+
+            }
+
+        }
+
+
+        html +=
+            "</tbody></table>";
+
+
+        contenedor.innerHTML =
+            html;
+
+
+        contenedor
+            .querySelectorAll(
+                "[data-cita]"
+            )
+            .forEach(
+                function (boton) {
+
+                    boton.addEventListener(
+                        "click",
+                        function (event) {
+
+                            event.stopPropagation();
+
+                            abrirDetalle(
+                                this.getAttribute(
+                                    "data-cita"
+                                )
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+        contenedor
+            .querySelectorAll(
+                ".ed-day-cell"
+            )
+            .forEach(
+                function (celda) {
+
+                    celda.addEventListener(
+                        "dblclick",
+                        function () {
+
+                            {% if puede_crear %}
+
+                            const fecha =
+                                this.getAttribute(
+                                    "data-fecha"
+                                );
+
+                            window.location.href =
+                                "{{ url_for('citas.nueva') }}" +
+                                "?fecha=" +
+                                encodeURIComponent(
+                                    fecha
+                                );
+
+                            {% endif %}
+
+                        }
+                    );
+
+                }
+            );
+
+    }
+
+
+    function renderSemana(lista) {
+
+        const contenedor =
+            $("ed-vista-semana");
+
+
+        const inicio =
+            new Date(
+                fechaActual
+            );
+
+
+        const dia =
+            inicio.getDay();
+
+
+        const diferencia =
+            dia === 0
+                ? -6
+                : 1 - dia;
+
+
+        inicio.setDate(
+            inicio.getDate() +
+            diferencia
+        );
+
+
+        let html =
+            '<div class="ed-week-wrapper">' +
+            '<table class="ed-week-table">' +
+            "<thead><tr>" +
+            "<th>Hora</th>";
+
+
+        for (
+            let i = 0;
+            i < 7;
+            i++
+        ) {
+
+            const fecha =
+                new Date(
+                    inicio
+                );
+
+            fecha.setDate(
+                fecha.getDate() + i
+            );
+
+
+            html +=
+                "<th>" +
+                nombreDia(
+                    fecha.getDay()
+                ) +
+                "<br>" +
+                fecha.getDate() +
+                "</th>";
+
+        }
+
+
+        html +=
+            "</tr></thead><tbody>";
+
+
+        for (
+            let hora = 6;
+            hora <= 18;
+            hora++
+        ) {
+
+            html +=
+                "<tr>";
+
+            html +=
+                '<td class="ed-hora">' +
+                pad(hora) +
+                ":00</td>";
+
+
+            for (
+                let i = 0;
+                i < 7;
+                i++
+            ) {
+
+                const fecha =
+                    new Date(
+                        inicio
+                    );
+
+                fecha.setDate(
+                    fecha.getDate() + i
+                );
+
+
+                const fechaIso =
+                    isoFecha(
+                        fecha
+                    );
+
+
+                const citasHora =
+                    citasDelDia(
+                        fecha,
+                        lista
+                    ).filter(
+                        function (cita) {
+
+                            const partes =
+                                txt(
+                                    cita.hora
+                                ).split(":");
+
+                            return (
+                                Number(
+                                    partes[0]
+                                ) === hora
+                            );
+
+                        }
+                    );
+
+
+                html +=
+                    '<td class="' +
+                    (
+                        fechaIso ===
+                        isoFecha(new Date())
+                            ? "ed-dia-hoy"
+                            : ""
+                    ) +
+                    '">';
+
+
+                citasHora.forEach(
+                    function (cita) {
+
+                        html += renderCita(
+                            cita
+                        );
+
+                    }
+                );
+
+
+                html +=
+                    "</td>";
+
+            }
+
+
+            html +=
+                "</tr>";
+
+        }
+
+
+        html +=
+            "</tbody></table></div>";
+
+
+        contenedor.innerHTML =
+            html;
+
+
+        contenedor
+            .querySelectorAll(
+                "[data-cita]"
+            )
+            .forEach(
+                function (boton) {
+
+                    boton.addEventListener(
+                        "click",
+                        function () {
+
+                            abrirDetalle(
+                                this.getAttribute(
+                                    "data-cita"
+                                )
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+    }
+
+
+    function renderDia(lista) {
+
+        const contenedor =
+            $("ed-vista-dia");
+
+
+        const diaCitas =
+            citasDelDia(
+                fechaActual,
+                lista
+            );
+
+
+        let html =
+            '<div class="ed-day-detail">';
+
+
+        html +=
+            '<div class="ed-day-detail-head">' +
+
+                "<h3>" +
+
+                    nombreDia(
+                        fechaActual.getDay()
+                    ) +
+
+                    ", " +
+
+                    fechaActual.getDate() +
+
+                    " de " +
+
+                    nombreMes(
+                        fechaActual.getMonth()
+                    ) +
+
+                    " de " +
+
+                    fechaActual.getFullYear() +
+
+                "</h3>" +
+
+            "</div>";
+
+
+        if (!diaCitas.length) {
+
+            html +=
+                '<div class="ed-sin-citas">' +
+
+                    "<strong>No hay citas este dÃ­a</strong>" +
+
+                    "No existen citaciones registradas para esta fecha." +
+
+                "</div>";
+
+        } else {
+
+            diaCitas.forEach(
+                function (cita) {
+
+                    html +=
+                        '<div class="ed-day-detail-row">' +
+
+                            '<div class="ed-day-detail-time">' +
+                                escapar(
+                                    horaHumana(
+                                        cita.hora
+                                    )
+                                ) +
+                            "</div>" +
+
+                            '<div class="ed-day-detail-content">' +
+
+                                renderCita(
+                                    cita
+                                ) +
+
+                            "</div>" +
+
+                        "</div>";
+
+                }
+            );
+
+        }
+
+
+        html +=
+            "</div>";
+
+
+        contenedor.innerHTML =
+            html;
+
+
+        contenedor
+            .querySelectorAll(
+                "[data-cita]"
+            )
+            .forEach(
+                function (boton) {
+
+                    boton.addEventListener(
+                        "click",
+                        function () {
+
+                            abrirDetalle(
+                                this.getAttribute(
+                                    "data-cita"
+                                )
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+    }
+
+
+    function renderAgenda(lista) {
+
+        const contenedor =
+            $("ed-vista-agenda");
+
+
+        const ordenadas =
+            lista
+
+                .filter(function (cita) {
+
+                    return (
+                        cita.fecha &&
+                        cita.hora
+                    );
+
+                })
+
+                .slice()
+
+                .sort(function (a, b) {
+
+                    return (
+                        (
+                            txt(a.fecha) +
+                            "T" +
+                            txt(a.hora)
+                        )
+                        .localeCompare(
+                            txt(b.fecha) +
+                            "T" +
+                            txt(b.hora)
+                        )
+                    );
+
+                });
+
+
+        if (!ordenadas.length) {
+
+            contenedor.innerHTML =
+                '<div class="ed-sin-citas">' +
+                    "<strong>No hay citas para mostrar</strong>" +
+                    "No existen citaciones con los filtros seleccionados." +
+                "</div>";
+
+            return;
+
+        }
+
+
+        let html =
+            '<div class="ed-agenda">';
+
+
+        ordenadas.forEach(
+            function (cita) {
+
+                html +=
+                    '<div class="ed-agenda-item" data-cita="' +
+                    escapar(cita.id) +
+                    '">' +
+
+                        '<div class="ed-agenda-date">' +
+
+                            escapar(
+                                fechaHumana(
+                                    cita.fecha
+                                )
+                            ) +
+
+                            "<br>" +
+
+                            escapar(
+                                horaHumana(
+                                    cita.hora
+                                )
+                            ) +
+
+                        "</div>" +
+
+
+                        '<div class="ed-agenda-main">' +
+
+                            "<strong>" +
+
+                                escapar(
+                                    cita.motivo_nombre ||
+                                    "Cita escolar"
+                                ) +
+
+                            "</strong>" +
+
+
+                            "<span>" +
+
+                                escapar(
+                                    cita.estudiante ||
+                                    "Estudiante"
+                                ) +
+
+                                " Â· " +
+
+                                escapar(
+                                    cita.docente ||
+                                    "Docente"
+                                ) +
+
+                                " Â· " +
+
+                                escapar(
+                                    cita.lugar ||
+                                    "Lugar pendiente"
+                                ) +
+
+                            "</span>" +
+
+                        "</div>" +
+
+
+                        '<span class="ed-estado">' +
+
+                            escapar(
+                                cita.estado_nombre ||
+                                "Pendiente"
+                            ) +
+
+                        "</span>" +
+
+                    "</div>";
+
+            }
+        );
+
+
+        html +=
+            "</div>";
+
+
+        contenedor.innerHTML =
+            html;
+
+
+        contenedor
+            .querySelectorAll(
+                "[data-cita]"
+            )
+            .forEach(
+                function (elemento) {
+
+                    elemento.addEventListener(
+                        "click",
+                        function () {
+
+                            abrirDetalle(
+                                this.getAttribute(
+                                    "data-cita"
+                                )
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+    }
+
+
+    function actualizarEstadisticas(lista) {
+
+        const hoy =
+            isoFecha(
+                new Date()
+            );
+
+
+        $("ed-total").textContent =
+            lista.length;
+
+
+        $("ed-hoy-total").textContent =
+            lista.filter(
+                function (cita) {
+
+                    return (
+                        txt(cita.fecha) ===
+                        hoy
+                    );
+
+                }
+            ).length;
+
+
+        $("ed-pendientes").textContent =
+            lista.filter(
+                function (cita) {
+
+                    return txt(
+                        cita.estado_nombre
+                    )
+                        .toLowerCase()
+                        .indexOf(
+                            "pendiente"
+                        ) !== -1;
+
+                }
+            ).length;
+
+
+        $("ed-confirmadas").textContent =
+            lista.filter(
+                function (cita) {
+
+                    return txt(
+                        cita.estado_nombre
+                    )
+                        .toLowerCase()
+                        .indexOf(
+                            "confirm"
+                        ) !== -1;
+
+                }
+            ).length;
+
+
+        $("ed-contador").textContent =
+            lista.length +
+            (
+                lista.length === 1
+                    ? " cita"
+                    : " citas"
+            );
+
+    }
+
+
+    function actualizarTitulo() {
+
+        if (vista === "mes") {
+
+            $("ed-periodo").textContent =
+                nombreMes(
+                    fechaActual.getMonth()
+                ) +
+                " " +
+                fechaActual.getFullYear();
+
+        } else if (
+            vista === "semana"
+        ) {
+
+            $("ed-periodo").textContent =
+                "Semana";
+
+        } else if (
+            vista === "dia"
+        ) {
+
+            $("ed-periodo").textContent =
+                nombreDia(
+                    fechaActual.getDay()
+                ) +
+                ", " +
+                fechaActual.getDate() +
+                " de " +
+                nombreMes(
+                    fechaActual.getMonth()
+                );
+
+        } else {
+
+            $("ed-periodo").textContent =
+                "Agenda";
+
+        }
+
+    }
+
+
+    function renderizar() {
+
+        const lista =
+            obtenerCitasFiltradas();
+
+
+        actualizarEstadisticas(
+            lista
+        );
+
+
+        actualizarTitulo();
+
+
+        $("ed-vista-mes")
+            .classList.toggle(
+                "activa",
+                vista === "mes"
+            );
+
+
+        $("ed-vista-semana")
+            .classList.toggle(
+                "activa",
+                vista === "semana"
+            );
+
+
+        $("ed-vista-dia")
+            .classList.toggle(
+                "activa",
+                vista === "dia"
+            );
+
+
+        $("ed-vista-agenda")
+            .classList.toggle(
+                "activa",
+                vista === "agenda"
+            );
+
+
+        if (
+            vista === "mes"
+        ) {
+
+            renderMes(lista);
+
+        } else if (
+            vista === "semana"
+        ) {
+
+            renderSemana(lista);
+
+        } else if (
+            vista === "dia"
+        ) {
+
+            renderDia(lista);
+
+        } else {
+
+            renderAgenda(lista);
+
+        }
+
+
+        renderProximas(lista);
+
+    }
+
+
+    function renderProximas(lista) {
+
+        const ahora =
+            new Date();
+
+
+        const proximas =
+            lista
+
+                .map(function (cita) {
+
+                    const partesFecha =
+                        txt(cita.fecha)
+                            .split("-");
+
+
+                    const partesHora =
+                        txt(cita.hora)
+                            .split(":");
+
+
+                    if (
+                        partesFecha.length !== 3 ||
+                        partesHora.length < 2
+                    ) {
+                        return null;
+                    }
+
+
+                    const fecha =
+                        new Date(
+                            Number(
+                                partesFecha[0]
+                            ),
+                            Number(
+                                partesFecha[1]
+                            ) - 1,
+                            Number(
+                                partesFecha[2]
+                            ),
+                            Number(
+                                partesHora[0]
+                            ) || 0,
+                            Number(
+                                partesHora[1]
+                            ) || 0
+                        );
+
+
+                    return {
+                        cita: cita,
+                        fecha: fecha
+                    };
+
+                })
+
+                .filter(function (item) {
+
+                    return (
+                        item &&
+                        !isNaN(
+                            item.fecha.getTime()
+                        ) &&
+                        item.fecha >= ahora
+                    );
+
+                })
+
+                .sort(function (a, b) {
+
+                    return (
+                        a.fecha -
+                        b.fecha
+                    );
+
+                })
+
+                .slice(0, 8);
+
+
+        const contenedor =
+            $("ed-proximas-lista");
+
+
+        if (!proximas.length) {
+
+            contenedor.innerHTML =
+                '<div class="ed-sin-citas">' +
+                    "<strong>No hay prÃ³ximas citas</strong>" +
+                    "Las nuevas citaciones aparecerÃ¡n aquÃ­." +
+                "</div>";
+
+            return;
+
+        }
+
+
+        let html = "";
+
+
+        proximas.forEach(
+            function (item) {
+
+                const cita =
+                    item.cita;
+
+
+                html +=
+                    '<div class="ed-proxima" data-cita="' +
+                    escapar(cita.id) +
+                    '">' +
+
+                        '<div class="ed-proxima-fecha">' +
+
+                            escapar(
+                                fechaHumana(
+                                    cita.fecha
+                                )
+                            ) +
+
+                            "<br>" +
+
+                            escapar(
+                                horaHumana(
+                                    cita.hora
+                                )
+                            ) +
+
+                        "</div>" +
+
+
+                        '<div class="ed-proxima-main">' +
+
+                            "<strong>" +
+
+                                escapar(
+                                    cita.motivo_nombre ||
+                                    "Cita escolar"
+                                ) +
+
+                            "</strong>" +
+
+                            "<span>" +
+
+                                escapar(
+                                    cita.estudiante ||
+                                    "Estudiante"
+                                ) +
+
+                                " Â· " +
+
+                                escapar(
+                                    cita.docente ||
+                                    "Docente"
+                                ) +
+
+                            "</span>" +
+
+                        "</div>" +
+
+
+                        '<span class="ed-estado">' +
+
+                            escapar(
+                                cita.estado_nombre ||
+                                "Pendiente"
+                            ) +
+
+                        "</span>" +
+
+                    "</div>";
+
+            }
+        );
+
+
+        contenedor.innerHTML =
+            html;
+
+
+        contenedor
+            .querySelectorAll(
+                "[data-cita]"
+            )
+            .forEach(
+                function (elemento) {
+
+                    elemento.addEventListener(
+                        "click",
+                        function () {
+
+                            abrirDetalle(
+                                this.getAttribute(
+                                    "data-cita"
+                                )
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+    }
+
+
+    function abrirDetalle(id) {
+
+        const cita =
+            citas.find(
+                function (item) {
+
+                    return (
+                        String(
+                            item.id
+                        ) ===
+                        String(id)
+                    );
+
+                }
+            );
+
+
+        if (!cita) {
+            return;
+        }
+
+
+        $("ed-modal-titulo").textContent =
+            cita.motivo_nombre ||
+            "Detalle de la cita";
+
+
+        $("det-fecha").textContent =
+            fechaHumana(
+                cita.fecha
+            );
+
+
+        $("det-hora").textContent =
+            horaHumana(
+                cita.hora
+            );
+
+
+        $("det-estudiante").textContent =
+            cita.estudiante ||
+            "â€”";
+
+
+        $("det-documento").textContent =
+            cita.estudiante_documento ||
+            "â€”";
+
+
+        $("det-docente").textContent =
+            cita.docente ||
+            "â€”";
+
+
+        $("det-acudiente").textContent =
+            cita.acudiente ||
+            "â€”";
+
+
+        $("det-motivo").textContent =
+            cita.motivo_nombre ||
+            "â€”";
+
+
+        $("det-estado").textContent =
+            cita.estado_nombre ||
+            "â€”";
+
+
+        $("det-sede").textContent =
+            cita.sede_nombre ||
+            "â€”";
+
+
+        $("det-jornada").textContent =
+            cita.jornada_nombre ||
+            "â€”";
+
+
+        $("det-lugar").textContent =
+            cita.lugar ||
+            "â€”";
+
+
+        $("det-codigo").textContent =
+            cita.codigo_estudiantil ||
+            "â€”";
+
+
+        $("det-observaciones").textContent =
+            cita.observaciones ||
+            "Sin observaciones.";
+
+
+        $("det-ics").href =
+            "/calendario/" +
+            encodeURIComponent(
+                cita.id
+            ) +
+            ".ics";
+
+
+        $("ed-modal-fondo").style.display =
+            "flex";
+
+    }
+
+
+    function cerrarModal() {
+
+        $("ed-modal-fondo").style.display =
+            "none";
+
+    }
+
+
+    $("ed-anterior")
+        .addEventListener(
+            "click",
+            function () {
+
+                if (vista === "mes") {
+
+                    fechaActual =
+                        new Date(
+                            fechaActual.getFullYear(),
+                            fechaActual.getMonth() - 1,
+                            1
+                        );
+
+                } else if (
+                    vista === "semana"
+                ) {
+
+                    fechaActual =
+                        new Date(
+                            fechaActual
+                        );
+
+                    fechaActual.setDate(
+                        fechaActual.getDate() - 7
+                    );
+
+                } else if (
+                    vista === "dia"
+                ) {
+
+                    fechaActual =
+                        new Date(
+                            fechaActual
+                        );
+
+                    fechaActual.setDate(
+                        fechaActual.getDate() - 1
+                    );
+
+                } else {
+
+                    fechaActual =
+                        new Date(
+                            fechaActual
+                        );
+
+                    fechaActual.setMonth(
+                        fechaActual.getMonth() - 1
+                    );
+
+                }
+
+                renderizar();
+
+            }
+        );
+
+
+    $("ed-siguiente")
+        .addEventListener(
+            "click",
+            function () {
+
+                if (vista === "mes") {
+
+                    fechaActual =
+                        new Date(
+                            fechaActual.getFullYear(),
+                            fechaActual.getMonth() + 1,
+                            1
+                        );
+
+                } else if (
+                    vista === "semana"
+                ) {
+
+                    fechaActual =
+                        new Date(
+                            fechaActual
+                        );
+
+                    fechaActual.setDate(
+                        fechaActual.getDate() + 7
+                    );
+
+                } else if (
+                    vista === "dia"
+                ) {
+
+                    fechaActual =
+                        new Date(
+                            fechaActual
+                        );
+
+                    fechaActual.setDate(
+                        fechaActual.getDate() + 1
+                    );
+
+                } else {
+
+                    fechaActual =
+                        new Date(
+                            fechaActual
+                        );
+
+                    fechaActual.setMonth(
+                        fechaActual.getMonth() + 1
+                    );
+
+                }
+
+                renderizar();
+
+            }
+        );
+
+
+    $("ed-ir-hoy")
+        .addEventListener(
+            "click",
+            function () {
+
+                fechaActual =
+                    new Date();
+
+                renderizar();
+
+            }
+        );
+
+
+    $("ed-limpiar")
+        .addEventListener(
+            "click",
+            function () {
+
+                $("ed-buscar").value = "";
+                $("ed-sede").value = "";
+                $("ed-jornada").value = "";
+                $("ed-estado").value = "";
+                $("ed-fecha-desde").value = "";
+
+                renderizar();
+
+            }
+        );
+
+
+    [
+        "ed-buscar",
+        "ed-sede",
+        "ed-jornada",
+        "ed-estado",
+        "ed-fecha-desde"
+    ].forEach(
+        function (id) {
+
+            $(id).addEventListener(
+                "input",
+                renderizar
+            );
+
+            $(id).addEventListener(
+                "change",
+                renderizar
+            );
+
+        }
+    );
+
+
+    document
+        .querySelectorAll(
+            ".ed-vista"
+        )
+        .forEach(
+            function (boton) {
+
+                boton.addEventListener(
+                    "click",
+                    function () {
+
+                        vista =
+                            this.getAttribute(
+                                "data-vista"
+                            );
+
+
+                        document
+                            .querySelectorAll(
+                                ".ed-vista"
+                            )
+                            .forEach(
+                                function (item) {
+
+                                    item.classList.remove(
+                                        "activa"
+                                    );
+
+                                }
+                            );
+
+
+                        this.classList.add(
+                            "activa"
+                        );
+
+
+                        renderizar();
+
+                    }
+                );
+
+            }
+        );
+
+
+    $("ed-modal-cerrar")
+        .addEventListener(
+            "click",
+            cerrarModal
+        );
+
+
+    $("ed-modal-cerrar-footer")
+        .addEventListener(
+            "click",
+            cerrarModal
+        );
+
+
+    $("ed-modal-fondo")
+        .addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target ===
+                    $("ed-modal-fondo")
+                ) {
+                    cerrarModal();
+                }
+
+            }
+        );
+
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape"
+            ) {
+                cerrarModal();
+            }
+
+        }
+    );
+
+
+    /*
+       INICIO.
+       Esta llamada genera inmediatamente
+       el calendario de 30/31 dÃ­as.
+    */
+
+    renderizar();
+
+})();
+</script>
+
+{% endblock %}

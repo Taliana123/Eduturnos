@@ -1,0 +1,582 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear cuenta · EDUTURNOS{% endblock %}
+
+{% block content %}
+
+<section class="registro-pagina">
+
+    <div class="registro-layout">
+
+        <!-- =================================================
+             ILUSTRACIÓN CREAR CUENTA
+             SIN PERSONAS
+             SIN CUADRO
+             ================================================= -->
+
+        <div class="registro-ilustracion" aria-hidden="true">
+
+            <svg
+                class="registro-dibujo"
+                viewBox="0 0 460 430"
+            >
+
+                <!-- Decoración -->
+
+                <circle
+                    class="decor-punto punto-1"
+                    cx="65"
+                    cy="92"
+                    r="5"
+                />
+
+                <circle
+                    class="decor-punto punto-2"
+                    cx="386"
+                    cy="112"
+                    r="4"
+                />
+
+                <circle
+                    class="decor-punto punto-3"
+                    cx="355"
+                    cy="334"
+                    r="6"
+                />
+
+                <path
+                    class="decor-estrella estrella-1"
+                    d="M82 154
+                       L87 166
+                       L99 171
+                       L87 176
+                       L82 188
+                       L77 176
+                       L65 171
+                       L77 166 Z"
+                />
+
+                <path
+                    class="decor-estrella estrella-2"
+                    d="M366 205
+                       L370 215
+                       L380 219
+                       L370 223
+                       L366 233
+                       L362 223
+                       L352 219
+                       L362 215 Z"
+                />
+
+
+                <!-- Línea decorativa -->
+
+                <path
+                    class="decor-trazo"
+                    d="M55 260
+                       C42 230 51 195 77 178"
+                />
+
+
+                <!-- Sombra -->
+
+                <ellipse
+                    class="dibujo-sombra"
+                    cx="229"
+                    cy="372"
+                    rx="132"
+                    ry="17"
+                />
+
+
+                <!-- =================================================
+                     CALENDARIO
+                     ================================================= -->
+
+                <g class="dibujo-calendario">
+
+                    <rect
+                        x="88"
+                        y="91"
+                        width="225"
+                        height="205"
+                        rx="18"
+                    />
+
+                    <!-- parte superior -->
+
+                    <rect
+                        x="88"
+                        y="91"
+                        width="225"
+                        height="55"
+                        rx="18"
+                    />
+
+                    <rect
+                        x="88"
+                        y="125"
+                        width="225"
+                        height="21"
+                    />
+
+                    <!-- anillos -->
+
+                    <rect
+                        x="126"
+                        y="72"
+                        width="13"
+                        height="45"
+                        rx="6"
+                    />
+
+                    <rect
+                        x="262"
+                        y="72"
+                        width="13"
+                        height="45"
+                        rx="6"
+                    />
+
+
+                    <!-- título -->
+
+                    <line
+                        x1="121"
+                        y1="169"
+                        x2="181"
+                        y2="169"
+                    />
+
+                    <line
+                        x1="121"
+                        y1="182"
+                        x2="163"
+                        y2="182"
+                    />
+
+
+                    <!-- cuadricula -->
+
+                    <line x1="120" y1="207" x2="281" y2="207" />
+                    <line x1="120" y1="239" x2="281" y2="239" />
+                    <line x1="120" y1="271" x2="281" y2="271" />
+
+                    <line x1="152" y1="197" x2="152" y2="281" />
+                    <line x1="184" y1="197" x2="184" y2="281" />
+                    <line x1="216" y1="197" x2="216" y2="281" />
+                    <line x1="248" y1="197" x2="248" y2="281" />
+
+
+                    <!-- día seleccionado -->
+
+                    <circle
+                        class="dia-seleccionado"
+                        cx="200"
+                        cy="223"
+                        r="12"
+                    />
+
+                </g>
+
+
+                <!-- =================================================
+                     DOCUMENTO
+                     ================================================= -->
+
+                <g class="dibujo-documento">
+
+                    <rect
+                        x="274"
+                        y="157"
+                        width="101"
+                        height="132"
+                        rx="13"
+                    />
+
+                    <path
+                        d="M346 157
+                           L375 186
+                           L346 186 Z"
+                    />
+
+                    <line
+                        x1="292"
+                        y1="211"
+                        x2="350"
+                        y2="211"
+                    />
+
+                    <line
+                        x1="292"
+                        y1="229"
+                        x2="341"
+                        y2="229"
+                    />
+
+                    <line
+                        x1="292"
+                        y1="247"
+                        x2="353"
+                        y2="247"
+                    />
+
+                    <circle
+                        cx="305"
+                        cy="270"
+                        r="6"
+                    />
+
+                </g>
+
+
+                <!-- =================================================
+                     CHECK
+                     ================================================= -->
+
+                <g class="dibujo-check">
+
+                    <circle
+                        cx="334"
+                        cy="321"
+                        r="31"
+                    />
+
+                    <path
+                        d="M317 321
+                           L329 333
+                           L353 305"
+                    />
+
+                </g>
+
+
+                <!-- =================================================
+                     LÁPIZ
+                     ================================================= -->
+
+                <g class="dibujo-lapiz">
+
+                    <rect
+                        x="285"
+                        y="278"
+                        width="17"
+                        height="83"
+                        rx="7"
+                        transform="rotate(25 285 278)"
+                    />
+
+                    <path
+                        d="M318 354
+                           L326 369
+                           L311 363 Z"
+                    />
+
+                    <line
+                        x1="294"
+                        y1="292"
+                        x2="307"
+                        y2="298"
+                    />
+
+                </g>
+
+            </svg>
+
+
+            <div class="registro-ilustracion-texto">
+
+                <strong>Crear tu cuenta</strong>
+
+                <span>Organiza tus citas en EDUTURNOS</span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CONTENIDO DE REGISTRO
+             ================================================= -->
+
+        <div class="registro-contenedor">
+
+            <div class="registro-encabezado">
+
+                <p class="registro-etiqueta">EDUTURNOS</p>
+
+                <h1>Crear cuenta</h1>
+
+                <p class="registro-descripcion">
+                    Selecciona el tipo de cuenta que deseas crear
+                    para continuar.
+                </p>
+
+            </div>
+
+
+            <div class="registro-grid">
+
+{% for slug, info in portales.items() %}
+
+            <article class="registro-opcion">
+
+                <div class="registro-opcion-contenido">
+
+                    <h3>{{ info.label }}</h3>
+
+                    <p>{{ info.descripcion }}</p>
+
+                </div>
+
+                <a
+                    class="registro-boton"
+                    href="{{ url_for('auth.registro_portal', portal=slug) }}"
+                >
+                    Crear cuenta
+                </a>
+
+            </article>
+
+            {% endfor %}
+
+            </div>
+
+
+            <div class="registro-retorno">
+
+                <a
+                    href="{{ url_for('auth.login') }}"
+                    class="link-back"
+                >
+                    <span aria-hidden="true">←</span>
+                    <span>Volver al inicio de sesión</span>
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+
+{% endblock %}
+
+<!-- EDUTURNOS_REGISTRO_ESTILO_UNICO_FINAL_20260926 -->
+<style id="EDUTURNOS_REGISTRO_ESTILO_UNICO_FINAL_20260926">
+
+/* =========================================================
+   FONDO ÚNICO
+   ========================================================= */
+
+html,
+body {
+    background: #f4f7fb !important;
+    background-color: #f4f7fb !important;
+}
+
+#contenido,
+#contenido main,
+#contenido main.contenedor,
+#contenido .contenedor,
+#contenido main.container,
+#contenido .container,
+.registro-pagina {
+    background: #f4f7fb !important;
+    background-color: #f4f7fb !important;
+    background-image: none !important;
+}
+
+
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+   ========================================================= */
+
+.registro-contenedor {
+    width: 100% !important;
+    max-width: 630px !important;
+    padding: 37px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #dce7f4 !important;
+    border-radius: 18px !important;
+
+    box-shadow: 0 15px 38px rgba(18, 59, 104, .08) !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+   ========================================================= */
+
+.registro-encabezado {
+    margin-bottom: 24px !important;
+}
+
+
+/* =========================================================
+   ROLES
+   TODOS DEL MISMO TAMAÑO
+   ========================================================= */
+
+.registro-grid {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr)) !important;
+
+    gap: 13px !important;
+
+    align-items: stretch !important;
+}
+
+
+/* Cada tarjeta exactamente igual */
+
+.registro-grid .registro-opcion {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    height: 94px !important;
+    min-height: 94px !important;
+    max-height: 94px !important;
+
+    margin: 0 !important;
+
+    padding: 14px 15px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    gap: 13px !important;
+
+    box-sizing: border-box !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #dfe8f2 !important;
+    border-radius: 11px !important;
+
+    overflow: hidden !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease !important;
+}
+
+
+/* Hover */
+
+.registro-grid .registro-opcion:hover {
+    transform: translateY(-2px) !important;
+
+    border-color: #bdd5f2 !important;
+
+    box-shadow:
+        0 8px 18px rgba(18, 59, 104, .09) !important;
+}
+
+
+/* Texto */
+
+.registro-grid .registro-opcion h3 {
+    margin: 0 0 4px !important;
+
+    color: #123b68 !important;
+
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+    font-weight: 750 !important;
+}
+
+
+.registro-grid .registro-opcion p {
+    margin: 0 !important;
+
+    color: #71859a !important;
+
+    font-size: 10.5px !important;
+    line-height: 1.35 !important;
+}
+
+
+/* Botones */
+
+.registro-grid .registro-boton {
+    flex: 0 0 auto !important;
+    flex-shrink: 0 !important;
+
+    min-height: 35px !important;
+
+    padding: 8px 12px !important;
+
+    background: #2f78ff !important;
+    color: #ffffff !important;
+
+    border: 1px solid #2f78ff !important;
+    border-radius: 8px !important;
+
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+
+    line-height: 1 !important;
+
+    text-decoration: none !important;
+
+    box-shadow:
+        0 4px 9px rgba(47, 120, 255, .13) !important;
+}
+
+
+/* =========================================================
+   ILUSTRACIÓN
+   SIN CUADRO DE FONDO
+   ========================================================= */
+
+.registro-ilustracion,
+.registro-dibujo {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+    .registro-contenedor {
+        max-width: calc(100% - 20px) !important;
+        padding: 28px 20px !important;
+    }
+
+    .registro-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .registro-grid .registro-opcion {
+        height: 94px !important;
+        min-height: 94px !important;
+        max-height: 94px !important;
+    }
+}
+
+</style>
+<!-- FIN EDUTURNOS_REGISTRO_ESTILO_UNICO_FINAL_20260926 -->

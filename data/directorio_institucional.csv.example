@@ -1,0 +1,4 @@
+rol,documento,nombres,apellidos,correo,sede,jornada
+Docente,10000003,Carlos,Docente,carlos.docente@jjfh.edu.co,Sede Picaleña,Mañana
+Coordinador,10000002,Ana,Coordinadora,ana.coordinadora@jjfh.edu.co,Sede Picaleña,Mañana
+Coordinador,10000006,Luis,Rector,luis.rector@jjfh.edu.co,Sede Picaleña,Mañana

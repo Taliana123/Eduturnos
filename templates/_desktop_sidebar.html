@@ -1,0 +1,41 @@
+{% if usuario_navegacion %}
+{% set rol = usuario_navegacion.rol_nombre %}
+{% set personal = rol in ['Super Admin', 'Rector', 'Administrador / Coordinador', 'Docente'] %}
+{% set gestion = rol in ['Super Admin', 'Rector', 'Administrador / Coordinador'] %}
+{% set endpoint = request.endpoint or '' %}
+<aside id="eduturnos-mobile-nav" class="eduturnos-desktop-sidebar" aria-label="Navegación institucional">
+  <div class="desktop-sidebar-institution">
+    <img src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional" width="40" height="40">
+    <strong>I. E. José Joaquín Flórez Hernández</strong>
+  </div>
+  <nav aria-label="Funciones de {{ rol }}">
+    {% set enlaces = [('auth.dashboard', 'Resumen')] %}
+    {% if personal %}{% set enlaces = enlaces + [('citas.nueva', 'Nueva citación')] %}{% endif %}
+    {% set enlaces = enlaces + [('citas.index', 'Citaciones'), ('calendario.index', 'Ver agenda'), ('notificaciones.index', 'Recordatorios')] %}
+    {% if personal %}{% set enlaces = enlaces + [('estudiantes.lista', 'Estudiantes'), ('seguimiento.lista', 'Seguimiento'), ('solicitudes.index', 'Solicitudes')] %}{% endif %}
+    {% if gestion %}{% set enlaces = enlaces + [('reportes.index', 'Reportes'), ('acudientes.lista', 'Acudientes'), ('docentes.lista', 'Docentes')] %}{% endif %}
+    {% if rol in ['Rector', 'Super Admin'] %}{% set enlaces = enlaces + [('configuracion.index', 'Administración')] %}{% endif %}
+    {% if rol in ['Estudiante', 'Acudiente'] %}{% set enlaces = enlaces + [('justificaciones.index', 'Justificaciones')] %}{% endif %}
+    {% for destino, nombre in enlaces %}
+    {% if destino == 'citas.nueva' %}
+    {% set activo = endpoint == destino %}
+    {% elif destino == 'citas.index' %}
+    {% set activo = endpoint.startswith('citas.') and endpoint != 'citas.nueva' %}
+    {% else %}
+    {% set activo = endpoint == destino if destino == 'auth.dashboard' else endpoint.split('.')[0] == destino.split('.')[0] %}
+    {% endif %}
+    <a href="{{ url_for(destino) }}" {% if activo %}aria-current="page"{% endif %}>{{ nombre }}</a>
+    {% endfor %}
+    <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=coliejjfh@hotmail.com&amp;su=Soporte%20EDUTURNOS&amp;body=Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS." target="_blank" rel="noopener noreferrer">Soporte por Gmail</a>
+  </nav>
+  {% if beepy_disponible or personal %}
+  {% with usuario = usuario_navegacion %}{% include '_asistente_widget.html' %}{% endwith %}
+  {% endif %}
+  <a class="desktop-sidebar-account-link" href="{{ url_for('cuenta.index') }}" {% if endpoint.startswith('cuenta.') %}aria-current="page"{% endif %}>Mi cuenta</a>
+  <div class="desktop-sidebar-account">
+    <span class="desktop-sidebar-account-avatar" aria-hidden="true">ET</span>
+    <div class="desktop-sidebar-account-info"><strong>Acceso institucional</strong><small>{{ usuario_navegacion.nombres }} {{ usuario_navegacion.apellidos }}</small></div>
+    <form class="desktop-sidebar-logout-form" method="post" action="{{ url_for('auth.logout') }}">{{ csrf_field()|safe }}<button class="desktop-sidebar-logout-button" type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><img src="{{ url_for('static', filename='icons/lucide-log-out.svg') }}" alt=""></button></form>
+  </div>
+</aside>
+{% endif %}
