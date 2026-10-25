@@ -1115,7 +1115,7 @@ body {
 }
 
 </style>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_home_copy_lift_v66" media="(max-width: 900px)">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_home_copy_lift_v67" media="(max-width: 900px)">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-ui-fixes.css') }}?v=20261026_desktop_account_config_v3" media="(min-width: 901px)">
 <style id="eduturnos-home-hero-illustration">
     html body.public-home-page .hero-message-row {
@@ -1197,7 +1197,8 @@ body {
         }
 
         html body.public-home-page .hero-texto {
-            transform: translateY(-32px) !important;
+            margin-top: -32px !important;
+            transform: none !important;
         }
 
         html body.public-home-page .hero-illustration {
@@ -1219,6 +1220,10 @@ body {
             flex: 0 0 60% !important;
             width: 60% !important;
             font-size: clamp(24px, 7.3vw, 28px) !important;
+        }
+
+        html body.public-home-page .hero-texto {
+            margin-top: -38px !important;
         }
 
         html body.public-home-page .hero-illustration {
