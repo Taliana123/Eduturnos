@@ -29,6 +29,32 @@ def test_recovery_back_button_matches_institutional_square_and_messages_precede_
     assert 'aria-live="polite"' in text
 
 
+def test_public_menu_back_buttons_align_with_each_page_title():
+    page_paths = (
+        "templates/publico/como_funciona.html",
+        "templates/publico/beneficios.html",
+        "templates/publico/privacidad.html",
+        "templates/publico/terminos.html",
+    )
+    base = Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
+
+    assert ".public-title-row { display: flex;" in base
+    assert "align-items: center;" in base
+    assert ".public-back-button { display: grid;" in base
+    mobile_css = Path("static/css/mobile/eduturnos-mobile.css").read_text(encoding="utf-8")
+    assert "html body.public-info-page .public-title-row h1" in mobile_css
+    assert '<a class="public-back-button"' not in base.split("<main>", 1)[1].split("</main>", 1)[0]
+
+    for page_path in page_paths:
+        text = Path(page_path).read_text(encoding="utf-8")
+        title_row = text.split('class="public-title-row"', 1)[1]
+        assert title_row.index('class="public-back-button"') < title_row.index("<h1>")
+
+    institution = Path("templates/institucion.html").read_text(encoding="utf-8")
+    assert 'class="institucion-title-row"' in institution
+    assert institution.index("institucion-back") < institution.index("<h1>{{ informacion.nombre }}</h1>")
+
+
 def test_cancelar_registro_y_volver_a_login_navegan_a_destinos_correctos(monkeypatch):
     from app import app as flask_app
 
@@ -290,8 +316,8 @@ def test_mobile_navigation_reuses_role_sidebar_as_drawer():
     assert ".dashboard-assistant[open]>.dashboard-assistant-panel{position:fixed;" in sidebar_css
     assert ".dashboard-assistant[open]>.dashboard-assistant-panel" in sidebar_css
     assert "v=20261026_mobile_recovery_v64" in base
-    for template in (publico, portada):
-        assert "v=20261026_mobile_recovery_v64" in template
+    assert "v=20261026_public_menu_title_v65" in publico
+    assert "v=20261026_mobile_recovery_v64" in portada
 
 
 def test_portada_muestra_ilustracion_junto_al_lema_y_login_mantiene_registro_compacto():

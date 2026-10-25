@@ -1359,6 +1359,10 @@
         letter-spacing: 0 !important;
     }
 
+    html body.public-info-page .public-title-row h1 {
+        margin: 0 !important;
+    }
+
     html body.public-info-page .intro {
         margin: 0 0 16px !important;
         font-size: 14px !important;
