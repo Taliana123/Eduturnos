@@ -338,7 +338,11 @@ def test_recovery_illustration_keeps_mobile_proportions():
     assert "width: 200px;" in illustration
     assert "height: 180px;" in illustration
     assert ".eduturnos-recovery-art-content" in illustration
-    assert "transform: scale(.72);" in illustration
+    assert "width: 166px;" in illustration
+    assert "height: 166px;" in illustration
+    assert "width: 300px;" in illustration
+    assert "height: 270px;" in illustration
+    assert "transform: translate(-50%, -50%) scale(.72);" in illustration
     assert "width: 72px;" in recovery
     assert "height: 66px;" in recovery
     assert "width: 34px;" in recovery
