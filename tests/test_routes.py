@@ -460,27 +460,16 @@ def test_formulario_login_no_se_guarda_en_cache():
     assert respuesta.headers["Cache-Control"] == "no-store"
 
 
-def test_soporte_muestra_solo_enlace_de_correo_a_acudiente(monkeypatch):
-    from routes import soporte as soporte_routes
-
-    usuario = {
-        "id_usuario": 42,
-        "nombres": "Ana",
-        "apellidos": "Pérez",
-        "correo": "ana@example.com",
-        "rol_nombre": "Acudiente",
-    }
-    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
-    monkeypatch.setattr(soporte_routes, "usuario_actual", lambda: usuario)
-
+def test_soporte_abre_directamente_el_correo_institucional():
     client = app.test_client()
-    with client.session_transaction() as session:
-        session["usuario_id"] = 42
     respuesta = client.get("/soporte/")
 
-    assert respuesta.status_code == 200
-    assert 'href="mailto:coliejjfh@hotmail.com' in respuesta.get_data(as_text=True)
-    assert "Enviar solicitud" not in respuesta.get_data(as_text=True)
+    assert respuesta.status_code == 302
+    assert respuesta.headers["Location"] == (
+        "mailto:coliejjfh@hotmail.com"
+        "?subject=Ayuda%20con%20EDUTURNOS"
+        "&body=Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS"
+    )
 
 
 @pytest.mark.parametrize("scope,rol,permitido", [

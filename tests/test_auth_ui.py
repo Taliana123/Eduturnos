@@ -123,6 +123,15 @@ def test_password_change_back_button_stays_aligned_with_title_on_mobile():
     assert "form-card > .section-heading > .account-subpage-title > h1" in responsive
 
 
+def test_password_reset_login_link_is_below_save_button_and_uses_blue_text():
+    template = Path("templates/auth/restablecer.html").read_text(encoding="utf-8")
+
+    assert "form-top-actions" not in template
+    assert template.index("Guardar contraseña") < template.index("Iniciar sesión")
+    assert '<div class="restablecer-login-link"><a href="{{ url_for(\'auth.login\') }}">Iniciar sesión</a></div>' in template
+    assert ".restablecer-login-link a{color:#2f78ff;" in template
+
+
 def test_login_illustration_is_restored_only_on_desktop():
     login = Path("templates/auth/login.html").read_text(encoding="utf-8")
     desktop_rules = login.split("@media (min-width: 981px)", 1)[1].split("</style>", 1)[0]
@@ -146,19 +155,16 @@ def test_account_title_and_description_align_with_personal_info_heading_on_mobil
 def test_support_link_opens_prefilled_email_to_institution():
     sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
     assistant_widget = Path("templates/_asistente_widget.html").read_text(encoding="utf-8")
-    template = Path("templates/soporte/index.html").read_text(encoding="utf-8")
     route = Path("routes/soporte.py").read_text(encoding="utf-8")
     assert "('soporte.index', 'Ayuda y soporte')" in sidebar
     assert "'soporte.index': 'mail'" in sidebar
     assert "mailto:coliejjfh@hotmail.com" in sidebar
     assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
     assert "url_for('soporte.index')" not in assistant_widget
-    assert 'href="mailto:coliejjfh@hotmail.com' in template
-    assert "mailto:coliejjfh@hotmail.com" in template
-    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in template
-    assert "support-form" not in template
-    assert "generar_respuesta" not in route
-    assert "enviar_solicitud_soporte" not in route
+    assert "redirect(" in route
+    assert "mailto:coliejjfh@hotmail.com" in route
+    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in route
+    assert not Path("templates/soporte/index.html").exists()
 
 
 def test_registration_email_domain_blocks_blur_and_tab_until_valid():
@@ -574,7 +580,6 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     app_js = Path('static/js/app.js').read_text(encoding='utf-8')
     assistant_script = Path('static/js/asistente.js').read_text(encoding='utf-8')
     dashboard = Path('templates/dashboard.html').read_text(encoding='utf-8')
-    support = Path('templates/soporte/index.html').read_text(encoding='utf-8')
     assert 'aria-label="Ayuda y soporte"' in widget
     assert 'data-eduturnos-assistant' in widget
     assert 'id="dashboard-help-title">EDUBOT</strong>' in widget
@@ -599,13 +604,12 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'datos de estudiantes' not in widget
     assert "{% include '_asistente_widget.html' %}" in lateral
     assert "{% include '_asistente_widget.html' %}" not in dashboard
-    assert "{% include '_asistente_widget.html' %}" not in support
     assert "endpoint != 'auth.dashboard'" not in lateral
     assert 'class="desktop-sidebar-account-link"' in lateral
     assert lateral.index("include '_asistente_widget.html'") < lateral.index('class="desktop-sidebar-account-link"')
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
-    assert "request.endpoint != 'soporte.index'" in base
+    assert "request.endpoint != 'soporte.index'" not in base
     assert "css/edubot.css') }}?v=20261023_assistant_compact_v2" in base
     assert "js/asistente.js') }}?v=20261023_assistant_compact_v2" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script

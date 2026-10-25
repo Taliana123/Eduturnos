@@ -731,7 +731,6 @@ def test_mobile_notification_and_directory_layouts_use_available_width():
 def test_support_opens_prefilled_email_without_extra_form_or_chat():
     sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
     assistant_widget = Path("templates/_asistente_widget.html").read_text(encoding="utf-8")
-    template = Path("templates/soporte/index.html").read_text(encoding="utf-8")
     route = Path("routes/soporte.py").read_text(encoding="utf-8")
     email = Path("servicios/email.py").read_text(encoding="utf-8")
 
@@ -741,10 +740,10 @@ def test_support_opens_prefilled_email_without_extra_form_or_chat():
     assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
     assert 'class="support-nav-link" href="{{ url_for(\'soporte.index\') }}"' not in assistant_widget
     assert "mail.google.com/mail/" not in sidebar
-    assert 'href="mailto:coliejjfh@hotmail.com' in template
-    assert "support-form" not in template
-    assert "generar_respuesta" not in route
-    assert "enviar_solicitud_soporte" not in route
+    assert "redirect(" in route
+    assert "mailto:coliejjfh@hotmail.com" in route
+    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in route
+    assert not Path("templates/soporte/index.html").exists()
     assert "Respuesta automática de EDUBOT" in email
 
 
@@ -805,7 +804,7 @@ def test_support_is_available_in_sidebar_and_legacy_gmail_composer_is_removed():
     assert "mail.google.com/mail/" not in sidebar
     assert "soporte_bp" in app_source
     assert "supportEmailLink" not in app_js
-    assert "mailto:coliejjfh@hotmail.com" in Path("templates/soporte/index.html").read_text(encoding="utf-8")
+    assert "mailto:coliejjfh@hotmail.com" in Path("routes/soporte.py").read_text(encoding="utf-8")
     assert "mailto:coliejjfh@hotmail.com" in sidebar
 
 

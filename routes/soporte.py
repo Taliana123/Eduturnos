@@ -1,12 +1,12 @@
-from flask import Blueprint, render_template
-
-from routes.helpers import login_requerido, usuario_actual
+from flask import Blueprint, redirect
 
 soporte_bp = Blueprint("soporte", __name__, url_prefix="/soporte")
 
 
 @soporte_bp.get("/")
-@login_requerido
 def index():
-    usuario = usuario_actual()
-    return render_template("soporte/index.html", usuario=usuario)
+    return redirect(
+        "mailto:coliejjfh@hotmail.com"
+        "?subject=Ayuda%20con%20EDUTURNOS"
+        "&body=Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS"
+    )
