@@ -153,7 +153,8 @@ def test_registro_filtra_grupos_por_grado_para_ambos_portales(portal):
             csrf_token=lambda: "csrf-test",
         )
 
-    assert 'data-grupo-de="id_grado"' in html
+    grado_name = "estudiante_id_grado" if portal == "acudiente" else "id_grado"
+    assert f'data-grupo-de="{grado_name}"' in html
     assert 'data-id-grado="6"' in html
     assert 'data-id-grado="7"' in html
 
@@ -295,15 +296,14 @@ def test_forms_preserve_fields_on_validation_errors_without_storing_passwords():
     assert "errorNotice" in script
 
 
-def test_botones_de_mi_cuenta_comparten_diseno_sin_flecha_extra_en_titulo():
+def test_botones_de_mi_cuenta_conservan_tamano_compacto_sin_flecha_extra():
     template = Path("templates/cuenta/index.html").read_text(encoding="utf-8")
 
-    assert len(re.findall(r'<a class="[^"]*cuenta-action-button', template)) == 4
+    assert template.count('class="boton"') == 1
+    assert template.count('class="boton secundario"') == 3
     assert 'class="account-back-button"' not in template
-    assert "height:64px!important;" in template
-    assert "min-height:64px!important;" in template
-    assert "border-radius:12px!important;" in template
-    assert "background:#2f78ff!important;" in template
+    assert "cuenta-action-button" not in template
+    assert "height:64px!important;" not in template
 
 
 def test_homepage_hero_title_and_copy_are_lifted_together():
@@ -554,7 +554,9 @@ def test_requested_visual_updates_are_present():
     assert "Solicitar otro código" in verification
     assert "Iniciar sesión" not in verification
     assert "margin-bottom:14px!important" in verification
-    assert account.count('class="boton cuenta-action-button"') == 4
+    assert account.count('class="boton"') == 1
+    assert account.count('class="boton secundario"') == 3
+    assert "cuenta-action-button" not in account
 
 
 def test_mobile_menu_reopens_at_the_top_with_all_links_scrollable():
@@ -726,7 +728,7 @@ def test_mobile_notification_and_directory_layouts_use_available_width():
     assert 'class="tarjeta reportes-results"' in reports
 
 
-def test_gmail_support_form_uses_account_email_and_automatic_receipt():
+def test_support_opens_prefilled_email_without_extra_form_or_chat():
     sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
     assistant_widget = Path("templates/_asistente_widget.html").read_text(encoding="utf-8")
     template = Path("templates/soporte/index.html").read_text(encoding="utf-8")
@@ -735,15 +737,15 @@ def test_gmail_support_form_uses_account_email_and_automatic_receipt():
 
     assert "('soporte.index', 'Ayuda y soporte')" in sidebar
     assert "'soporte.index': 'mail'" in sidebar
+    assert "mailto:coliejjfh@hotmail.com" in sidebar
+    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
     assert 'class="support-nav-link" href="{{ url_for(\'soporte.index\') }}"' not in assistant_widget
     assert "mail.google.com/mail/" not in sidebar
-    assert 'readonly autocomplete="email"' in template
-    assert "usuario.get(\"correo\")" in route
-    assert "generar_respuesta(detalle)" in route
-    assert "enviar_solicitud_soporte" in route
-    assert "respuesta_automatica=respuesta" in route
+    assert 'href="mailto:coliejjfh@hotmail.com' in template
+    assert "support-form" not in template
+    assert "generar_respuesta" not in route
+    assert "enviar_solicitud_soporte" not in route
     assert "Respuesta automática de EDUBOT" in email
-    assert "el resto del texto se enviará a Gemini" in template
 
 
 def test_los_filtros_de_listas_tienen_opciones_por_defecto_descriptivas():
@@ -804,6 +806,7 @@ def test_support_is_available_in_sidebar_and_legacy_gmail_composer_is_removed():
     assert "soporte_bp" in app_source
     assert "supportEmailLink" not in app_js
     assert "mailto:coliejjfh@hotmail.com" in Path("templates/soporte/index.html").read_text(encoding="utf-8")
+    assert "mailto:coliejjfh@hotmail.com" in sidebar
 
 
 def test_administracion_usa_enlaces_de_seccion_y_un_panel_activo():

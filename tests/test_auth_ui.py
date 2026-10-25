@@ -95,17 +95,16 @@ def test_password_change_button_matches_title_width():
     assert "v=20261023_account_actions_fit_v2" in base
 
 
-def test_account_actions_match_reference_and_calendar_actions_fit_content():
+def test_account_actions_keep_compact_default_button_size():
     account = Path("templates/cuenta/index.html").read_text(encoding="utf-8")
     calendar = Path("templates/integraciones_google.html").read_text(encoding="utf-8")
     responsive = Path("static/css/layout-responsive.css").read_text(encoding="utf-8")
 
-    assert "html body #contenido .cuenta-page .cuenta-section:has(>a.cuenta-action-button)>a.cuenta-action-button" in account
-    assert "width:100%!important;" in account
-    assert "min-height:64px!important;" in account
-    assert "border-radius:12px!important;" in account
-    assert "background:#2f78ff!important;" in account
-    assert "html body #contenido .cuenta-page .cuenta-section:has(>a.cuenta-action-button)>a.cuenta-action-button:hover" in account
+    assert account.count('class="boton"') == 1
+    assert account.count('class="boton secundario"') == 3
+    assert "cuenta-action-button" not in account
+    assert "height:64px" not in account
+    assert "min-height:44px;" in Path("static/css/estilos.css").read_text(encoding="utf-8")
     assert "width: 36px !important;" in responsive
     assert "width: 18px !important;" in responsive
     assert "html body #contenido .integraciones-page .integracion-actions .boton" in calendar
@@ -144,20 +143,22 @@ def test_account_title_and_description_align_with_personal_info_heading_on_mobil
     assert 'class="account-back-button"' not in template
 
 
-def test_support_form_is_available_from_sidebar_and_emails_institution():
+def test_support_link_opens_prefilled_email_to_institution():
     sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
     assistant_widget = Path("templates/_asistente_widget.html").read_text(encoding="utf-8")
     template = Path("templates/soporte/index.html").read_text(encoding="utf-8")
     route = Path("routes/soporte.py").read_text(encoding="utf-8")
     assert "('soporte.index', 'Ayuda y soporte')" in sidebar
     assert "'soporte.index': 'mail'" in sidebar
+    assert "mailto:coliejjfh@hotmail.com" in sidebar
+    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
     assert "url_for('soporte.index')" not in assistant_widget
-    assert "{% include '_asistente_widget.html' %}" in sidebar
-    assert 'readonly autocomplete="email"' in template
+    assert 'href="mailto:coliejjfh@hotmail.com' in template
     assert "mailto:coliejjfh@hotmail.com" in template
     assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in template
-    assert 'placeholder="Hola, necesito ayuda con EDUTURNOS"' in template
-    assert "enviar_solicitud_soporte" in route
+    assert "support-form" not in template
+    assert "generar_respuesta" not in route
+    assert "enviar_solicitud_soporte" not in route
 
 
 def test_registration_email_domain_blocks_blur_and_tab_until_valid():
@@ -176,7 +177,7 @@ def test_registration_email_domain_blocks_blur_and_tab_until_valid():
     assert "@jjfh.edu.co" in template
 
 
-def test_main_menu_pages_share_aligned_dashboard_back_button():
+def test_role_dashboard_pages_do_not_show_back_arrows():
     pages = (
         "templates/citas/index.html",
         "templates/citas/nueva.html",
@@ -192,14 +193,14 @@ def test_main_menu_pages_share_aligned_dashboard_back_button():
     )
     for page in pages:
         source = Path(page).read_text(encoding="utf-8")
-        assert "dashboard_back_button" in source
+        assert "dashboard_back_button" not in source
+        assert "menu-page-back" not in source
         assert "menu-page-heading" in source
 
-    macro = Path("templates/_menu_back_button.html").read_text(encoding="utf-8")
-    css = Path("static/css/layout-responsive.css").read_text(encoding="utf-8")
-    assert 'href="{{ url_for(\'auth.dashboard\') }}"' in macro
-    assert "menu-page-back account-settings-back" in macro
-    assert "#contenido .menu-page-heading" in css
+    account = Path("templates/auth/cambiar_password.html").read_text(encoding="utf-8")
+    public = Path("templates/institucion.html").read_text(encoding="utf-8")
+    assert "account-settings-back" in account
+    assert "account-settings-back" in public
 
 
 def test_home_hero_and_recovery_actions_are_raised_and_aligned():
@@ -434,7 +435,7 @@ def test_barra_lateral_respeta_roles_y_seccion_activa():
         assert 'aria-label="Cerrar sesión"' in html
         assert 'desktop-sidebar-logout-form' in html
         assert 'Ayuda y soporte' in html
-        assert 'href="/soporte/"' in html
+        assert 'href="mailto:coliejjfh@hotmail.com' in html
         assert 'Bandeja de soporte' not in html
         assert 'Soporte por Gmail' not in html
         assert 'mail.google.com/mail/' not in html

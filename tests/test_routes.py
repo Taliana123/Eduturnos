@@ -460,7 +460,7 @@ def test_formulario_login_no_se_guarda_en_cache():
     assert respuesta.headers["Cache-Control"] == "no-store"
 
 
-def test_soporte_envia_respuesta_automatica_tambien_a_acudiente(monkeypatch):
+def test_soporte_muestra_solo_enlace_de_correo_a_acudiente(monkeypatch):
     from routes import soporte as soporte_routes
 
     usuario = {
@@ -470,30 +470,17 @@ def test_soporte_envia_respuesta_automatica_tambien_a_acudiente(monkeypatch):
         "correo": "ana@example.com",
         "rol_nombre": "Acudiente",
     }
-    envios = []
     monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
     monkeypatch.setattr(soporte_routes, "usuario_actual", lambda: usuario)
-    monkeypatch.setattr(soporte_routes, "generar_respuesta", lambda pregunta: "Abre Calendario desde el menú.")
-    monkeypatch.setattr(soporte_routes, "enviar_solicitud_soporte", lambda *args, **kwargs: envios.append((args, kwargs)))
 
     client = app.test_client()
     with client.session_transaction() as session:
         session["usuario_id"] = 42
-        session["_csrf_token"] = "token-prueba"
-    respuesta = client.post(
-        "/soporte/",
-        data={"csrf_token": "token-prueba", "mensaje": "No encuentro el calendario en la aplicación."},
-    )
+    respuesta = client.get("/soporte/")
 
-    assert respuesta.status_code == 302
-    assert urlsplit(respuesta.location).path == "/soporte/"
-    assert envios[0][0] == (
-        "ana@example.com",
-        "Ana Pérez",
-        "Acudiente",
-        "No encuentro el calendario en la aplicación.",
-    )
-    assert envios[0][1]["respuesta_automatica"] == "Abre Calendario desde el menú."
+    assert respuesta.status_code == 200
+    assert 'href="mailto:coliejjfh@hotmail.com' in respuesta.get_data(as_text=True)
+    assert "Enviar solicitud" not in respuesta.get_data(as_text=True)
 
 
 @pytest.mark.parametrize("scope,rol,permitido", [
