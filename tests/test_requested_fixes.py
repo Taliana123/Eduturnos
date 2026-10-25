@@ -865,6 +865,7 @@ def test_requested_visual_fixes_are_scoped_to_desktop():
         assert 'css/desktop-ui-fixes.css' in template
         assert 'media="(min-width: 901px)"' in template
 
+    assert "html body.public-info-page > header.barra {\n        margin-top: -21px !important;\n    }" in desktop_css
     assert 'button[data-citas-state="Pendiente"]' in desktop_css
     assert 'button[data-citas-state="Realizada"]' in desktop_css
     assert ".edc-page .edc-buttons > button" in desktop_css
