@@ -143,6 +143,7 @@ const initializeEduturnosAssistant = () => {
     const chatPositionKey = "eduturnos-assistant-position-v1";
     let dragState = null;
     let resizeState = null;
+    let defaultChatSize = null;
 
     const positionLimits = () => {
         const bounds = root.getBoundingClientRect();
@@ -185,9 +186,9 @@ const initializeEduturnosAssistant = () => {
         const availableHeight = window.innerHeight - (mobileViewport ? 100 : 16);
         const maxHeight = Math.max(1, Math.min(700, availableHeight));
         return {
-            minWidth: Math.min(260, maxWidth),
+            minWidth: Math.min(defaultChatSize?.width ?? 260, maxWidth),
             maxWidth,
-            minHeight: Math.min(280, maxHeight),
+            minHeight: Math.min(defaultChatSize?.height ?? 280, maxHeight),
             maxHeight,
         };
     };
@@ -302,6 +303,7 @@ const initializeEduturnosAssistant = () => {
         if (!isOpen) {
             resetConversation();
             clearChatPosition();
+            defaultChatSize = null;
         }
         root.hidden = !isOpen;
         root.classList.toggle("is-open", isOpen);
@@ -310,6 +312,11 @@ const initializeEduturnosAssistant = () => {
         });
         if (isOpen) {
             clearChatPosition();
+            const defaultBounds = root.getBoundingClientRect();
+            defaultChatSize = {
+                width: defaultBounds.width,
+                height: defaultBounds.height,
+            };
         } else {
             (sourceButton?.hasAttribute("data-assistant-open") ? sourceButton : openButton).focus();
         }

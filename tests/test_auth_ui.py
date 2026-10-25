@@ -642,7 +642,7 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert "css/edubot.css') }}?v=20261025_assistant_resize_v2" in base
     assert "js/asistente.js') }}?v=20261025_assistant_resize_v2" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
-    assert 'if (isOpen) {\n            clearChatPosition();\n        } else {' in assistant_script
+    assert 'if (isOpen) {\n            clearChatPosition();\n            const defaultBounds = root.getBoundingClientRect();' in assistant_script
     assert 'assistantWidget' not in app_js
 
 
@@ -664,6 +664,11 @@ def test_edubot_tiene_compositor_compacto_y_sin_indicador_ia():
     assistant_script = Path('static/js/asistente.js').read_text(encoding='utf-8')
     assert 'root.setPointerCapture(event.pointerId)' in assistant_script
     assert 'root.addEventListener("pointermove"' in assistant_script
+    assert 'let defaultChatSize = null;' in assistant_script
+    assert 'minWidth: Math.min(defaultChatSize?.width ?? 260, maxWidth)' in assistant_script
+    assert 'minHeight: Math.min(defaultChatSize?.height ?? 280, maxHeight)' in assistant_script
+    assert 'width: defaultBounds.width' in assistant_script
+    assert 'height: defaultBounds.height' in assistant_script
     assert 'root.querySelectorAll("[data-assistant-resize]")' in assistant_script
     assert 'root.style.removeProperty("width")' in assistant_script
     assert 'root.style.removeProperty("height")' in assistant_script
