@@ -1,6 +1,5 @@
 {% extends 'base.html' %}{% block title %}Nueva contraseña · EDUTURNOS{% endblock %}{% block content %}
-<section class="formulario"><div class="tarjeta form-card">
-  <div class="form-top-actions"><a class="link-back" href="{{ url_for('auth.login') }}">← Iniciar sesión</a></div>
+<section class="formulario"><div class="tarjeta form-card restablecer-card">
   <div class="section-heading"><span class="badge">Seguridad de cuenta</span><h1>Nueva contraseña</h1><p>Debe tener entre 12 y 15 caracteres e incluir al menos una mayúscula, una minúscula y un número.</p></div>
   <form method="post" class="stack-form form-uniform">{{ csrf_field()|safe }}
     <label>Contraseña nueva<input type="password" name="password_nueva" minlength="12" maxlength="15" required autocomplete="new-password" aria-describedby="ayuda-password-nueva"></label>
@@ -8,8 +7,14 @@
     <label>Confirmar contraseña<input type="password" name="password_confirmacion" minlength="12" maxlength="15" required autocomplete="new-password"></label>
     <button class="boton boton-full" type="submit">Guardar contraseña</button>
   </form>
+  <div class="restablecer-login-link"><a href="{{ url_for('auth.login') }}">Iniciar sesión</a></div>
 </div></section>
 
-
+<style>
+.restablecer-card > .section-heading{margin-bottom:12px}
+.restablecer-login-link{display:flex;justify-content:center;margin-top:14px}
+.restablecer-login-link a{color:#2f78ff;font-size:12px;font-weight:600;line-height:1.3;text-decoration:none}
+.restablecer-login-link a:hover{color:#123b68;text-decoration:underline}
+</style>
 
 {% endblock %}

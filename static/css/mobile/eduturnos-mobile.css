@@ -1359,6 +1359,10 @@
         letter-spacing: 0 !important;
     }
 
+    html body.public-info-page .public-title-row h1 {
+        margin: 0 !important;
+    }
+
     html body.public-info-page .intro {
         margin: 0 0 16px !important;
         font-size: 14px !important;
@@ -3612,7 +3616,7 @@ html body.auth-page .registro-contenedor h1 {
     }
 
     html body #contenido .eduturnos-recuperar-final-illustration {
-        min-height: 120px !important;
+        min-height: 190px !important;
     }
 
     html body #contenido .eduturnos-recuperar-final-content {

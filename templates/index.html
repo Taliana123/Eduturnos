@@ -902,7 +902,7 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
 </div>
 
 {% if request.args.get('mobile') == '1' or session.get('mobile_mode') or 'Android' in request.user_agent.string or 'iPhone' in request.user_agent.string or 'iPad' in request.user_agent.string %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_mobile_recovery_v63">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_mobile_recovery_v64">
 {% endif %}
 <script src="{{ url_for('static', filename='js/pwa.js') }}?v=2" defer></script>
 </body>
@@ -1115,15 +1115,15 @@ body {
 }
 
 </style>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_mobile_recovery_v63" media="(max-width: 900px)">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_mobile_recovery_v64" media="(max-width: 900px)">
 <style id="eduturnos-home-hero-illustration">
     html body.public-home-page .hero-message-row {
         display: flex !important;
         align-items: center !important;
         gap: clamp(10px, 1.5vw, 24px) !important;
-        margin: 0 0 20px !important;
+        margin: 0 0 16px !important;
         min-width: 0 !important;
-        transform: translateY(-6px) !important;
+        transform: translateY(-10px) !important;
     }
 
     html body.public-home-page .hero-message-row h1 {
@@ -1134,7 +1134,7 @@ body {
     }
 
     html body.public-home-page .hero-texto {
-        transform: translateY(-8px) !important;
+        transform: translateY(-12px) !important;
     }
 
     html body.public-home-page .hero-illustration {
@@ -1171,7 +1171,7 @@ body {
     @media (max-width: 900px) {
         html body.public-home-page .hero-message-row {
             gap: 10px !important;
-            margin-bottom: 18px !important;
+            margin-bottom: 14px !important;
         }
 
         html body.public-home-page .hero-message-row h1 {
@@ -1210,7 +1210,7 @@ body {
         html body.public-home-page .hero-message-row {
             position: relative !important;
             align-items: flex-start !important;
-            min-height: clamp(124px, calc(33vw + 22px), 155px) !important;
+            min-height: clamp(160px, calc(33vw + 48px), 180px) !important;
             margin-bottom: 0 !important;
         }
 
@@ -1232,7 +1232,7 @@ body {
 
     @media (max-width: 350px) {
         html body.public-home-page .hero-message-row {
-            min-height: clamp(114px, calc(33vw + 22px), 131px) !important;
+            min-height: clamp(160px, calc(33vw + 48px), 180px) !important;
         }
 
         html body.public-home-page .hero-message-row h1 {

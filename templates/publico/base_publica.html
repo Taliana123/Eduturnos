@@ -11,7 +11,7 @@
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}">
     <title>EDUTURNOS · {{ titulo }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_mobile_recovery_v63" media="(max-width: 900px)">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_public_menu_title_v65" media="(max-width: 900px)">
 
     <style>
         * {
@@ -380,9 +380,6 @@
 </header>
 
 <main>
-    <a class="public-back-button" href="{{ url_for('inicio') }}" aria-label="Volver a la página anterior" title="Volver">
-        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
-    </a>
     {{ contenido|safe }}
 </main>
 
@@ -394,13 +391,16 @@
 <script src="{{ url_for('static', filename='js/pwa.js') }}?v=2" defer></script>
 <script src="{{ url_for('static', filename='js/public-back.js') }}?v=20261021_public_back_v3" defer></script>
 <style>
-    .public-back-button { display: none; width: 36px; height: 36px; margin: 0 0 14px; place-items: center; border: 1px solid #d5e1fa; border-radius: 8px; background: #fff; color: #1769aa; text-decoration: none; }
+    .public-title-row { display: flex; min-width: 0; align-items: center; gap: 12px; margin: 22px 0 20px; }
+    .public-title-row h1 { flex: 1 1 auto; min-width: 0; margin: 0; }
+    .public-back-button { display: none; flex: 0 0 36px; width: 36px; height: 36px; place-items: center; border: 1px solid #d5e1fa; border-radius: 8px; background: #fff; color: #1769aa; text-decoration: none; }
     .public-back-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     @media (max-width: 720px) {
         body.public-info-page { display: flex; min-height: 100vh; flex-direction: column; }
         body.public-info-page > main { display: flex; position: relative; flex: 1 0 auto; flex-direction: column; }
         body.public-info-page > footer { flex: 0 0 auto; margin-top: auto; padding: 20px 16px; }
-        .public-back-button { display: grid; flex: 0 0 36px; }
+        .public-title-row { gap: 10px; margin: 12px 0 10px; }
+        .public-back-button { display: grid; }
         .public-info-page h1, .public-info-page h2 { scroll-margin-top: 90px; }
     }
 </style>

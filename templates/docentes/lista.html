@@ -1,6 +1,6 @@
-{% extends 'base.html' %}{% from "_menu_back_button.html" import dashboard_back_button %}{% block content %}
+{% extends 'base.html' %}{% block content %}
 <section class="directory-page">
-<div class="page-head"><div class="menu-page-heading">{{ dashboard_back_button() }}<div class="menu-page-heading-copy"><h1>Docentes</h1></div></div></div>
+<div class="page-head"><div class="menu-page-heading"><div class="menu-page-heading-copy"><h1>Docentes</h1></div></div></div>
 <form method="get" role="search" class="directory-search">
     <label class="visually-hidden" for="docentes-query">Buscar docentes</label>
     <input id="docentes-query" type="search" name="q" value="{{ q }}" placeholder="Palabras clave">

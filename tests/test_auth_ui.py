@@ -29,6 +29,32 @@ def test_recovery_back_button_matches_institutional_square_and_messages_precede_
     assert 'aria-live="polite"' in text
 
 
+def test_public_menu_back_buttons_align_with_each_page_title():
+    page_paths = (
+        "templates/publico/como_funciona.html",
+        "templates/publico/beneficios.html",
+        "templates/publico/privacidad.html",
+        "templates/publico/terminos.html",
+    )
+    base = Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
+
+    assert ".public-title-row { display: flex;" in base
+    assert "align-items: center;" in base
+    assert ".public-back-button { display: grid;" in base
+    mobile_css = Path("static/css/mobile/eduturnos-mobile.css").read_text(encoding="utf-8")
+    assert "html body.public-info-page .public-title-row h1" in mobile_css
+    assert '<a class="public-back-button"' not in base.split("<main>", 1)[1].split("</main>", 1)[0]
+
+    for page_path in page_paths:
+        text = Path(page_path).read_text(encoding="utf-8")
+        title_row = text.split('class="public-title-row"', 1)[1]
+        assert title_row.index('class="public-back-button"') < title_row.index("<h1>")
+
+    institution = Path("templates/institucion.html").read_text(encoding="utf-8")
+    assert 'class="institucion-title-row"' in institution
+    assert institution.index("institucion-back") < institution.index("<h1>{{ informacion.nombre }}</h1>")
+
+
 def test_cancelar_registro_y_volver_a_login_navegan_a_destinos_correctos(monkeypatch):
     from app import app as flask_app
 
@@ -95,17 +121,16 @@ def test_password_change_button_matches_title_width():
     assert "v=20261023_account_actions_fit_v2" in base
 
 
-def test_account_actions_match_reference_and_calendar_actions_fit_content():
+def test_account_actions_keep_compact_default_button_size():
     account = Path("templates/cuenta/index.html").read_text(encoding="utf-8")
     calendar = Path("templates/integraciones_google.html").read_text(encoding="utf-8")
     responsive = Path("static/css/layout-responsive.css").read_text(encoding="utf-8")
 
-    assert "html body #contenido .cuenta-page .cuenta-section:has(>a.cuenta-action-button)>a.cuenta-action-button" in account
-    assert "width:100%!important;" in account
-    assert "min-height:64px!important;" in account
-    assert "border-radius:12px!important;" in account
-    assert "background:#2f78ff!important;" in account
-    assert "html body #contenido .cuenta-page .cuenta-section:has(>a.cuenta-action-button)>a.cuenta-action-button:hover" in account
+    assert account.count('class="boton"') == 1
+    assert account.count('class="boton secundario"') == 3
+    assert "cuenta-action-button" not in account
+    assert "height:64px" not in account
+    assert "min-height:44px;" in Path("static/css/estilos.css").read_text(encoding="utf-8")
     assert "width: 36px !important;" in responsive
     assert "width: 18px !important;" in responsive
     assert "html body #contenido .integraciones-page .integracion-actions .boton" in calendar
@@ -122,6 +147,17 @@ def test_password_change_back_button_stays_aligned_with_title_on_mobile():
     assert "flex-flow: row nowrap !important;" in responsive
     assert "width: auto !important;" in responsive
     assert "form-card > .section-heading > .account-subpage-title > h1" in responsive
+
+
+def test_password_reset_login_link_is_below_save_button_and_uses_blue_text():
+    template = Path("templates/auth/restablecer.html").read_text(encoding="utf-8")
+
+    assert "form-top-actions" not in template
+    assert template.index("Guardar contraseña") < template.index("Iniciar sesión")
+    assert '<div class="restablecer-login-link"><a href="{{ url_for(\'auth.login\') }}">Iniciar sesión</a></div>' in template
+    assert ".restablecer-login-link a{color:#2f78ff;" in template
+    assert 'class="tarjeta form-card restablecer-card"' in template
+    assert ".restablecer-card > .section-heading{margin-bottom:12px}" in template
 
 
 def test_login_illustration_is_restored_only_on_desktop():
@@ -144,20 +180,19 @@ def test_account_title_and_description_align_with_personal_info_heading_on_mobil
     assert 'class="account-back-button"' not in template
 
 
-def test_support_form_is_available_from_sidebar_and_emails_institution():
+def test_support_link_opens_prefilled_email_to_institution():
     sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
     assistant_widget = Path("templates/_asistente_widget.html").read_text(encoding="utf-8")
-    template = Path("templates/soporte/index.html").read_text(encoding="utf-8")
     route = Path("routes/soporte.py").read_text(encoding="utf-8")
     assert "('soporte.index', 'Ayuda y soporte')" in sidebar
     assert "'soporte.index': 'mail'" in sidebar
+    assert "mailto:coliejjfh@hotmail.com" in sidebar
+    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
     assert "url_for('soporte.index')" not in assistant_widget
-    assert "{% include '_asistente_widget.html' %}" in sidebar
-    assert 'readonly autocomplete="email"' in template
-    assert "mailto:coliejjfh@hotmail.com" in template
-    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in template
-    assert 'placeholder="Hola, necesito ayuda con EDUTURNOS"' in template
-    assert "enviar_solicitud_soporte" in route
+    assert "redirect(" in route
+    assert "mailto:coliejjfh@hotmail.com" in route
+    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in route
+    assert not Path("templates/soporte/index.html").exists()
 
 
 def test_registration_email_domain_blocks_blur_and_tab_until_valid():
@@ -176,7 +211,7 @@ def test_registration_email_domain_blocks_blur_and_tab_until_valid():
     assert "@jjfh.edu.co" in template
 
 
-def test_main_menu_pages_share_aligned_dashboard_back_button():
+def test_role_dashboard_pages_do_not_show_back_arrows():
     pages = (
         "templates/citas/index.html",
         "templates/citas/nueva.html",
@@ -192,14 +227,14 @@ def test_main_menu_pages_share_aligned_dashboard_back_button():
     )
     for page in pages:
         source = Path(page).read_text(encoding="utf-8")
-        assert "dashboard_back_button" in source
+        assert "dashboard_back_button" not in source
+        assert "menu-page-back" not in source
         assert "menu-page-heading" in source
 
-    macro = Path("templates/_menu_back_button.html").read_text(encoding="utf-8")
-    css = Path("static/css/layout-responsive.css").read_text(encoding="utf-8")
-    assert 'href="{{ url_for(\'auth.dashboard\') }}"' in macro
-    assert "menu-page-back account-settings-back" in macro
-    assert "#contenido .menu-page-heading" in css
+    account = Path("templates/auth/cambiar_password.html").read_text(encoding="utf-8")
+    public = Path("templates/institucion.html").read_text(encoding="utf-8")
+    assert "account-settings-back" in account
+    assert "account-settings-back" in public
 
 
 def test_home_hero_and_recovery_actions_are_raised_and_aligned():
@@ -208,8 +243,9 @@ def test_home_hero_and_recovery_actions_are_raised_and_aligned():
     verification = Path("templates/auth/verificar_codigo.html").read_text(encoding="utf-8")
     base = Path("templates/base.html").read_text(encoding="utf-8")
 
-    assert "margin: 0 0 20px !important;" in home
-    assert "transform: translateY(-6px) !important;" in home
+    assert "margin: 0 0 16px !important;" in home
+    assert "transform: translateY(-10px) !important;" in home
+    assert "transform: translateY(-12px) !important;" in home
     assert "translateY(-4px)" in recovery
     assert "eduturnos-recuperar-final-back account-settings-back" in recovery
     assert verification.count('class="boton boton-full recovery-code-action"') == 2
@@ -273,7 +309,7 @@ def test_mobile_navigation_reuses_role_sidebar_as_drawer():
     assert "mobile-nav-open" in app_js
     assert "mobile-nav-toggle-lines" in sidebar_css
     assert "v=20261024_account_back_targeted_v1" in base
-    assert "v=20261026_mobile_recovery_v63" in base
+    assert "v=20261026_mobile_recovery_v64" in base
     assert "overflow-y:auto!important" in sidebar_css
     assert "Volver al inicio" not in publico
     assert 'filename=\'js/public-back.js\'' in publico
@@ -281,9 +317,9 @@ def test_mobile_navigation_reuses_role_sidebar_as_drawer():
     assert "margin-top: auto;" in publico
     assert ".dashboard-assistant[open]>.dashboard-assistant-panel{position:fixed;" in sidebar_css
     assert ".dashboard-assistant[open]>.dashboard-assistant-panel" in sidebar_css
-    assert "v=20261026_mobile_recovery_v63" in base
-    for template in (publico, portada):
-        assert "v=20261026_mobile_recovery_v63" in template
+    assert "v=20261026_mobile_recovery_v64" in base
+    assert "v=20261026_public_menu_title_v65" in publico
+    assert "v=20261026_mobile_recovery_v64" in portada
 
 
 def test_portada_muestra_ilustracion_junto_al_lema_y_login_mantiene_registro_compacto():
@@ -434,7 +470,7 @@ def test_barra_lateral_respeta_roles_y_seccion_activa():
         assert 'aria-label="Cerrar sesión"' in html
         assert 'desktop-sidebar-logout-form' in html
         assert 'Ayuda y soporte' in html
-        assert 'href="/soporte/"' in html
+        assert 'href="mailto:coliejjfh@hotmail.com' in html
         assert 'Bandeja de soporte' not in html
         assert 'Soporte por Gmail' not in html
         assert 'mail.google.com/mail/' not in html
@@ -573,7 +609,6 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     app_js = Path('static/js/app.js').read_text(encoding='utf-8')
     assistant_script = Path('static/js/asistente.js').read_text(encoding='utf-8')
     dashboard = Path('templates/dashboard.html').read_text(encoding='utf-8')
-    support = Path('templates/soporte/index.html').read_text(encoding='utf-8')
     assert 'aria-label="Ayuda y soporte"' in widget
     assert 'data-eduturnos-assistant' in widget
     assert 'id="dashboard-help-title">EDUBOT</strong>' in widget
@@ -598,13 +633,12 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'datos de estudiantes' not in widget
     assert "{% include '_asistente_widget.html' %}" in lateral
     assert "{% include '_asistente_widget.html' %}" not in dashboard
-    assert "{% include '_asistente_widget.html' %}" not in support
     assert "endpoint != 'auth.dashboard'" not in lateral
     assert 'class="desktop-sidebar-account-link"' in lateral
     assert lateral.index("include '_asistente_widget.html'") < lateral.index('class="desktop-sidebar-account-link"')
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
-    assert "request.endpoint != 'soporte.index'" in base
+    assert "request.endpoint != 'soporte.index'" not in base
     assert "css/edubot.css') }}?v=20261023_assistant_compact_v2" in base
     assert "js/asistente.js') }}?v=20261023_assistant_compact_v2" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
@@ -719,7 +753,7 @@ def test_formularios_y_acciones_de_listas_conservan_contexto():
     assert '<th>Área</th>' not in lista_docentes
     assert 'url_for(\'docentes.asignaciones\'' not in lista_docentes
     assert 'url_for(\'acudientes.relaciones\'' not in lista_acudientes
-    assert portada.count('v=20261026_mobile_recovery_v63') == 2
+    assert portada.count('v=20261026_mobile_recovery_v64') == 2
     assert 'font-size: 16px;' in portada
     assert 'font-size: 14px;' in portada
     assert 'eduturnos-footer-mobile-text' in portada

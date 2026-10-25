@@ -18,10 +18,11 @@ from routes import configuracion as configuracion_routes
 from routes import helpers as session_helpers
 
 
-def test_login_cookie_persists_for_30_days():
+def test_login_cookie_persists_for_365_days():
     from datetime import timedelta as datetime_timedelta
 
-    assert app.permanent_session_lifetime == datetime_timedelta(days=30)
+    assert app.permanent_session_lifetime == datetime_timedelta(days=365)
+    assert app.config["SESSION_REFRESH_EACH_REQUEST"]
 
     client = app.test_client()
     with client.session_transaction() as stored_session:
@@ -33,7 +34,47 @@ def test_login_cookie_persists_for_30_days():
 
     expires = response.headers["Set-Cookie"].split("Expires=", 1)[1].split(";", 1)[0]
     remaining = parsedate_to_datetime(expires).timestamp() - time.time()
-    assert 29 * 24 * 60 * 60 < remaining <= 30 * 24 * 60 * 60
+    assert 364 * 24 * 60 * 60 < remaining <= 365 * 24 * 60 * 60
+
+
+def test_login_correcto_emite_cookie_permanente(monkeypatch):
+    usuario = {
+        "id_usuario": 42,
+        "rol_nombre": "Estudiante",
+        "correo": "ana@gmail.com",
+        "password_hash": "hash",
+        "estado": 1,
+    }
+    monkeypatch.setattr(auth_routes, "_asegurar_control_acceso", lambda: None)
+    monkeypatch.setattr(auth_routes, "consultar", lambda *args, **kwargs: None)
+    monkeypatch.setattr(auth_routes, "_buscar_usuario", lambda _identificador: usuario)
+    monkeypatch.setattr(auth_routes, "check_password_hash", lambda *_args: True)
+    monkeypatch.setattr(auth_routes, "_limpiar_intentos", lambda _rate_key: None)
+    monkeypatch.setattr(auth_routes, "ejecutar", lambda *args, **kwargs: 1)
+
+    client = app.test_client()
+    with client.session_transaction() as stored_session:
+        stored_session["_csrf_token"] = "csrf-test"
+
+    response = client.post(
+        "/auth/login",
+        data={
+            "csrf_token": "csrf-test",
+            "identificador": usuario["correo"],
+            "password": "ClaveSegura123",
+        },
+    )
+
+    assert response.status_code == 302
+    assert urlsplit(response.location).path == "/auth/dashboard"
+    cookie = response.headers["Set-Cookie"]
+    assert "session=" in cookie
+    expires = cookie.split("Expires=", 1)[1].split(";", 1)[0]
+    remaining = parsedate_to_datetime(expires).timestamp() - time.time()
+    assert 364 * 24 * 60 * 60 < remaining <= 365 * 24 * 60 * 60
+    with client.session_transaction() as stored_session:
+        assert stored_session.permanent
+        assert stored_session["usuario_id"] == usuario["id_usuario"]
 
 
 def test_usuario_actual_no_expira_sesion_durante_su_periodo_configurado(monkeypatch):
@@ -46,7 +87,7 @@ def test_usuario_actual_no_expira_sesion_durante_su_periodo_configurado(monkeypa
 
     with app.test_request_context("/"):
         session_helpers.session["usuario_id"] = 42
-        session_helpers.session["creado_en"] = now - datetime_timedelta(days=29).total_seconds()
+        session_helpers.session["creado_en"] = now - datetime_timedelta(days=364).total_seconds()
         assert session_helpers.usuario_actual() == usuario
         assert session_helpers.session["usuario_id"] == 42
 
@@ -64,7 +105,7 @@ def test_usuario_actual_expira_sesion_despues_de_30_dias(monkeypatch):
 
     with app.test_request_context("/"):
         session_helpers.session["usuario_id"] = 42
-        session_helpers.session["creado_en"] = now - datetime_timedelta(days=31).total_seconds()
+        session_helpers.session["creado_en"] = now - datetime_timedelta(days=366).total_seconds()
         assert session_helpers.usuario_actual() is None
         assert not session_helpers.session
 
@@ -336,12 +377,20 @@ def test_registro_crea_cuenta_con_grupo_bloqueado_como_diccionario(
         "id_grupo": "1",
     }
     if portal == "acudiente":
+        data.pop("id_sede")
+        data.pop("id_jornada")
+        data.pop("id_grado")
+        data.pop("id_grupo")
         data.update(
             {
                 "estudiante_tipo_documento": "TI",
                 "estudiante_documento": "987654321",
                 "estudiante_nombres": "Luis",
                 "estudiante_apellidos": "Perez",
+                "estudiante_id_sede": "1",
+                "estudiante_id_jornada": "1",
+                "estudiante_id_grado": "6",
+                "estudiante_id_grupo": "1",
                 "parentesco": "Madre",
             }
         )
@@ -452,40 +501,16 @@ def test_formulario_login_no_se_guarda_en_cache():
     assert respuesta.headers["Cache-Control"] == "no-store"
 
 
-def test_soporte_envia_respuesta_automatica_tambien_a_acudiente(monkeypatch):
-    from routes import soporte as soporte_routes
-
-    usuario = {
-        "id_usuario": 42,
-        "nombres": "Ana",
-        "apellidos": "Pérez",
-        "correo": "ana@example.com",
-        "rol_nombre": "Acudiente",
-    }
-    envios = []
-    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
-    monkeypatch.setattr(soporte_routes, "usuario_actual", lambda: usuario)
-    monkeypatch.setattr(soporte_routes, "generar_respuesta", lambda pregunta: "Abre Calendario desde el menú.")
-    monkeypatch.setattr(soporte_routes, "enviar_solicitud_soporte", lambda *args, **kwargs: envios.append((args, kwargs)))
-
+def test_soporte_abre_directamente_el_correo_institucional():
     client = app.test_client()
-    with client.session_transaction() as session:
-        session["usuario_id"] = 42
-        session["_csrf_token"] = "token-prueba"
-    respuesta = client.post(
-        "/soporte/",
-        data={"csrf_token": "token-prueba", "mensaje": "No encuentro el calendario en la aplicación."},
-    )
+    respuesta = client.get("/soporte/")
 
     assert respuesta.status_code == 302
-    assert urlsplit(respuesta.location).path == "/soporte/"
-    assert envios[0][0] == (
-        "ana@example.com",
-        "Ana Pérez",
-        "Acudiente",
-        "No encuentro el calendario en la aplicación.",
+    assert respuesta.headers["Location"] == (
+        "mailto:coliejjfh@hotmail.com"
+        "?subject=Ayuda%20con%20EDUTURNOS"
+        "&body=Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS"
     )
-    assert envios[0][1]["respuesta_automatica"] == "Abre Calendario desde el menú."
 
 
 @pytest.mark.parametrize("scope,rol,permitido", [

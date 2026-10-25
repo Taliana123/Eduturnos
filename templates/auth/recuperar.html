@@ -595,7 +595,20 @@ body:has(.eduturnos-recuperar-final-page) main.contenedor {
     .eduturnos-recovery-art {
         width: 200px;
         height: 180px;
-        transform: scale(.72);
+    }
+
+    .eduturnos-recovery-art::before {
+        width: 166px;
+        height: 166px;
+    }
+
+    .eduturnos-recovery-art-content {
+        position: absolute;
+        width: 300px;
+        height: 270px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(.72);
     }
 
     .eduturnos-recuperar-final-content {
@@ -613,9 +626,13 @@ body:has(.eduturnos-recuperar-final-page) main.contenedor {
 
             <div class="eduturnos-recovery-art">
 
-                <div class="eduturnos-recovery-envelope"></div>
+                <div class="eduturnos-recovery-art-content">
 
-                <div class="eduturnos-recovery-lock"></div>
+                    <div class="eduturnos-recovery-envelope"></div>
+
+                    <div class="eduturnos-recovery-lock"></div>
+
+                </div>
 
             </div>
 

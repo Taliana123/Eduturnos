@@ -153,7 +153,8 @@ def test_registro_filtra_grupos_por_grado_para_ambos_portales(portal):
             csrf_token=lambda: "csrf-test",
         )
 
-    assert 'data-grupo-de="id_grado"' in html
+    grado_name = "estudiante_id_grado" if portal == "acudiente" else "id_grado"
+    assert f'data-grupo-de="{grado_name}"' in html
     assert 'data-id-grado="6"' in html
     assert 'data-id-grado="7"' in html
 
@@ -295,15 +296,14 @@ def test_forms_preserve_fields_on_validation_errors_without_storing_passwords():
     assert "errorNotice" in script
 
 
-def test_botones_de_mi_cuenta_comparten_diseno_sin_flecha_extra_en_titulo():
+def test_botones_de_mi_cuenta_conservan_tamano_compacto_sin_flecha_extra():
     template = Path("templates/cuenta/index.html").read_text(encoding="utf-8")
 
-    assert len(re.findall(r'<a class="[^"]*cuenta-action-button', template)) == 4
+    assert template.count('class="boton"') == 1
+    assert template.count('class="boton secundario"') == 3
     assert 'class="account-back-button"' not in template
-    assert "height:64px!important;" in template
-    assert "min-height:64px!important;" in template
-    assert "border-radius:12px!important;" in template
-    assert "background:#2f78ff!important;" in template
+    assert "cuenta-action-button" not in template
+    assert "height:64px!important;" not in template
 
 
 def test_homepage_hero_title_and_copy_are_lifted_together():
@@ -312,9 +312,52 @@ def test_homepage_hero_title_and_copy_are_lifted_together():
     title_styles = homepage.split("html body.public-home-page .hero-message-row h1", 1)[1].split("}", 1)[0]
     copy_styles = homepage.split("html body.public-home-page .hero-texto", 1)[1].split("}", 1)[0]
 
-    assert "transform: translateY(-6px) !important;" in row_styles
+    assert "transform: translateY(-10px) !important;" in row_styles
     assert "transform: none !important;" in title_styles
-    assert "transform: translateY(-8px) !important;" in copy_styles
+    assert "transform: translateY(-12px) !important;" in copy_styles
+    assert "margin: 0 0 16px !important;" in row_styles
+    illustration_styles = homepage.split(
+        '<style id="eduturnos-home-hero-illustration">', 1
+    )[1]
+    mobile_styles = illustration_styles.split(
+        "@media (max-width: 900px)", 1
+    )[1].split("}", 1)[0]
+    assert "margin-bottom: 14px !important;" in mobile_styles
+    assert "Descargar app Android" not in homepage
+    assert "downloads/EDUTURNOS-Android-v1.1.apk" not in homepage
+
+
+def test_recovery_illustration_keeps_mobile_proportions():
+    recovery = Path("templates/auth/recuperar.html").read_text(encoding="utf-8")
+    mobile = Path("static/css/mobile/eduturnos-mobile.css").read_text(encoding="utf-8")
+    illustration = recovery.split(
+        "@media (max-width: 760px)", 1
+    )[1].split("</style>", 1)[0]
+
+    assert "min-height: 120px;" in illustration
+    assert "width: 200px;" in illustration
+    assert "height: 180px;" in illustration
+    assert ".eduturnos-recovery-art-content" in illustration
+    assert "width: 166px;" in illustration
+    assert "height: 166px;" in illustration
+    assert "width: 300px;" in illustration
+    assert "height: 270px;" in illustration
+    assert "transform: translate(-50%, -50%) scale(.72);" in illustration
+    assert "width: 72px;" in recovery
+    assert "height: 66px;" in recovery
+    assert "width: 34px;" in recovery
+    assert "height: 35px;" in recovery
+    assert "width: 9px;" in recovery
+    assert "height: 18px;" in recovery
+    assert "min-height: 190px !important;" in mobile.split(
+        "html body #contenido .eduturnos-recuperar-final-illustration", 1
+    )[1].split("}", 1)[0]
+
+
+def test_recovery_page_is_not_cached_by_the_browser():
+    response = app.test_client().get("/auth/recuperar")
+
+    assert response.headers["Cache-Control"] == "no-store"
 
 
 def test_mobile_account_creation_choices_share_one_button_style():
@@ -554,7 +597,9 @@ def test_requested_visual_updates_are_present():
     assert "Solicitar otro código" in verification
     assert "Iniciar sesión" not in verification
     assert "margin-bottom:14px!important" in verification
-    assert account.count('class="boton cuenta-action-button"') == 4
+    assert account.count('class="boton"') == 1
+    assert account.count('class="boton secundario"') == 3
+    assert "cuenta-action-button" not in account
 
 
 def test_mobile_menu_reopens_at_the_top_with_all_links_scrollable():
@@ -658,7 +703,7 @@ def test_homepage_artwork_scales_on_mobile_and_login_remains_plain():
     assert "width: clamp(196px, calc(36vw + 80px), 224px) !important;" in homepage
     assert "transform: translateX(-20px) !important;" in homepage
     assert "@media (max-width: 350px)" in homepage
-    assert "min-height: clamp(114px, calc(33vw + 22px), 131px) !important;" in homepage
+    assert "min-height: clamp(160px, calc(33vw + 48px), 180px) !important;" in homepage
     assert "flex: 0 0 60% !important;" in homepage
     assert "right: -4px !important;" in homepage
     assert "width: clamp(173px, calc(33.33vw + 73px), 190px) !important;" in homepage
@@ -681,7 +726,7 @@ def test_public_mobile_navigation_dropdown_is_not_clipped_by_header():
     assert "overflow: visible !important;" in mobile.split(
         "html body.public-info-page > header.barra", 1
     )[1].split("}", 1)[0]
-    assert "v=20261026_mobile_recovery_v63" in public_base
+    assert "v=20261026_public_menu_title_v65" in public_base
     assert "padding: 6px 12px !important;" in mobile.split(
         "html body.public-info-page > header.barra", 1
     )[1].split("}", 1)[0]
@@ -726,24 +771,23 @@ def test_mobile_notification_and_directory_layouts_use_available_width():
     assert 'class="tarjeta reportes-results"' in reports
 
 
-def test_gmail_support_form_uses_account_email_and_automatic_receipt():
+def test_support_opens_prefilled_email_without_extra_form_or_chat():
     sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
     assistant_widget = Path("templates/_asistente_widget.html").read_text(encoding="utf-8")
-    template = Path("templates/soporte/index.html").read_text(encoding="utf-8")
     route = Path("routes/soporte.py").read_text(encoding="utf-8")
     email = Path("servicios/email.py").read_text(encoding="utf-8")
 
     assert "('soporte.index', 'Ayuda y soporte')" in sidebar
     assert "'soporte.index': 'mail'" in sidebar
+    assert "mailto:coliejjfh@hotmail.com" in sidebar
+    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
     assert 'class="support-nav-link" href="{{ url_for(\'soporte.index\') }}"' not in assistant_widget
     assert "mail.google.com/mail/" not in sidebar
-    assert 'readonly autocomplete="email"' in template
-    assert "usuario.get(\"correo\")" in route
-    assert "generar_respuesta(detalle)" in route
-    assert "enviar_solicitud_soporte" in route
-    assert "respuesta_automatica=respuesta" in route
+    assert "redirect(" in route
+    assert "mailto:coliejjfh@hotmail.com" in route
+    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in route
+    assert not Path("templates/soporte/index.html").exists()
     assert "Respuesta automática de EDUBOT" in email
-    assert "el resto del texto se enviará a Gemini" in template
 
 
 def test_los_filtros_de_listas_tienen_opciones_por_defecto_descriptivas():
@@ -803,7 +847,8 @@ def test_support_is_available_in_sidebar_and_legacy_gmail_composer_is_removed():
     assert "mail.google.com/mail/" not in sidebar
     assert "soporte_bp" in app_source
     assert "supportEmailLink" not in app_js
-    assert "mailto:coliejjfh@hotmail.com" in Path("templates/soporte/index.html").read_text(encoding="utf-8")
+    assert "mailto:coliejjfh@hotmail.com" in Path("routes/soporte.py").read_text(encoding="utf-8")
+    assert "mailto:coliejjfh@hotmail.com" in sidebar
 
 
 def test_administracion_usa_enlaces_de_seccion_y_un_panel_activo():
