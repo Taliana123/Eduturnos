@@ -329,15 +329,6 @@
                 </a>
 
 
-            {% elif rol == "Docente" %}
-
-                <a
-                    href="{{ url_for('solicitudes.nueva_docente') }}"
-                    class="btn btn-primary solicitudes-final-seguimiento"
-                >
-                    + Solicitar cita
-                </a>
-
             {% endif %}
 
         </div>
@@ -475,6 +466,7 @@ a.solicitudes-final-seguimiento:hover {
         padding-top: 10px !important;
     }
     .solicitudes-header-actions, a.solicitudes-seguimiento { width:100% !important; }
+    .solicitudes-header-actions { margin-top:-4px !important; }
     a.solicitudes-seguimiento { justify-content:center !important; }
 }
 </style>

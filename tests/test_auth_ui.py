@@ -157,6 +157,29 @@ def test_support_form_route_and_automatic_receipt_are_available_from_sidebar():
     assert "enviar_solicitud_soporte" in route
 
 
+def test_solicitudes_docente_no_duplica_solicitar_y_acudiente_conserva_acceso():
+    from flask import render_template
+    from app import app as flask_app
+
+    with flask_app.test_request_context("/solicitudes/"):
+        docente = render_template(
+            "solicitudes/index.html",
+            rol="Docente",
+            solicitudes=[],
+        )
+        acudiente = render_template(
+            "solicitudes/index.html",
+            rol="Acudiente",
+            solicitudes=[],
+        )
+
+    assert docente.count("+ Solicitar cita") == 1
+    assert 'class="btn btn-primary solicitudes-final-seguimiento"' not in docente
+    assert acudiente.count("+ Solicitar cita") == 1
+    assert 'class="btn btn-primary solicitudes-final-seguimiento"' in acudiente
+    assert ".solicitudes-header-actions { margin-top:-4px !important; }" in docente
+
+
 def test_student_registration_has_no_student_code_field():
     text = Path("templates/auth/registro_portal.html").read_text(encoding="utf-8")
     # The template may render a personal institutional code only conditionally; it must not
