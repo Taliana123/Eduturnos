@@ -686,7 +686,7 @@ def test_homepage_artwork_scales_on_mobile_and_login_remains_plain():
     assert "width: clamp(196px, calc(36vw + 80px), 224px) !important;" in homepage
     assert "transform: translateX(-20px) !important;" in homepage
     assert "@media (max-width: 350px)" in homepage
-    assert "min-height: clamp(114px, calc(33vw + 22px), 131px) !important;" in homepage
+    assert "min-height: clamp(160px, calc(33vw + 48px), 180px) !important;" in homepage
     assert "flex: 0 0 60% !important;" in homepage
     assert "right: -4px !important;" in homepage
     assert "width: clamp(173px, calc(33.33vw + 73px), 190px) !important;" in homepage
