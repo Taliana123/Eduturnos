@@ -334,10 +334,10 @@ def test_recovery_illustration_keeps_mobile_proportions():
         "@media (max-width: 760px)", 1
     )[1].split("</style>", 1)[0]
 
-    assert "min-height: 190px;" in illustration
-    assert "width: 250px;" in illustration
-    assert "height: 225px;" in illustration
-    assert "transform: scale(.88);" in illustration
+    assert "min-height: 120px;" in illustration
+    assert "width: 200px;" in illustration
+    assert "height: 180px;" in illustration
+    assert "transform: scale(.72);" in illustration
     assert ".eduturnos-recovery-art-content" not in illustration
     assert "width: 72px;" in recovery
     assert "height: 66px;" in recovery
