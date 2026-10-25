@@ -4784,5 +4784,68 @@ html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"]
     background-image: none !important;
     box-shadow: none !important;
 }
+
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar #contenido .dashboard-page.dashboard-overview .dashboard-greeting-row {
+        grid-template-columns: 88px minmax(0, 1fr) !important;
+        align-items: center !important;
+        gap: 12px !important;
+        width: min(100%, 920px) !important;
+        min-height: 0 !important;
+        margin: 0 0 16px !important;
+        padding: 12px 18px !important;
+        box-sizing: border-box !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .dashboard-page.dashboard-overview .dashboard-left-art,
+    html body.has-desktop-sidebar #contenido .dashboard-page.dashboard-overview .dashboard-dibujo {
+        width: 80px !important;
+        max-width: 80px !important;
+        height: 80px !important;
+        margin: 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .dashboard-page.dashboard-overview .dashboard-head {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        min-height: 0 !important;
+        justify-content: flex-start !important;
+        padding: 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .dashboard-page.dashboard-overview .dashboard-head-info {
+        display: grid !important;
+        align-content: center !important;
+        align-items: start !important;
+        gap: 4px !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        text-align: left !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .dashboard-page.dashboard-overview .dashboard-head-info .badge {
+        width: fit-content !important;
+        margin: 0 !important;
+        padding: 5px 10px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .dashboard-page.dashboard-overview .dashboard-head-info h1 {
+        margin: 0 !important;
+        font-size: clamp(24px, 2.2vw, 30px) !important;
+        line-height: 1.15 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .dashboard-page.dashboard-overview .dashboard-current-date {
+        margin: 0 !important;
+        line-height: 1.3 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .dashboard-page.dashboard-overview .dashboard-head-info > .muted {
+        margin: 0 !important;
+        font-size: 13px !important;
+        line-height: 1.4 !important;
+    }
+}
 </style>
 {% endblock %}

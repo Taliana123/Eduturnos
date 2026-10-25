@@ -445,3 +445,131 @@
         min-width: 0 !important;
     }
 }
+
+    html body.has-desktop-sidebar #contenido .edc-page .edc-kicker {
+        display: none !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page .directory-search {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page .directory-search > input {
+        flex: 1 1 auto !important;
+        min-width: 180px !important;
+        height: 40px !important;
+        box-sizing: border-box !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page .directory-search > button,
+    html body.has-desktop-sidebar #contenido .directory-page .directory-search > .directory-search-all,
+    html body.has-desktop-sidebar #contenido .directory-page .directory-search > .directory-new {
+        display: inline-flex !important;
+        flex: 0 0 64px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 64px !important;
+        min-width: 64px !important;
+        max-width: 64px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+        margin: 0 !important;
+        padding: 4px !important;
+        box-sizing: border-box !important;
+        border: 1px solid #2f78ff !important;
+        border-radius: 7px !important;
+        background: #2f78ff !important;
+        color: #fff !important;
+        box-shadow: none !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
+        text-decoration: none !important;
+        white-space: nowrap !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page .directory-search > button:hover,
+    html body.has-desktop-sidebar #contenido .directory-page .directory-search > .directory-search-all:hover,
+    html body.has-desktop-sidebar #contenido .directory-page .directory-search > .directory-new:hover {
+        border-color: #2458d6 !important;
+        background: #2458d6 !important;
+        color: #fff !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page .directory-search > button svg,
+    html body.has-desktop-sidebar #contenido .directory-page .directory-search > .directory-search-all svg {
+        display: block !important;
+        width: 20px !important;
+        height: 20px !important;
+        fill: none !important;
+        stroke: currentColor !important;
+        stroke-width: 2 !important;
+        stroke-linecap: round !important;
+        stroke-linejoin: round !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .cuenta-page > .page-head .account-back-button,
+    html body.has-desktop-sidebar #contenido .integraciones-page > .page-head .account-back-button,
+    html body.has-desktop-sidebar #contenido .account-subpage-title > .password-account-back {
+        display: none !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .cuenta-page > .page-head,
+    html body.has-desktop-sidebar #contenido .integraciones-page > .page-head,
+    html body.has-desktop-sidebar #contenido .account-subpage-title {
+        gap: 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page > .page-head {
+        margin: 0 0 14px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page > .panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 0 16px !important;
+        padding: 18px !important;
+        box-sizing: border-box !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page > .configuracion-catalogos {
+        gap: 16px !important;
+        margin: 0 0 16px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .panel > .section-heading,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .panel > .config-section-heading {
+        display: block !important;
+        min-height: 0 !important;
+        margin: 0 0 12px !important;
+        padding: 0 !important;
+        text-align: left !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .panel > .section-heading h2,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .panel > .config-section-heading h2 {
+        margin: 0 !important;
+        line-height: 1.25 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .panel > .section-heading p,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .panel > .config-section-heading p {
+        min-height: 0 !important;
+        margin: 4px 0 0 !important;
+        line-height: 1.45 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .panel > form {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .panel > .table-wrap,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .config-record-list,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .state-list {
+        margin-top: 12px !important;
+    }
+}

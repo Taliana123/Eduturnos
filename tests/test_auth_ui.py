@@ -188,6 +188,8 @@ def test_support_link_opens_prefilled_email_to_institution():
     assert "'soporte.index': 'mail'" in sidebar
     assert "mailto:coliejjfh@hotmail.com" in sidebar
     assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
+    assert "desktop-support-link" not in sidebar
+    assert "outlook.live.com" not in sidebar
     assert "url_for('soporte.index')" not in assistant_widget
     assert "redirect(" in route
     assert "mailto:coliejjfh@hotmail.com" in route
@@ -319,7 +321,7 @@ def test_mobile_navigation_reuses_role_sidebar_as_drawer():
     assert ".dashboard-assistant[open]>.dashboard-assistant-panel" in sidebar_css
     assert "v=20261026_mobile_recovery_v64" in base
     assert "v=20261026_public_menu_title_v65" in publico
-    assert "v=20261026_home_copy_lift_v65" in portada
+    assert "v=20261026_home_copy_lift_v66" in portada
 
 
 def test_portada_muestra_ilustracion_junto_al_lema_y_login_mantiene_registro_compacto():
@@ -471,6 +473,7 @@ def test_barra_lateral_respeta_roles_y_seccion_activa():
         assert 'desktop-sidebar-logout-form' in html
         assert 'Ayuda y soporte' in html
         assert 'href="mailto:coliejjfh@hotmail.com' in html
+        assert 'desktop-support-link' not in html
         assert 'Bandeja de soporte' not in html
         assert 'Soporte por Gmail' not in html
         assert 'mail.google.com/mail/' not in html
@@ -777,7 +780,7 @@ def test_formularios_y_acciones_de_listas_conservan_contexto():
     assert 'url_for(\'docentes.asignaciones\'' not in lista_docentes
     assert 'url_for(\'acudientes.relaciones\'' not in lista_acudientes
     assert portada.count('v=20261026_mobile_recovery_v64') == 1
-    assert portada.count('v=20261026_home_copy_lift_v65') == 1
+    assert portada.count('v=20261026_home_copy_lift_v66') == 1
     assert 'font-size: 16px;' in portada
     assert 'font-size: 14px;' in portada
     assert 'eduturnos-footer-mobile-text' in portada

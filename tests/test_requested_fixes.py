@@ -322,7 +322,7 @@ def test_homepage_hero_title_and_copy_are_lifted_together():
     mobile_copy_styles = illustration_styles.split(
         "@media (max-width: 560px)", 1
     )[1].split("@media (max-width: 420px)", 1)[0]
-    assert "transform: translateY(-20px) !important;" in mobile_copy_styles
+    assert "transform: translateY(-32px) !important;" in mobile_copy_styles
     mobile_styles = illustration_styles.split(
         "@media (max-width: 900px)", 1
     )[1].split("}", 1)[0]
@@ -701,7 +701,7 @@ def test_homepage_artwork_scales_on_mobile_and_login_remains_plain():
     assert "@media (max-width: 560px)" in homepage
     assert "flex-basis: clamp(195px, calc(36vw + 80px), 230px) !important;" in homepage
     assert "transform: translateX(-49px) !important;" in homepage
-    assert "transform: translateY(-20px) !important;" in homepage
+    assert "transform: translateY(-32px) !important;" in homepage
     assert "@media (max-width: 420px)" in homepage
     assert "font-size: clamp(24px, 7.3vw, 28px) !important;" in homepage
     assert "width: clamp(196px, calc(36vw + 80px), 224px) !important;" in homepage
@@ -785,6 +785,8 @@ def test_support_opens_prefilled_email_without_extra_form_or_chat():
     assert "'soporte.index': 'mail'" in sidebar
     assert "mailto:coliejjfh@hotmail.com" in sidebar
     assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
+    assert "desktop-support-link" not in sidebar
+    assert "outlook.live.com" not in sidebar
     assert 'class="support-nav-link" href="{{ url_for(\'soporte.index\') }}"' not in assistant_widget
     assert "mail.google.com/mail/" not in sidebar
     assert "redirect(" in route
@@ -870,13 +872,17 @@ def test_requested_visual_fixes_are_scoped_to_desktop():
         assert 'media="(min-width: 901px)"' in template
 
     assert "html body.public-info-page > header.barra {\n        margin-top: -21px !important;\n    }" in desktop_css
+    assert "html body.has-desktop-sidebar #contenido .edc-page .edc-kicker" in desktop_css
+    assert "html body.has-desktop-sidebar #contenido .directory-page .directory-search > .directory-new" in desktop_css
+    assert "html body.has-desktop-sidebar #contenido .cuenta-page > .page-head .account-back-button" in desktop_css
+    assert "html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page > .panel" in desktop_css
     assert 'button[data-citas-state="Pendiente"]' in desktop_css
     assert 'button[data-citas-state="Realizada"]' in desktop_css
     assert ".edc-page .edc-buttons > button" in desktop_css
     assert ".config-page-title > .config-institution-back" in desktop_css
     assert ".cita-print-header img" in desktop_css
-    assert "window.matchMedia('(min-width: 901px)')" in sidebar
-    assert "outlook.live.com/mail/0/deeplink/compose" in sidebar
+    assert "window.matchMedia('(min-width: 901px)')" not in sidebar
+    assert "outlook.live.com/mail/0/deeplink/compose" not in sidebar
 
 
 def test_administracion_usa_enlaces_de_seccion_y_un_panel_activo():
