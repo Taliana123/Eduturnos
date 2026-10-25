@@ -319,6 +319,10 @@ def test_homepage_hero_title_and_copy_are_lifted_together():
     illustration_styles = homepage.split(
         '<style id="eduturnos-home-hero-illustration">', 1
     )[1]
+    mobile_copy_styles = illustration_styles.split(
+        "@media (max-width: 560px)", 1
+    )[1].split("@media (max-width: 420px)", 1)[0]
+    assert "transform: translateY(-20px) !important;" in mobile_copy_styles
     mobile_styles = illustration_styles.split(
         "@media (max-width: 900px)", 1
     )[1].split("}", 1)[0]
@@ -697,7 +701,7 @@ def test_homepage_artwork_scales_on_mobile_and_login_remains_plain():
     assert "@media (max-width: 560px)" in homepage
     assert "flex-basis: clamp(195px, calc(36vw + 80px), 230px) !important;" in homepage
     assert "transform: translateX(-49px) !important;" in homepage
-    assert "transform: translateY(-8px) !important;" in homepage
+    assert "transform: translateY(-20px) !important;" in homepage
     assert "@media (max-width: 420px)" in homepage
     assert "font-size: clamp(24px, 7.3vw, 28px) !important;" in homepage
     assert "width: clamp(196px, calc(36vw + 80px), 224px) !important;" in homepage
