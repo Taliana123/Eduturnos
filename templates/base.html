@@ -1705,7 +1705,7 @@ header.eduturnos-header .eduturnos-logo span {
     }
 </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/role-forms.css') }}?v=20261012_assignment_compact_v4">
-{% if usuario_navegacion %}<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261023_assistant_compact_v2">{% endif %}
+{% if usuario_navegacion %}<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261025_assistant_resize_v1">{% endif %}
 {% block page_styles %}{% endblock %}
 </head>
 <body class="{% if request.endpoint and (request.endpoint.startswith('auth.') or request.endpoint == 'passwords.recuperar' or request.endpoint == 'passwords.restablecer') %}auth-page{% endif %}{% if usuario_navegacion %} has-desktop-sidebar{% endif %}">
@@ -1727,7 +1727,7 @@ header.eduturnos-header .eduturnos-logo span {
 <main class="contenedor" id="contenido">{% with mensajes=get_flashed_messages(with_categories=true) %}{% for categoria,mensaje in mensajes %}<div class="alerta {{ categoria }}">{{ mensaje }}</div>{% endfor %}{% endwith %}{% block content %}{% endblock %}</main>
 {% include '_desktop_sidebar.html' %}
 {% if usuario_navegacion %}<button class="mobile-nav-backdrop" type="button" data-mobile-nav-backdrop aria-label="Cerrar men�" hidden></button>{% endif %}
-{% if usuario_navegacion %}<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261023_assistant_compact_v2" defer></script>{% endif %}
+{% if usuario_navegacion %}<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261025_assistant_resize_v1" defer></script>{% endif %}
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20261024_account_back_targeted_v1" defer></script>
 <script src="{{ url_for('static', filename='js/public-back.js') }}?v=20261021_public_back_v3" defer></script>
 <script src="{{ url_for('static',filename='js/form-preserve.js') }}?v=20261018_form_recovery_v1" defer></script>

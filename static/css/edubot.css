@@ -453,6 +453,7 @@
     bottom: max(20px, env(safe-area-inset-bottom));
     width: min(320px, calc(100vw - 32px));
     height: min(400px, calc(100vh - 48px));
+    box-sizing: border-box;
     min-height: 0;
     margin: 0;
     grid-template-rows: auto minmax(0, 1fr);
@@ -461,9 +462,100 @@
     box-shadow: 0 18px 48px rgba(16, 38, 70, .22);
 }
 
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-handle {
+    position: absolute;
+    z-index: 2;
+    display: block !important;
+    flex: 0 0 18px !important;
+    width: 18px;
+    max-width: 18px !important;
+    height: 18px;
+    max-height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #71829a;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    appearance: none;
+    touch-action: none;
+    cursor: nwse-resize;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-handle::after {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    content: "";
+    opacity: .9;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-nw {
+    top: 0;
+    left: 0;
+    cursor: nwse-resize;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-nw::after {
+    top: 3px;
+    left: 3px;
+    border-top: 2px solid #d8e5ff;
+    border-left: 2px solid #d8e5ff;
+    border-radius: 3px 0 0;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-ne {
+    top: 0;
+    right: 0;
+    cursor: nesw-resize;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-ne::after {
+    top: 3px;
+    right: 3px;
+    border-top: 2px solid #d8e5ff;
+    border-right: 2px solid #d8e5ff;
+    border-radius: 0 3px 0 0;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-sw {
+    bottom: 0;
+    left: 0;
+    cursor: nesw-resize;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-sw::after {
+    bottom: 3px;
+    left: 3px;
+    border-bottom: 2px solid #d8e5ff;
+    border-left: 2px solid #d8e5ff;
+    border-radius: 0 0 0 3px;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-se {
+    right: 0;
+    bottom: 0;
+    cursor: nwse-resize;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-se::after {
+    right: 3px;
+    bottom: 3px;
+    border-right: 2px solid #d8e5ff;
+    border-bottom: 2px solid #d8e5ff;
+    border-radius: 0 0 3px;
+}
+
 .eduturnos-desktop-sidebar .dashboard-help-chat .assistant-header {
     cursor: grab;
     touch-action: none;
+    user-select: none;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat.is-resizing {
     user-select: none;
 }
 
