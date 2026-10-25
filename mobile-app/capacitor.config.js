@@ -3,8 +3,7 @@ const config = {
   appName: 'EDUTURNOS',
   webDir: 'www',
   server: {
-    url: 'http://192.168.18.24:5000/?mobile=1',
-    cleartext: true
+    url: 'https://eduturnos-jjfh.alwaysdata.net/?mobile=1'
   }
 };
 
