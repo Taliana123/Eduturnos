@@ -595,7 +595,45 @@ body:has(.eduturnos-recuperar-final-page) main.contenedor {
     .eduturnos-recovery-art {
         width: 250px;
         height: 225px;
-        transform: scale(.88);
+    }
+
+    .eduturnos-recovery-art-content {
+        position: absolute;
+        inset: 0;
+        transform: scale(.81);
+    }
+
+    .eduturnos-recovery-art::before {
+        width: 200px;
+        height: 200px;
+    }
+
+    .eduturnos-recovery-envelope {
+        left: 15px;
+        top: 37.5px;
+    }
+
+    .eduturnos-recovery-lock {
+        width: 64px;
+        height: 60px;
+        top: 148px;
+        right: -17px;
+        bottom: auto;
+    }
+
+    .eduturnos-recovery-lock::before {
+        width: 30px;
+        height: 31px;
+        left: 17px;
+        top: -29px;
+        border-width: 6px;
+    }
+
+    .eduturnos-recovery-lock::after {
+        width: 8px;
+        height: 15px;
+        left: 23px;
+        top: 18px;
     }
 
     .eduturnos-recuperar-final-content {
@@ -613,9 +651,13 @@ body:has(.eduturnos-recuperar-final-page) main.contenedor {
 
             <div class="eduturnos-recovery-art">
 
-                <div class="eduturnos-recovery-envelope"></div>
+                <div class="eduturnos-recovery-art-content">
 
-                <div class="eduturnos-recovery-lock"></div>
+                    <div class="eduturnos-recovery-envelope"></div>
+
+                    <div class="eduturnos-recovery-lock"></div>
+
+                </div>
 
             </div>
 
