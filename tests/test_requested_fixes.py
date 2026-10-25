@@ -315,14 +315,14 @@ def test_homepage_hero_title_and_copy_are_lifted_together():
     assert "transform: translateY(-10px) !important;" in row_styles
     assert "transform: none !important;" in title_styles
     assert "transform: translateY(-12px) !important;" in copy_styles
-    assert "margin: 0 0 16px !important;" in row_styles
+    assert "margin: 0 0 12px !important;" in row_styles
     illustration_styles = homepage.split(
         '<style id="eduturnos-home-hero-illustration">', 1
     )[1]
     mobile_styles = illustration_styles.split(
         "@media (max-width: 900px)", 1
     )[1].split("}", 1)[0]
-    assert "margin-bottom: 14px !important;" in mobile_styles
+    assert "margin-bottom: 10px !important;" in mobile_styles
     assert "Descargar app Android" not in homepage
     assert "downloads/EDUTURNOS-Android-v1.1.apk" not in homepage
 

@@ -243,7 +243,7 @@ def test_home_hero_and_recovery_actions_are_raised_and_aligned():
     verification = Path("templates/auth/verificar_codigo.html").read_text(encoding="utf-8")
     base = Path("templates/base.html").read_text(encoding="utf-8")
 
-    assert "margin: 0 0 16px !important;" in home
+    assert "margin: 0 0 12px !important;" in home
     assert "transform: translateY(-10px) !important;" in home
     assert "transform: translateY(-12px) !important;" in home
     assert "translateY(-4px)" in recovery
@@ -639,8 +639,8 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
     assert "request.endpoint != 'soporte.index'" not in base
-    assert "css/edubot.css') }}?v=20261025_assistant_resize_v1" in base
-    assert "js/asistente.js') }}?v=20261025_assistant_resize_v1" in base
+    assert "css/edubot.css') }}?v=20261025_assistant_resize_v2" in base
+    assert "js/asistente.js') }}?v=20261025_assistant_resize_v2" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
     assert 'if (isOpen) {\n            clearChatPosition();\n        } else {' in assistant_script
     assert 'assistantWidget' not in app_js
@@ -662,7 +662,8 @@ def test_edubot_tiene_compositor_compacto_y_sin_indicador_ia():
     assert 'cursor: grab;' in styles
     assert 'touch-action: none;' in styles
     assistant_script = Path('static/js/asistente.js').read_text(encoding='utf-8')
-    assert 'handle.setPointerCapture(event.pointerId)' in assistant_script
+    assert 'root.setPointerCapture(event.pointerId)' in assistant_script
+    assert 'root.addEventListener("pointermove"' in assistant_script
     assert 'root.querySelectorAll("[data-assistant-resize]")' in assistant_script
     assert 'root.style.removeProperty("width")' in assistant_script
     assert 'root.style.removeProperty("height")' in assistant_script
@@ -671,10 +672,16 @@ def test_edubot_tiene_compositor_compacto_y_sin_indicador_ia():
     assert 'data-assistant-resize="ne"' in widget
     assert 'data-assistant-resize="sw"' in widget
     assert 'data-assistant-resize="se"' in widget
-    assert 'border-top: 2px solid #d8e5ff;' in styles
+    assert 'width: 32px;' in styles
+    assert 'height: 32px;' in styles
+    assert '.assistant-resize-ne' in styles
+    assert 'max-height: 16px !important;' in styles
+    assert '.assistant-resize-handle::after' not in styles
     assert 'repeating-linear-gradient(' not in styles
     assert 'const fixedRight = startLeft + startWidth;' in assistant_script
     assert 'const fixedBottom = startTop + startHeight;' in assistant_script
+    assert 'Math.min(Math.max(8, left), window.innerWidth - width - 8)' in assistant_script
+    assert 'Math.min(Math.max(8, top), window.innerHeight - height - 8)' in assistant_script
     assert 'width: min(320px, calc(100vw - 32px));' in styles
     assert 'height: min(400px, calc(100vh - 48px));' in styles
     assert 'Arrastra este encabezado para mover el chat' in widget
