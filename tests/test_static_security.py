@@ -30,7 +30,7 @@ def test_plaintext_directory_codes_are_not_distributed():
 def test_service_worker_version_invalidates_stale_app_assets():
     service_worker = (ROOT / "static" / "service-worker.js").read_text(encoding="utf-8")
 
-    assert 'const CACHE_VERSION = "eduturnos-v10";' in service_worker
+    assert 'const CACHE_VERSION = "eduturnos-v11";' in service_worker
     assert "keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key))" in service_worker
 
 

@@ -208,6 +208,9 @@ def create_app():
                 "max-age=31536000; includeSubDomains"
             )
 
+        if request.endpoint == "passwords.recuperar":
+            response.headers["Cache-Control"] = "no-store"
+
         return response
 
     # PÃ¡gina principal

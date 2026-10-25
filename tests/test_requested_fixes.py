@@ -341,20 +341,28 @@ def test_recovery_illustration_keeps_mobile_proportions():
     assert ".eduturnos-recovery-art-content" in illustration
     assert "left: 15px;" in illustration
     assert "top: 37.5px;" in illustration
-    assert "width: 64px;" in illustration
+    assert "width: 72px;" in illustration
+    assert "height: 62px;" in illustration
     assert "right: -17px;" in illustration
     assert "top: 148px;" in illustration
-    assert "width: 34px;" in illustration
-    assert "height: 35px;" in illustration
-    assert "top: -33px;" in illustration
-    assert "border-width: 5px;" in illustration
-    assert "width: 10px;" in illustration
-    assert "height: 18px;" in illustration
-    assert "left: 27px;" in illustration
-    assert "top: 21px;" in illustration
+    assert "width: 38px;" in illustration
+    assert "height: 40px;" in illustration
+    assert "left: 17px;" in illustration
+    assert "top: -38px;" in illustration
+    assert "border-width: 6px;" in illustration
+    assert "width: 11px;" in illustration
+    assert "height: 21px;" in illustration
+    assert "left: 30px;" in illustration
+    assert "top: 20px;" in illustration
     assert "min-height: 190px !important;" in mobile.split(
         "html body #contenido .eduturnos-recuperar-final-illustration", 1
     )[1].split("}", 1)[0]
+
+
+def test_recovery_page_is_not_cached_by_the_browser():
+    response = app.test_client().get("/auth/recuperar")
+
+    assert response.headers["Cache-Control"] == "no-store"
 
 
 def test_mobile_account_creation_choices_share_one_button_style():
