@@ -48,16 +48,31 @@
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    gap: 6px;
+    gap: 22px;
     margin: 14px 0 18px;
+    padding: 0 2px;
     overflow-x: auto;
-    border-bottom: 1px solid var(--borde);
     scrollbar-width: thin;
 }
 
-.configuracion-page .admin-catalog-tabs button {
+.configuracion-page .admin-catalog-tabs a {
     flex: 0 0 auto;
+    padding: 10px 0 12px;
+    border-bottom: 2px solid transparent;
+    color: #557096;
+    font-weight: 600;
+    text-decoration: none;
     white-space: nowrap;
+}
+
+.configuracion-page .admin-catalog-tabs a[aria-selected="true"] {
+    border-bottom-color: #2458d6;
+    color: #2458d6;
+}
+
+.configuracion-page .admin-catalog-tabs a:focus-visible {
+    outline: 2px solid #2458d6;
+    outline-offset: 3px;
 }
 
 .configuracion-page .configuracion-catalogos {
@@ -678,4 +693,630 @@ html body.has-desktop-sidebar #contenido .administracion-page .configuracion-pag
     max-width: 100% !important;
     padding-inline: 5px !important;
     align-self: flex-start !important;
+}
+
+/* Keep editable catalog entries compact and consistent; institution and periods stay unchanged. */
+.configuracion-page .config-entry-form,
+.configuracion-page .config-record-form,
+.configuracion-page .motivo-edit-form,
+.configuracion-page .state-form-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(72px, 92px) !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 520px !important;
+    margin: 0 !important;
+    padding: 8px 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid #e5ebf2 !important;
+}
+
+.configuracion-page .config-entry-form > label,
+.configuracion-page .config-record-form > label {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 4px !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    color: #36506e !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+}
+
+.configuracion-page .config-entry-form input:not([type="hidden"]),
+.configuracion-page .config-entry-form select,
+.configuracion-page .config-record-form input:not([type="hidden"]),
+.configuracion-page .config-record-form select,
+.configuracion-page .motivo-edit-form > input[name="nombre"],
+.configuracion-page .motivo-edit-form > select,
+.configuracion-page .state-form-row .state-name-control,
+.configuracion-page .state-form-row .state-status-control {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 6px 9px !important;
+    border: 1px solid #d7e1ed !important;
+    border-radius: 7px !important;
+    background-color: #fff !important;
+    color: #17365d !important;
+    font-size: 12px !important;
+}
+
+.configuracion-page .config-entry-form > label,
+.configuracion-page .config-record-form > label {
+    grid-column: auto !important;
+}
+
+.configuracion-page .config-entry-form .catalogo-form-actions,
+.configuracion-page .config-entry-form .form-actions,
+.configuracion-page .config-record-actions,
+.configuracion-page .catalogo-edit-actions,
+.configuracion-page .motivo-edit-actions,
+.configuracion-page .state-actions {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 5px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.configuracion-page .config-entry-form .catalogo-form-actions .boton,
+.configuracion-page .config-entry-form .form-actions .boton,
+.configuracion-page .config-record-actions .boton,
+.configuracion-page .catalogo-edit-actions .boton,
+.configuracion-page .motivo-edit-actions .boton,
+.configuracion-page .state-actions .boton {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 30px !important;
+    height: 30px !important;
+    margin: 0 !important;
+    padding: 6px 9px !important;
+    border: 1px solid #2f78ff !important;
+    border-radius: 6px !important;
+    background: #2f78ff !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+.configuracion-page .config-entry-form .boton.secundario,
+.configuracion-page .config-record-form .boton.secundario,
+.configuracion-page .motivo-edit-form .boton.secundario,
+.configuracion-page .state-form-row .boton.secundario {
+    border-color: #2f78ff !important;
+    background: #2f78ff !important;
+    color: #fff !important;
+}
+
+.configuracion-page .config-entry-grupo > .config-field-grade,
+.configuracion-page .config-entry-grupo > .config-field-name,
+.configuracion-page .config-record-grupo > .config-field-grade,
+.configuracion-page .config-record-grupo > .config-field-name {
+    grid-column: auto !important;
+}
+
+.configuracion-page .config-entry-grupo > .config-field-status,
+.configuracion-page .config-record-grupo > .config-field-status {
+    grid-column: 1 / -1 !important;
+    max-width: 180px !important;
+}
+
+.configuracion-page .config-entry-sede > label:nth-of-type(1),
+.configuracion-page .config-record-sede > .config-field-name {
+    grid-column: 1 !important;
+}
+
+.configuracion-page .config-entry-sede > label:nth-of-type(2),
+.configuracion-page .config-record-sede > .config-field-status {
+    grid-column: 2 !important;
+}
+
+.configuracion-page .config-record-list,
+.configuracion-page .state-list {
+    display: grid !important;
+    gap: 0 !important;
+    max-width: 520px !important;
+    margin-top: 6px !important;
+}
+
+.configuracion-page .config-record-list > .muted {
+    margin: 8px 0 0 !important;
+}
+
+@media (max-width: 900px) {
+    .configuracion-page .config-entry-form,
+    .configuracion-page .config-record-form,
+    .configuracion-page .motivo-edit-form,
+    .configuracion-page .state-form-row {
+        grid-template-columns: minmax(0, 1fr) minmax(72px, 92px) !important;
+        max-width: 100% !important;
+        gap: 7px !important;
+        padding: 8px 0 !important;
+    }
+
+    .configuracion-page .config-entry-form .catalogo-form-actions,
+    .configuracion-page .config-entry-form .form-actions,
+    .configuracion-page .config-record-actions,
+    .configuracion-page .catalogo-edit-actions,
+    .configuracion-page .motivo-edit-actions,
+    .configuracion-page .state-actions {
+        grid-column: 1 / -1 !important;
+    }
+
+    .configuracion-page .config-entry-sede > label:nth-of-type(3),
+    .configuracion-page .config-entry-sede > label:nth-of-type(4),
+    .configuracion-page .config-record-sede > label:nth-of-type(3),
+    .configuracion-page .config-record-sede > label:nth-of-type(4) {
+        grid-column: 1 / -1 !important;
+    }
+
+    .configuracion-page .config-entry-grupo > .config-field-grade,
+    .configuracion-page .config-record-grupo > .config-field-grade {
+        grid-column: 1 !important;
+    }
+
+    .configuracion-page .config-entry-grupo > .config-field-name,
+    .configuracion-page .config-record-grupo > .config-field-name {
+        grid-column: 2 !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .configuracion-page .config-entry-form .catalogo-form-actions .boton,
+    .configuracion-page .config-entry-form .form-actions .boton,
+    .configuracion-page .config-record-actions .boton,
+    .configuracion-page .catalogo-edit-actions .boton,
+    .configuracion-page .motivo-edit-actions .boton,
+    .configuracion-page .state-actions .boton {
+        padding-inline: 7px !important;
+        font-size: 10px !important;
+    }
+}
+
+.configuracion-page .panel > .config-section-heading {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    min-height: 58px !important;
+    margin: 0 0 18px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.configuracion-page .config-section-heading > div {
+    display: grid !important;
+    align-content: start !important;
+    gap: 5px !important;
+    min-width: 0 !important;
+}
+
+.configuracion-page .config-section-heading h2 {
+    margin: 0 !important;
+    color: var(--texto, #17365d) !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+}
+
+.configuracion-page .config-section-heading p {
+    min-height: 17px !important;
+    margin: 0 !important;
+    color: var(--gris, #66788a) !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+}
+
+@media (max-width: 900px) {
+    .configuracion-page .panel > .config-section-heading {
+        min-height: 54px !important;
+        margin-bottom: 14px !important;
+    }
+
+    .configuracion-page .config-section-heading h2 {
+        font-size: 21px !important;
+    }
+}
+
+@media (max-width: 720px) {
+.configuracion-page .institucion-form {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    row-gap: 10px !important;
+}
+
+.configuracion-page .institucion-form .institution-name {
+    grid-column: auto !important;
+}
+
+.configuracion-page .institucion-form .institution-name input,
+.configuracion-page .institucion-form .institution-city input,
+.configuracion-page .institucion-form .institution-department input {
+    field-sizing: fixed !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+.configuracion-page .institucion-form .institution-actions {
+    grid-column: 1 / -1 !important;
+    justify-self: start !important;
+}
+
+.configuracion-page .institucion-form .institution-actions .boton {
+    width: auto !important;
+    min-width: 0 !important;
+}
+
+.configuracion-page .panel > .config-section-heading {
+    min-height: 0 !important;
+    margin-bottom: 8px !important;
+}
+
+.configuracion-page .config-entry-sede {
+    margin-top: 0 !important;
+    row-gap: 8px !important;
+}
+
+.configuracion-page .config-entry-sede > label:nth-of-type(1) {
+    grid-column: 1 !important;
+}
+
+.configuracion-page .config-entry-sede > label:nth-of-type(2) {
+    grid-column: 2 !important;
+}
+
+.configuracion-page .config-entry-sede > label:nth-of-type(3),
+.configuracion-page .config-entry-sede > label:nth-of-type(4) {
+    grid-column: auto !important;
+}
+
+.configuracion-page .config-entry-sede .catalogo-form-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+}
+
+    .configuracion-page .institucion-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .configuracion-page .institucion-form .institution-name {
+        grid-column: auto !important;
+    }
+
+    .configuracion-page .config-entry-sede > label:nth-of-type(3),
+    .configuracion-page .config-entry-sede > label:nth-of-type(4) {
+        grid-column: 1 / -1 !important;
+    }
+
+@media (max-width: 520px) {
+    .configuracion-page .institucion-form {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+}
+
+@media (max-width: 720px) {
+    .configuracion-page > .page-head {
+        align-items: center !important;
+        justify-content: flex-start !important;
+        margin-bottom: 12px !important;
+    }
+
+    .configuracion-page .config-page-title {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        min-width: 0 !important;
+    }
+
+    .configuracion-page .config-institution-back {
+        display: inline-flex !important;
+        flex: 0 0 36px !important;
+        width: 36px !important;
+        height: 36px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: 1px solid #d5e1fa !important;
+        border-radius: 8px !important;
+        background: #fff !important;
+        color: #1769aa !important;
+        text-decoration: none !important;
+    }
+
+    .configuracion-page .config-institution-back svg {
+        width: 18px !important;
+        height: 18px !important;
+        fill: none !important;
+        stroke: currentColor !important;
+        stroke-width: 2 !important;
+        stroke-linecap: round !important;
+        stroke-linejoin: round !important;
+    }
+
+    .configuracion-page > .page-head h1,
+    .configuracion-page .section-heading h2,
+    .configuracion-page .config-section-heading h2 {
+        margin: 0 !important;
+        font-size: 24px !important;
+        line-height: 1.2 !important;
+        text-align: left !important;
+    }
+
+    .configuracion-page .section-heading,
+    .configuracion-page .panel > .config-section-heading {
+        min-height: 0 !important;
+        margin: 0 0 8px !important;
+        padding: 0 !important;
+        text-align: left !important;
+    }
+
+    .configuracion-page .section-heading p,
+    .configuracion-page .config-section-heading p {
+        margin: 4px 0 0 !important;
+        text-align: left !important;
+    }
+
+    .configuracion-page .panel > form {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    .configuracion-page .institucion-form {
+        grid-template-columns: minmax(0, 1fr) !important;
+        align-items: stretch !important;
+        row-gap: 8px !important;
+    }
+
+    .configuracion-page .institucion-form > label,
+    .configuracion-page .config-entry-form > label,
+    .configuracion-page .catalogo-form > label,
+    .configuracion-page .stack-form > label {
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 !important;
+        gap: 4px !important;
+    }
+
+    .configuracion-page .institucion-form .institution-name,
+    .configuracion-page .institucion-form .institution-city,
+    .configuracion-page .institucion-form .institution-department {
+        grid-column: 1 / -1 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .configuracion-page .institucion-form .institution-name input,
+    .configuracion-page .institucion-form .institution-city input,
+    .configuracion-page .institucion-form .institution-department input {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    .configuracion-page .config-entry-form,
+    .configuracion-page .catalogo-form,
+    .configuracion-page .stack-form {
+        row-gap: 8px !important;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    .configuracion-page .config-entry-sede .catalogo-form-actions {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
+        margin-top: 2px !important;
+    }
+
+    .configuracion-page .config-entry-sede .catalogo-form-actions .boton {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        min-width: 0 !important;
+    }
+}
+
+@media (max-width: 900px) {
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form .institution-name {
+        grid-column: auto !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form .institution-name > input,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form .institution-city > input,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form .institution-department > input,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form[action*="/periodo/nuevo"] .full-field > input[name="nombre"] {
+        box-sizing: border-box !important;
+        field-sizing: fixed !important;
+        width: 100% !important;
+        inline-size: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        padding-inline: 12px !important;
+        align-self: stretch !important;
+    }
+
+    .configuracion-page,
+    .configuracion-page label,
+    .configuracion-page input,
+    .configuracion-page select,
+    .configuracion-page textarea,
+    .configuracion-page button,
+    .configuracion-page .boton {
+        font-family: inherit !important;
+    }
+
+    .configuracion-page input:not([type="hidden"]),
+    .configuracion-page select,
+    .configuracion-page textarea {
+        font-size: 14px !important;
+    }
+
+    .configuracion-page .boton {
+        min-height: 36px !important;
+        height: 36px !important;
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        line-height: 1.2 !important;
+    }
+
+    .configuracion-page .catalogo-form-actions .boton,
+    .configuracion-page .form-actions .boton {
+        display: inline-flex !important;
+        flex: 0 0 auto !important;
+        width: auto !important;
+        min-width: 92px !important;
+        justify-content: center !important;
+    }
+}
+
+@media (max-width: 720px) {
+    html body #contenido .administracion-page .configuracion-page > .page-head h1 {
+        font-size: 28px !important;
+        line-height: 1.2 !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-entry-sede,
+    html body #contenido .administracion-page .configuracion-page .config-record-sede {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        align-items: stretch !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-entry-sede > label,
+    html body #contenido .administracion-page .configuracion-page .config-record-sede > label {
+        min-width: 0 !important;
+        align-self: stretch !important;
+        grid-template-rows: 14px 40px !important;
+        line-height: 14px !important;
+        white-space: nowrap !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-entry-sede > label:nth-of-type(1) {
+        grid-column: 1 !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-entry-sede > label:nth-of-type(3) {
+        grid-column: 1 !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-entry-sede > label:nth-of-type(4) {
+        grid-column: 2 !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-record-sede > label:nth-of-type(3) {
+        grid-column: 1 !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-record-sede > label:nth-of-type(4) {
+        grid-column: 2 !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-entry-sede .catalogo-form-actions {
+        grid-column: 1 / -1 !important;
+        width: 100% !important;
+        flex-wrap: nowrap !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-entry-sede .catalogo-form-actions .boton {
+        flex: 1 1 0 !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        padding-inline: 14px !important;
+        white-space: nowrap !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .section-heading,
+    html body #contenido .administracion-page .configuracion-page .panel > .config-section-heading {
+        min-height: 0 !important;
+        margin: 0 0 4px !important;
+        padding: 0 !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .section-heading h2,
+    html body #contenido .administracion-page .configuracion-page .config-section-heading h2 {
+        margin: 0 !important;
+        font-size: 22px !important;
+        line-height: 1.25 !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .section-heading p,
+    html body #contenido .administracion-page .configuracion-page .config-section-heading p {
+        margin: 2px 0 0 !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .panel > form {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+}
+
+@media (max-width: 720px) {
+    html body #contenido .administracion-page .configuracion-page form.institucion-form input:not([type="hidden"]),
+    html body #contenido .administracion-page .configuracion-page form.catalogo-form input:not([type="hidden"]),
+    html body #contenido .administracion-page .configuracion-page form.catalogo-form select,
+    html body #contenido .administracion-page .configuracion-page form.config-record-form input:not([type="hidden"]),
+    html body #contenido .administracion-page .configuracion-page form.config-record-form select,
+    html body #contenido .administracion-page .configuracion-page form.state-form input:not([type="hidden"]),
+    html body #contenido .administracion-page .configuracion-page form.state-form select,
+    html body #contenido .administracion-page .configuracion-page form.motivo-edit-form input:not([type="hidden"]),
+    html body #contenido .administracion-page .configuracion-page form.motivo-edit-form select {
+        box-sizing: border-box !important;
+        height: 38px !important;
+        min-height: 38px !important;
+        max-height: 38px !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-entry-form > label,
+    html body #contenido .administracion-page .configuracion-page .config-record-form > label {
+        align-self: stretch !important;
+        min-height: 0 !important;
+        height: auto !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-entry-form .catalogo-form-actions .boton,
+    html body #contenido .administracion-page .configuracion-page .config-entry-form .form-actions .boton {
+        box-sizing: border-box !important;
+        flex: 0 0 108px !important;
+        width: 108px !important;
+        min-width: 108px !important;
+        max-width: 108px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        padding: 4px 6px !important;
+        font-size: 11px !important;
+        line-height: 1.1 !important;
+        white-space: nowrap !important;
+    }
+
+    html body #contenido .administracion-page .configuracion-page .config-entry-sede .catalogo-form-actions .boton {
+        flex: 0 0 108px !important;
+        width: 108px !important;
+        min-width: 108px !important;
+        max-width: 108px !important;
+        padding-inline: 6px !important;
+    }
 }

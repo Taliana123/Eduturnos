@@ -1,15 +1,23 @@
 {% extends 'base.html' %}
 {% block title %}Verificar código · EDUTURNOS{% endblock %}
 {% block content %}
-<section class="formulario"><div class="tarjeta form-card">
-  <div class="form-top-actions"><a class="link-back" href="{{ url_for('passwords.recuperar') }}">← Solicitar otro código</a><a class="link-back" href="{{ url_for('auth.login') }}">Iniciar sesión</a></div>
+<section class="formulario verification-code-page"><div class="tarjeta form-card">
   <div class="section-heading"><span class="badge">Seguridad de cuenta</span><h1>Verificar código</h1><p>Escribe el código de 6 dígitos que recibiste en tu correo.</p></div>
   <form method="post" class="stack-form form-uniform">{{ csrf_field()|safe }}
     <label>Correo electrónico<input type="email" name="correo" value="{{ correo }}" readonly></label>
     <label>Código de recuperación<input name="codigo" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" required autofocus autocomplete="one-time-code" placeholder="000000"></label>
-    <button class="boton boton-full" type="submit">Verificar código</button>
+    <div class="recovery-code-actions">
+      <button class="boton boton-full recovery-code-action" type="submit" name="accion" value="verificar">Verificar código</button>
+      <button class="boton boton-full recovery-code-action" type="submit" name="accion" value="reenviar" formnovalidate>Solicitar otro código</button>
+    </div>
   </form>
 </div></section>
+<style>
+#contenido .recovery-code-actions{display:grid;gap:12px;width:100%;margin-top:4px;}
+#contenido .recovery-code-action{display:flex;width:100%;min-height:46px;align-items:center;justify-content:center;margin:0;text-align:center;}
+#contenido:has(.verification-code-page) > .alerta{margin-bottom:8px!important;}
+#contenido .verification-code-page{padding-top:8px!important;}
+</style>
 
 
 

@@ -6,6 +6,11 @@ while ($true) {
     $network = Get-NetConnectionProfile |
         Where-Object { $_.NetworkCategory -eq 'Private' } |
         Select-Object -First 1
+    if (-not $network) {
+        $network = Get-NetConnectionProfile |
+            Where-Object { $_.IPv4Connectivity -eq 'Internet' } |
+            Select-Object -First 1
+    }
     $lanIp = if ($network) {
         Get-NetIPAddress -InterfaceIndex $network.InterfaceIndex -AddressFamily IPv4 |
             Where-Object {

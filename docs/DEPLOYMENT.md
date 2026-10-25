@@ -4,7 +4,7 @@
 
 Usa `docker-compose.prod.yml` y `.env`. Define `DOMAIN`, `SECRET_KEY`, credenciales MySQL y SMTP. Caddy gestiona HTTPS para el dominio apuntado por DNS.
 
-Para las integraciones opcionales consulta [INTEGRACIONES.md](INTEGRACIONES.md). Google Calendar requiere un cliente OAuth web, consent screen, callback HTTPS y `GOOGLE_OAUTH_CLIENT_ID`/`GOOGLE_OAUTH_CLIENT_SECRET`. La ayuda Gemini requiere `GEMINI_API_KEY`; no se envían expedientes ni datos de estudiantes.
+Para las integraciones opcionales consulta [INTEGRACIONES.md](INTEGRACIONES.md). Google Calendar requiere un cliente OAuth web, consent screen, callback HTTPS y `GOOGLE_OAUTH_CLIENT_ID`/`GOOGLE_OAUTH_CLIENT_SECRET`. EDUBOT responde preguntas frecuentes localmente y usa Groq para preguntas abiertas; configura `GROQ_API_KEY` únicamente en las variables de entorno protegidas del servidor, nunca en el repositorio ni en el navegador. Consulta [INTEGRACIONES.md](INTEGRACIONES.md) para sus límites de privacidad y cuota.
 
 ## Opción 2: proveedor cloud
 

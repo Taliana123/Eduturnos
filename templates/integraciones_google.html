@@ -3,8 +3,10 @@
 {% block content %}
 <section class="integraciones-page">
     <header class="page-head">
+        <a class="account-back-button account-settings-back history-back-button" href="{{ url_for('cuenta.index') }}" aria-label="Volver a Mi cuenta" title="Volver a Mi cuenta">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
+        </a>
         <div>
-            <a class="link-back" href="{{ url_for('cuenta.index') }}">← Mi cuenta</a>
             <h1>Calendarios conectados</h1>
             <p class="muted">Las citas se guardan primero en EDUTURNOS. Google Calendar es una copia adicional.</p>
         </div>
@@ -16,20 +18,24 @@
 
     {% if not configuracion_lista %}
     <div class="alerta info" role="status">
-        Google Calendar está desactivado hasta configurar OAuth y un dominio HTTPS público en el servidor. La dirección local HTTP no puede recibir el retorno seguro de Google.
+        La autorización de Google está pendiente de configurar las credenciales OAuth y el dominio HTTPS del servidor. Las citas seguirán guardándose en EDUTURNOS mientras tanto.
     </div>
-    <p class="muted">Cuando tengas dominio HTTPS, registra esta URI de retorno en el cliente OAuth web de Google Cloud: <code>{{ callback_url }}</code></p>
+    <p class="muted">Registra esta URI de retorno en el cliente OAuth web de Google Cloud: <code>{{ callback_url }}</code></p>
     {% endif %}
 
     {% if puede_institucional %}
     <section class="integracion-row">
         <div>
             <h2>Agenda institucional</h2>
-            <p class="muted">Al conectar, copia las citas futuras al calendario escolar compartido y sincroniza las nuevas, con recordatorios 24 h y 2 h antes.</p>
-            {% if institucional %}<small>Conectada: {{ institucional.correo_google or 'Cuenta Google' }}</small>{% else %}<small>Sin conectar</small>{% endif %}
+            <p class="muted">Al conectar una vez la cuenta institucional autorizada, EDUTURNOS sincroniza las citas automáticamente con recordatorios emergentes 24 h y 2 h antes. Los usuarios no tienen que conectar sus cuentas.</p>
+            {% if institucional %}<small>Conectada: {{ institucional.correo_google or 'Cuenta Google' }} · Prueba de conexión: {% if institucional.fecha_prueba %}correcta el {{ institucional.fecha_prueba.strftime('%d/%m/%Y %H:%M') }}{% else %}pendiente{% endif %}</small>{% else %}<small>Sin conectar</small>{% endif %}
+            {% if institucional_sync %}
+            <p class="muted">Pendientes: {{ institucional_sync.pendientes or 0 }} · Fallidas: {{ institucional_sync.fallidas or 0 }} · Última sincronización correcta: {% if institucional_sync.ultima_correcta %}{{ institucional_sync.ultima_correcta.strftime('%d/%m/%Y %H:%M') }}{% else %}Sin sincronizaciones{% endif %}</p>
+            {% if institucional_sync.fallidas %}<p class="alerta error" role="status">Hay tareas que requieren revisión administrativa{% if institucional_sync.ultimo_error %}: {{ institucional_sync.ultimo_error }}{% endif %}.</p>{% endif %}
+            {% endif %}
         </div>
         <div class="integracion-actions">
-            {% if configuracion_lista %}<a class="boton" href="{{ url_for('integraciones_google.conectar', scope='institucional') }}">{% if institucional %}Volver a conectar{% else %}Conectar{% endif %}</a>{% endif %}
+            <a class="boton" href="{{ url_for('integraciones_google.conectar', scope='institucional') }}">Conectar</a>
             {% if institucional %}<form method="post" action="{{ url_for('integraciones_google.desconectar', scope='institucional') }}">{{ csrf_field()|safe }}<button class="boton secundario" type="submit">Desconectar</button></form>{% endif %}
         </div>
     </section>
@@ -44,10 +50,14 @@
             {% else %}
             <p class="muted">Al conectar, copia las citas futuras asignadas a tu cuenta y sincroniza las nuevas, con recordatorios 24 h y 2 h antes.</p>
             {% endif %}
-            {% if personal %}<small>Conectado: {{ personal.correo_google or 'Cuenta Google' }}</small>{% else %}<small>Sin conectar</small>{% endif %}
+            {% if personal %}<small>Conectado: {{ personal.correo_google or 'Cuenta Google' }} · Prueba de conexión: {% if personal.fecha_prueba %}correcta el {{ personal.fecha_prueba.strftime('%d/%m/%Y %H:%M') }}{% else %}pendiente{% endif %}</small>{% else %}<small>Sin conectar</small>{% endif %}
+            {% if personal_sync %}
+            <p class="muted">Pendientes: {{ personal_sync.pendientes or 0 }} · Fallidas: {{ personal_sync.fallidas or 0 }} · Última sincronización correcta: {% if personal_sync.ultima_correcta %}{{ personal_sync.ultima_correcta.strftime('%d/%m/%Y %H:%M') }}{% else %}Sin sincronizaciones{% endif %}</p>
+            {% if personal_sync.fallidas %}<p class="alerta error" role="status">Hay tareas que requieren revisión{% if personal_sync.ultimo_error %}: {{ personal_sync.ultimo_error }}{% endif %}.</p>{% endif %}
+            {% endif %}
         </div>
         <div class="integracion-actions">
-            {% if configuracion_lista %}<a class="boton" href="{{ url_for('integraciones_google.conectar', scope='personal') }}">{% if personal %}Volver a conectar{% else %}Conectar{% endif %}</a>{% endif %}
+            <a class="boton" href="{{ url_for('integraciones_google.conectar', scope='personal') }}">Conectar</a>
             {% if personal %}<form method="post" action="{{ url_for('integraciones_google.desconectar', scope='personal') }}">{{ csrf_field()|safe }}<button class="boton secundario" type="submit">Desconectar</button></form>{% endif %}
         </div>
     </section>
@@ -60,6 +70,7 @@
 <style>
 .integraciones-page{width:100%;max-width:940px;margin:0 auto;padding:18px 0 40px;}
 .integraciones-page .page-head h1{margin:8px 0;font-size:26px;color:#172942;}
+.integraciones-page .account-back-button{display:none;}
 .integraciones-page .page-head .link-back{display:inline-flex;margin-bottom:8px;}
 .integracion-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 0;border-bottom:1px solid #dce4eb;}
 .integracion-row h2{margin:0 0 5px;color:#172942;font-size:17px;}
@@ -68,5 +79,20 @@
 .integracion-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
 .integracion-actions form{margin:0;}
 @media(max-width:600px){.integraciones-page{padding-top:8px}.integracion-row{align-items:flex-start;flex-direction:column;gap:12px}.integracion-actions{width:100%}}
+@media(max-width:720px){
+    html body #contenido .integraciones-page > .page-head{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;}
+    html body #contenido .integraciones-page > .page-head .account-back-button{display:inline-flex!important;flex:0 0 36px!important;width:36px!important;min-width:36px!important;max-width:36px!important;height:36px!important;min-height:36px!important;max-height:36px!important;align-self:center!important;box-sizing:border-box!important;}
+    html body #contenido .integraciones-page > .page-head > div{flex:1 1 0%!important;width:0!important;min-width:0!important;}
+    html body #contenido .integraciones-page > .page-head h1{margin:0!important;}
+    html body #contenido .integraciones-page .integracion-actions{align-items:flex-start!important;}
+    html body #contenido .integraciones-page .integracion-actions form{width:fit-content!important;max-width:100%!important;}
+    html body #contenido .integraciones-page .integracion-actions .boton,
+    html body #contenido .integraciones-page .integracion-row > .boton{
+        display:inline-flex!important;
+        width:fit-content!important;
+        min-width:0!important;
+        max-width:100%!important;
+    }
+}
 </style>
 {% endblock %}

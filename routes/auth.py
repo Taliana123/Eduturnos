@@ -3,7 +3,7 @@
 # ============================================================
 
 from calendar import monthcalendar
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 import time
 import hashlib
 
@@ -13,6 +13,7 @@ from flask import (
     request,
     redirect,
     url_for,
+    make_response,
     session,
     flash,
 )
@@ -32,9 +33,15 @@ from roles import (
     PORTALES,
     SEDES_INSTITUCIONALES,
     es_correo_institucional,
+    es_correo_gmail,
+    dominio_correo_para_rol,
+    es_correo_valido_para_rol,
     es_codigo_institucional_valido,
     validar_codigo_sede,
     obtener_sede,
+    es_nombre_valido,
+    es_solo_digitos,
+    es_documento_valido,
 )
 
 from routes.helpers import usuario_actual
@@ -61,6 +68,11 @@ from servicios.estudiantes import (
 # ============================================================
 
 auth_bp = Blueprint("auth", __name__)
+ZONA_HORARIA_COLOMBIA = timezone(timedelta(hours=-5))
+
+
+def _fecha_actual_colombia():
+    return datetime.now(ZONA_HORARIA_COLOMBIA).date()
 
 
 # ============================================================
@@ -69,6 +81,13 @@ auth_bp = Blueprint("auth", __name__)
 
 MAX_INTENTOS = 5
 BLOQUEO_MINUTOS = 15
+TIPOS_DOCUMENTO_REGISTRO = {
+    "estudiante": {"CC", "TI", "RC", "CE"},
+    "acudiente": {"CC", "CE", "TI"},
+    "docente": {"CC", "CE"},
+    "coordinador": {"CC", "CE"},
+    "rector": {"CC", "CE"},
+}
 
 
 # ============================================================
@@ -184,6 +203,16 @@ def _mostrar_registro(
     sedes,
     jornadas,
 ):
+    # Conserva lo que el usuario ya había escrito para que un error de
+    # validación no borre todo el formulario, solo el/los campos con problema.
+    datos = {}
+    if request.method == "POST":
+        datos = {
+            clave: valor
+            for clave, valor in request.form.items()
+            if clave != "csrf_token" and "password" not in clave
+        }
+
     try:
         grados = consultar(
             """
@@ -239,15 +268,20 @@ def _mostrar_registro(
         jornadas=jornadas,
         grados=grados,
         grupos=grupos,
+        datos=datos,
     )
 
 
 def _mostrar_login():
-    return render_template(
-        "auth/login.html",
-        sedes=_sedes(),
-        jornadas=_jornadas(),
+    respuesta = make_response(
+        render_template(
+            "auth/login.html",
+            sedes=_sedes(),
+            jornadas=_jornadas(),
+        )
     )
+    respuesta.headers["Cache-Control"] = "no-store"
+    return respuesta
 
 
 def _correo(valor):
@@ -662,11 +696,7 @@ def _perfil_personal(
         codigo or ""
     ).strip()
 
-    if tipo_documento not in (
-        "CC",
-        "TI",
-        "CE",
-    ):
+    if tipo_documento not in TIPOS_DOCUMENTO_REGISTRO.get(portal, set()):
         return None
 
     if not documento:
@@ -1184,6 +1214,17 @@ def login():
 
         return _mostrar_login()
 
+    if "@" in identificador and not (
+        es_correo_gmail(identificador)
+        or es_correo_institucional(identificador)
+    ):
+        flash(
+            "Usa un correo @gmail.com para estudiantes y acudientes, "
+            "o @jjfh.edu.co para personal.",
+            "error",
+        )
+        return _mostrar_login()
+
     usuario = _buscar_usuario(
         identificador
     )
@@ -1297,6 +1338,17 @@ def login():
                 "error",
             )
 
+        return _mostrar_login()
+
+    if "@" in identificador and not es_correo_valido_para_rol(
+        usuario.get("rol_nombre", ""),
+        identificador,
+    ):
+        dominio = dominio_correo_para_rol(usuario.get("rol_nombre", ""))
+        flash(
+            f"Para este tipo de cuenta debes usar un correo terminado en {dominio}.",
+            "error",
+        )
         return _mostrar_login()
 
     if not usuario.get("estado"):
@@ -1526,11 +1578,10 @@ def registro_portal(portal):
     tipo_documento = (
         request.form.get(
             "tipo_documento",
-            "CC",
+            "",
         )
         .strip()
         .upper()
-        or "CC"
     )
 
     documento = request.form.get(
@@ -1554,6 +1605,14 @@ def registro_portal(portal):
             "",
         )
     )
+
+    dominio_requerido = dominio_correo_para_rol(info["rol"])
+    if dominio_requerido and not es_correo_valido_para_rol(info["rol"], correo):
+        flash(
+            f"Para este tipo de cuenta debes usar un correo terminado en {dominio_requerido}.",
+            "error",
+        )
+        return _mostrar_registro(portal, info, sedes, jornadas)
 
     telefono = request.form.get(
         "telefono",
@@ -1608,11 +1667,10 @@ def registro_portal(portal):
     estudiante_tipo_documento = (
         request.form.get(
             "estudiante_tipo_documento",
-            "TI",
+            "",
         )
         .strip()
         .upper()
-        or "TI"
     )
 
     estudiante_documento = request.form.get(
@@ -1668,11 +1726,7 @@ def registro_portal(portal):
     # VALIDACIONES GENERALES
     # ========================================================
 
-    if tipo_documento not in (
-        "CC",
-        "TI",
-        "CE",
-    ):
+    if tipo_documento not in TIPOS_DOCUMENTO_REGISTRO.get(portal, set()):
 
         flash(
             "Selecciona un tipo de documento válido.",
@@ -1700,10 +1754,39 @@ def registro_portal(portal):
             jornadas,
         )
 
+    if not es_documento_valido(documento):
+
+        flash(
+            "El documento debe contener solo dígitos y no superar 30 caracteres.",
+            "error",
+        )
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
     if not nombres:
 
         flash(
             "Escribe los nombres.",
+            "error",
+        )
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
+    if not es_nombre_valido(nombres):
+
+        flash(
+            "Los nombres solo pueden contener letras y espacios "
+            "(sin números ni símbolos).",
             "error",
         )
 
@@ -1728,6 +1811,21 @@ def registro_portal(portal):
             jornadas,
         )
 
+    if not es_nombre_valido(apellidos):
+
+        flash(
+            "Los apellidos solo pueden contener letras y espacios "
+            "(sin números ni símbolos).",
+            "error",
+        )
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
     if not correo:
 
         flash(
@@ -1742,11 +1840,24 @@ def registro_portal(portal):
             jornadas,
         )
 
-    if len(password) < 12:
+    if telefono and not es_solo_digitos(telefono):
 
         flash(
-            "La contraseña debe tener mínimo "
-            "12 caracteres.",
+            "El teléfono solo puede contener dígitos (sin letras ni símbolos).",
+            "error",
+        )
+
+        return _mostrar_registro(
+            portal,
+            info,
+            sedes,
+            jornadas,
+        )
+
+    if len(password) < 12 or len(password) > 15:
+
+        flash(
+            "La contraseña debe tener entre 12 y 15 caracteres.",
             "error",
         )
 
@@ -1855,11 +1966,7 @@ def registro_portal(portal):
 
     if portal == "acudiente":
 
-        if estudiante_tipo_documento not in (
-            "CC",
-            "TI",
-            "CE",
-        ):
+        if estudiante_tipo_documento not in {"CC", "TI", "RC"}:
 
             flash(
                 "El tipo de documento del estudiante "
@@ -1888,6 +1995,20 @@ def registro_portal(portal):
                 jornadas,
             )
 
+        if not es_documento_valido(estudiante_documento):
+
+            flash(
+                "El documento del estudiante debe contener solo dígitos y no superar 30 caracteres.",
+                "error",
+            )
+
+            return _mostrar_registro(
+                portal,
+                info,
+                sedes,
+                jornadas,
+            )
+
         if not estudiante_nombres:
 
             flash(
@@ -1902,10 +2023,40 @@ def registro_portal(portal):
                 jornadas,
             )
 
+        if not es_nombre_valido(estudiante_nombres):
+
+            flash(
+                "Los nombres del estudiante solo pueden contener letras "
+                "y espacios (sin números ni símbolos).",
+                "error",
+            )
+
+            return _mostrar_registro(
+                portal,
+                info,
+                sedes,
+                jornadas,
+            )
+
         if not estudiante_apellidos:
 
             flash(
                 "Escribe los apellidos del estudiante.",
+                "error",
+            )
+
+            return _mostrar_registro(
+                portal,
+                info,
+                sedes,
+                jornadas,
+            )
+
+        if not es_nombre_valido(estudiante_apellidos):
+
+            flash(
+                "Los apellidos del estudiante solo pueden contener letras "
+                "y espacios (sin números ni símbolos).",
                 "error",
             )
 
@@ -2023,24 +2174,6 @@ def registro_portal(portal):
     # ========================================================
 
     if info.get("requiere_codigo"):
-
-        if not es_correo_institucional(
-            correo
-        ):
-
-            flash(
-                "Para este tipo de cuenta debes utilizar "
-                "un correo terminado en @jjfh.edu.co.",
-                "error",
-            )
-
-            return _mostrar_registro(
-                portal,
-                info,
-                sedes,
-                jornadas,
-            )
-
         if not sede_id.isdigit():
 
             flash(
@@ -2294,7 +2427,7 @@ def registro_portal(portal):
                 SELECT
                     id
                 FROM periodos_academicos
-                WHERE estado = 1
+                WHERE activo = 1 AND cerrado = 0
                 ORDER BY id DESC
                 LIMIT 1
                 """,
@@ -2605,7 +2738,7 @@ def registro_portal(portal):
                 SELECT
                     id
                 FROM periodos_academicos
-                WHERE estado = 1
+                WHERE activo = 1 AND cerrado = 0
                 ORDER BY id DESC
                 LIMIT 1
                 """,
@@ -3447,6 +3580,7 @@ def dashboard():
         return render_template(
             "dashboard.html",
             usuario=usuario,
+            fecha_actual=_fecha_actual_colombia(),
             datos=datos,
             citas_activas_mes=citas_activas_mes,
             agenda_hoy=agenda_hoy,
@@ -3493,6 +3627,7 @@ def dashboard():
         return render_template(
             "dashboard.html",
             usuario=usuario,
+            fecha_actual=_fecha_actual_colombia(),
             datos=datos,
             citas_activas_mes=0,
             agenda_hoy=[],

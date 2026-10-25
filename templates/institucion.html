@@ -3,9 +3,11 @@
 {% block content %}
 <main class="institucion-page">
     <header class="institucion-heading">
-        <a class="link-back" href="{{ url_for('inicio') }}">← Inicio</a>
         <p class="institucion-kicker">Institución educativa</p>
-        <h1>{{ informacion.nombre }}</h1>
+        <div class="institucion-title-row">
+            <a class="link-back institucion-back account-settings-back history-back-button" href="{{ url_for('inicio') }}" aria-label="Volver al inicio" title="Volver al inicio"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg></a>
+            <h1>{{ informacion.nombre }}</h1>
+        </div>
         <p>Información institucional y ubicaciones de sus sedes en Ibagué, Tolima.</p>
     </header>
 
@@ -60,7 +62,9 @@
 <style>
 .institucion-page{width:100%;max-width:1180px;margin:0 auto;padding:24px 18px 48px;}
 .institucion-heading{max-width:780px;margin:0 0 30px;}
-.institucion-heading .link-back{display:inline-flex;margin:0 0 18px;}
+.institucion-heading .institucion-back{display:none;flex:0 0 36px;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid #dce4eb;border-radius:8px;background:#fff;color:#1769aa;text-decoration:none;}
+.institucion-title-row{min-width:0;}
+.institucion-heading .institucion-back svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .institucion-kicker{margin:0 0 8px;color:#2875c7;font-size:12px;font-weight:700;}
 .institucion-heading h1{margin:0;color:#172942;font-size:32px;line-height:1.2;overflow-wrap:anywhere;}
 .institucion-heading>p:last-child{margin:10px 0 0;color:#5c6e80;line-height:1.5;}
@@ -90,7 +94,11 @@
 .institucion-sede-content iframe{display:block;width:100%;height:300px;border:0;border-radius:6px;background:#f0f3f6;}
 @media(max-width:760px){
     .institucion-page{padding:18px 14px 30px;}
-    .institucion-heading{margin-bottom:22px;}
+    .institucion-heading{margin-bottom:22px;padding-top:8px;}
+    .institucion-title-row{display:flex;align-items:center;gap:8px;}
+    html body #contenido .institucion-page .institucion-heading .institucion-back{display:inline-flex;flex:0 0 36px;width:36px;min-width:36px;max-width:36px;height:36px;min-height:36px;max-height:36px;box-sizing:border-box;padding:0;background:#fff!important;border:1px solid #d5e1fa!important;border-radius:8px;color:#1769aa!important;}
+    html body #contenido .institucion-page .institucion-heading .institucion-back:hover{background:#fff!important;border-color:#d5e1fa!important;color:#1769aa!important;}
+    .institucion-kicker{color:#1769aa;}
     .institucion-heading h1{font-size:25px;}
     .institucion-info dl{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;}
     .institucion-info dd{font-size:13px;}

@@ -3,7 +3,7 @@ from io import StringIO, BytesIO
 import csv
 from flask import Blueprint, Response, render_template, request
 from database.db import consultar
-from routes.helpers import roles_permitidos, usuario_actual
+from routes.helpers import roles_permitidos
 from servicios.reuniones import formatear_hora
 
 reportes_bp=Blueprint("reportes",__name__,url_prefix="/reportes")
@@ -43,9 +43,7 @@ def index():
     w,p,desde,hasta,estado=_filtros()
     resumen=consultar(f"SELECT COUNT(*) total,SUM(ec.nombre='Pendiente') pendientes,SUM(ec.nombre='Confirmada') confirmadas,SUM(ec.nombre='Realizada') realizadas,SUM(ec.nombre='Cancelada') canceladas,SUM(ec.nombre='No asistió') no_asistio FROM citas c JOIN estados_cita ec ON ec.id=c.id_estado{w}",tuple(p),uno=True) or {}
     citas=_filas_reporte()[:1000]
-    usuario=usuario_actual() or {}
-    panorama_movil=usuario.get("rol_nombre") in ("Rector","Administrador / Coordinador")
-    return render_template("reportes/index.html",resumen=resumen,citas=citas,estados=consultar("SELECT nombre FROM estados_cita ORDER BY id"),desde=desde,hasta=hasta,estado=estado,panorama_movil=panorama_movil)
+    return render_template("reportes/index.html",resumen=resumen,citas=citas,estados=consultar("SELECT nombre FROM estados_cita ORDER BY id"),desde=desde,hasta=hasta,estado=estado)
 
 
 @reportes_bp.route("/exportar.csv")

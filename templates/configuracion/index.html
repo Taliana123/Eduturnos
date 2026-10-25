@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
 {% block title %}Configuración · EDUTURNOS{% endblock %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/configuracion.css') }}?v=20261013_fields_fit_v15">{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/configuracion.css') }}?v=20261021_mobile_config_v28">{% endblock %}
 {% block content %}
 <div class="administracion-page">
 <div class="configuracion-page">
 <div class="page-head">
-  <div>
+  <div class="config-page-title">
+    <a class="config-institution-back history-back-button" href="{{ url_for('institucion') }}" aria-label="Volver a institución educativa" title="Volver a institución educativa">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
+    </a>
     <h1>Configuración institucional</h1>
   </div>
 </div>
@@ -18,7 +21,7 @@
   <form method="post" action="{{ url_for('configuracion.guardar_institucion') }}" class="form-grid institucion-form">
     {{ csrf_field()|safe }}
     <input type="hidden" name="id_institucion" value="{{ institucion.id if institucion else '' }}">
-    <label class="institution-name">Nombre<input name="nombre" size="{{ institucion.nombre|length + 2 if institucion else 24 }}" maxlength="180" required value="{{ institucion.nombre if institucion else '' }}"></label>
+    <label class="institution-name">Nombre<input name="nombre" maxlength="180" required value="{{ institucion.nombre if institucion else '' }}"></label>
     <label class="institution-city">Ciudad<input name="ciudad" maxlength="100" required value="{{ institucion.ciudad if institucion else '' }}"></label>
     <label class="institution-department">Departamento<input name="departamento" maxlength="100" required value="{{ institucion.departamento if institucion else '' }}"></label>
     <div class="form-actions institution-actions"><button class="boton" type="submit">Guardar institución</button></div>
@@ -31,7 +34,7 @@
   {% if puede_editar_institucion %}
   <form method="post" action="{{ url_for('configuracion.nuevo_periodo') }}" class="form-grid catalogo-form">
     {{ csrf_field()|safe }}
-    <label class="full-field">Nombre<input name="nombre" size="24" maxlength="80" required placeholder="Periodo académico 2027"></label>
+    <label class="full-field">Nombre<input name="nombre" maxlength="80" required placeholder="Periodo académico 2027"></label>
     <label>Inicio<input type="date" name="inicio" required></label>
     <label>Fin<input type="date" name="fin" required></label>
     <div class="form-actions catalogo-form-actions"><button class="boton" type="submit">Crear periodo</button><button class="boton pequeno secundario" type="reset" aria-label="Limpiar formulario" title="Limpiar formulario">Limpiar</button></div>
@@ -59,8 +62,8 @@
 </section>
 
 <section class="panel">
-  <div class="section-heading"><h2>Sedes</h2><p>Cada sede puede desactivarse sin borrar las relaciones históricas.</p></div>
-  <form method="post" action="{{ url_for('configuracion.guardar_sede') }}" class="form-grid catalogo-form">
+  <header class="page-head config-section-heading"><div><h2>Sedes</h2><p>Cada sede puede desactivarse sin borrar las relaciones históricas.</p></div></header>
+  <form method="post" action="{{ url_for('configuracion.guardar_sede') }}" class="form-grid catalogo-form config-entry-form config-entry-sede">
     {{ csrf_field()|safe }}
     <input type="hidden" name="id_institucion" value="{{ institucion.id if institucion else '' }}">
     <label class="full-field">Nombre<input name="nombre" maxlength="140" required placeholder="Nueva sede"></label>
@@ -71,68 +74,61 @@
 <option value="1" selected>Activa</option><option value="0">Inactiva</option></select></label>
     <div class="form-actions catalogo-form-actions"><button class="boton" type="submit">Agregar sede</button><button class="boton pequeno secundario" type="reset" aria-label="Limpiar formulario" title="Limpiar formulario">Limpiar</button></div>
   </form>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Nombre</th><th>Código</th><th>Dirección</th><th>Estado</th><th>Acciones</th></tr></thead>
-      <tbody>
-      {% for s in sedes %}
-        <tr>
-          <td>
-            <form id="sede-{{ s.id }}" method="post" action="{{ url_for('configuracion.guardar_sede') }}">
-              {{ csrf_field()|safe }}<input type="hidden" name="id_sede" value="{{ s.id }}"><input type="hidden" name="id_institucion" value="{{ s.id_institucion }}">
-            </form>
-            <input form="sede-{{ s.id }}" name="nombre" value="{{ s.nombre }}" size="{{ s.nombre|length + 1 }}" maxlength="140" required>
-          </td>
-          <td><input form="sede-{{ s.id }}" name="codigo_sede" value="{{ s.codigo_sede or '' }}" maxlength="6" pattern="[0-9]{6}"></td>
-          <td><input form="sede-{{ s.id }}" name="direccion" value="{{ s.direccion or '' }}" maxlength="255"></td>
-          <td><select form="sede-{{ s.id }}" name="estado">
-<option value="" selected disabled hidden></option>
-<option value="1"{% if s.estado %} selected{% endif %}>Activa</option><option value="0"{% if not s.estado %} selected{% endif %}>Inactiva</option></select></td>
-          <td><div class="config-row-actions"><button form="sede-{{ s.id }}" class="boton pequeno" type="submit">Guardar</button><div class="config-state-actions"><form method="post" action="{{ url_for('configuracion.toggle_sede', sede_id=s.id) }}">{{ csrf_field()|safe }}<input type="hidden" name="estado_objetivo" value="1"><button class="boton pequeno secundario" type="submit">Activar</button></form><form method="post" action="{{ url_for('configuracion.toggle_sede', sede_id=s.id) }}">{{ csrf_field()|safe }}<input type="hidden" name="estado_objetivo" value="0"><button class="boton pequeno secundario" type="submit">Desactivar</button></form></div></div></td>
-        </tr>
-      {% else %}<tr><td colspan="5">No hay sedes registradas.</td></tr>{% endfor %}
-      </tbody>
-    </table>
+  <div class="config-record-list">
+    {% for s in sedes %}
+    <form method="post" action="{{ url_for('configuracion.guardar_sede') }}" class="config-record-form config-record-sede">
+      {{ csrf_field()|safe }}<input type="hidden" name="id_sede" value="{{ s.id }}"><input type="hidden" name="id_institucion" value="{{ s.id_institucion }}">
+      <label class="config-field-name">Nombre<input name="nombre" value="{{ s.nombre }}" maxlength="140" required></label>
+      <label class="config-field-status">Estado<select name="estado"><option value="1"{% if s.estado %} selected{% endif %}>Activa</option><option value="0"{% if not s.estado %} selected{% endif %}>Inactiva</option></select></label>
+      <label>Código (6 dígitos)<input name="codigo_sede" value="{{ s.codigo_sede or '' }}" maxlength="6" pattern="[0-9]{6}"></label>
+      <label>Dirección<input name="direccion" value="{{ s.direccion or '' }}" maxlength="255"></label>
+      <div class="config-record-actions">
+        <button class="boton pequeno" type="submit">Guardar</button>
+        <button class="boton pequeno secundario" name="estado_objetivo" value="1" formmethod="post" formaction="{{ url_for('configuracion.toggle_sede', sede_id=s.id) }}">Activar</button>
+        <button class="boton pequeno secundario" name="estado_objetivo" value="0" formmethod="post" formaction="{{ url_for('configuracion.toggle_sede', sede_id=s.id) }}">Desactivar</button>
+      </div>
+    </form>
+    {% else %}<p class="muted">No hay sedes registradas.</p>{% endfor %}
   </div>
 </section>
 
 <section class="grid configuracion-catalogos">
   <div class="panel">
-    <div class="section-heading"><h2>Jornadas</h2><p>Horarios disponibles para estudiantes y personal.</p></div>
-    <form method="post" action="{{ url_for('configuracion.guardar_jornada') }}" class="stack-form catalogo-form">
+    <header class="page-head config-section-heading"><div><h2>Jornadas</h2><p>Horarios disponibles para estudiantes y personal.</p></div></header>
+    <form method="post" action="{{ url_for('configuracion.guardar_jornada') }}" class="stack-form catalogo-form config-entry-form">
       {{ csrf_field()|safe }}<label>Nombre<input name="nombre" maxlength="50" required placeholder="Tarde"></label><label>Estado<select name="estado">
     <option value="" selected disabled hidden></option>
     <option value="1">Activa</option><option value="0">Inactiva</option></select></label><div class="catalogo-form-actions"><button class="boton" type="submit">Agregar jornada</button><button class="boton pequeno secundario" type="reset" aria-label="Limpiar formulario" title="Limpiar formulario">Limpiar</button></div>
     </form>
     {% for j in jornadas %}
-      <form method="post" action="{{ url_for('configuracion.guardar_jornada') }}" class="acciones catalogo-edit-form" style="margin-top:12px;">
-        {{ csrf_field()|safe }}<input type="hidden" name="id_jornada" value="{{ j.id }}"><input name="nombre" value="{{ j.nombre }}" size="{{ j.nombre|length + 1 }}" maxlength="50" required><select name="estado">
+      <form method="post" action="{{ url_for('configuracion.guardar_jornada') }}" class="config-record-form catalogo-edit-form">
+        {{ csrf_field()|safe }}<input type="hidden" name="id_jornada" value="{{ j.id }}"><input aria-label="Nombre de la jornada" name="nombre" value="{{ j.nombre }}" size="{{ j.nombre|length + 1 }}" maxlength="50" required><select aria-label="Estado de la jornada" name="estado">
 <option value="" selected disabled hidden></option>
-      <option value="1"{% if j.estado %} selected{% endif %}>Activa</option><option value="0"{% if not j.estado %} selected{% endif %}>Inactiva</option></select><button class="boton pequeno" type="submit">Guardar</button><div class="config-state-actions"><button class="boton pequeno secundario" name="estado_objetivo" value="1" formmethod="post" formaction="{{ url_for('configuracion.toggle_jornada', jornada_id=j.id) }}">Activar</button><button class="boton pequeno secundario" name="estado_objetivo" value="0" formmethod="post" formaction="{{ url_for('configuracion.toggle_jornada', jornada_id=j.id) }}">Desactivar</button></div>
+      <option value="1"{% if j.estado %} selected{% endif %}>Activa</option><option value="0"{% if not j.estado %} selected{% endif %}>Inactiva</option></select><div class="config-record-actions catalogo-edit-actions"><button class="boton pequeno" type="submit">Guardar</button><button class="boton pequeno secundario" name="estado_objetivo" value="1" formmethod="post" formaction="{{ url_for('configuracion.toggle_jornada', jornada_id=j.id) }}">Activar</button><button class="boton pequeno secundario" name="estado_objetivo" value="0" formmethod="post" formaction="{{ url_for('configuracion.toggle_jornada', jornada_id=j.id) }}">Desactivar</button></div>
       </form>
     {% else %}<p class="muted">No hay jornadas.</p>{% endfor %}
   </div>
 
   <div class="panel">
-    <div class="section-heading"><h2>Grados</h2><p>Niveles académicos activos o inactivos.</p></div>
-    <form method="post" action="{{ url_for('configuracion.guardar_grado') }}" class="stack-form catalogo-form">
+    <header class="page-head config-section-heading"><div><h2>Grados</h2><p>Niveles académicos activos o inactivos.</p></div></header>
+    <form method="post" action="{{ url_for('configuracion.guardar_grado') }}" class="stack-form catalogo-form config-entry-form">
       {{ csrf_field()|safe }}<label>Nombre<input name="nombre" maxlength="30" required placeholder="11"></label><label>Estado<select name="estado">
     <option value="" selected disabled hidden></option>
     <option value="1">Activo</option><option value="0">Inactivo</option></select></label><div class="catalogo-form-actions"><button class="boton" type="submit">Agregar grado</button><button class="boton pequeno secundario" type="reset" aria-label="Limpiar formulario" title="Limpiar formulario">Limpiar</button></div>
     </form>
     {% for g in grados %}
-      <form method="post" action="{{ url_for('configuracion.guardar_grado') }}" class="acciones catalogo-edit-form" style="margin-top:12px;">
-        {{ csrf_field()|safe }}<input type="hidden" name="id_grado" value="{{ g.id }}"><input name="nombre" value="{{ g.nombre }}" size="{{ g.nombre|length + 1 }}" maxlength="30" required><select name="estado">
+      <form method="post" action="{{ url_for('configuracion.guardar_grado') }}" class="config-record-form catalogo-edit-form">
+        {{ csrf_field()|safe }}<input type="hidden" name="id_grado" value="{{ g.id }}"><input aria-label="Nombre del grado" name="nombre" value="{{ g.nombre }}" size="{{ g.nombre|length + 1 }}" maxlength="30" required><select aria-label="Estado del grado" name="estado">
 <option value="" selected disabled hidden></option>
-      <option value="1"{% if g.estado %} selected{% endif %}>Activo</option><option value="0"{% if not g.estado %} selected{% endif %}>Inactivo</option></select><button class="boton pequeno" type="submit">Guardar</button><div class="config-state-actions"><button class="boton pequeno secundario" name="estado_objetivo" value="1" formmethod="post" formaction="{{ url_for('configuracion.toggle_grado', grado_id=g.id) }}">Activar</button><button class="boton pequeno secundario" name="estado_objetivo" value="0" formmethod="post" formaction="{{ url_for('configuracion.toggle_grado', grado_id=g.id) }}">Desactivar</button></div>
+      <option value="1"{% if g.estado %} selected{% endif %}>Activo</option><option value="0"{% if not g.estado %} selected{% endif %}>Inactivo</option></select><div class="config-record-actions catalogo-edit-actions"><button class="boton pequeno" type="submit">Guardar</button><button class="boton pequeno secundario" name="estado_objetivo" value="1" formmethod="post" formaction="{{ url_for('configuracion.toggle_grado', grado_id=g.id) }}">Activar</button><button class="boton pequeno secundario" name="estado_objetivo" value="0" formmethod="post" formaction="{{ url_for('configuracion.toggle_grado', grado_id=g.id) }}">Desactivar</button></div>
       </form>
     {% else %}<p class="muted">No hay grados.</p>{% endfor %}
   </div>
 </section>
 
 <section class="panel">
-  <div class="section-heading"><h2>Grupos</h2><p>Cada grupo pertenece a un grado y mantiene sus relaciones históricas.</p></div>
-  <form method="post" action="{{ url_for('configuracion.guardar_grupo') }}" class="form-grid catalogo-form">
+  <header class="page-head config-section-heading"><div><h2>Grupos</h2><p>Cada grupo pertenece a un grado y mantiene sus relaciones históricas.</p></div></header>
+  <form method="post" action="{{ url_for('configuracion.guardar_grupo') }}" class="form-grid catalogo-form config-entry-form config-entry-grupo">
     {{ csrf_field()|safe }}
     <label>Grado<select name="id_grado" required>
 <option value="" selected disabled hidden></option>
@@ -143,42 +139,33 @@
 <option value="1">Activo</option><option value="0">Inactivo</option></select></label>
     <div class="form-actions catalogo-form-actions"><button class="boton" type="submit">Agregar grupo</button><button class="boton pequeno secundario" type="reset" aria-label="Limpiar formulario" title="Limpiar formulario">Limpiar</button></div>
   </form>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Grado</th><th>Grupo</th><th>Estado</th><th>Acciones</th></tr></thead>
-      <tbody>
-      {% for g in grupos %}
-        <tr>
-          <td>
-            <form id="grupo-{{ g.id }}" method="post" action="{{ url_for('configuracion.guardar_grupo') }}">
-              {{ csrf_field()|safe }}<input type="hidden" name="id_grupo" value="{{ g.id }}">
-            </form>
-            <select form="grupo-{{ g.id }}" name="id_grado" required>
-<option value="" selected disabled hidden></option>
-{% for grado in grados %}<option value="{{ grado.id }}"{% if grado.id == g.id_grado %} selected{% endif %}>{{ grado.nombre }}</option>{% endfor %}</select>
-          </td>
-          <td><input form="grupo-{{ g.id }}" name="nombre" value="{{ g.nombre }}" size="{{ g.nombre|length + 1 }}" maxlength="20" required></td>
-          <td><select form="grupo-{{ g.id }}" name="estado">
-<option value="" selected disabled hidden></option>
-<option value="1"{% if g.estado %} selected{% endif %}>Activo</option><option value="0"{% if not g.estado %} selected{% endif %}>Inactivo</option></select></td>
-          <td><div class="config-row-actions"><button form="grupo-{{ g.id }}" class="boton pequeno" type="submit">Guardar</button><div class="config-state-actions"><form method="post" action="{{ url_for('configuracion.toggle_grupo', grupo_id=g.id) }}">{{ csrf_field()|safe }}<input type="hidden" name="estado_objetivo" value="1"><button class="boton pequeno secundario" type="submit">Activar</button></form><form method="post" action="{{ url_for('configuracion.toggle_grupo', grupo_id=g.id) }}">{{ csrf_field()|safe }}<input type="hidden" name="estado_objetivo" value="0"><button class="boton pequeno secundario" type="submit">Desactivar</button></form></div></div></td>
-        </tr>
-      {% else %}<tr><td colspan="4">No hay grupos registrados.</td></tr>{% endfor %}
-      </tbody>
-    </table>
+  <div class="config-record-list">
+    {% for g in grupos %}
+    <form method="post" action="{{ url_for('configuracion.guardar_grupo') }}" class="config-record-form config-record-grupo">
+      {{ csrf_field()|safe }}<input type="hidden" name="id_grupo" value="{{ g.id }}">
+      <label class="config-field-grade">Grado<select name="id_grado" required>{% for grado in grados %}<option value="{{ grado.id }}"{% if grado.id == g.id_grado %} selected{% endif %}>{{ grado.nombre }}</option>{% endfor %}</select></label>
+      <label class="config-field-name">Grupo<input name="nombre" value="{{ g.nombre }}" maxlength="20" required></label>
+      <label class="config-field-status">Estado<select name="estado"><option value="1"{% if g.estado %} selected{% endif %}>Activo</option><option value="0"{% if not g.estado %} selected{% endif %}>Inactivo</option></select></label>
+      <div class="config-record-actions">
+        <button class="boton pequeno" type="submit">Guardar</button>
+        <button class="boton pequeno secundario" name="estado_objetivo" value="1" formmethod="post" formaction="{{ url_for('configuracion.toggle_grupo', grupo_id=g.id) }}">Activar</button>
+        <button class="boton pequeno secundario" name="estado_objetivo" value="0" formmethod="post" formaction="{{ url_for('configuracion.toggle_grupo', grupo_id=g.id) }}">Desactivar</button>
+      </div>
+    </form>
+    {% else %}<p class="muted">No hay grupos registrados.</p>{% endfor %}
   </div>
 </section>
 
 <section class="grid configuracion-catalogos">
   <div class="panel">
-    <div class="section-heading"><h2>Motivos</h2></div>
-    <form method="post" action="{{ url_for('configuracion.guardar_motivo') }}" class="stack-form catalogo-form motivo-form">
+    <header class="page-head config-section-heading"><div><h2>Motivos</h2></div></header>
+    <form method="post" action="{{ url_for('configuracion.guardar_motivo') }}" class="stack-form catalogo-form motivo-form config-entry-form">
       {{ csrf_field()|safe }}<label>Nombre<input name="nombre" maxlength="120" required></label><label>Estado<select name="estado">
     <option value="" selected disabled hidden></option>
     <option value="1">Activo</option><option value="0">Inactivo</option></select></label><div class="catalogo-form-actions"><button class="boton" type="submit">Agregar motivo</button><button class="boton pequeno secundario" type="reset" aria-label="Limpiar formulario" title="Limpiar formulario">Limpiar</button></div>
     </form>
     {% for m in motivos %}
-      <form method="post" action="{{ url_for('configuracion.guardar_motivo') }}" class="motivo-edit-form">
+      <form method="post" action="{{ url_for('configuracion.guardar_motivo') }}" class="motivo-edit-form config-record-form">
         {{ csrf_field()|safe }}<input type="hidden" name="id_motivo" value="{{ m.id }}"><input aria-label="Nombre del motivo" name="nombre" value="{{ m.nombre }}" size="{{ m.nombre|length + 1 }}" maxlength="120" required><select aria-label="Estado del motivo" name="estado">
 <option value="" selected disabled hidden></option>
       <option value="1"{% if m.estado %} selected{% endif %}>Activo</option><option value="0"{% if not m.estado %} selected{% endif %}>Inactivo</option></select><div class="motivo-edit-actions"><button class="boton pequeno" type="submit">Guardar</button><div class="config-state-actions"><button class="boton pequeno secundario" name="estado_objetivo" value="1" formmethod="post" formaction="{{ url_for('configuracion.toggle_motivo', motivo_id=m.id) }}">Activar</button><button class="boton pequeno secundario" name="estado_objetivo" value="0" formmethod="post" formaction="{{ url_for('configuracion.toggle_motivo', motivo_id=m.id) }}">Desactivar</button></div></div>
@@ -187,15 +174,15 @@
   </div>
 
   <div class="panel">
-    <div class="section-heading"><h2>Estados de citación</h2><p>Los estados inactivos dejan de estar disponibles para cambios futuros.</p></div>
-    <form method="post" action="{{ url_for('configuracion.guardar_estado') }}" class="state-form state-form-new">
+    <header class="page-head config-section-heading"><div><h2>Estados de citación</h2><p>Los estados inactivos dejan de estar disponibles para cambios futuros.</p></div></header>
+    <form method="post" action="{{ url_for('configuracion.guardar_estado') }}" class="state-form state-form-new config-entry-form">
       {{ csrf_field()|safe }}<label class="state-name">Nombre<input name="nombre" maxlength="40" required></label><label class="state-status">Estado<select name="estado">
 <option value="" selected disabled hidden></option>
 <option value="1">Activo</option><option value="0">Inactivo</option></select></label><div class="catalogo-form-actions state-add"><button class="boton" type="submit">Agregar estado</button><button class="boton pequeno secundario" type="reset" aria-label="Limpiar formulario" title="Limpiar formulario">Limpiar</button></div>
     </form>
     <div class="state-list">
     {% for e in estados %}
-      <form method="post" action="{{ url_for('configuracion.guardar_estado') }}" class="state-form state-form-row">
+      <form method="post" action="{{ url_for('configuracion.guardar_estado') }}" class="state-form state-form-row config-record-form">
         {{ csrf_field()|safe }}<input type="hidden" name="id_estado" value="{{ e.id }}"><input class="state-name-control" aria-label="Nombre del estado" name="nombre" value="{{ e.nombre }}" size="{{ e.nombre|length + 1 }}" maxlength="40" required><select class="state-status-control" aria-label="Estado del estado" name="estado">
 <option value="" selected disabled hidden></option>
       <option value="1"{% if e.estado %} selected{% endif %}>Activo</option><option value="0"{% if not e.estado %} selected{% endif %}>Inactivo</option></select><div class="state-actions"><button class="boton pequeno" type="submit">Guardar</button><div class="config-state-actions"><button class="boton pequeno secundario" name="estado_objetivo" value="1" formmethod="post" formaction="{{ url_for('configuracion.toggle_estado', estado_id=e.id) }}">Activar</button><button class="boton pequeno secundario" name="estado_objetivo" value="0" formmethod="post" formaction="{{ url_for('configuracion.toggle_estado', estado_id=e.id) }}">Desactivar</button></div></div>

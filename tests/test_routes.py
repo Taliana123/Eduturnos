@@ -1,5 +1,7 @@
 from datetime import date, timedelta
 from contextlib import contextmanager
+from email.utils import parsedate_to_datetime
+import time
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
@@ -12,6 +14,58 @@ from routes import helpers
 from routes import calendario as calendario_routes
 from routes import auth as auth_routes
 from routes import configuracion as configuracion_routes
+from routes import helpers as session_helpers
+
+
+def test_login_cookie_persists_for_30_days():
+    from datetime import timedelta as datetime_timedelta
+
+    assert app.permanent_session_lifetime == datetime_timedelta(days=30)
+
+    client = app.test_client()
+    with client.session_transaction() as stored_session:
+        stored_session.permanent = True
+        stored_session["usuario_id"] = 42
+        stored_session["creado_en"] = time.time()
+
+    response = client.get("/auth/login")
+
+    expires = response.headers["Set-Cookie"].split("Expires=", 1)[1].split(";", 1)[0]
+    remaining = parsedate_to_datetime(expires).timestamp() - time.time()
+    assert 29 * 24 * 60 * 60 < remaining <= 30 * 24 * 60 * 60
+
+
+def test_usuario_actual_no_expira_sesion_durante_su_periodo_configurado(monkeypatch):
+    from datetime import timedelta as datetime_timedelta
+
+    usuario = {"id_usuario": 42, "rol_nombre": "Estudiante"}
+    now = 1_800_000_000
+    monkeypatch.setattr(session_helpers, "time", lambda: now)
+    monkeypatch.setattr(session_helpers, "consultar", lambda *args, **kwargs: usuario)
+
+    with app.test_request_context("/"):
+        session_helpers.session["usuario_id"] = 42
+        session_helpers.session["creado_en"] = now - datetime_timedelta(days=29).total_seconds()
+        assert session_helpers.usuario_actual() == usuario
+        assert session_helpers.session["usuario_id"] == 42
+
+
+def test_usuario_actual_expira_sesion_despues_de_30_dias(monkeypatch):
+    from datetime import timedelta as datetime_timedelta
+
+    now = 1_800_000_000
+    monkeypatch.setattr(session_helpers, "time", lambda: now)
+    monkeypatch.setattr(
+        session_helpers,
+        "consultar",
+        lambda *args, **kwargs: pytest.fail("No debe consultar una sesión expirada."),
+    )
+
+    with app.test_request_context("/"):
+        session_helpers.session["usuario_id"] = 42
+        session_helpers.session["creado_en"] = now - datetime_timedelta(days=31).total_seconds()
+        assert session_helpers.usuario_actual() is None
+        assert not session_helpers.session
 
 
 def test_blueprints_principales_registrados():
@@ -32,6 +86,267 @@ def test_mi_cuenta_solicita_inicio_de_sesion_sin_consultar_base():
     assert urlsplit(respuesta.location).path == "/auth/login"
 
 
+@pytest.mark.parametrize(
+    ("endpoint", "extra_data"),
+    [
+        ("/auth/recuperar", {}),
+        ("/auth/verificar-codigo", {"accion": "reenviar", "codigo": ""}),
+    ],
+)
+def test_recuperacion_envia_codigo_al_correo_que_se_ingreso(
+    monkeypatch, endpoint, extra_data
+):
+    from routes import passwords as passwords_routes
+    from servicios import email as email_service
+
+    usuario = {
+        "id_usuario": 42,
+        "correo": "persona@gmail.com",
+        "rol_nombre": "Acudiente",
+    }
+    envios = []
+
+    def consultar_mock(sql, params=(), uno=False):
+        if "FROM usuarios" in sql:
+            assert params == ("persona@gmail.com",)
+            return usuario
+        if "information_schema.columns" in sql:
+            return {"existe": 1}
+        raise AssertionError(sql)
+
+    monkeypatch.setattr(passwords_routes, "consultar", consultar_mock)
+    monkeypatch.setattr(passwords_routes, "ejecutar", lambda *args, **kwargs: 1)
+    monkeypatch.setattr(
+        email_service.mail,
+        "send",
+        lambda mensaje: envios.append(mensaje),
+    )
+    for key, value in {
+        "MAIL_SERVER": "smtp.example.com",
+        "MAIL_USERNAME": "sender@example.com",
+        "MAIL_PASSWORD": "smtp-test-password",
+        "MAIL_DEFAULT_SENDER": "sender@example.com",
+    }.items():
+        monkeypatch.setitem(app.config, key, value)
+
+    client = app.test_client()
+    with client.session_transaction() as client_session:
+        client_session["_csrf_token"] = "csrf-test"
+    data = {"csrf_token": "csrf-test", "correo": "Persona@Gmail.com", **extra_data}
+
+    respuesta = client.post(endpoint, data=data)
+
+    assert respuesta.status_code == 302
+    assert urlsplit(respuesta.location).path == "/auth/verificar-codigo"
+    assert len(envios) == 1
+    assert envios[0].recipients == ["persona@gmail.com"]
+    assert 'src="cid:eduturnos-logo"' in envios[0].html
+
+
+def test_recuperacion_no_envia_si_el_dominio_no_corresponde_al_rol(monkeypatch):
+    from routes import passwords as passwords_routes
+    from servicios import email as email_service
+
+    usuario = {
+        "id_usuario": 42,
+        "correo": "persona@jjfh.edu.co",
+        "rol_nombre": "Acudiente",
+    }
+    envios = []
+    monkeypatch.setattr(passwords_routes, "consultar", lambda *args, **kwargs: usuario)
+    monkeypatch.setattr(email_service.mail, "send", lambda mensaje: envios.append(mensaje))
+
+    client = app.test_client()
+    with client.session_transaction() as client_session:
+        client_session["_csrf_token"] = "csrf-test"
+    respuesta = client.post(
+        "/auth/recuperar",
+        data={"csrf_token": "csrf-test", "correo": "persona@jjfh.edu.co"},
+    )
+
+    assert respuesta.status_code == 302
+    assert not envios
+
+
+def test_correo_no_registrado_no_se_reporta_como_enviado(monkeypatch):
+    from routes import passwords as passwords_routes
+    from servicios import email as email_service
+
+    monkeypatch.setattr(passwords_routes, "consultar", lambda *args, **kwargs: None)
+    envios = []
+    monkeypatch.setattr(email_service.mail, "send", lambda mensaje: envios.append(mensaje))
+
+    client = app.test_client()
+    with client.session_transaction() as client_session:
+        client_session["_csrf_token"] = "csrf-test"
+
+    respuesta = client.post(
+        "/auth/recuperar",
+        data={
+            "csrf_token": "csrf-test",
+            "correo": "no-registrado@gmail.com",
+        },
+    )
+
+    assert respuesta.status_code == 302
+    assert not envios
+    with client.session_transaction() as client_session:
+        mensajes = client_session["_flashes"]
+    assert "asociado a una cuenta activa" in mensajes[0][1]
+
+
+def test_recuperacion_rechaza_dominio_no_permitido_sin_buscar_cuenta(monkeypatch):
+    from routes import passwords as passwords_routes
+
+    monkeypatch.setattr(
+        passwords_routes,
+        "consultar",
+        lambda *args, **kwargs: pytest.fail("No debe consultar cuentas con un dominio no permitido."),
+    )
+    client = app.test_client()
+    with client.session_transaction() as client_session:
+        client_session["_csrf_token"] = "csrf-test"
+
+    respuesta = client.post(
+        "/auth/recuperar",
+        data={"csrf_token": "csrf-test", "correo": "persona@outlook.com"},
+    )
+
+    assert respuesta.status_code == 200
+    assert "Gmail para estudiantes y acudientes" in respuesta.get_data(as_text=True)
+
+
+@pytest.mark.parametrize(
+    ("portal", "correo"),
+    [
+        ("estudiante", "estudiante@jjfh.edu.co"),
+        ("acudiente", "acudiente@outlook.com"),
+        ("docente", "docente@gmail.com"),
+    ],
+)
+def test_registro_rechaza_correo_que_no_corresponde_al_portal(
+    monkeypatch, portal, correo
+):
+    monkeypatch.setattr(auth_routes, "_sedes", lambda: [])
+    monkeypatch.setattr(auth_routes, "_jornadas", lambda: [])
+    monkeypatch.setattr(
+        auth_routes,
+        "_mostrar_registro",
+        lambda *args: "blocked-by-domain-validation",
+    )
+
+    with app.test_request_context(
+        f"/auth/registro/{portal}",
+        method="POST",
+        data={"correo": correo},
+    ):
+        respuesta = auth_routes.registro_portal(portal)
+
+    assert respuesta == "blocked-by-domain-validation"
+
+
+def test_fallo_smtp_no_muestra_mensaje_de_envio_correcto(monkeypatch):
+    from routes import passwords as passwords_routes
+    from servicios import email as email_service
+
+    usuario = {
+        "id_usuario": 42,
+        "correo": "persona@gmail.com",
+        "rol_nombre": "Estudiante",
+    }
+    escrituras = []
+
+    def consultar_mock(sql, params=(), uno=False):
+        if "FROM usuarios" in sql:
+            return usuario
+        if "information_schema.columns" in sql:
+            return {"existe": 1}
+        raise AssertionError(sql)
+
+    def fallar_envio(_mensaje):
+        raise OSError("SMTP no disponible")
+
+    monkeypatch.setattr(passwords_routes, "consultar", consultar_mock)
+    monkeypatch.setattr(
+        passwords_routes,
+        "ejecutar",
+        lambda sql, params=(): escrituras.append((sql, params)),
+    )
+    monkeypatch.setattr(email_service.mail, "send", fallar_envio)
+    for key, value in {
+        "MAIL_SERVER": "smtp.example.com",
+        "MAIL_USERNAME": "sender@example.com",
+        "MAIL_PASSWORD": "smtp-test-password",
+        "MAIL_DEFAULT_SENDER": "sender@example.com",
+    }.items():
+        monkeypatch.setitem(app.config, key, value)
+
+    client = app.test_client()
+    with client.session_transaction() as client_session:
+        client_session["_csrf_token"] = "csrf-test"
+
+    respuesta = client.post(
+        "/auth/recuperar",
+        data={"csrf_token": "csrf-test", "correo": "persona@gmail.com"},
+    )
+
+    assert respuesta.status_code == 200
+    assert b"No fue posible enviar el correo de recuperaci" in respuesta.data
+    assert any(sql.startswith("DELETE FROM tokens_recuperacion") for sql, _ in escrituras)
+    assert b"Si el correo ingresado est" not in respuesta.data
+
+
+def test_login_con_csrf_vencido_regresa_al_formulario_sin_error_400(caplog):
+    respuesta = app.test_client().post("/auth/login", data={"identificador": "", "password": ""})
+
+    assert respuesta.status_code == 302
+    assert urlsplit(respuesta.location).path == "/auth/login"
+    assert "Validación CSRF rechazada: método=POST endpoint=auth.login" in caplog.text
+
+
+def test_formulario_login_no_se_guarda_en_cache():
+    respuesta = app.test_client().get("/auth/login")
+
+    assert respuesta.status_code == 200
+    assert respuesta.headers["Cache-Control"] == "no-store"
+
+
+def test_soporte_envia_respuesta_automatica_tambien_a_acudiente(monkeypatch):
+    from routes import soporte as soporte_routes
+
+    usuario = {
+        "id_usuario": 42,
+        "nombres": "Ana",
+        "apellidos": "Pérez",
+        "correo": "ana@example.com",
+        "rol_nombre": "Acudiente",
+    }
+    envios = []
+    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(soporte_routes, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(soporte_routes, "generar_respuesta", lambda pregunta: "Abre Calendario desde el menú.")
+    monkeypatch.setattr(soporte_routes, "enviar_solicitud_soporte", lambda *args, **kwargs: envios.append((args, kwargs)))
+
+    client = app.test_client()
+    with client.session_transaction() as session:
+        session["usuario_id"] = 42
+        session["_csrf_token"] = "token-prueba"
+    respuesta = client.post(
+        "/soporte/",
+        data={"csrf_token": "token-prueba", "mensaje": "No encuentro el calendario en la aplicación."},
+    )
+
+    assert respuesta.status_code == 302
+    assert urlsplit(respuesta.location).path == "/soporte/"
+    assert envios[0][0] == (
+        "ana@example.com",
+        "Ana Pérez",
+        "Acudiente",
+        "No encuentro el calendario en la aplicación.",
+    )
+    assert envios[0][1]["respuesta_automatica"] == "Abre Calendario desde el menú."
+
+
 @pytest.mark.parametrize("scope,rol,permitido", [
     ("personal", "Docente", True),
     ("personal", "Rector", True),
@@ -47,7 +362,7 @@ def test_google_calendar_respeta_alcance_y_rol(scope, rol, permitido):
     assert _permite(scope, rol) is permitido
 
 
-def test_callback_google_sincroniza_citas_futuras_al_conectar_acudiente(monkeypatch):
+def test_callback_google_encola_citas_futuras_al_conectar_acudiente(monkeypatch):
     from routes import integraciones_google as google_routes
 
     usuario = {"id_usuario": 42, "rol_nombre": "Acudiente"}
@@ -56,12 +371,14 @@ def test_callback_google_sincroniza_citas_futuras_al_conectar_acudiente(monkeypa
     monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
     monkeypatch.setattr(google_routes, "usuario_actual", lambda: usuario)
     monkeypatch.setattr(google_routes, "intercambiar_codigo", lambda code: {"access_token": "token"})
+    monkeypatch.setattr(google_routes, "calendar_id_objetivo", lambda scope_key: "primary")
+    monkeypatch.setattr(google_routes, "probar_conexion_calendario", lambda token, calendar_id: None)
     monkeypatch.setattr(google_routes, "correo_google", lambda token: "acudiente@example.com")
     monkeypatch.setattr(google_routes, "guardar_conexion", lambda *args: conexiones.append(args))
     monkeypatch.setattr(
         google_routes,
-        "sincronizar_citas_futuras",
-        lambda scope_key, user_id: sincronizaciones.append((scope_key, user_id)) or {"citas": 2, "fallidas": 0},
+        "encolar_citas_futuras",
+        lambda scope_key, user_id: sincronizaciones.append((scope_key, user_id)) or {"citas": 2, "encoladas": 2},
     )
     client = app.test_client()
     with client.session_transaction() as sesion:
@@ -80,52 +397,41 @@ def test_callback_google_sincroniza_citas_futuras_al_conectar_acudiente(monkeypa
     ("Rector", True),
     ("Administrador / Coordinador", True),
     ("Docente", True),
-    ("Estudiante", False),
-    ("Acudiente", False),
+    ("Estudiante", True),
+    ("Acudiente", True),
 ])
-def test_widget_asistente_se_muestra_solo_a_personal(rol, visible):
+def test_widget_edubot_esta_disponible_para_todos_los_roles(rol, visible):
     from flask import render_template
 
     with app.test_request_context("/auth/dashboard"):
         contenido = render_template(
             "_asistente_widget.html",
-            usuario={"rol_nombre": rol},
-            asistente_disponible=False,
-            beepy_disponible=False,
+            usuario_navegacion={"rol_nombre": rol, "nombres": "Ana"},
         )
 
-    assert ("Ayuda EDUTURNOS" in contenido) is visible
-    assert ("El chat todavía no está activado." in contenido) is visible
+    assert ('class="dashboard-help"' in contenido) is visible
+    assert ('data-eduturnos-assistant' in contenido) is visible
+    assert ('<iframe' in contenido) is False
 
 
-def test_widget_refleja_configuracion_opcional_de_gemini():
+def test_widget_edubot_no_aparece_sin_sesion():
     from flask import render_template
 
-    with app.app_context():
-        clave_original = app.config.get("GEMINI_API_KEY")
-        try:
-            app.config["GEMINI_API_KEY"] = "clave-prueba"
-            with app.test_request_context("/auth/dashboard"):
-                html = render_template(
-                    "_asistente_widget.html",
-                    usuario={"rol_nombre": "Docente"},
-                    beepy_disponible=False,
-                )
-            assert "data-endpoint=\"/asistente/preguntar\"" in html
-            assert "Aún no está configurado" not in html
-        finally:
-            app.config["GEMINI_API_KEY"] = clave_original
+    with app.test_request_context("/auth/dashboard"):
+        html = render_template(
+            "_asistente_widget.html",
+            usuario_navegacion=None,
+        )
+    assert html.strip() == ""
 
 
-@pytest.mark.parametrize("rol,estado_esperado", [("Estudiante", 403), ("Acudiente", 403), ("Docente", 200)])
-def test_asistente_solo_esta_disponible_para_personal(monkeypatch, rol, estado_esperado):
+@pytest.mark.parametrize("rol", ["Super Admin", "Rector", "Administrador / Coordinador", "Docente", "Estudiante", "Acudiente"])
+def test_asistente_responde_localmente_a_todos_los_roles(monkeypatch, rol):
     from routes import asistente as asistente_routes
 
-    consultas_gemini = []
     usuario = {"id_usuario": 12, "rol_nombre": rol}
     monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
     monkeypatch.setattr(asistente_routes, "usuario_actual", lambda: usuario)
-    monkeypatch.setattr(asistente_routes, "_respuesta_gemini", lambda mensaje: consultas_gemini.append(mensaje) or "Ayuda general")
     client = app.test_client()
     with client.session_transaction() as sesion:
         sesion["_csrf_token"] = "chat-csrf"
@@ -135,12 +441,81 @@ def test_asistente_solo_esta_disponible_para_personal(monkeypatch, rol, estado_e
         headers={"X-CSRFToken": "chat-csrf"},
     )
 
-    assert response.status_code == estado_esperado
-    if rol == "Docente":
-        assert response.json["respuesta"] == "Ayuda general"
-        assert consultas_gemini == ["¿Cómo reviso el calendario?"]
-    else:
-        assert not consultas_gemini
+    assert response.status_code == 200
+    assert "Calendario" in response.json["respuesta"]
+    assert "citaciones" in response.json["respuesta"].lower()
+
+
+def test_asistente_responde_pregunta_abierta_con_el_perfil_actual(monkeypatch):
+    from routes import asistente as asistente_routes
+
+    usuario = {"id_usuario": 12, "rol_nombre": "Docente"}
+    respuestas = []
+    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(asistente_routes, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(
+        asistente_routes,
+        "generar_respuesta",
+        lambda pregunta, rol=None: respuestas.append((pregunta, rol)) or "Para cambiar una preferencia, abre Mi cuenta.",
+    )
+    client = app.test_client()
+    with client.session_transaction() as sesion:
+        sesion["_csrf_token"] = "chat-csrf"
+    response = client.post(
+        "/asistente/preguntar",
+        json={"mensaje": "¿Cómo puedo usar el sistema?"},
+        headers={"X-CSRFToken": "chat-csrf"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["respuesta"] == "Para cambiar una preferencia, abre Mi cuenta."
+    assert respuestas == [("¿Cómo puedo usar el sistema?", "Docente")]
+
+
+def test_asistente_avisa_si_la_respuesta_abierta_no_esta_disponible(monkeypatch):
+    from routes import asistente as asistente_routes
+
+    usuario = {"id_usuario": 12, "rol_nombre": "Docente"}
+    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(asistente_routes, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(
+        asistente_routes,
+        "generar_respuesta",
+        lambda pregunta, rol=None: (_ for _ in ()).throw(RuntimeError("IA no disponible")),
+    )
+    client = app.test_client()
+    with client.session_transaction() as sesion:
+        sesion["_csrf_token"] = "chat-csrf"
+
+    response = client.post(
+        "/asistente/preguntar",
+        json={"mensaje": "¿Cómo configuro otro módulo?"},
+        headers={"X-CSRFToken": "chat-csrf"},
+    )
+
+    assert response.status_code == 503
+    assert response.json["error"] == "IA no disponible"
+
+
+def test_asistente_muestra_error_si_falta_configurar_proveedor(monkeypatch):
+    from routes import asistente as asistente_routes
+
+    usuario = {"id_usuario": 12, "rol_nombre": "Docente"}
+    monkeypatch.setitem(app.config, "GROQ_API_KEY", "")
+    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(asistente_routes, "usuario_actual", lambda: usuario)
+    client = app.test_client()
+    with client.session_transaction() as sesion:
+        sesion["_csrf_token"] = "chat-csrf"
+
+    response = client.post(
+        "/asistente/preguntar",
+        json={"mensaje": "¿Cómo configuro un proceso institucional especial?"},
+        headers={"X-CSRFToken": "chat-csrf"},
+    )
+
+    assert response.status_code == 503
+    assert "respuestas abiertas no están activadas" in response.json["error"]
 
 
 def test_asistente_rechaza_mensaje_no_textual(monkeypatch):
@@ -160,34 +535,6 @@ def test_asistente_rechaza_mensaje_no_textual(monkeypatch):
 
     assert response.status_code == 400
     assert response.json["error"] == "El mensaje debe ser texto."
-
-
-def test_gemini_api_key_viaja_en_header_no_en_url(monkeypatch):
-    from routes import asistente as asistente_routes
-
-    solicitudes = []
-
-    class Respuesta:
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *args):
-            pass
-
-        def read(self):
-            return b'{"candidates":[{"content":{"parts":[{"text":"Ayuda general"}]}}]}'
-
-    monkeypatch.setattr(asistente_routes, "urlopen", lambda request, timeout: solicitudes.append(request) or Respuesta())
-    with app.app_context():
-        clave_original = app.config.get("GEMINI_API_KEY")
-        app.config["GEMINI_API_KEY"] = "clave-ficticia-no-real"
-        try:
-            assert asistente_routes._respuesta_gemini("Ayuda") == "Ayuda general"
-        finally:
-            app.config["GEMINI_API_KEY"] = clave_original
-
-    assert "clave-ficticia-no-real" not in solicitudes[0].full_url
-    assert solicitudes[0].get_header("X-goog-api-key") == "clave-ficticia-no-real"
 
 
 def test_informacion_institucional_publica_muestra_siete_sedes():
@@ -331,6 +678,7 @@ def test_home_publico():
     client = app.test_client()
     response = client.get('/')
     assert response.status_code == 200
+    assert response.headers["Cache-Control"] == "no-store"
     assert b'EDUTURNOS' in response.data
     assert b'/privacidad' in response.data
     assert b'/terminos' in response.data
@@ -524,6 +872,9 @@ def test_reprogramar_solo_realizada_conserva_cita_anterior(monkeypatch, estado_a
             if "FOR UPDATE" in self.sql:
                 return {"fecha": date.today(), "hora": "10:30", "id_estado": 4, "estado": estado_actual}
             return {"id": 6}
+
+        def fetchall(self):
+            return []
 
         def close(self):
             pass

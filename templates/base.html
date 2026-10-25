@@ -1,7 +1,7 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172942"><meta name="description" content="EDUTURNOS: gestión institucional de citaciones escolares">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172942"><meta name="description" content="EDUTURNOS: gesti�n institucional de citaciones escolares">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="EDUTURNOS">
 <link rel="manifest" href="{{ url_for('static',filename='manifest.webmanifest') }}"><link rel="icon" href="{{ url_for('static',filename='icons/eduturnos-192.svg') }}" type="image/svg+xml"><link rel="apple-touch-icon" href="{{ url_for('static',filename='icons/eduturnos-192.svg') }}"><title>{% block title %}EDUTURNOS{% endblock %}</title>
 <link rel="stylesheet" href="{{ url_for('static',filename='css/estilos.css') }}?v=20261006_calendar_ampm">
@@ -9,14 +9,11 @@
 
 <style id="eduturnos-estilo-fijo">
 
-html body #contenido .desktop-back-link{display:inline-flex!important;align-items:center;gap:6px;margin:0 0 16px!important;text-decoration:none;}
-@media(max-width:900px){html body #contenido .desktop-back-link{display:none!important;}}
-
 /* =========================================================
    EDUTURNOS - ESTILO VISUAL FIJO
    ========================================================= */
 
-/* Todo calcula sus tamaÃƒÂ±os correctamente */
+/* Todo calcula sus tamaÃ±os correctamente */
 #contenido,
 #contenido *,
 #contenido *::before,
@@ -200,7 +197,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
 
 /* =========================================================
    LOS TRES CAMPOS:
-   CÃƒâ€œDIGO | SEDE | JORNADA
+   CÃ“DIGO | SEDE | JORNADA
    ========================================================= */
 
 #contenido .personal-login .form-grid {
@@ -251,7 +248,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
 }
 
 /* =========================================================
-   TÃƒÂTULOS DE CÃƒâ€œDIGO / SEDE / JORNADA
+   TÃTULOS DE CÃ“DIGO / SEDE / JORNADA
    ========================================================= */
 
 #contenido .personal-login .form-grid > label:first-child,
@@ -262,7 +259,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
 }
 
 /* =========================================================
-   QUITAR EL PEQUEÃƒâ€˜O TEXTO DE APOYO DEL TÃƒÂTULO
+   QUITAR EL PEQUEÃ‘O TEXTO DE APOYO DEL TÃTULO
    ========================================================= */
 
 #contenido .personal-login label small {
@@ -412,7 +409,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
 <style id="eduturnos-personal-organizado">
 
 /* =========================================================
-   PERSONAL INSTITUCIONAL - ORGANIZACIÃƒâ€œN DEFINITIVA
+   PERSONAL INSTITUCIONAL - ORGANIZACIÃ“N DEFINITIVA
    ========================================================= */
 
 /* Tarjeta principal */
@@ -443,7 +440,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
     overflow: visible !important;
 }
 
-/* TÃƒÂ­tulo */
+/* TÃ­tulo */
 #contenido .personal-login h3 {
     display: block !important;
 
@@ -468,7 +465,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
 }
 
 /* =========================================================
-   CÃƒâ€œDIGO | SEDE | JORNADA
+   CÃ“DIGO | SEDE | JORNADA
    ========================================================= */
 
 #contenido .personal-login .form-grid {
@@ -543,7 +540,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
     background: #ffffff !important;
 }
 
-/* Sede: mÃƒÂ¡s espacio para nombres largos */
+/* Sede: mÃ¡s espacio para nombres largos */
 #contenido .personal-login .form-grid > label:nth-child(2) select {
     font-size: 13px !important;
 }
@@ -562,13 +559,13 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
     white-space: nowrap !important;
 }
 
-/* El cÃƒÂ³digo tambiÃƒÂ©n permanece dentro */
+/* El cÃ³digo tambiÃ©n permanece dentro */
 #contenido .personal-login .form-grid > label:nth-child(1) {
     min-width: 0 !important;
 }
 
 /* =========================================================
-   BOTÃƒâ€œN
+   BOTÃ“N
    ========================================================= */
 
 #contenido .personal-login + * {
@@ -898,7 +895,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
 
 
 /* =========================================================
-   BOTÃƒâ€œN NUEVA CITACIÃƒâ€œN
+   BOTÃ“N NUEVA CITACIÃ“N
    ========================================================= */
 
 #contenido .page-head .boton,
@@ -1139,11 +1136,11 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
 <style id="eduturnos-citas-interno-elegante">
 
 /* =========================================================
-   CITAS - DISEÃƒâ€˜O INTERNO ELEGANTE
+   CITAS - DISEÃ‘O INTERNO ELEGANTE
    ========================================================= */
 
 /* ---------------------------------------------------------
-   ENCABEZADO DE LA PÃƒÂGINA DE CITAS
+   ENCABEZADO DE LA PÃGINA DE CITAS
    --------------------------------------------------------- */
 
 #contenido .page-head:has(a[href*="/citas/nueva"]) {
@@ -1181,7 +1178,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
     color: #2563eb !important;
 }
 
-/* TÃƒÂ­tulo */
+/* TÃ­tulo */
 #contenido .page-head:has(a[href*="/citas/nueva"]) h1 {
     position: relative !important;
 
@@ -1196,7 +1193,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
     line-height: 1.15 !important;
 }
 
-/* PequeÃƒÂ±o detalle visual delante del tÃƒÂ­tulo */
+/* PequeÃ±o detalle visual delante del tÃ­tulo */
 #contenido .page-head:has(a[href*="/citas/nueva"]) h1::before {
     content: "\2713";
 
@@ -1223,7 +1220,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
     font-weight: 800;
 }
 
-/* DescripciÃƒÂ³n */
+/* DescripciÃ³n */
 #contenido .page-head:has(a[href*="/citas/nueva"]) p {
     margin: 0 !important;
     padding-left: 34px !important;
@@ -1238,7 +1235,7 @@ html body #contenido .desktop-back-link{display:inline-flex!important;align-item
 }
 
 /* ---------------------------------------------------------
-   BOTÃƒâ€œN NUEVA CITACIÃƒâ€œN
+   BOTÃ“N NUEVA CITACIÃ“N
    --------------------------------------------------------- */
 
 #contenido .page-head:has(a[href*="/citas/nueva"])
@@ -1339,7 +1336,7 @@ a[href*="/citas/nueva"]:hover {
     white-space: nowrap !important;
 }
 
-/* LÃƒÂ­nea inferior decorativa */
+/* LÃ­nea inferior decorativa */
 #contenido .page-head:has(a[href*="/citas/nueva"])
 ~ table thead th:first-child {
     box-shadow:
@@ -1708,28 +1705,33 @@ header.eduturnos-header .eduturnos-logo span {
     }
 </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/role-forms.css') }}?v=20261012_assignment_compact_v4">
+{% if usuario_navegacion %}<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261023_assistant_compact_v2">{% endif %}
 {% block page_styles %}{% endblock %}
 </head>
 <body class="{% if request.endpoint and (request.endpoint.startswith('auth.') or request.endpoint == 'passwords.recuperar' or request.endpoint == 'passwords.restablecer') %}auth-page{% endif %}{% if usuario_navegacion %} has-desktop-sidebar{% endif %}">
     {% if request.endpoint and (request.endpoint.startswith('auth.') or request.endpoint == 'passwords.recuperar' or request.endpoint == 'passwords.restablecer') %}
         {% if request.endpoint == 'auth.dashboard' %}
         <header class="barra">
-            <div class="logo"><img class="eduturnos-header-logo" src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional">EDUTURNOS<span>.</span></div>
             {% if usuario_navegacion %}
-            <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-controls="eduturnos-mobile-nav" aria-expanded="false" aria-label="Abrir menú" title="Abrir menú"><span class="mobile-nav-toggle-lines" aria-hidden="true"><i></i><i></i><i></i></span></button>
+            <button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-controls="eduturnos-mobile-nav" aria-expanded="false" aria-label="Abrir men�" title="Abrir men�"><span class="mobile-nav-toggle-lines" aria-hidden="true"><i></i><i></i><i></i></span></button>
             {% endif %}
+            <div class="logo"><img class="eduturnos-header-logo" src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional">EDUTURNOS<span>.</span></div>
         </header>
         {% else %}<header class="eduturnos-header"><div class="eduturnos-logo"><img class="eduturnos-header-logo" src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional">EDUTURNOS<span>.</span></div></header>{% endif %}
     {% else %}
-        <header class="barra"><div class="logo"><img class="eduturnos-header-logo" src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional">EDUTURNOS<span>.</span></div>{% if usuario_navegacion %}<button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-controls="eduturnos-mobile-nav" aria-expanded="false" aria-label="Abrir menú" title="Abrir menú"><span class="mobile-nav-toggle-lines" aria-hidden="true"><i></i><i></i><i></i></span></button>{% else %}<nav><a href="{{ url_for('auth.login') }}">Iniciar sesión</a><a href="{{ url_for('auth.registro', portal='estudiante') }}">Crear cuenta</a></nav>{% endif %}</header>
+        <header class="barra">{% if usuario_navegacion %}<button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-controls="eduturnos-mobile-nav" aria-expanded="false" aria-label="Abrir men�" title="Abrir men�"><span class="mobile-nav-toggle-lines" aria-hidden="true"><i></i><i></i><i></i></span></button>{% endif %}{% if request.endpoint != 'soporte.index' %}<div class="logo"><img class="eduturnos-header-logo" src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional">EDUTURNOS<span>.</span></div>{% endif %}{% if not usuario_navegacion %}<nav><a href="{{ url_for('auth.login') }}">Iniciar sesi�n</a><a href="{{ url_for('auth.registro', portal='estudiante') }}">Crear cuenta</a></nav>{% endif %}</header>
     {% endif %}
 
 
 
 <main class="contenedor" id="contenido">{% with mensajes=get_flashed_messages(with_categories=true) %}{% for categoria,mensaje in mensajes %}<div class="alerta {{ categoria }}">{{ mensaje }}</div>{% endfor %}{% endwith %}{% block content %}{% endblock %}</main>
 {% include '_desktop_sidebar.html' %}
-{% if usuario_navegacion %}<button class="mobile-nav-backdrop" type="button" data-mobile-nav-backdrop aria-label="Cerrar menú" hidden></button>{% endif %}
-<script src="{{ url_for('static', filename='js/app.js') }}?v=20261012_mobile_nav_v20" defer></script>
+{% if usuario_navegacion %}<button class="mobile-nav-backdrop" type="button" data-mobile-nav-backdrop aria-label="Cerrar men�" hidden></button>{% endif %}
+{% if usuario_navegacion %}<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261023_assistant_compact_v2" defer></script>{% endif %}
+<script src="{{ url_for('static', filename='js/app.js') }}?v=20261024_account_back_targeted_v1" defer></script>
+<script src="{{ url_for('static', filename='js/public-back.js') }}?v=20261021_public_back_v3" defer></script>
+<script src="{{ url_for('static',filename='js/form-preserve.js') }}?v=20261018_form_recovery_v1" defer></script>
+<script src="{{ url_for('static',filename='js/pwa.js') }}?v=2" defer></script>
 
 <!-- EDUTURNOS_VISUAL_FINAL_REAL -->
 
@@ -2138,7 +2140,7 @@ header.eduturnos-header .eduturnos-logo span {
 }
 
 /* =========================================================
-   BOTÃƒâ€œN CERRAR SESIÃƒâ€œN
+   BOTÃ“N CERRAR SESIÃ“N
    ========================================================= */
 
 #contenido .ed-dashboard .ed-logout {
@@ -3010,7 +3012,7 @@ body:has(.dashboard-page) {
 /*
    HEADER REGISTRO
    Misma banda azul del sistema.
-   Sin lÃƒÂ­neas adicionales.
+   Sin lÃ­neas adicionales.
    Sin desplazamientos.
 */
 
@@ -3085,7 +3087,7 @@ header.eduturnos-header .eduturnos-logo span {
 }
 
 
-/* Sin lÃƒÂ­neas decorativas debajo del header */
+/* Sin lÃ­neas decorativas debajo del header */
 header.eduturnos-header::before,
 header.eduturnos-header::after {
     content: none !important;
@@ -3183,7 +3185,7 @@ html body #contenido .dashboard-page
 }
 
 
-/* LÃƒÂ­nea institucional */
+/* LÃ­nea institucional */
 
 html body #contenido .dashboard-page
 .dashboard-head::before {
@@ -3214,7 +3216,7 @@ html body #contenido .dashboard-page
 
 
 /* =========================================================
-   INFORMACIÃƒâ€œN DEL ENCABEZADO
+   INFORMACIÃ“N DEL ENCABEZADO
    ========================================================= */
 
 html body #contenido .dashboard-page
@@ -3231,7 +3233,7 @@ html body #contenido .dashboard-page
 
 
 /* =========================================================
-   DIBUJO / SÃƒÂMBOLO DEL ROL
+   DIBUJO / SÃMBOLO DEL ROL
    ========================================================= */
 
 html body #contenido .dashboard-page
@@ -3327,7 +3329,7 @@ html body #contenido .dashboard-page
 
 
 /* =========================================================
-   DESCRIPCIÃƒâ€œN
+   DESCRIPCIÃ“N
    ========================================================= */
 
 html body #contenido .dashboard-page
@@ -3342,7 +3344,7 @@ html body #contenido .dashboard-page
 
 
 /* =========================================================
-   BOTÃƒâ€œN CERRAR SESIÃƒâ€œN
+   BOTÃ“N CERRAR SESIÃ“N
    ========================================================= */
 
 html body #contenido .dashboard-page
@@ -3488,7 +3490,7 @@ html body #contenido .dashboard-page
 
 
 /* =========================================================
-   TÃƒÂTULOS DE SECCIÃƒâ€œN
+   TÃTULOS DE SECCIÃ“N
    ========================================================= */
 
 html body #contenido .dashboard-page
@@ -3510,7 +3512,7 @@ html body #contenido .dashboard-page
 
 
 /* =========================================================
-   ACCIONES RÃƒÂPIDAS
+   ACCIONES RÃPIDAS
    ========================================================= */
 
 html body #contenido .dashboard-page
@@ -3528,7 +3530,7 @@ html body #contenido .dashboard-page
 
 
 /* =========================================================
-   TARJETAS DE ACCIÃƒâ€œN
+   TARJETAS DE ACCIÃ“N
    ========================================================= */
 
 html body #contenido .dashboard-page
@@ -3591,7 +3593,7 @@ html body #contenido .dashboard-page
 
 
 /* =========================================================
-   TÃƒÂTULO DE ACCIÃƒâ€œN
+   TÃTULO DE ACCIÃ“N
    ========================================================= */
 
 html body #contenido .dashboard-page
@@ -3608,7 +3610,7 @@ html body #contenido .dashboard-page
 
 
 /* =========================================================
-   TEXTO DE ACCIÃƒâ€œN
+   TEXTO DE ACCIÃ“N
    ========================================================= */
 
 html body #contenido .dashboard-page
@@ -3625,7 +3627,7 @@ html body #contenido .dashboard-page
 
 
 /* =========================================================
-   ENLACE DE ACCIÃƒâ€œN
+   ENLACE DE ACCIÃ“N
    ========================================================= */
 
 html body #contenido .dashboard-page
@@ -3820,7 +3822,7 @@ html body #contenido .dashboard-page
 
 /* =========================================================
    CABECERA
-   NO CAMBIA SU TAMAÃƒâ€˜O NI DISTRIBUCIÃƒâ€œN
+   NO CAMBIA SU TAMAÃ‘O NI DISTRIBUCIÃ“N
    ========================================================= */
 
 .dashboard-page .dashboard-head {
@@ -4315,7 +4317,7 @@ html body #contenido .dashboard-page.dashboard-rol-rector
    EDUTURNOS - DASHBOARD MAESTRO FINAL
    MISMA IDENTIDAD VISUAL QUE CREAR CUENTA
    TODOS LOS ROLES
-   RectorÃƒÂ­a / Docente / Coordinador / Estudiante / Acudiente
+   RectorÃ­a / Docente / Coordinador / Estudiante / Acudiente
 
    NO MODIFICA:
    - rutas
@@ -4367,20 +4369,23 @@ html body #contenido .dashboard-page[class*="dashboard-rol-"]
 }
 
 
-/* UNA SOLA LÃƒÂNEA INSTITUCIONAL
+/* UNA SOLA LÃNEA INSTITUCIONAL
    SIN AZUL/VERDE/AMARILLO REPETIDO */
 
 html body #contenido .dashboard-page[class*="dashboard-rol-"]
 .dashboard-head::before {
 
-    background: #2f78ff !important;
-
-    height: 4px !important;
+    content: none !important;
+    display: none !important;
+    height: 0 !important;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
 }
 
 
 /* ============================================================
-   ILUSTRACIÃƒâ€œN / SÃƒÂMBOLO DEL ROL
+   ILUSTRACIÃ“N / SÃMBOLO DEL ROL
    ============================================================ */
 
 html body #contenido .dashboard-page[class*="dashboard-"]
@@ -4468,7 +4473,7 @@ html body #contenido .dashboard-page[class*="dashboard-"]
 
 
 /* ============================================================
-   CERRAR SESIÃƒâ€œN
+   CERRAR SESIÃ“N
    ============================================================ */
 
 html body #contenido .dashboard-page[class*="dashboard-"]
@@ -4576,8 +4581,8 @@ html body #contenido .dashboard-page[class*="dashboard-"]
 
 
 /* ============================================================
-   ACCIONES RÃƒÂPIDAS
-   MISMA ORGANIZACIÃƒâ€œN PARA TODOS LOS ROLES
+   ACCIONES RÃPIDAS
+   MISMA ORGANIZACIÃ“N PARA TODOS LOS ROLES
    ============================================================ */
 
 html body #contenido .dashboard-page[class*="dashboard-"]
@@ -4633,7 +4638,7 @@ html body #contenido .dashboard-page[class*="dashboard-"]
 
 
 /* QUITAR LOS COLORES AZUL/VERDE/AMARILLO
-   QUE APARECÃƒÂAN ENCIMA DE CADA RECUADRO */
+   QUE APARECÃAN ENCIMA DE CADA RECUADRO */
 
 html body #contenido .dashboard-page[class*="dashboard-rol-"]
 .dashboard-action:nth-child(1),
@@ -4652,7 +4657,7 @@ html body #contenido .dashboard-page[class*="dashboard-rol-"]
 }
 
 
-/* HOVER ÃƒÅ¡NICO PARA TODAS */
+/* HOVER ÃšNICO PARA TODAS */
 
 html body #contenido .dashboard-page[class*="dashboard-rol-"]
 .dashboard-action:hover {
@@ -4789,7 +4794,7 @@ html body #contenido .dashboard-page[class*="dashboard-"]
 
 
 /* ============================================================
-   CAMBIAR CONTRASEÃƒâ€˜A
+   CAMBIAR CONTRASEÃ‘A
    MEJOR ORGANIZADO Y SEPARADO
    ============================================================ */
 
@@ -4911,11 +4916,8 @@ html body #contenido .dashboard-page[class*="dashboard-"]
    ============================================================ */
 
 </style>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261009_mobile_v49" media="(max-width: 900px)">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-sidebar.css') }}?v=20261013_mobile_calendar_assistant_v22">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/citas-desktop.css') }}?v=20261010_citas_print_v3">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/password-controls.css') }}?v=20261012_password_desktop_v1">
-
-
-
-
+<link rel="stylesheet" href="{{ url_for('static',filename='css/mobile/eduturnos-mobile.css') }}?v=20261021_mobile_tuning_v62" media="(max-width: 900px)">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-sidebar.css') }}?v=20261021_mobile_only_support_v13">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/citas-desktop.css') }}?v=20261023_citas_header_spacing_v1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/password-controls.css') }}?v=20261023_account_actions_fit_v2">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layout-responsive.css') }}?v=20261024_account_back_targeted_v1">

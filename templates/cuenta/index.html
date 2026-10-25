@@ -4,7 +4,6 @@
 <section class="cuenta-page">
     <header class="page-head">
         <div>
-            <a class="link-back" href="{{ url_for('auth.dashboard') }}">← Panel</a>
             <h1>Mi cuenta</h1>
             <p class="muted">Tu información y opciones según tu rol.</p>
         </div>
@@ -31,34 +30,33 @@
     <section class="cuenta-section" aria-labelledby="cuenta-seguridad-title">
         <h2 id="cuenta-seguridad-title">Seguridad</h2>
         <p class="muted">Actualiza tu contraseña cuando lo necesites.</p>
-        <a class="boton" href="{{ url_for('passwords.cambiar_password') }}">Cambiar contraseña</a>
+        <a class="boton cuenta-action-button" href="{{ url_for('passwords.cambiar_password') }}">Cambiar contraseña</a>
     </section>
 
     {% if puede_configurar %}
     <section class="cuenta-section" aria-labelledby="cuenta-admin-title">
         <h2 id="cuenta-admin-title">Configuración institucional</h2>
         <p class="muted">Administra periodos, sedes y catálogos según tus permisos.</p>
-        <a class="boton secundario" href="{{ url_for('configuracion.index') }}">Abrir configuración</a>
+        <a class="boton cuenta-action-button" href="{{ url_for('configuracion.index') }}">Abrir configuración</a>
     </section>
     {% endif %}
 
     <section class="cuenta-section" aria-labelledby="cuenta-institucion-title">
         <h2 id="cuenta-institucion-title">Información institucional</h2>
         <p class="muted">Consulta los datos y ubicaciones de las sedes.</p>
-        <a class="boton secundario" href="{{ url_for('institucion') }}">Ver institución y sedes</a>
+        <a class="boton cuenta-action-button" href="{{ url_for('institucion') }}">Ver institución y sedes</a>
     </section>
 
     <section class="cuenta-section" aria-labelledby="cuenta-calendario-title">
         <h2 id="cuenta-calendario-title">Calendarios conectados</h2>
         <p class="muted">Conecta tu Google Calendar personal o revisa la agenda institucional.</p>
-        <a class="boton secundario" href="{{ url_for('integraciones_google.index') }}">Administrar calendarios</a>
+        <a class="boton cuenta-action-button" href="{{ url_for('integraciones_google.index') }}">Administrar calendarios</a>
     </section>
 </section>
 <style>
 .cuenta-page{width:100%;max-width:1100px;margin:0 auto;padding:24px;border:1px solid #dce4eb;border-radius:8px;background:#fff;box-sizing:border-box;}
-.cuenta-page .page-head{margin-bottom:22px;}
+.cuenta-page .page-head{display:flex;align-items:center;justify-content:flex-start;gap:12px;margin-bottom:22px;}
 .cuenta-page .page-head h1{margin:8px 0;color:#172942;font-size:28px;}
-.cuenta-page .page-head .link-back{display:inline-flex;margin-bottom:8px;}
 .cuenta-section{padding:18px 0;margin:0;border:0;border-bottom:1px solid #e5ebf2;background:transparent;}
 .cuenta-section:last-child{border-bottom:0;}
 .cuenta-section h2{margin:0 0 12px;color:#172942;font-size:18px;}
@@ -66,7 +64,51 @@
 .cuenta-section dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;margin:0;}
 .cuenta-section dt{color:#66788a;font-size:12px;font-weight:700;}
 .cuenta-section dd{margin:4px 0 0;color:#20354a;overflow-wrap:anywhere;}
-@media(max-width:900px){.cuenta-page .page-head .link-back{display:none!important;}}
-@media(max-width:600px){.cuenta-page{padding-top:8px}.cuenta-section dl{grid-template-columns:1fr;gap:10px;}}
+html body #contenido .cuenta-page .cuenta-section:has(>a.cuenta-action-button)>a.cuenta-action-button,
+html body.has-desktop-sidebar #contenido .cuenta-page .cuenta-section:has(>a.cuenta-action-button)>a.cuenta-action-button{
+    display:flex!important;
+    justify-self:stretch!important;
+    align-self:end!important;
+    width:100%!important;
+    max-width:560px!important;
+    min-width:0!important;
+    height:64px!important;
+    min-height:64px!important;
+    max-height:64px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    margin:4px 0 0!important;
+    padding:14px 20px!important;
+    border:1px solid #2f78ff!important;
+    border-radius:12px!important;
+    background:#2f78ff!important;
+    color:#fff!important;
+    font-size:16px!important;
+    font-weight:700!important;
+    line-height:1.25!important;
+    text-align:center!important;
+    text-decoration:none!important;
+    box-shadow:0 6px 14px rgba(47,120,255,.2)!important;
+    transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease,transform .15s ease!important;
+}
+html body #contenido .cuenta-page .cuenta-section:has(>a.cuenta-action-button)>a.cuenta-action-button:hover,
+html body.has-desktop-sidebar #contenido .cuenta-page .cuenta-section:has(>a.cuenta-action-button)>a.cuenta-action-button:hover{
+    background:#123b68!important;
+    border-color:#123b68!important;
+    box-shadow:0 9px 18px rgba(18,59,104,.2)!important;
+    transform:translateY(-1px)!important;
+}
+html body #contenido .cuenta-page .cuenta-section>a.cuenta-action-button:focus-visible{
+    outline:3px solid rgba(47,120,255,.35)!important;
+    outline-offset:3px!important;
+}
+@media(max-width:720px){
+    .cuenta-page{padding-top:8px}
+    html body #contenido .cuenta-page>.page-head{justify-content:flex-start!important;align-items:center!important;gap:8px!important;margin:0 0 12px!important}
+    html body #contenido .cuenta-page>.page-head>div{flex:1;min-width:0;padding-left:0;box-sizing:border-box}
+    .cuenta-page .page-head h1{margin:0}
+    .cuenta-section dl{grid-template-columns:1fr;gap:10px;}
+}
 </style>
 {% endblock %}

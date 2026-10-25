@@ -17,6 +17,7 @@
     margin: 0 auto;
     padding: 10px 10px 22px;
     font-family: inherit;
+}
 
 .edc-page *,
 .edc-page *::before,
@@ -119,7 +120,6 @@
 
 
 /* ==========================================================
-   BOTÓN ← ATRÁS
    Mismo estilo de Citas
    ========================================================== */
 
@@ -409,6 +409,42 @@
     background: #145b91 !important;
     border-color: #145b91 !important;
     color: #ffffff !important;
+}
+
+@media (max-width: 900px) {
+    html body.has-desktop-sidebar #contenido .edc-page .edc-buttons {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        width: 100% !important;
+        height: auto !important;
+        gap: 8px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .edc-page .edc-buttons > button,
+    html body.has-desktop-sidebar #contenido .edc-page .edc-buttons > a {
+        display: inline-flex !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        max-height: 36px !important;
+        box-sizing: border-box !important;
+        padding: 6px 12px !important;
+        border: 1px solid #1769aa !important;
+        background: #1769aa !important;
+        color: #ffffff !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .edc-page .edc-buttons > button:hover,
+    html body.has-desktop-sidebar #contenido .edc-page .edc-buttons > a:hover {
+        border-color: #145b91 !important;
+        background: #145b91 !important;
+        color: #ffffff !important;
+    }
 }
 
 
@@ -873,30 +909,6 @@
         </div>
 
 
-        <div class="edc-header-actions" style="
-            display:flex !important;
-            flex-direction:row !important;
-            align-items:center !important;
-            justify-content:flex-end !important;
-            gap:8px !important;
-            flex:0 0 auto !important;
-            flex-wrap:nowrap !important;
-            width:auto !important;
-            margin:0 !important;
-            padding:0 !important;
-            box-sizing:border-box !important;
-            ">
-
-            <!-- MISMA ESTRUCTURA DE REGRESO QUE CITAS -->
-
-            <a
-                class="edc-back eduturnos-atras"
-                href="{{ url_for('auth.dashboard') }}"
-            >← Atrás</a>
-
-
-        </div>
-
     </header>
 
 
@@ -1001,14 +1013,12 @@
                     name="sede_id"
                 >
 
-                    <!-- ESPACIO EN BLANCO INICIAL -->
-
                     <option
                         value=""
                         {% if not request.args.get('sede_id') %}
                             selected
                         {% endif %}
-                    ></option>
+                    >Todas las sedes</option>
 
 
                     <!-- ORDEN IGUAL A INICIO DE SESIÓN -->
@@ -1096,14 +1106,12 @@
                     name="jornada_id"
                 >
 
-                    <!-- ESPACIO EN BLANCO -->
-
                     <option
                         value=""
                         {% if not request.args.get('jornada_id') %}
                             selected
                         {% endif %}
-                    ></option>
+                    >Todas las jornadas</option>
 
                     <option
                         value="1"
@@ -1152,14 +1160,12 @@
                     name="docente_id"
                 >
 
-                    <!-- ESPACIO EN BLANCO -->
-
                     <option
                         value=""
                         {% if not request.args.get('docente_id') %}
                             selected
                         {% endif %}
-                    ></option>
+                    >Todos los docentes</option>
 
 
                     {% for docente in docentes %}
@@ -1221,14 +1227,12 @@
                     name="estado"
                 >
 
-                    <!-- ESPACIO EN BLANCO -->
-
                     <option
                         value=""
                         {% if not request.args.get('estado') %}
                             selected
                         {% endif %}
-                    ></option>
+                    >Todos los estados</option>
 
                     <option
                         value="Pendiente"
@@ -1711,7 +1715,6 @@
 
 /* ==========================================================
    PARTE SUPERIOR DEL CALENDARIO
-   Atrás + Ver citas + Nueva cita
    TODOS EN LA MISMA LÍNEA
    ========================================================== */
 
@@ -2354,41 +2357,6 @@
     .eduturnos-barra-real .eduturnos-titulo-mes .edc-month-title{min-width:0 !important;font-size:16px !important;}
     .eduturnos-flecha a{width:28px !important;height:28px !important;}
     .eduturnos-barra-real > .eduturnos-hoy{padding:6px 8px !important;min-height:30px !important;font-size:11px !important;}
-}
-
-</style>
-<style id="eduturnos-barra-mes-correccion-final">
-
-.eduturnos-barra-mes-correccion-final {
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin-bottom: 12px !important;
-}
-
-.eduturnos-mes-navegacion {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 14px !important;
-    width: 100% !important;
-}
-
-.eduturnos-mes-actual {
-    font-weight: 600 !important;
-}
-
-.eduturnos-hoy {
-    align-self: flex-end !important;
-    margin-top: 8px !important;
-    margin-right: 2px !important;
-}
-
-.eduturnos-hoy a {
-    font-size: 13px !important;
-    padding: 5px 10px !important;
 }
 
 </style>

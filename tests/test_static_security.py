@@ -1,3 +1,6 @@
+import base64
+import hashlib
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,7 +40,12 @@ def test_beepy_script_solo_en_inicio_del_dominio_registrado():
     from app import app
 
     client = app.test_client()
-    for ruta, dominio, permitido in (('/', 'seventy-excavator-designate.ngrok-free.dev', True), ('/', '192.168.18.24:5000', False), ('/auth/login', 'seventy-excavator-designate.ngrok-free.dev', False)):
+    for ruta, dominio, permitido in (
+        ('/', 'seventy-excavator-designate.ngrok-free.dev', True),
+        ('/', 'eduturnos-jjfh.alwaysdata.net', True),
+        ('/', '192.168.18.24:5000', False),
+        ('/auth/login', 'seventy-excavator-designate.ngrok-free.dev', False),
+    ):
         response = client.get(ruta, base_url='https://' + dominio)
         assert response.status_code == 200
         assert ('js/beepy.js' in response.get_data(as_text=True)) == permitido
@@ -47,36 +55,37 @@ def test_beepy_script_solo_en_inicio_del_dominio_registrado():
         assert "'unsafe-inline'" not in script_rule
 
 
-def test_beepy_redirige_a_proveedor_sin_datos_del_usuario(monkeypatch):
-    import json
+def test_csp_allows_only_hashed_base_inline_scripts():
     from app import app
-    from routes import asistente, helpers
+
+    base = (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
+    inline_scripts = re.findall(
+        r"<script\b(?![^>]*\bsrc=)[^>]*>(.*?)</script>",
+        base,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    response = app.test_client().get("/auth/registro")
+    script_rule = next(
+        rule
+        for rule in response.headers["Content-Security-Policy"].split(";")
+        if rule.strip().startswith("script-src")
+    )
+
+    assert len(inline_scripts) == 2
+    assert "'unsafe-inline'" not in script_rule
+    for script in inline_scripts:
+        digest = base64.b64encode(hashlib.sha256(script.encode()).digest()).decode()
+        assert f"'sha256-{digest}'" in script_rule
+
+
+def test_beepy_redirige_a_proveedor_sin_datos_del_usuario(monkeypatch):
+    from app import app
+    from routes import helpers
 
     monkeypatch.setattr(helpers, 'usuario_actual', lambda: {'id_usuario': 17, 'rol_nombre': 'Estudiante'})
-    calls = []
-
-    class ConfiguracionPublica:
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *args):
-            return False
-
-        def read(self, limit):
-            return json.dumps({'ifrurl': 'https://www.beepychatbot.com/visitor/events/contact/chat/server/contact.chat.load.php?cid=27952&vid=visitor-test'}).encode()
-
-    def consultar_publica(request, timeout):
-        calls.append(request)
-        return ConfiguracionPublica()
-
-    monkeypatch.setattr(asistente, 'urlopen', consultar_publica)
     response = app.test_client().get('/asistente/beepy')
     assert response.status_code == 302
-    assert response.location.startswith('https://www.beepychatbot.com/')
     assert response.headers['Cache-Control'] == 'no-store'
-    assert not calls
-    from urllib.parse import parse_qs, urlsplit
-
     assert response.location == 'https://www.beepychatbot.com/u/1nLBFlV/'
     public_response = app.test_client().get('/asistente/beepy', base_url='https://seventy-excavator-designate.ngrok-free.dev')
     assert public_response.location == response.location
@@ -84,22 +93,10 @@ def test_beepy_redirige_a_proveedor_sin_datos_del_usuario(monkeypatch):
 
 def test_beepy_rechaza_redireccion_a_otro_dominio(monkeypatch):
     from app import app
-    from routes import asistente, helpers
+    from routes import helpers
 
     monkeypatch.setattr(helpers, 'usuario_actual', lambda: {'id_usuario': 17, 'rol_nombre': 'Acudiente'})
     monkeypatch.setitem(app.config, 'BEEPY_CHAT_URL', 'https://example.com/chat')
-
-    class ConfiguracionInvalida:
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *args):
-            return False
-
-        def read(self, limit):
-            return b'{"ifrurl":"https://example.com/chat"}'
-
-    monkeypatch.setattr(asistente, 'urlopen', lambda *args, **kwargs: ConfiguracionInvalida())
     response = app.test_client().get('/asistente/beepy')
     assert response.status_code == 503
     assert 'Location' not in response.headers
@@ -111,3 +108,19 @@ def test_beepy_ayuda_requiere_sesion():
     response = app.test_client().get('/asistente/beepy')
     assert response.status_code == 302
     assert '/auth/login' in response.location
+
+
+def test_edubot_no_depende_de_una_csp_de_proveedor_externo():
+    from app import app
+
+    client = app.test_client()
+    public_response = client.get("/")
+    assert "dashboard-help-chat" not in public_response.get_data(as_text=True)
+    public_policy = public_response.headers["Content-Security-Policy"]
+    assert "https://cdn.botpress.cloud" not in public_policy.split("frame-src", 1)[1].split(";", 1)[0]
+
+    with client.session_transaction() as session:
+        session["usuario_id"] = 17
+    private_response = client.get("/health/live")
+    private_policy = private_response.headers["Content-Security-Policy"]
+    assert "https://cdn.botpress.cloud" not in private_policy.split("frame-src", 1)[1].split(";", 1)[0]

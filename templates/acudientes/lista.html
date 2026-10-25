@@ -1,5 +1,13 @@
-{% extends 'base.html' %}{% block content %}<div class="page-head"><h1>Acudientes</h1><a class="boton" href="{{ url_for('acudientes.nuevo') }}">+ Nuevo</a></div><div class="table-wrap"><table><tr><th>Nombre</th><th>Documento</th><th>Correo</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr>{% for a in acudientes %}<tr><td>{{ a.nombres }} {{ a.apellidos }}</td><td>{{ a.documento }}</td><td>{{ a.correo or '-' }}</td><td>{{ a.telefono or '-' }}</td><td>{{ 'Activo' if a.estado else 'Inactivo' }}</td><td class="table-actions-cell"><a href="{{ url_for('acudientes.editar',id=a.id_acudiente) }}">Editar</a></td></tr>{% else %}<tr><td colspan="6">No hay acudientes.</td></tr>{% endfor %}</table></div>
-
-
-
+{% extends 'base.html' %}{% block content %}
+<section class="directory-page">
+<div class="page-head"><h1>Acudientes</h1></div>
+<form method="get" role="search" class="directory-search">
+    <label class="visually-hidden" for="acudientes-query">Buscar acudientes</label>
+    <input id="acudientes-query" type="search" name="q" value="{{ q }}" placeholder="Palabras clave">
+    <button class="boton secundario" type="submit" aria-label="Buscar" title="Buscar"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"></circle><path d="m15.5 15.5 4.2 4.2"></path></svg></button>
+    <a class="directory-search-all" href="{{ url_for('acudientes.lista') }}" aria-label="Mostrar todos los acudientes" title="Mostrar todos"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.9-4L3 10"></path><path d="M3 5v5h5M4 13a8 8 0 0 0 14.9 4L21 14"></path><path d="M21 19v-5h-5"></path></svg></a>
+    <a class="boton pequeno directory-new" href="{{ url_for('acudientes.nuevo') }}">Nuevo</a>
+</form>
+<div class="table-wrap"><table class="directory-table"><thead><tr><th scope="col">Nombre</th><th scope="col">Documento</th><th scope="col">Correo</th><th scope="col">Teléfono</th><th scope="col">Estudiantes</th><th scope="col">Grado / Grupo</th><th scope="col">Sede</th><th scope="col">Jornada</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead><tbody>{% for a in acudientes %}<tr><td data-label="Nombre">{{ a.nombres }} {{ a.apellidos }}</td><td data-label="Documento">{{ a.documento }}</td><td data-label="Correo">{{ a.correo or '-' }}</td><td data-label="Teléfono">{{ a.telefono or '-' }}</td><td data-label="Estudiantes">{{ a.estudiantes or 'Sin estudiantes asociados' }}</td><td data-label="Grado / Grupo">{{ a.grados_grupos or 'Sin grado/grupo asignado' }}</td><td data-label="Sede">{{ a.sedes or '-' }}</td><td data-label="Jornada">{{ a.jornadas or '-' }}</td><td data-label="Estado">{{ 'Activo' if a.estado else 'Inactivo' }}</td><td class="table-actions-cell" data-label="Acciones"><a href="{{ url_for('acudientes.editar',id=a.id_acudiente) }}">Editar</a></td></tr>{% else %}<tr class="directory-empty-row"><td colspan="10">No hay resultados.</td></tr>{% endfor %}</tbody></table></div>
+</section>
 {% endblock %}

@@ -1,21 +1,94 @@
-{% extends 'base.html' %}{% block content %}
-<a class="boton secundario desktop-back-link" href="{{ url_for('estudiantes.lista') }}" aria-label="Volver a estudiantes">← Volver</a>
-<h1>{{ 'Editar' if estudiante else 'Nuevo' }} estudiante</h1><form method="post" class="panel form-grid">{{ csrf_field()|safe }}{% if estudiante %}<input type="hidden" name="periodo" value="{{ estudiante.id_periodo }}">{% elif catalogos.periodos %}<input type="hidden" name="periodo" value="{{ catalogos.periodos[0].id }}">{% endif %}
-<label>Código estudiantil<input name="codigo" value="{{ estudiante.codigo_estudiantil if estudiante else '' }}" required></label><label>Tipo documento<select name="tipo_documento">
-<option value="" selected disabled hidden></option>
-<option value="CC" {% if not estudiante or estudiante.tipo_documento=='CC' %}selected{% endif %}>Cédula de ciudadanía</option><option value="TI" {% if estudiante and estudiante.tipo_documento=='TI' %}selected{% endif %}>Tarjeta de identidad</option><option value="CE" {% if estudiante and estudiante.tipo_documento=='CE' %}selected{% endif %}>Cédula de extranjería</option></select></label><label>Documento<input name="documento" value="{{ estudiante.documento if estudiante else '' }}" required></label><label>Nombres<input name="nombres" value="{{ estudiante.nombres if estudiante else '' }}" required></label><label>Apellidos<input name="apellidos" value="{{ estudiante.apellidos if estudiante else '' }}" required></label><label>Curso<input name="curso" value="{{ estudiante.curso if estudiante else '' }}" placeholder="Ej. 11A"></label>
-<label>Sede<select name="sede" required>
-<option value="" selected disabled hidden></option>
-{% for s in catalogos.sedes %}<option value="{{ s.id }}" {% if estudiante and estudiante.id_sede==s.id %}selected{% endif %}>{{ s.nombre }}</option>{% endfor %}</select></label><label>Jornada<select name="jornada" required>
-<option value="" selected disabled hidden></option>
-{% for j in catalogos.jornadas %}<option value="{{ j.id }}" {% if estudiante and estudiante.id_jornada==j.id %}selected{% endif %}>{{ j.nombre }}</option>{% endfor %}</select></label><label>Grado<select name="grado">
-<option value="" selected disabled hidden></option>
-{% for g in catalogos.grados %}<option value="{{ g.id }}" {% if estudiante and estudiante.id_grado==g.id %}selected{% endif %}>{{ g.nombre }}</option>{% endfor %}</select></label><label>Grupo<select name="grupo">
-<option value="" selected disabled hidden></option>
-{% for g in catalogos.grupos %}<option value="{{ g.id }}" {% if estudiante and estudiante.id_grupo==g.id %}selected{% endif %}>{{ g.grado }} - {{ g.nombre }}</option>{% endfor %}</select></label>{% if estudiante %}<label>Estado<select name="estado">
-<option value="" selected disabled hidden></option>
-<option>Activo</option><option {% if estudiante.estado=='Retirado' %}selected{% endif %}>Retirado</option></select></label>{% endif %}<div class="full-field"><button class="boton">Guardar</button> <a class="boton secundario" href="{{ url_for('estudiantes.lista') }}">Cancelar</a></div></form>
+{% extends 'base.html' %}
 
+{% block title %}{{ 'Editar' if estudiante else 'Nuevo' }} estudiante · EDUTURNOS{% endblock %}
 
+{% block content %}
+{% set datos = datos or {} %}
+{% set selected_grade = datos.get('grado', estudiante.id_grado if estudiante else '') %}
+{% set selected_group = datos.get('grupo', estudiante.id_grupo if estudiante else '') %}
+{% set selected_period = datos.get('periodo', estudiante.id_periodo if estudiante else (catalogos.periodos[0].id if catalogos.periodos else '')) %}
 
+<h1>{{ 'Editar' if estudiante else 'Nuevo' }} estudiante</h1>
+
+<form method="post" class="panel form-grid student-form" id="student-form">
+    {{ csrf_field()|safe }}
+    <input type="hidden" name="periodo" value="{{ selected_period }}">
+
+    {% if estudiante %}
+    <label for="codigo">Código institucional
+        <input id="codigo" value="{{ estudiante.codigo_estudiantil }}" readonly>
+    </label>
+    {% else %}
+    <label for="codigo">Código institucional
+        <input id="codigo" value="" placeholder="EST_" readonly>
+    </label>
+    {% endif %}
+    <label for="tipo_documento">Tipo de documento
+        <select id="tipo_documento" name="tipo_documento" required>
+            <option value="" disabled {% if not datos.get('tipo_documento') and not estudiante %}selected{% endif %}>Selecciona un tipo</option>
+            <option value="CC" {% if datos.get('tipo_documento', estudiante.tipo_documento if estudiante else '') == 'CC' %}selected{% endif %}>Cédula de ciudadanía</option>
+            <option value="TI" {% if datos.get('tipo_documento', estudiante.tipo_documento if estudiante else '') == 'TI' %}selected{% endif %}>Tarjeta de identidad</option>
+            <option value="CE" {% if datos.get('tipo_documento', estudiante.tipo_documento if estudiante else '') == 'CE' %}selected{% endif %}>Cédula de extranjería</option>
+            <option value="RC" {% if datos.get('tipo_documento', estudiante.tipo_documento if estudiante else '') == 'RC' %}selected{% endif %}>Registro civil</option>
+        </select>
+    </label>
+    <label for="documento">Documento
+        <input id="documento" name="documento" value="{{ datos.get('documento', estudiante.documento if estudiante else '') }}" inputmode="numeric" pattern="[0-9]{1,30}" maxlength="30" data-digits-only required>
+    </label>
+    <label for="nombres">Nombres
+        <input id="nombres" name="nombres" value="{{ datos.get('nombres', estudiante.nombres if estudiante else '') }}" pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü ]+" title="Usa solo letras y espacios." data-letters-only required>
+    </label>
+    <label for="apellidos">Apellidos
+        <input id="apellidos" name="apellidos" value="{{ datos.get('apellidos', estudiante.apellidos if estudiante else '') }}" pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü ]+" title="Usa solo letras y espacios." data-letters-only required>
+    </label>
+    <label for="sede">Sede
+        <select id="sede" name="sede" required>
+            <option value="" disabled {% if not datos.get('sede') and not estudiante %}selected{% endif %}>Selecciona una sede</option>
+            {% for sede in catalogos.sedes %}
+            <option value="{{ sede.id }}" {% if datos.get('sede', estudiante.id_sede if estudiante else '')|string == sede.id|string %}selected{% endif %}>{{ sede.nombre }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label for="jornada">Jornada
+        <select id="jornada" name="jornada" required>
+            <option value="" disabled {% if not datos.get('jornada') and not estudiante %}selected{% endif %}>Selecciona una jornada</option>
+            {% for jornada in catalogos.jornadas %}
+            <option value="{{ jornada.id }}" {% if datos.get('jornada', estudiante.id_jornada if estudiante else '')|string == jornada.id|string %}selected{% endif %}>{{ jornada.nombre }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label for="grado">Grado
+        <select id="grado" name="grado">
+            <option value="">Selecciona un grado</option>
+            {% for grado in catalogos.grados %}
+            <option value="{{ grado.id }}" {% if selected_grade|string == grado.id|string %}selected{% endif %}>{{ grado.nombre }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label for="grupo">Grupo
+        <select id="grupo" name="grupo" data-selected-group="{{ selected_group }}">
+            <option value="">Selecciona un grupo</option>
+            {% for grupo in catalogos.grupos %}
+                {% if grupo.nombre in ('1', '2', '3', '4', '5', '6') %}
+                <option value="{{ grupo.id }}" data-grade="{{ grupo.id_grado }}" data-group-number="{{ grupo.nombre }}" {% if selected_group|string == grupo.id|string %}selected{% endif %}>{{ grupo.nombre }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <small>Selecciona primero el grado; luego elige un grupo del 1 al 6.</small>
+    </label>
+    {% if estudiante %}
+    <label for="estado">Estado
+        <select id="estado" name="estado">
+            <option value="Activo" {% if datos.get('estado', estudiante.estado) == 'Activo' %}selected{% endif %}>Activo</option>
+            <option value="Retirado" {% if datos.get('estado', estudiante.estado) == 'Retirado' %}selected{% endif %}>Retirado</option>
+        </select>
+    </label>
+    {% endif %}
+    <div class="full-field student-form-actions">
+        <button class="boton" type="submit">Guardar</button>
+        <a class="boton secundario" href="{{ url_for('estudiantes.lista') }}">Cancelar</a>
+    </div>
+</form>
+
+<script src="{{ url_for('static', filename='js/estudiantes.js') }}?v=20261020_student_form_v1" defer></script>
 {% endblock %}

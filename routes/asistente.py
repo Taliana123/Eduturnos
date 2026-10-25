@@ -1,26 +1,23 @@
 from __future__ import annotations
 
-import json
 import re
 import time
-from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
 from urllib.parse import urlsplit, urlunsplit
 
 from flask import Blueprint, current_app, jsonify, request, session, redirect, Response
 
 from routes.helpers import login_requerido, usuario_actual
+from servicios.asistente import generar_respuesta
 
 asistente_bp = Blueprint("asistente", __name__, url_prefix="/asistente")
-ROLES_PERMITIDOS = {"Super Admin", "Rector", "Administrador / Coordinador", "Docente"}
-INSTRUCCION = (
-    "Eres el asistente de ayuda general de EDUTURNOS, una plataforma escolar colombiana. "
-    "Responde en español, de forma clara, breve y respetuosa, sobre el uso general del sistema, "
-    "calendario, citaciones, cuentas y buenas prácticas. No tienes acceso a cuentas, citas, "
-    "estudiantes ni expedientes; no solicites ni infieras datos personales. Si preguntan por un "
-    "caso particular, indica que consulten EDUTURNOS o coordinación por el canal autorizado. "
-    "No inventes políticas ni datos institucionales no incluidos en la pregunta."
-)
+ROLES_PERMITIDOS = {
+    "Super Admin",
+    "Rector",
+    "Administrador / Coordinador",
+    "Docente",
+    "Estudiante",
+    "Acudiente",
+}
 
 
 @asistente_bp.get("/beepy")
@@ -34,36 +31,6 @@ def abrir_beepy():
     result = redirect(urlunsplit((destination.scheme, destination.netloc, destination.path, "", "")))
     result.headers["Cache-Control"] = "no-store"
     return result
-
-
-def _respuesta_gemini(pregunta: str) -> str:
-    api_key = current_app.config.get("GEMINI_API_KEY", "")
-    modelo = current_app.config.get("GEMINI_MODEL", "gemini-3.8-flash")
-    if not api_key:
-        raise RuntimeError("El asistente aún no está configurado en el servidor.")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{modelo}:generateContent"
-    payload = {
-        "system_instruction": {"parts": [{"text": INSTRUCCION}]},
-        "contents": [{"role": "user", "parts": [{"text": pregunta}]}],
-        "generationConfig": {"temperature": 0.3, "maxOutputTokens": 400},
-    }
-    req = Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json", "x-goog-api-key": api_key},
-    )
-    try:
-        with urlopen(req, timeout=15) as response:
-            result = json.loads(response.read().decode("utf-8"))
-    except HTTPError as exc:
-        current_app.logger.warning("Gemini respondió HTTP %s", exc.code)
-        raise RuntimeError("El asistente no está disponible en este momento.") from exc
-    except (URLError, TimeoutError, json.JSONDecodeError) as exc:
-        raise RuntimeError("No se pudo conectar con el asistente.") from exc
-    try:
-        return result["candidates"][0]["content"]["parts"][0]["text"].strip()
-    except (KeyError, IndexError, TypeError) as exc:
-        raise RuntimeError("El asistente no devolvió una respuesta utilizable.") from exc
 
 
 @asistente_bp.post("/preguntar")
@@ -88,7 +55,10 @@ def preguntar():
     peticiones.append(ahora)
     session["assistant_requests"] = peticiones
     try:
-        respuesta = _respuesta_gemini(pregunta)
+        respuesta = generar_respuesta(pregunta, rol=usuario["rol_nombre"])
+    except ValueError as exc:
+        return jsonify(error=str(exc)), 400
     except RuntimeError as exc:
+        current_app.logger.warning("No se pudo generar la respuesta de EDUBOT: %s", exc)
         return jsonify(error=str(exc)), 503
     return jsonify(respuesta=respuesta)

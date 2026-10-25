@@ -2,7 +2,36 @@
 # ROLES Y VALIDACIONES DE EDUTURNOS
 # ============================================================
 
+import re
+
+DOMINIO_GMAIL = "@gmail.com"
 DOMINIO_INSTITUCIONAL = "@jjfh.edu.co"
+
+
+# ============================================================
+# VALIDAR NOMBRES / APELLIDOS (solo letras, espacios y tildes)
+# ============================================================
+
+_NOMBRE_REGEX = re.compile(r"^[A-Za-zÁÉÍÓÚÑÜáéíóúñü ]+$")
+
+
+def es_nombre_valido(texto: str) -> bool:
+    texto = (texto or "").strip()
+    return bool(texto) and bool(_NOMBRE_REGEX.fullmatch(texto))
+
+
+# ============================================================
+# VALIDAR CAMPOS NUMÉRICOS (documento, teléfono, código, etc.)
+# ============================================================
+
+def es_solo_digitos(texto: str) -> bool:
+    texto = (texto or "").strip()
+    return bool(texto) and texto.isdigit()
+
+
+def es_documento_valido(texto: str) -> bool:
+    texto = (texto or "").strip()
+    return texto.isascii() and texto.isdigit() and len(texto) <= 30
 
 
 # ============================================================
@@ -125,13 +154,39 @@ SEDES_INSTITUCIONALES = [
 # ============================================================
 
 def es_correo_institucional(correo: str) -> bool:
+    return es_correo_de_dominio(correo, DOMINIO_INSTITUCIONAL)
+
+
+def es_correo_gmail(correo: str) -> bool:
+    return es_correo_de_dominio(correo, DOMINIO_GMAIL)
+
+
+def es_correo_de_dominio(correo: str, dominio: str) -> bool:
     correo = (correo or "").strip().lower()
+    dominio = (dominio or "").strip().lower()
+    if not dominio.startswith("@"):
+        dominio = f"@{dominio}"
 
     return (
         correo.count("@") == 1
-        and correo.endswith(DOMINIO_INSTITUCIONAL)
-        and len(correo) > len(DOMINIO_INSTITUCIONAL)
+        and len(correo) > len(dominio)
+        and correo.endswith(dominio)
+        and not any(caracter.isspace() for caracter in correo)
     )
+
+
+def dominio_correo_para_rol(rol: str) -> str | None:
+    rol = (rol or "").strip().casefold()
+    if rol in {"estudiante", "acudiente"}:
+        return DOMINIO_GMAIL
+    if rol in {"docente", "rector", "administrador / coordinador"}:
+        return DOMINIO_INSTITUCIONAL
+    return None
+
+
+def es_correo_valido_para_rol(rol: str, correo: str) -> bool:
+    dominio = dominio_correo_para_rol(rol)
+    return dominio is None or es_correo_de_dominio(correo, dominio)
 
 
 # ============================================================

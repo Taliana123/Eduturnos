@@ -41,6 +41,19 @@ def test_migracion_escolar_no_elimina_datos():
         assert f"CREATE TABLE IF NOT EXISTS {nombre}" in sql
 
 
+def test_migracion_google_calendar_crea_cola_durable_sin_borrar_datos():
+    sql = (Path(__file__).resolve().parents[1] / "sql" / "google_calendar_sync.sql").read_text(encoding="utf-8")
+    assert "CREATE TABLE IF NOT EXISTS google_calendar_sync_queue" in sql
+    assert "UNIQUE KEY uq_google_queue_cita_scope (id_cita, scope_key)" in sql
+    assert "intentos SMALLINT UNSIGNED NOT NULL DEFAULT 0" in sql
+    assert "ultimo_intento DATETIME NULL" in sql
+    assert "proximo_intento DATETIME NULL" in sql
+    assert "lease_until DATETIME NULL" in sql
+    assert "ALTER TABLE eventos_google" in sql
+    assert "DROP " not in sql
+    assert "DELETE FROM " not in sql
+
+
 def test_google_calendar_tokens_cifrados_y_configuracion_https():
     from servicios.google_calendar import cifrar_token, configuracion_lista, descifrar_token
 
@@ -59,7 +72,7 @@ def test_google_calendar_tokens_cifrados_y_configuracion_https():
             app.config.update(valores)
 
 
-def test_reserva_guarda_local_antes_de_intentar_google(monkeypatch):
+def test_reserva_persiste_la_tarea_de_google_en_la_transaccion_local(monkeypatch):
     eventos = []
 
     class CursorPrueba:
@@ -82,22 +95,138 @@ def test_reserva_guarda_local_antes_de_intentar_google(monkeypatch):
         yield ConexionPrueba()
         eventos.append("commit")
 
-    def sincronizar(cita_id, creador_id):
-        eventos.append(("google", cita_id, creador_id))
-        raise RuntimeError("Google temporalmente no disponible")
+    from servicios import google_calendar
 
     monkeypatch.setattr(reuniones, "transaccion", transaccion_prueba)
     monkeypatch.setattr(reuniones, "validar_disponibilidad", lambda *args: None)
     monkeypatch.setattr(reuniones, "bloquear_agenda", lambda *args: None)
     monkeypatch.setattr(reuniones, "comprobar_hueco", lambda *args, **kwargs: None)
-    monkeypatch.setattr("servicios.google_calendar.sincronizar_cita", sincronizar)
+    monkeypatch.setattr(
+        google_calendar,
+        "encolar_cita_cursor",
+        lambda cursor, cita_id, creador_id: eventos.append(("outbox", cita_id, creador_id)),
+    )
     parametros = (2, 3, 1, 4, 5, 6, date.today() + timedelta(days=1), time(7), "", "", 77)
 
     with app.app_context():
         cita_id = reuniones.reservar_cita("INSERT INTO citas VALUES (...) ", parametros)
 
     assert cita_id == 321
-    assert eventos == ["insert", "commit", ("google", 321, 77)]
+    assert eventos == ["insert", ("outbox", 321, 77), "commit"]
+
+
+def test_fallo_temporal_de_google_se_programa_para_reintento(monkeypatch):
+    from servicios import google_calendar
+
+    tarea = {
+        "id": 9,
+        "id_cita": 321,
+        "scope_key": "institucional",
+        "intentos": 2,
+        "claim_token": "lease-de-prueba",
+    }
+    escrituras = []
+    tareas = iter((tarea, None))
+
+    def fallar(_tarea):
+        raise google_calendar.GoogleCalendarError("Google no disponible", 503)
+
+    monkeypatch.setattr(google_calendar, "_tomar_tarea_google", lambda: next(tareas))
+    monkeypatch.setattr(google_calendar, "_procesar_tarea_google", fallar)
+    monkeypatch.setattr(
+        google_calendar,
+        "ejecutar",
+        lambda sql, params=(): escrituras.append((sql, params)),
+    )
+
+    with app.app_context():
+        resultado = google_calendar.procesar_cola_google(limite=1)
+
+    assert resultado == {"procesadas": 1, "sincronizadas": 0, "fallidas": 1}
+    assert escrituras[0][1][0] == "Reintentar"
+    assert "DATE_ADD(NOW(),INTERVAL 4 MINUTE)" in escrituras[0][0]
+    assert escrituras[0][1][1] == "Google no disponible"
+
+
+def test_identificador_de_evento_google_es_determinista_y_admitido_por_google():
+    from servicios.google_calendar import _event_id
+
+    first = _event_id(321, "institucional")
+    assert first == _event_id(321, "institucional")
+    assert first.startswith("eduturnos")
+    assert all(character in "0123456789abcdefghijklmnopqrstuvwxyz" for character in first)
+
+
+def test_actualizacion_google_no_incluye_id_en_el_payload(monkeypatch):
+    from servicios import google_calendar
+
+    solicitudes = []
+
+    class Respuesta:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return b"{}"
+
+    monkeypatch.setattr(
+        google_calendar,
+        "urlopen",
+        lambda solicitud, timeout: solicitudes.append((solicitud, timeout)) or Respuesta(),
+    )
+
+    with app.app_context():
+        google_calendar._actualizar_evento_google(
+            "https://calendar.google.test/evento",
+            {"id": "evento-existente", "summary": "Citación escolar"},
+            "token-prueba",
+        )
+
+    assert solicitudes[0][0].get_method() == "PATCH"
+    assert json.loads(solicitudes[0][0].data) == {"summary": "Citación escolar"}
+
+
+def test_solicitud_google_envia_token_bearer(monkeypatch):
+    from servicios import google_calendar
+
+    class Respuesta:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return b"{}"
+
+    solicitudes = []
+    monkeypatch.setattr(
+        google_calendar,
+        "urlopen",
+        lambda solicitud, timeout: solicitudes.append(solicitud) or Respuesta(),
+    )
+
+    google_calendar._solicitud_json(
+        "https://calendar.google.test/events",
+        {},
+        "token-de-prueba",
+    )
+
+    assert solicitudes[0].get_header("Authorization") == "Bearer token-de-prueba"
+
+
+def test_error_google_muestra_solo_mensajes_seguros():
+    from servicios.google_calendar import GoogleCalendarError, error_google_seguro
+
+    assert error_google_seguro(ValueError("detalle con datos sensibles")) == (
+        "Error interno de tipo ValueError."
+    )
+    assert error_google_seguro(GoogleCalendarError("Google respondió HTTP 503.", 503)) == (
+        "Google respondió HTTP 503."
+    )
 
 
 @pytest.mark.parametrize("hora_cita", [time(8), timedelta(hours=17)])
@@ -171,26 +300,26 @@ def test_roles_personales_pueden_conectar_google_calendar(rol):
     assert not _permite("institucional", rol)
 
 
-def test_backfill_google_personal_solo_considera_citas_futuras_del_usuario(monkeypatch):
+def test_backfill_google_encola_citas_futuras_del_usuario(monkeypatch):
     from servicios import google_calendar
 
     user_id = 42
     consultas = []
-    sincronizadas = []
+    encoladas = []
 
     def consultar_mock(sql, params=(), uno=False):
         consultas.append((sql, params))
         return [{"id": 5, "creado_por": 77}]
 
-    def sincronizar_mock(cita_id, creador_id):
-        sincronizadas.append((cita_id, creador_id))
-        return [{"scope": f"usuario:{user_id}", "estado": "Sincronizado"}]
-
     monkeypatch.setattr(google_calendar, "consultar", consultar_mock)
-    monkeypatch.setattr(google_calendar, "sincronizar_cita", sincronizar_mock)
+    monkeypatch.setattr(
+        google_calendar,
+        "encolar_cita",
+        lambda cita_id, creador_id: encoladas.append((cita_id, creador_id)) or 2,
+    )
 
     with app.app_context():
-        resumen = google_calendar.sincronizar_citas_futuras(f"usuario:{user_id}", user_id)
+        resumen = google_calendar.encolar_citas_futuras(f"usuario:{user_id}", user_id)
 
     sql, parametros = consultas[0]
     assert "TIMESTAMP(c.fecha,c.hora)>=NOW()" in sql
@@ -198,8 +327,8 @@ def test_backfill_google_personal_solo_considera_citas_futuras_del_usuario(monke
     assert "a.id_usuario=%s" in sql
     assert "d.id_usuario=%s" in sql
     assert parametros == (user_id, user_id, user_id, user_id, user_id)
-    assert resumen == {"citas": 1, "fallidas": 0}
-    assert sincronizadas == [(5, 77)]
+    assert resumen == {"citas": 1, "encoladas": 2}
+    assert encoladas == [(5, 77)]
 
 
 @pytest.mark.parametrize("hora", ["07:00", "11:30", "13:00", "17:30"])

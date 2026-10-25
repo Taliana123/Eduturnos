@@ -1398,7 +1398,8 @@
 
     html body main.login-page {
         min-height: 0 !important;
-        padding: 8px 14px 20px !important;
+        align-items: center !important;
+        padding: 14px !important;
     }
 
     html body main.login-page .login-shell {
@@ -1622,6 +1623,115 @@ html body #contenido .dashboard-page .dashboard-card h2 {
     line-height: 1.15 !important;
 }
 
+@media (max-width: 900px) {
+    html body header.eduturnos-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        height: 58px !important;
+        min-height: 58px !important;
+        margin: 0 !important;
+        padding: 0 16px !important;
+        background: #172942 !important;
+        box-sizing: border-box !important;
+    }
+
+    html body header.eduturnos-header .eduturnos-logo {
+        align-items: center !important;
+        margin: 0 !important;
+        line-height: 1 !important;
+    }
+
+    html body header.eduturnos-header .mobile-back-link {
+        display: inline-grid !important;
+        place-items: center !important;
+        flex: 0 0 36px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 1px solid rgba(255, 255, 255, .4) !important;
+        border-radius: 50% !important;
+        background: transparent !important;
+        color: #ffffff !important;
+        font-size: 0 !important;
+        box-shadow: none !important;
+    }
+
+    html body header.eduturnos-header .mobile-back-link::before {
+        content: "←";
+        font-size: 19px !important;
+        line-height: 1 !important;
+    }
+
+    html body main.login-page .login-visual {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        width: 100% !important;
+        height: 142px !important;
+        min-height: 142px !important;
+        margin: 0 auto 8px !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    html body main.login-page .login-visual > .login-illustration {
+        width: min(100%, 300px) !important;
+        height: auto !important;
+        max-width: 100% !important;
+        aspect-ratio: 46 / 35 !important;
+    }
+
+    html body main.login-page .login-visual > .login-illustration svg {
+        width: 100% !important;
+        height: 100% !important;
+        aspect-ratio: 46 / 35 !important;
+    }
+
+    html body main.login-page .section-heading::after {
+        content: none !important;
+        display: none !important;
+    }
+
+    html body main.login-page .login-card > .section-heading {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    html body main.login-page .login-card > .section-heading > p {
+        grid-column: 1 !important;
+    }
+
+    html body #contenido .boton,
+    html body #contenido button:not(.mobile-nav-toggle),
+    html body #contenido input[type="submit"] {
+        min-height: 40px !important;
+        height: auto !important;
+        padding: 9px 14px !important;
+        border-radius: 7px !important;
+        line-height: 1.25 !important;
+    }
+
+    html body #contenido .boton.pequeno {
+        min-height: 34px !important;
+        padding: 6px 10px !important;
+    }
+
+    html body #contenido .directory-search > button,
+    html body #contenido .directory-search > .directory-search-all,
+    html body #contenido .estudiantes-search > .directory-search-button,
+    html body #contenido .estudiantes-search > .directory-search-all {
+        min-height: 36px !important;
+        height: 36px !important;
+        padding: 0 !important;
+    }
+}
+
+
 html body #contenido label {
     font-size: 13px !important;
 }
@@ -1634,6 +1744,62 @@ html body #contenido .boton,
 html body #contenido a.boton {
     min-height: 42px !important;
     font-size: 14px !important;
+}
+
+html body.auth-page .portal-registro-action-buttons {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 10px;
+}
+
+html body.auth-page .portal-registro-action-buttons > button,
+html body.auth-page .portal-registro-action-buttons > a {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100% !important;
+    min-width: 0;
+    height: 42px !important;
+    min-height: 42px !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+    text-align: center !important;
+}
+
+html body.auth-page .portal-registro-action-buttons > button {
+    border: 1px solid #2f78ff !important;
+    border-radius: 7px !important;
+    background: #2f78ff !important;
+    color: #fff !important;
+    font: inherit !important;
+    font-weight: 700 !important;
+}
+
+html body.auth-page .portal-registro-action-buttons > .portal-registro-cancel {
+    border: 1px solid #d4deeb !important;
+    border-radius: 7px !important;
+    background: #f4f7fb !important;
+    color: #23466f !important;
+}
+
+@media (max-width: 900px) {
+    html body.auth-page .registro-pagina .registro-grid .registro-opcion .registro-boton {
+        flex: 0 0 72px !important;
+        width: 72px !important;
+        min-width: 72px !important;
+        max-width: 72px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        padding: 0 5px !important;
+        border: 1px solid #2f78ff !important;
+        border-radius: 7px !important;
+        background: #2f78ff !important;
+        color: #fff !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        box-shadow: 0 3px 7px rgba(47, 120, 255, .12) !important;
+    }
 }
 
 /* Formulario de registro por rol: la cuadrícula de PC se vuelve una columna. */
@@ -1828,6 +1994,52 @@ html body.auth-page .portal-registro-form textarea {
     height: 38px !important;
     padding: 7px 9px !important;
     font-size: 13px !important;
+}
+
+@media (max-width: 900px) {
+    html body.public-info-page > header.barra {
+        overflow: visible !important;
+        z-index: 40 !important;
+        margin-top: -20px !important;
+        padding: 6px 12px !important;
+    }
+
+    html body.public-home-page .pagina > header.barra {
+        margin-top: 0 !important;
+        padding: 6px 12px !important;
+    }
+
+    html body main.login-page .login-visual {
+        position: relative !important;
+        inset: auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 0 12px !important;
+        padding: 0 !important;
+        gap: 8px !important;
+    }
+
+    html body main.login-page .login-visual > .login-illustration {
+        flex: 0 0 94px !important;
+        width: 94px !important;
+        height: 88px !important;
+        aspect-ratio: auto !important;
+    }
+
+    html body main.login-page .login-visual > .login-illustration svg {
+        display: none !important;
+    }
+
+    html body main.login-page .login-visual > .login-slogan {
+        flex: 0 0 auto !important;
+        font-size: clamp(22px, 6vw, 27px) !important;
+        line-height: 1.04 !important;
+    }
 }
 
 /* Final compact scale for the Android/iPhone app. */
@@ -2822,10 +3034,10 @@ html body.auth-page .registro-contenedor h1 {
 
     html body #contenido .edc-page .eduturnos-barra-real {
         display: grid !important;
-        grid-template-columns: minmax(0, 1fr) 128px !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
         align-items: center !important;
-        justify-content: initial !important;
-        gap: 8px !important;
+        justify-content: stretch !important;
+        gap: 6px !important;
         width: 100% !important;
         height: auto !important;
         min-height: 40px !important;
@@ -2842,8 +3054,8 @@ html body.auth-page .registro-contenedor h1 {
         width: auto !important;
         min-width: 0 !important;
         max-width: none !important;
-        gap: 4px !important;
-        justify-content: space-between !important;
+        gap: 2px !important;
+        justify-content: center !important;
     }
 
     html body #contenido .edc-page .eduturnos-barra-real .eduturnos-titulo-mes,
@@ -2866,25 +3078,6 @@ html body.auth-page .registro-contenedor h1 {
         min-height: 0 !important;
         margin: 0 !important;
         box-sizing: border-box !important;
-    }
-
-    @media (max-width: 380px) {
-        html body #contenido .edc-page .eduturnos-barra-real {
-            grid-template-columns: minmax(0, 1fr) !important;
-            row-gap: 6px !important;
-        }
-
-        html body #contenido .edc-page .eduturnos-barra-real .eduturnos-mes-navegacion {
-            grid-column: 1 !important;
-            grid-row: 1 !important;
-            width: 100% !important;
-        }
-
-        html body #contenido .edc-page .eduturnos-barra-real .eduturnos-hoy {
-            grid-column: 1 !important;
-            grid-row: 2 !important;
-            justify-self: center !important;
-        }
     }
 
     html body #contenido .reportes-page .report-mobile-detail:target {
@@ -3880,4 +4073,69 @@ html body.auth-page .registro-contenedor h1 {
         padding: 8px 9px !important;
         gap: 7px !important;
     }
+}
+
+@media (max-width: 900px) {
+    html body main.login-page .login-visual {
+        position: relative !important;
+        inset: auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 0 8px !important;
+        padding: 0 8px !important;
+        gap: 10px !important;
+    }
+
+    html body main.login-page .login-visual > .login-illustration {
+        order: 1 !important;
+        flex: 0 0 112px !important;
+        width: 112px !important;
+        height: 86px !important;
+        aspect-ratio: 46 / 35 !important;
+        overflow: visible !important;
+    }
+
+    html body main.login-page .login-visual > .login-illustration svg {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        object-fit: contain !important;
+    }
+
+    html body main.login-page .login-visual > .login-slogan {
+        order: 0 !important;
+        flex: 0 1 auto !important;
+        font-size: clamp(20px, 5.8vw, 25px) !important;
+        line-height: 1.04 !important;
+    }
+
+    html body.auth-page .registro-pagina .registro-grid .registro-opcion .registro-boton {
+        flex: 0 0 72px !important;
+        width: 72px !important;
+        min-width: 72px !important;
+        max-width: 72px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        max-height: 32px !important;
+        padding: 0 5px !important;
+        font-size: 10px !important;
+    }
+}
+@media (max-width: 900px) {
+    html body #contenido .directory-page .directory-search > .directory-search-all {
+        font-weight: 600 !important;
+        line-height: 1 !important;
+    }
+
+    html body #contenido .nueva-cita-form label {
+        font-size: 13px !important;
+    }
+
 }

@@ -8,9 +8,14 @@ from routes.helpers import login_requerido, roles_permitidos, usuario_actual
 from servicios.google_calendar import (
     configuracion_lista,
     correo_google,
+    error_google_seguro,
     guardar_conexion,
     intercambiar_codigo,
-    sincronizar_citas_futuras,
+    encolar_cita,
+    encolar_citas_futuras,
+    estado_cola_google,
+    calendar_id_objetivo,
+    probar_conexion_calendario,
     uri_callback,
     url_autorizacion,
 )
@@ -31,22 +36,28 @@ def _permite(scope: str, rol: str) -> bool:
 def index():
     usuario = usuario_actual()
     personal = None
+    personal_sync = None
     if usuario["rol_nombre"] in ROLES_PERSONAL:
         personal = consultar(
-            "SELECT correo_google,calendar_id,fecha_actualizacion FROM integraciones_google WHERE scope_key=%s",
+            "SELECT correo_google,calendar_id,fecha_actualizacion,fecha_prueba FROM integraciones_google WHERE scope_key=%s",
             (f"usuario:{usuario['id_usuario']}",), uno=True,
         )
+        personal_sync = estado_cola_google(f"usuario:{usuario['id_usuario']}")
     institucional = None
+    institucional_sync = None
     if usuario["rol_nombre"] in ("Super Admin", "Rector"):
         institucional = consultar(
-            "SELECT correo_google,calendar_id,fecha_actualizacion FROM integraciones_google WHERE scope_key='institucional'",
+            "SELECT correo_google,calendar_id,fecha_actualizacion,fecha_prueba FROM integraciones_google WHERE scope_key='institucional'",
             uno=True,
         )
+        institucional_sync = estado_cola_google("institucional")
     return render_template(
         "integraciones_google.html",
         usuario=usuario,
         personal=personal,
         institucional=institucional,
+        personal_sync=personal_sync,
+        institucional_sync=institucional_sync,
         puede_personal=usuario["rol_nombre"] in ROLES_PERSONAL,
         puede_institucional=usuario["rol_nombre"] in ("Super Admin", "Rector"),
         configuracion_lista=configuracion_lista(),
@@ -90,30 +101,30 @@ def callback():
         abort(403)
     try:
         token = intercambiar_codigo(code)
-        email = correo_google(token["access_token"])
         scope_key = "institucional" if scope == "institucional" else f"usuario:{usuario['id_usuario']}"
+        probar_conexion_calendario(
+            token["access_token"],
+            calendar_id_objetivo(scope_key),
+        )
+        email = correo_google(token["access_token"])
         user_id = None if scope == "institucional" else usuario["id_usuario"]
         guardar_conexion(scope_key, "Institucional" if scope == "institucional" else "Personal", user_id, email, token)
         try:
-            resumen = sincronizar_citas_futuras(scope_key, user_id)
-            if resumen["fallidas"]:
+            resumen = encolar_citas_futuras(scope_key, user_id)
+            if resumen["encoladas"]:
                 flash(
-                    f"Google Calendar quedó conectado; {resumen['fallidas']} de "
-                    f"{resumen['citas']} citas futuras no se pudieron sincronizar.",
-                    "warning",
-                )
-            else:
-                flash(
-                    f"Google Calendar quedó conectado y se sincronizaron "
-                    f"{resumen['citas']} citas futuras con recordatorios.",
+                    f"Google Calendar quedó conectado. Se encolaron "
+                    f"{resumen['citas']} citas futuras para sincronización automática.",
                     "success",
                 )
+            else:
+                flash("Google Calendar quedó conectado; no hay citas futuras pendientes de sincronización.", "success")
         except Exception:
             current_app.logger.exception("Falló la sincronización inicial de Google Calendar")
             flash("Google Calendar quedó conectado, pero no se pudieron sincronizar las citas futuras.", "warning")
     except Exception as exc:
         current_app.logger.exception("Falló el callback OAuth de Google Calendar")
-        flash(f"No fue posible conectar Google Calendar: {exc}", "error")
+        flash(f"No fue posible conectar Google Calendar: {error_google_seguro(exc)}", "error")
     return redirect(url_for("integraciones_google.index"))
 
 
@@ -135,16 +146,22 @@ def desconectar(scope):
 @roles_permitidos(*ROLES_PERSONAL)
 def reintentar(cita_id):
     from routes.calendario import citas_visibles
-    from servicios.google_calendar import sincronizar_cita
 
     usuario = usuario_actual()
-    if cita_id not in {int(cita["id"]) for cita in citas_visibles(usuario)}:
+    cita = next(
+        (
+            item
+            for item in citas_visibles(usuario)
+            if int(item["id"]) == cita_id
+        ),
+        None,
+    )
+    if not cita:
         abort(404)
-    resultados = sincronizar_cita(cita_id, usuario["id_usuario"])
-    if any(resultado["estado"] == "Sincronizado" for resultado in resultados):
-        flash("Cita sincronizada con los calendarios conectados.", "success")
-    elif resultados:
-        flash("Google no pudo sincronizar la cita. Revisa la conexión del calendario.", "error")
+    operacion = "delete" if cita.get("estado_nombre") == "Cancelada" else "upsert"
+    cantidad = encolar_cita(cita_id, usuario["id_usuario"], operacion)
+    if cantidad:
+        flash("La sincronización quedó en cola y se reintentará automáticamente.", "success")
     else:
         flash("No hay calendarios conectados para esta cita.", "error")
     return redirect(url_for("citas.index", _anchor=f"cita-dialog-{cita_id}"))

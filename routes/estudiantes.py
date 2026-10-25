@@ -1,11 +1,54 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from database.db import consultar, ejecutar
+from flask import Blueprint, current_app, render_template, request, redirect, url_for, flash
+from database.db import consultar, ejecutar, transaccion
 from routes.helpers import roles_permitidos, auditoria
+from roles import es_documento_valido, es_nombre_valido
+from servicios.estudiantes import codigo_final, codigo_temporal
 
 estudiantes_bp=Blueprint("estudiantes",__name__,url_prefix="/estudiantes")
 
 def catalogos():
-    return {"sedes":consultar("SELECT * FROM sedes WHERE estado=1 ORDER BY nombre"),"jornadas":consultar("SELECT * FROM jornadas WHERE estado=1 ORDER BY CASE nombre WHEN 'Mañana' THEN 1 WHEN 'Tarde' THEN 2 WHEN 'Noche' THEN 3 ELSE 4 END,nombre"),"periodos":consultar("SELECT * FROM periodos_academicos WHERE activo=1 AND cerrado=0 ORDER BY id DESC"),"grados":consultar("SELECT * FROM grados WHERE estado=1 ORDER BY CAST(nombre AS UNSIGNED),nombre"),"grupos":consultar("SELECT g.id,g.nombre,gr.nombre grado FROM grupos g JOIN grados gr ON gr.id=g.id_grado WHERE g.estado=1 ORDER BY CAST(gr.nombre AS UNSIGNED),gr.nombre,CAST(g.nombre AS UNSIGNED),g.nombre")}
+    return {
+        "sedes": consultar("SELECT * FROM sedes WHERE estado=1 ORDER BY nombre"),
+        "jornadas": consultar("SELECT * FROM jornadas WHERE estado=1 ORDER BY CASE nombre WHEN 'Mañana' THEN 1 WHEN 'Tarde' THEN 2 WHEN 'Noche' THEN 3 ELSE 4 END,nombre"),
+        "periodos": consultar("SELECT * FROM periodos_academicos WHERE activo=1 AND cerrado=0 ORDER BY id DESC"),
+        "grados": consultar("SELECT * FROM grados WHERE estado=1 ORDER BY CAST(nombre AS UNSIGNED),nombre"),
+        "grupos": consultar(
+            "SELECT g.id,g.id_grado,g.nombre,gr.nombre grado FROM grupos g "
+            "JOIN grados gr ON gr.id=g.id_grado WHERE g.estado=1 "
+            "ORDER BY CAST(gr.nombre AS UNSIGNED),gr.nombre,CAST(g.nombre AS UNSIGNED),g.nombre"
+        ),
+    }
+
+
+def validar_formulario(datos):
+    campos_obligatorios = ("tipo_documento", "documento", "nombres", "apellidos", "sede", "jornada", "periodo")
+    if any(not datos.get(campo, "").strip() for campo in campos_obligatorios):
+        return "Completa todos los campos obligatorios."
+    if datos.get("tipo_documento") not in {"CC", "TI", "CE", "RC"}:
+        return "Selecciona un tipo de documento válido."
+    if not es_documento_valido(datos.get("documento", "")):
+        return "El documento debe contener solo dígitos y no superar 30 caracteres."
+    if not es_nombre_valido(datos.get("nombres", "")) or not es_nombre_valido(datos.get("apellidos", "")):
+        return "Los nombres y apellidos solo pueden contener letras y espacios."
+    if any(not datos.get(campo, "").isdigit() for campo in ("sede", "jornada", "periodo")):
+        return "Selecciona una sede, jornada y periodo válidos."
+
+    grado = datos.get("grado", "").strip()
+    grupo = datos.get("grupo", "").strip()
+    if grado and not grado.isdigit():
+        return "Selecciona un grado válido."
+    if grupo:
+        if not grado or not grupo.isdigit():
+            return "Selecciona primero el grado y luego un grupo del 1 al 6."
+        existente = consultar(
+            "SELECT id FROM grupos WHERE id=%s AND id_grado=%s AND estado=1 "
+            "AND nombre IN ('1','2','3','4','5','6') LIMIT 1",
+            (grupo, grado),
+            uno=True,
+        )
+        if not existente:
+            return "El grupo seleccionado no corresponde al grado."
+    return None
 
 @estudiantes_bp.route("/")
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador","Docente")
@@ -33,27 +76,58 @@ def lista():
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador")
 def nuevo():
     cat=catalogos()
+    datos=request.form if request.method=="POST" else {}
     if request.method=="POST":
         d=request.form
+        error=validar_formulario(d)
+        if error:
+            flash(error,"error")
+            return render_template("estudiantes/form.html",catalogos=cat,estudiante=None,datos=datos)
         try:
-            eid=ejecutar("""INSERT INTO estudiantes(codigo_estudiantil,tipo_documento,documento,nombres,apellidos,curso,id_sede,id_jornada,id_periodo,id_grado,id_grupo,estado)
-                           VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Activo')""",(d["codigo"],d["tipo_documento"],d["documento"],d["nombres"],d["apellidos"],d.get("curso"),d["sede"],d["jornada"],d["periodo"],d.get("grado") or None,d.get("grupo") or None))
-            auditoria("CREAR","Estudiantes",eid); flash("Estudiante creado.","success"); return redirect(url_for("estudiantes.lista"))
-        except Exception: flash("No se pudo crear el estudiante. Revisa los datos únicos y las selecciones.","error")
-    return render_template("estudiantes/form.html",catalogos=cat,estudiante=None)
+            with transaccion() as cnx:
+                cur = cnx.cursor()
+                try:
+                    cur.execute(
+                        """INSERT INTO estudiantes(codigo_estudiantil,tipo_documento,documento,nombres,apellidos,id_sede,id_jornada,id_periodo,id_grado,id_grupo,estado)
+                           VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Activo')""",
+                        (
+                            codigo_temporal(), d["tipo_documento"], d["documento"],
+                            d["nombres"], d["apellidos"], d["sede"], d["jornada"],
+                            d["periodo"], d.get("grado") or None, d.get("grupo") or None,
+                        ),
+                    )
+                    eid = cur.lastrowid
+                    cur.execute(
+                        "UPDATE estudiantes SET codigo_estudiantil=%s WHERE id_estudiante=%s",
+                        (codigo_final(eid), eid),
+                    )
+                finally:
+                    cur.close()
+            auditoria("CREAR","Estudiantes",eid); flash(f"Estudiante creado. Código institucional: {codigo_final(eid)}","success"); return redirect(url_for("estudiantes.lista"))
+        except Exception:
+            current_app.logger.exception("No se pudo crear el estudiante.")
+            flash("No se pudo crear el estudiante. Revisa los datos únicos y las selecciones.","error")
+    return render_template("estudiantes/form.html",catalogos=cat,estudiante=None,datos=datos)
 
 @estudiantes_bp.route("/<int:id>/editar",methods=["GET","POST"])
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador")
 def editar(id):
     est=consultar("SELECT * FROM estudiantes WHERE id_estudiante=%s",(id,),uno=True); cat=catalogos()
     if not est: return redirect(url_for("estudiantes.lista"))
+    datos=request.form if request.method=="POST" else {}
     if request.method=="POST":
         d=request.form
+        error=validar_formulario(d)
+        if error:
+            flash(error,"error")
+            return render_template("estudiantes/form.html",catalogos=cat,estudiante=est,datos=datos)
         try:
-            ejecutar("""UPDATE estudiantes SET codigo_estudiantil=%s,tipo_documento=%s,documento=%s,nombres=%s,apellidos=%s,curso=%s,id_sede=%s,id_jornada=%s,id_periodo=%s,id_grado=%s,id_grupo=%s,estado=%s WHERE id_estudiante=%s""",(d["codigo"],d["tipo_documento"],d["documento"],d["nombres"],d["apellidos"],d.get("curso"),d["sede"],d["jornada"],d["periodo"],d.get("grado") or None,d.get("grupo") or None,d.get("estado", "Activo"),id))
+            ejecutar("""UPDATE estudiantes SET tipo_documento=%s,documento=%s,nombres=%s,apellidos=%s,id_sede=%s,id_jornada=%s,id_periodo=%s,id_grado=%s,id_grupo=%s,estado=%s WHERE id_estudiante=%s""",(d["tipo_documento"],d["documento"],d["nombres"],d["apellidos"],d["sede"],d["jornada"],d["periodo"],d.get("grado") or None,d.get("grupo") or None,d.get("estado", "Activo"),id))
             auditoria("ACTUALIZAR","Estudiantes",id); flash("Estudiante actualizado.","success"); return redirect(url_for("estudiantes.lista"))
-        except Exception: flash("No se pudo actualizar el estudiante.","error")
-    return render_template("estudiantes/form.html",catalogos=cat,estudiante=est)
+        except Exception:
+            current_app.logger.exception("No se pudo actualizar el estudiante %s.", id)
+            flash("No se pudo actualizar el estudiante.","error")
+    return render_template("estudiantes/form.html",catalogos=cat,estudiante=est,datos=datos)
 
 @estudiantes_bp.post("/<int:id>/desactivar")
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador")

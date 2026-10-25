@@ -27,7 +27,7 @@
 # el número visible del grupo como id_grupo.
 # ============================================================
 
-from datetime import datetime
+import re
 import uuid
 
 from database.db import consultar
@@ -557,13 +557,13 @@ def codigo_final(id_estudiante):
 
     Formato:
 
-        EDU-AAAA-00001
+        EST_00001
 
     Ejemplos:
 
-        EDU-2026-00001
-        EDU-2026-00002
-        EDU-2026-00003
+        EST_00001
+        EST_00002
+        EST_00003
 
     El número final corresponde al ID interno del estudiante.
 
@@ -581,10 +581,7 @@ def codigo_final(id_estudiante):
             "porque el ID del estudiante no es válido."
         )
 
-    return (
-        f"EDU-{datetime.now().year}-"
-        f"{estudiante_id:05d}"
-    )
+    return f"EST_{estudiante_id:05d}"
 
 
 # ============================================================
@@ -596,9 +593,7 @@ def validar_codigo_estudiantil(codigo):
     Comprueba que un código estudiantil tenga el formato
     esperado.
 
-    Formato:
-
-        EDU-2026-00001
+    Acepta el formato actual EST_00001 y códigos históricos EDU-2026-00001.
 
     Devuelve:
 
@@ -613,23 +608,9 @@ def validar_codigo_estudiantil(codigo):
 
     codigo = str(codigo).strip().upper()
 
-    partes = codigo.split("-")
-
-    if len(partes) != 3:
-        return False
-
-    prefijo, anio, numero = partes
-
-    if prefijo != "EDU":
-        return False
-
-    if len(anio) != 4 or not anio.isdigit():
-        return False
-
-    if len(numero) != 5 or not numero.isdigit():
-        return False
-
-    return True
+    if re.fullmatch(r"EST_[0-9]{5,}", codigo):
+        return True
+    return bool(re.fullmatch(r"EDU-[0-9]{4}-[0-9]{5}", codigo))
 
 
 # ============================================================

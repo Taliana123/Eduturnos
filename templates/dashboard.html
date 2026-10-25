@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}Panel · EDUTURNOS{% endblock %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-overview.css') }}?v=20261013_dashboard_greeting_gap_v12">{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-overview.css') }}?v=20261022_local_edubot_v1">{% endblock %}
 
 
 {% block content %}
@@ -80,8 +80,24 @@
                 Hola, {{ usuario.nombres }} {{ usuario.apellidos }}
             </h1>
 
+            <time class="dashboard-current-date" datetime="{{ fecha_actual.isoformat() }}">
+                {{ fecha_actual.strftime('%d/%m/%Y') }}
+            </time>
+
             <p class="muted">
+                {% if usuario.rol_nombre in ['Super Admin', 'Rector'] %}
+                Vista institucional para coordinar citaciones y compromisos.
+                {% elif usuario.rol_nombre == 'Administrador / Coordinador' %}
+                Coordina las citaciones y da seguimiento a los compromisos institucionales.
+                {% elif usuario.rol_nombre == 'Docente' %}
+                Consulta tus citaciones y compromisos de seguimiento.
+                {% elif usuario.rol_nombre == 'Acudiente' %}
+                Consulta las citaciones y avisos vinculados a tu familia.
+                {% elif usuario.rol_nombre == 'Estudiante' %}
+                Consulta tus citaciones, agenda y avisos.
+                {% else %}
                 Cada encuentro cuenta. Organiza las citas y acompaña a tus estudiantes.
+                {% endif %}
             </p>
 
         </div>
@@ -108,7 +124,7 @@
         </a>
         {% else %}
         <a class="dashboard-quick-link quick-justifications" href="{{ url_for('justificaciones.index') }}">
-            <span class="quick-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#clipboard-check"></use></svg></span>
+            <span class="quick-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#file-text"></use></svg></span>
             <span><strong>Justificaciones</strong><small>Solicitudes y respuestas</small></span>
         </a>
         {% endif %}
@@ -256,7 +272,6 @@
             <footer class="overview-calendar-legend"><span><i class="legend-dot"></i>Con citaciones</span><span><i class="legend-selected"></i>Día seleccionado</span></footer>
         </aside>
     </div>
-
 
     <!-- =====================================================
          CONTENIDO
@@ -4665,6 +4680,109 @@ html body #contenido .dashboard-page[class*="dashboard-rol-"] .dashboard-action-
     }
 }
 </style>
+<style id="dashboard-mobile-hero-fix">
+@media (max-width: 900px) {
+    html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] {
+        padding: 10px 10px 22px !important;
+    }
+
+    html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-greeting-row {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 0 !important;
+        min-height: 0 !important;
+        padding: 12px 14px !important;
+    }
+
+    html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-left-art {
+        display: none !important;
+    }
+
+    html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head {
+        display: flex !important;
+        grid-column: auto !important;
+        grid-row: auto !important;
+        width: 100% !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        flex-direction: row !important;
+        align-items: center !important;
+    }
+
+    html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head-info {
+        display: flex !important;
+        grid-column: auto !important;
+        grid-row: auto !important;
+        grid-template-columns: none !important;
+        grid-template-areas: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+    }
+
+    html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head-info h1,
+    html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head-info .muted,
+    html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-current-date {
+        align-self: flex-start !important;
+        grid-column: auto !important;
+        grid-row: auto !important;
+        grid-area: auto !important;
+        width: auto !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+}
+
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"]::before,
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"]::after,
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-greeting-row::before,
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-greeting-row::after,
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head::before,
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head::after,
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head-info::before,
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head-info::after,
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head-info h1::before,
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head-info h1::after {
+    content: none !important;
+    display: none !important;
+    height: 0 !important;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head,
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head-info,
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head-info h1 {
+    border-top: 0 !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head-info {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-greeting-row {
+    border: 1px solid #dce7f4 !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 22px rgba(18, 59, 104, .06) !important;
+}
+
+html body #contenido .dashboard-page.dashboard-overview[class*="dashboard-rol-"] .dashboard-head {
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+</style>
 {% endblock %}
-
-

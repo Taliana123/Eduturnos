@@ -3,7 +3,6 @@
 {% block content %}
 <section class="page-head">
   <div>
-    <a class="link-back" href="{{ url_for('configuracion.index') }}">← Configuración</a>
     <h1>Importación institucional</h1>
     <p>Carga estudiantes y acudientes desde CSV o XLSX. Los duplicados se rechazan y se informa la fila con error.</p>
   </div>
@@ -20,7 +19,7 @@
   </section>
   <section class="tarjeta feature-card">
     <h2>Acudientes</h2>
-    <p>Columnas: tipo_documento, documento, nombres, apellidos, telefono, correo, direccion, barrio, municipio.</p>
+    <p>Columnas: tipo_documento, documento, nombres, apellidos, telefono, correo Gmail, direccion, barrio, municipio.</p>
     <form method="post" enctype="multipart/form-data" action="{{ url_for('importacion.acudientes') }}" class="stack-form form-uniform">
       {{ csrf_field()|safe }}
       <label>Archivo CSV o XLSX<input type="file" name="archivo" accept=".csv,.xlsx" required></label>

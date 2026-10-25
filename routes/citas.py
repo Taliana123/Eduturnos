@@ -279,18 +279,16 @@ def catalogos():
             """
             SELECT
                 e.id_estudiante,
-                e.documento,
                 CONCAT(e.nombres, ' ', e.apellidos) AS nombre,
-                CONCAT(
-                    COALESCE(e.curso, ''),
-                    ' · ',
-                    s.nombre
-                ) AS detalle
+                g.nombre AS grado,
+                jornada.nombre AS jornada
 
             FROM estudiantes e
 
-            JOIN sedes s
-                ON s.id = e.id_sede
+            LEFT JOIN grados g
+                ON g.id = e.id_grado
+            LEFT JOIN jornadas jornada
+                ON jornada.id = e.id_jornada
 
             WHERE e.estado = 'Activo'
 
@@ -303,32 +301,84 @@ def catalogos():
         "docentes": consultar(
             """
             SELECT
-                id_docente,
-                CONCAT(nombres, ' ', apellidos) AS nombre
+                d.id_docente,
+                CONCAT(d.nombres, ' ', d.apellidos) AS nombre,
+                asignaciones.grados AS grado,
+                jornada.nombre AS jornada
 
-            FROM docentes
+            FROM docentes d
+            LEFT JOIN jornadas jornada
+                ON jornada.id = d.id_jornada
+            LEFT JOIN (
+                SELECT
+                    asignacion.id_docente,
+                    GROUP_CONCAT(
+                        DISTINCT COALESCE(grado_estudiante.nombre, grado_grupo.nombre)
+                        ORDER BY COALESCE(grado_estudiante.nombre, grado_grupo.nombre)
+                        SEPARATOR ', '
+                    ) AS grados
+                FROM asignaciones_docentes asignacion
+                LEFT JOIN estudiantes estudiante
+                    ON estudiante.id_estudiante = asignacion.id_estudiante
+                LEFT JOIN grados grado_estudiante
+                    ON grado_estudiante.id = estudiante.id_grado
+                LEFT JOIN grupos grupo
+                    ON grupo.id = asignacion.id_grupo
+                LEFT JOIN grados grado_grupo
+                    ON grado_grupo.id = grupo.id_grado
+                WHERE asignacion.estado = 1
+                GROUP BY asignacion.id_docente
+            ) asignaciones
+                ON asignaciones.id_docente = d.id_docente
 
-            WHERE estado = 1
+            WHERE d.estado = 1
 
             ORDER BY
-                apellidos,
-                nombres
+                d.apellidos,
+                d.nombres
             """
         ),
 
         "acudientes": consultar(
             """
             SELECT
-                id_acudiente,
-                CONCAT(nombres, ' ', apellidos) AS nombre
+                acudiente.id_acudiente,
+                CONCAT(acudiente.nombres, ' ', acudiente.apellidos) AS nombre,
+                contexto.grados AS grado,
+                contexto.jornadas AS jornada
 
-            FROM acudientes
+            FROM acudientes acudiente
+            LEFT JOIN (
+                SELECT
+                    relacion.id_acudiente,
+                    GROUP_CONCAT(
+                        DISTINCT grado.nombre
+                        ORDER BY grado.nombre
+                        SEPARATOR ', '
+                    ) AS grados,
+                    GROUP_CONCAT(
+                        DISTINCT jornada.nombre
+                        ORDER BY jornada.nombre
+                        SEPARATOR ', '
+                    ) AS jornadas
+                FROM estudiante_acudiente relacion
+                JOIN estudiantes estudiante
+                    ON estudiante.id_estudiante = relacion.id_estudiante
+                LEFT JOIN grados grado
+                    ON grado.id = estudiante.id_grado
+                LEFT JOIN jornadas jornada
+                    ON jornada.id = estudiante.id_jornada
+                WHERE relacion.estado = 1
+                  AND estudiante.estado = 'Activo'
+                GROUP BY relacion.id_acudiente
+            ) contexto
+                ON contexto.id_acudiente = acudiente.id_acudiente
 
-            WHERE estado = 1
+            WHERE acudiente.estado = 1
 
             ORDER BY
-                apellidos,
-                nombres
+                acudiente.apellidos,
+                acudiente.nombres
             """
         ),
 
@@ -1238,35 +1288,29 @@ def cambiar_estado(cita_id):
     # ACTUALIZAR ESTADO
     # ---------------------------------------------
 
-    ejecutar(
-        """
-        UPDATE citas
+    with transaccion() as cnx:
+        cursor = cnx.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                "UPDATE citas SET id_estado=%s WHERE id=%s AND id_estado=%s",
+                (estado_nuevo["id"], cita_id, cita["id_estado"]),
+            )
+            if cursor.rowcount != 1:
+                flash(
+                    "La citación cambió mientras se procesaba. Recarga e inténtalo de nuevo.",
+                    "error",
+                )
+                return redirect(url_for("citas.index"))
+            from servicios.google_calendar import encolar_cita_cursor
 
-        SET id_estado = %s
-
-        WHERE id = %s
-          AND id_estado = %s
-        """,
-        (
-            estado_nuevo["id"],
-            cita_id,
-            cita["id_estado"],
-        ),
-    )
-
-    estado_final = consultar(
-        "SELECT id_estado FROM citas WHERE id = %s LIMIT 1",
-        (cita_id,),
-        uno=True,
-    )
-
-    if not estado_final or estado_final["id_estado"] != estado_nuevo["id"]:
-        flash(
-            "La citación cambió mientras se procesaba. "
-            "Recarga e inténtalo de nuevo.",
-            "error",
-        )
-        return redirect(url_for("citas.index"))
+            encolar_cita_cursor(
+                cursor,
+                cita_id,
+                cita.get("creado_por") or usuario["id_usuario"],
+                "delete" if estado_nuevo["nombre"] == "Cancelada" else "upsert",
+            )
+        finally:
+            cursor.close()
 
     # ---------------------------------------------
     # NOTIFICAR CAMBIO
@@ -1395,6 +1439,9 @@ def reprogramar_cita(cita_id):
                 )
                 nueva_cita_id = cursor.lastrowid
                 cursor.execute("INSERT INTO reprogramaciones_cita(id_cita,fecha_anterior,hora_anterior,fecha_nueva,hora_nueva,motivo,realizado_por) VALUES(%s,%s,%s,%s,%s,%s,%s)", (nueva_cita_id, actual["fecha"], actual["hora"], fecha, hora, motivo, usuario["id_usuario"]))
+                from servicios.google_calendar import encolar_cita_cursor
+
+                encolar_cita_cursor(cursor, nueva_cita_id, usuario["id_usuario"])
             finally:
                 cursor.close()
     except ValueError as exc:
@@ -1402,12 +1449,6 @@ def reprogramar_cita(cita_id):
         return redirect(url_for("citas.index", _anchor=f"cita-dialog-{cita_id}"))
     auditoria("REPROGRAMAR", "Citas", nueva_cita_id, f"Cita anterior: {cita_id}. Nueva fecha: {fecha} {formatear_hora(hora)}")
     _notificar(nueva_cita_id, "Citación reprogramada", f"La nueva fecha de tu citación es {fecha} a las {formatear_hora(hora)}.")
-    try:
-        from servicios.google_calendar import sincronizar_cita
-
-        sincronizar_cita(nueva_cita_id, usuario["id_usuario"])
-    except Exception:
-        current_app.logger.exception("La cita reprogramada %s se guardó, pero falló la sincronización con Google.", nueva_cita_id)
     flash("Cita reprogramada y participantes notificados.", "success")
     return redirect(url_for("calendario.index", dia=fecha.isoformat()))
 

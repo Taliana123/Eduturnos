@@ -1,5 +1,6 @@
 from functools import wraps
 from flask import session, redirect, url_for, flash, abort
+from time import time
 from database.db import consultar, ejecutar
 from flask import current_app
 
@@ -8,7 +9,11 @@ def usuario_actual():
     uid = session.get("usuario_id")
     if not uid:
         return None
-    if session.get("creado_en") and __import__("time").time() - session["creado_en"] > 3600:
+    if (
+        session.get("creado_en")
+        and time() - session["creado_en"]
+        > current_app.permanent_session_lifetime.total_seconds()
+    ):
         session.clear()
         return None
     try:

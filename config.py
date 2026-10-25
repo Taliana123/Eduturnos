@@ -30,7 +30,7 @@ class Config:
     SESSION_COOKIE_SECURE = _first("SESSION_COOKIE_SECURE", default="1" if APP_ENV == "production" else "0") == "1"
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
-    PERMANENT_SESSION_LIFETIME = 3600
+    PERMANENT_SESSION_LIFETIME = 30 * 24 * 60 * 60
     WTF_CSRF_ENABLED = True
     MAX_CONTENT_LENGTH = 2 * 1024 * 1024
     # Correo: una única cuenta remitente del sistema. Los usuarios reciben en su propio correo.
@@ -42,11 +42,21 @@ class Config:
     MAIL_USE_TLS = _first("MAIL_USE_TLS", "SMTP_TLS", default="1") == "1"
     MAIL_USE_SSL = _first("MAIL_USE_SSL", default="1" if MAIL_PORT == 465 else "0") == "1"
     MAIL_TIMEOUT = int(_first("MAIL_TIMEOUT", default="20"))
+    SUPPORT_EMAIL = _first("SUPPORT_EMAIL", default="coliejjfh@hotmail.com")
     GOOGLE_OAUTH_CLIENT_ID = _first("GOOGLE_OAUTH_CLIENT_ID", default="")
     GOOGLE_OAUTH_CLIENT_SECRET = _first("GOOGLE_OAUTH_CLIENT_SECRET", default="")
-    GEMINI_API_KEY = _first("GEMINI_API_KEY", default="")
-    GEMINI_MODEL = _first("GEMINI_MODEL", default="gemini-3.8-flash")
-    BEEPY_DOMAIN = _first("BEEPY_DOMAIN", default="seventy-excavator-designate.ngrok-free.dev")
+    GOOGLE_CALENDAR_ID = _first("GOOGLE_CALENDAR_ID", default="primary")
+    GROQ_API_KEY = _first("GROQ_API_KEY", default="")
+    GROQ_MODEL = _first("GROQ_MODEL", default="openai/gpt-oss-120b")
+    BEEPY_DOMAINS = tuple(
+        domain.strip().lower()
+        for domain in _first(
+            "BEEPY_DOMAINS",
+            default=f"{_first('BEEPY_DOMAIN', default='seventy-excavator-designate.ngrok-free.dev')},eduturnos-jjfh.alwaysdata.net",
+        ).split(",")
+        if domain.strip()
+    )
+    BEEPY_DOMAIN = _first("BEEPY_DOMAIN", default=BEEPY_DOMAINS[0] if BEEPY_DOMAINS else "")
     BEEPY_ENABLED = _first("BEEPY_ENABLED", default="1") == "1"
     BEEPY_CHAT_URL = _first("BEEPY_CHAT_URL", default="https://www.beepychatbot.com/u/1nLBFlV/")
     _mail_mode = _first("MAIL_MODE", default="")

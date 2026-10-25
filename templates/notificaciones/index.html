@@ -8,14 +8,6 @@
 
 <section class="page-head">
     <div>
-        <div class="page-navigation">
-            <a
-                class="link-back"
-                href="{{ url_for('auth.dashboard') }}">
-                ← Volver
-            </a>
-        </div>
-
         <h1>Notificaciones</h1>
         <p>Consulta los avisos y actualizaciones de tu cuenta.</p>
     </div>
@@ -204,6 +196,63 @@
     @media (max-width: 700px) {
         .notification-card {
             flex-direction: column;
+        }
+    }
+</style>
+<style id="eduturnos-notificaciones-compactas">
+    #contenido .notificaciones-page .notifications-list {
+        gap: 10px;
+    }
+
+    #contenido .notificaciones-page .notification-card {
+        gap: 12px;
+        padding: 14px;
+    }
+
+    #contenido .notificaciones-page .notification-content {
+        min-width: 0;
+    }
+
+    #contenido .notificaciones-page .notification-header {
+        flex-wrap: wrap;
+        gap: 6px 8px;
+        margin-bottom: 6px;
+    }
+
+    #contenido .notificaciones-page .notification-header h2 {
+        min-width: 0;
+        font-size: 16px;
+        overflow-wrap: anywhere;
+    }
+
+    #contenido .notificaciones-page .notification-badge {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    #contenido .notificaciones-page .notification-message {
+        margin-bottom: 8px;
+        overflow-wrap: anywhere;
+    }
+
+    #contenido .notificaciones-page .notification-meta {
+        gap: 6px 12px;
+    }
+
+    @media (max-width: 700px) {
+        #contenido .notificaciones-page .notification-card {
+            align-items: stretch;
+            gap: 10px;
+            padding: 12px;
+        }
+
+        #contenido .notificaciones-page .notification-card > form,
+        #contenido .notificaciones-page .notification-card > form button {
+            width: auto;
+        }
+
+        #contenido .notificaciones-page .notification-read {
+            align-self: flex-start;
         }
     }
 </style>

@@ -1,9 +1,52 @@
-{% extends 'base.html' %}{% block content %}<h1>{{ 'Editar' if acudiente else 'Nuevo' }} acudiente</h1><form method="post" class="panel form-grid">{{ csrf_field()|safe }}<label>Tipo documento<select name="tipo_documento">
-<option value="" {% if not acudiente or not acudiente.tipo_documento %}selected{% endif %} disabled hidden></option>
-<option value="CC">Cédula de ciudadanía</option><option value="TI">Tarjeta de identidad</option><option value="CE">Cédula de extranjería</option></select></label><label>Documento<input name="documento" value="{{ acudiente.documento if acudiente else '' }}" required></label><label>Nombres<input name="nombres" value="{{ acudiente.nombres if acudiente else '' }}" required></label><label>Apellidos<input name="apellidos" value="{{ acudiente.apellidos if acudiente else '' }}" required></label><label>Teléfono<input name="telefono" value="{{ acudiente.telefono if acudiente else '' }}"></label><label>Correo<input type="email" name="correo" value="{{ acudiente.correo if acudiente else '' }}"></label><label>Dirección<input name="direccion" value="{{ acudiente.direccion if acudiente else '' }}"></label><label>Barrio<input name="barrio" value="{{ acudiente.barrio if acudiente else '' }}"></label><label>Municipio<input name="municipio" value="{{ acudiente.municipio if acudiente else 'Ibagué' }}"></label>{% if acudiente %}<label>Estado<select name="estado">
-<option value="" {% if not acudiente.estado %}selected{% endif %} disabled hidden></option>
-<option value="1" {% if acudiente.estado %}selected{% endif %}>Activo</option><option value="0" {% if not acudiente.estado %}selected{% endif %}>Inactivo</option></select></label>{% endif %}<div class="full-field form-actions"><button class="boton">Guardar</button> <a class="boton secundario" href="{{ url_for('acudientes.lista') }}">Cancelar</a></div></form>
-
-
-
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ 'Editar' if acudiente else 'Nuevo' }} acudiente</h1>
+<form method="post" class="panel form-grid">
+    {{ csrf_field()|safe }}
+    <label>Tipo documento
+        <select name="tipo_documento">
+            <option value="" {% if not acudiente or not acudiente.tipo_documento %}selected{% endif %} disabled hidden></option>
+            <option value="CC">Cédula de ciudadanía</option>
+            <option value="TI">Tarjeta de identidad</option>
+            <option value="CE">Cédula de extranjería</option>
+        </select>
+    </label>
+    <label>Documento
+        <input name="documento" value="{{ acudiente.documento if acudiente else '' }}" required>
+    </label>
+    <label>Nombres
+        <input name="nombres" value="{{ acudiente.nombres if acudiente else '' }}" required>
+    </label>
+    <label>Apellidos
+        <input name="apellidos" value="{{ acudiente.apellidos if acudiente else '' }}" required>
+    </label>
+    <label>Teléfono
+        <input name="telefono" value="{{ acudiente.telefono if acudiente else '' }}">
+    </label>
+    <label>Correo
+        <input type="email" name="correo" value="{{ request.form.get('correo', acudiente.correo if acudiente else '') }}" pattern="[^@\s]+@[gG][mM][aA][iI][lL]\.[cC][oO][m]" title="Usa una dirección terminada en @gmail.com." required>
+    </label>
+    <label>Dirección
+        <input name="direccion" value="{{ acudiente.direccion if acudiente else '' }}">
+    </label>
+    <label>Barrio
+        <input name="barrio" value="{{ acudiente.barrio if acudiente else '' }}">
+    </label>
+    <label>Municipio
+        <input name="municipio" value="{{ acudiente.municipio if acudiente else 'Ibagué' }}">
+    </label>
+    {% if acudiente %}
+    <label>Estado
+        <select name="estado">
+            <option value="" {% if not acudiente.estado %}selected{% endif %} disabled hidden></option>
+            <option value="1" {% if acudiente.estado %}selected{% endif %}>Activo</option>
+            <option value="0" {% if not acudiente.estado %}selected{% endif %}>Inactivo</option>
+        </select>
+    </label>
+    {% endif %}
+    <div class="full-field form-actions">
+        <button class="boton">Guardar</button>
+        <a class="boton secundario" href="{{ url_for('acudientes.lista') }}">Cancelar</a>
+    </div>
+</form>
 {% endblock %}

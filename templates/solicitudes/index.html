@@ -6,13 +6,9 @@
 
 <div class="pagina-contenido solicitudes-page">
 
-    <div class="encabezado-seccion solicitudes-encabezado">
+    <header class="page-head solicitudes-encabezado">
 
         <div>
-            <a href="{{ url_for('auth.dashboard') }}" class="enlace-atras solicitudes-final-atras">
-                ← Atrás
-            </a>
-
             <h1>Solicitudes de cita</h1>
 
             <p class="descripcion-seccion solicitudes-final-descripcion">
@@ -31,7 +27,7 @@
         </div>
         {% endif %}
 
-    </div>
+    </header>
 
 
     {% if solicitudes %}
@@ -471,7 +467,13 @@ a.solicitudes-final-seguimiento:hover {
     color: #ffffff !important;
 }
 @media(max-width:760px) {
-    .solicitudes-encabezado { flex-direction:column !important; align-items:stretch !important; }
+    .solicitudes-encabezado {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+        margin: 0 0 8px !important;
+        padding-top: 10px !important;
+    }
     .solicitudes-header-actions, a.solicitudes-seguimiento { width:100% !important; }
     a.solicitudes-seguimiento { justify-content:center !important; }
 }

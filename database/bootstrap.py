@@ -68,6 +68,21 @@ def ensure_database(config=None):
         cursor.execute(migracion_escolar.read_text(encoding="utf-8"))
         while cursor.nextset():
             pass
+        migracion_google = Path(__file__).resolve().parents[1] / "sql" / "google_calendar_sync.sql"
+        for sentencia in migracion_google.read_text(encoding="utf-8").split(";"):
+            sentencia = sentencia.strip()
+            if not sentencia:
+                continue
+            if sentencia.upper().startswith("ALTER TABLE INTEGRACIONES_GOOGLE"):
+                cursor.execute("SHOW COLUMNS FROM integraciones_google LIKE 'fecha_prueba'")
+                if cursor.fetchone() is not None:
+                    continue
+            if sentencia.upper().startswith("ALTER TABLE EVENTOS_GOOGLE"):
+                cursor.execute("SHOW COLUMNS FROM eventos_google LIKE 'estado'")
+                estado = cursor.fetchone()
+                if estado and "Cancelado" in str(estado[1]):
+                    continue
+            cursor.execute(sentencia)
         cnx.commit()
 
         return True, "Base de datos verificada y migraciones compatibles aplicadas."

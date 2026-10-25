@@ -8,14 +8,6 @@ Registro - EDUTURNOS
 
 <section class="portal-registro-page">
 
-    <a
-        href="{{ url_for('auth.registro') }}"
-        class="portal-registro-back"
-    >
-        <span aria-hidden="true">←</span>
-        Atrás
-    </a>
-
     <div class="portal-registro-card">
 
         <div class="portal-registro-header" style="margin-bottom: 25px;">
@@ -76,7 +68,7 @@ Registro - EDUTURNOS
         {% endwith %}
 
 
-        <form method="POST" action="{{ request.path }}" class="portal-registro-form">
+        <form method="POST" action="{{ request.path }}" class="portal-registro-form" data-form-values="{{ datos|tojson|forceescape }}">
 
             <input
                 type="hidden"
@@ -141,6 +133,10 @@ Registro - EDUTURNOS
                         type="text"
                         name="documento"
                         id="documento"
+                        inputmode="numeric"
+                        pattern="[0-9]{1,30}"
+                        maxlength="30"
+                        data-digits-only
                         required
                         autocomplete="off"
                     >
@@ -158,6 +154,9 @@ Registro - EDUTURNOS
                         type="text"
                         name="nombres"
                         id="nombres"
+                        pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü ]+"
+                        title="Usa solo letras y espacios."
+                        data-letters-only
                         required
                         autocomplete="given-name"
                     >
@@ -175,6 +174,9 @@ Registro - EDUTURNOS
                         type="text"
                         name="apellidos"
                         id="apellidos"
+                        pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü ]+"
+                        title="Usa solo letras y espacios."
+                        data-letters-only
                         required
                         autocomplete="family-name"
                     >
@@ -192,6 +194,8 @@ Registro - EDUTURNOS
                         type="email"
                         name="correo"
                         id="correo"
+                        pattern="{% if portal in ('estudiante', 'acudiente') %}[^@\s]+@[gG][mM][aA][iI][lL]\.[cC][oO][m]{% else %}[^@\s]+@[jJ][jJ][fF][hH]\.[eE][dD][uU]\.[cC][oO]{% endif %}"
+                        title="{% if portal in ('estudiante', 'acudiente') %}Usa una dirección terminada en @gmail.com.{% else %}Usa una dirección terminada en @jjfh.edu.co.{% endif %}"
                         required
                         autocomplete="email"
                     >
@@ -210,9 +214,11 @@ Registro - EDUTURNOS
                         name="password"
                         id="password"
                         required
-                        minlength="8"
+                        minlength="12"
+                        maxlength="15"
                         autocomplete="new-password"
                     >
+                    <small class="password-requirement">La contraseña debe tener entre 12 y 15 caracteres.</small>
 
                 </div>
 
@@ -227,6 +233,8 @@ Registro - EDUTURNOS
                         type="text"
                         name="telefono"
                         id="telefono"
+                        inputmode="numeric"
+                        data-digits-only
                         autocomplete="tel"
                     >
 
@@ -418,6 +426,10 @@ Registro - EDUTURNOS
                         type="text"
                         name="documento"
                         id="documento"
+                        inputmode="numeric"
+                        pattern="[0-9]{1,30}"
+                        maxlength="30"
+                        data-digits-only
                         required
                         autocomplete="off"
                     >
@@ -435,6 +447,9 @@ Registro - EDUTURNOS
                         type="text"
                         name="nombres"
                         id="nombres"
+                        pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü ]+"
+                        title="Usa solo letras y espacios."
+                        data-letters-only
                         required
                         autocomplete="given-name"
                     >
@@ -452,6 +467,9 @@ Registro - EDUTURNOS
                         type="text"
                         name="apellidos"
                         id="apellidos"
+                        pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü ]+"
+                        title="Usa solo letras y espacios."
+                        data-letters-only
                         required
                         autocomplete="family-name"
                     >
@@ -469,6 +487,8 @@ Registro - EDUTURNOS
                         type="email"
                         name="correo"
                         id="correo"
+                        pattern="{% if portal in ('estudiante', 'acudiente') %}[^@\s]+@[gG][mM][aA][iI][lL]\.[cC][oO][m]{% else %}[^@\s]+@[jJ][jJ][fF][hH]\.[eE][dD][uU]\.[cC][oO]{% endif %}"
+                        title="{% if portal in ('estudiante', 'acudiente') %}Usa una dirección terminada en @gmail.com.{% else %}Usa una dirección terminada en @jjfh.edu.co.{% endif %}"
                         required
                         autocomplete="email"
                     >
@@ -486,6 +506,8 @@ Registro - EDUTURNOS
                         type="text"
                         name="telefono"
                         id="telefono"
+                        inputmode="numeric"
+                        data-digits-only
                         autocomplete="tel"
                     >
 
@@ -540,6 +562,10 @@ Registro - EDUTURNOS
                         type="text"
                         name="estudiante_documento"
                         id="estudiante_documento"
+                        inputmode="numeric"
+                        pattern="[0-9]{1,30}"
+                        maxlength="30"
+                        data-digits-only
                         required
                     >
 
@@ -556,6 +582,9 @@ Registro - EDUTURNOS
                         type="text"
                         name="estudiante_nombres"
                         id="estudiante_nombres"
+                        pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü ]+"
+                        title="Usa solo letras y espacios."
+                        data-letters-only
                         required
                     >
 
@@ -572,6 +601,9 @@ Registro - EDUTURNOS
                         type="text"
                         name="estudiante_apellidos"
                         id="estudiante_apellidos"
+                        pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü ]+"
+                        title="Usa solo letras y espacios."
+                        data-letters-only
                         required
                     >
 
@@ -731,9 +763,11 @@ Registro - EDUTURNOS
                         name="password"
                         id="password"
                         required
-                        minlength="8"
+                        minlength="12"
+                        maxlength="15"
                         autocomplete="new-password"
                     >
+                    <small class="password-requirement">La contraseña debe tener entre 12 y 15 caracteres.</small>
 
                 </div>
 
@@ -786,6 +820,10 @@ Registro - EDUTURNOS
                         type="text"
                         name="documento"
                         id="documento"
+                        inputmode="numeric"
+                        pattern="[0-9]{1,30}"
+                        maxlength="30"
+                        data-digits-only
                         required
                         autocomplete="off"
                     >
@@ -803,6 +841,9 @@ Registro - EDUTURNOS
                         type="text"
                         name="nombres"
                         id="nombres"
+                        pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü ]+"
+                        title="Usa solo letras y espacios."
+                        data-letters-only
                         required
                         autocomplete="given-name"
                     >
@@ -820,6 +861,9 @@ Registro - EDUTURNOS
                         type="text"
                         name="apellidos"
                         id="apellidos"
+                        pattern="[A-Za-zÁÉÍÓÚÑÜáéíóúñü ]+"
+                        title="Usa solo letras y espacios."
+                        data-letters-only
                         required
                         autocomplete="family-name"
                     >
@@ -838,6 +882,8 @@ Registro - EDUTURNOS
                         name="correo"
                         id="correo"
                         placeholder="usuario@jjfh.edu.co"
+                        pattern="[^@\s]+@[jJ][jJ][fF][hH]\.[eE][dD][uU]\.[cC][oO]"
+                        title="Usa una dirección terminada en @jjfh.edu.co."
                         required
                         autocomplete="email"
                     >
@@ -855,6 +901,8 @@ Registro - EDUTURNOS
                         type="text"
                         name="telefono"
                         id="telefono"
+                        inputmode="numeric"
+                        data-digits-only
                         autocomplete="tel"
                     >
 
@@ -939,6 +987,7 @@ Registro - EDUTURNOS
                         pattern="[0-9]{6}"
                         maxlength="6"
                         minlength="6"
+                        data-digits-only
                         required
                         autocomplete="off"
                     >
@@ -957,9 +1006,11 @@ Registro - EDUTURNOS
                         name="password"
                         id="password"
                         required
-                        minlength="8"
+                        minlength="12"
+                        maxlength="15"
                         autocomplete="new-password"
                     >
+                    <small class="password-requirement">La contraseña debe tener entre 12 y 15 caracteres.</small>
 
                 </div>
 
@@ -970,24 +1021,19 @@ Registro - EDUTURNOS
             <!-- BOTONES -->
             <!-- ================================================= -->
 
-            <div style="margin-top: 30px;">
-
-                <button type="submit">
-                    Crear cuenta
-                </button>
-
-                <a
-                    href="{{ url_for('auth.login') }}"
-                    style="margin-left: 15px;"
-                >
-                    Volver al inicio de sesión
-                </a>
-
+            <div class="portal-registro-form-actions">
+                <div class="portal-registro-action-buttons">
+                    <a class="portal-registro-cancel" href="{{ url_for('auth.registro') }}">Cancelar</a>
+                    <button type="submit">Crear cuenta</button>
+                </div>
+                <a class="portal-registro-login-link" href="{{ url_for('auth.login') }}">Volver al inicio de sesión</a>
             </div>
 
         </form>
 
     </div>
+
+<script src="{{ url_for('static', filename='js/registro.js') }}?v=20261020_form_flow_v1" defer></script>
 
 <style id="portal-registro-visual-unificado">
     body:has(.portal-registro-page),
@@ -1024,34 +1070,6 @@ Registro - EDUTURNOS
         margin-bottom: 16px !important;
     }
 
-    body.auth-page .portal-registro-page > .portal-registro-back {
-        position: absolute;
-        top: 24px;
-        right: calc(100% + 12px);
-        min-height: 38px;
-        padding: 8px 13px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        box-sizing: border-box;
-        border: 1px solid #2875c7;
-        border-radius: 7px;
-        background: #2875c7;
-        color: #ffffff;
-        font-size: 13px;
-        font-weight: 700;
-        line-height: 1;
-        text-decoration: none;
-        white-space: nowrap;
-    }
-
-    body.auth-page .portal-registro-page > .portal-registro-back:hover {
-        border-color: #172942;
-        background: #172942;
-        color: #ffffff;
-    }
-
     .portal-registro-card h1 {
         margin: 0 0 8px;
         color: #123b68;
@@ -1059,13 +1077,6 @@ Registro - EDUTURNOS
         font-size: 30px;
         line-height: 1.15;
         letter-spacing: 0;
-    }
-
-    @media (max-width: 1120px) {
-        body.auth-page .portal-registro-page > .portal-registro-back {
-            position: static;
-            margin: 0 0 10px;
-        }
     }
 
     .portal-registro-card h2 {
@@ -1143,18 +1154,21 @@ Registro - EDUTURNOS
         outline: none !important;
     }
 
-    .portal-registro-form > div:last-child {
+    .portal-registro-form > .portal-registro-form-actions {
         grid-column: 1 / -1;
+        display: grid;
+        justify-items: start;
+        gap: 12px;
+        margin-top: 8px !important;
+    }
+
+    .portal-registro-action-buttons {
         display: flex;
         align-items: center;
-        justify-content: flex-start;
-        gap: 14px;
-        min-height: 40px !important;
-        margin-top: 6px !important;
+        gap: 10px;
     }
 
     .portal-registro-form button {
-        order: 1;
         flex: 0 0 auto;
         height: 42px;
         min-height: 42px;
@@ -1174,15 +1188,32 @@ Registro - EDUTURNOS
         border-color: #172942;
     }
 
-    .portal-registro-form a {
+    .portal-registro-form .portal-registro-cancel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 8px 17px;
+        border: 1px solid #d4deeb;
+        border-radius: 7px;
+        background: #f4f7fb;
+        color: #23466f;
+        box-sizing: border-box;
+        text-decoration: none;
+    }
+
+    .portal-registro-form .portal-registro-login-link {
         margin-left: 0 !important;
         color: #2f78ff;
         font-size: 13px;
         font-weight: 700;
     }
 
-    .portal-registro-form > div:last-child > a:last-child {
-        order: 2;
+    .portal-registro-form .password-requirement {
+        margin-top: 0;
+        color: #5f7895;
+        font-size: 11px;
+        font-weight: 400;
     }
 
     @media (max-width: 700px) {
@@ -1204,8 +1235,29 @@ Registro - EDUTURNOS
             min-height: 67px !important;
         }
 
-        .portal-registro-form > div:last-child {
-            flex-wrap: wrap;
+        .portal-registro-form > .portal-registro-form-actions {
+            justify-items: stretch;
+        }
+
+        .portal-registro-action-buttons {
+            width: 100%;
+        }
+
+        .portal-registro-action-buttons > button {
+            order: 1;
+        }
+
+        .portal-registro-action-buttons > .portal-registro-cancel {
+            order: 2;
+        }
+
+        .portal-registro-action-buttons > * {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        .portal-registro-form .portal-registro-login-link {
+            justify-self: center;
         }
 
         .portal-registro-card h1 {

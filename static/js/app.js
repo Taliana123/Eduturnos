@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+	const mainContent = document.getElementById("contenido");
 	document.querySelectorAll(".sede-select").forEach((select) => {
 		const output = select.parentElement.querySelector("[data-sede-code]");
 		const sync = () => {
@@ -21,7 +22,17 @@ document.addEventListener("DOMContentLoaded", () => {
 			mobileNavToggle.setAttribute("aria-label", label);
 			mobileNavToggle.title = label;
 			mobileNavBackdrop.hidden = !open;
-			if (open) mobileNav.querySelector("nav a")?.focus({ preventScroll: true });
+			if (open) {
+				const navigation = mobileNav.querySelector("nav");
+				const resetNavigationScroll = () => {
+					mobileNav.scrollTop = 0;
+					if (navigation) navigation.scrollTop = 0;
+				};
+				resetNavigationScroll();
+				requestAnimationFrame(resetNavigationScroll);
+				const currentLink = navigation?.querySelector('a[aria-current="page"]') || navigation?.querySelector("a");
+				currentLink?.focus({ preventScroll: true });
+			}
 			else mobileNavToggle.focus({ preventScroll: true });
 		};
 		mobileNavToggle.addEventListener("click", () => {
@@ -35,21 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		mobileDialogMedia.addEventListener("change", () => {
 			if (!mobileDialogMedia.matches && document.body.classList.contains("mobile-nav-open")) setMobileNavOpen(false);
 		});
-	}
-	const assistantWidget = document.querySelector('[data-eduturnos-assistant]');
-	const sidebarNavigation = document.querySelector('.eduturnos-desktop-sidebar > nav');
-	if (assistantWidget && sidebarNavigation) {
-		const originalParent = assistantWidget.parentNode;
-		const originalNext = assistantWidget.nextSibling;
-		const updateAssistantLocation = () => {
-			if (mobileDialogMedia.matches) {
-				if (assistantWidget.parentNode !== originalParent) originalParent.insertBefore(assistantWidget, originalNext);
-			} else {
-				sidebarNavigation.after(assistantWidget);
-			}
-		};
-		updateAssistantLocation();
-		mobileDialogMedia.addEventListener('change', updateAssistantLocation);
 	}
 	const citationsView = document.querySelector('.citas-desktop-view');
 	if (citationsView) {
@@ -104,23 +100,23 @@ document.addEventListener("DOMContentLoaded", () => {
 		};
 		panels.forEach((panel, index) => {
 			panel.id = `admin-catalog-${index}`;
-			const button = document.createElement("button");
-			button.type = "button";
-			button.id = `admin-tab-${index}`;
-			button.textContent = panel.querySelector("h2").textContent;
-			button.setAttribute("role", "tab");
-			button.setAttribute("aria-controls", panel.id);
+			const link = document.createElement("a");
+			link.href = `#${panel.id}`;
+			link.id = `admin-tab-${index}`;
+			link.textContent = panel.querySelector("h2").textContent;
+			link.setAttribute("role", "tab");
+			link.setAttribute("aria-controls", panel.id);
 			panel.setAttribute("role", "tabpanel");
-			panel.setAttribute("aria-labelledby", button.id);
-			button.addEventListener("click", () => { selected = index; updateCatalogs(); });
-			button.addEventListener("keydown", (event) => {
+			panel.setAttribute("aria-labelledby", link.id);
+			link.addEventListener("click", (event) => { event.preventDefault(); selected = index; updateCatalogs(); });
+			link.addEventListener("keydown", (event) => {
 				if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
 				event.preventDefault();
 				selected = event.key === "Home" ? 0 : event.key === "End" ? panels.length - 1 : (selected + (event.key === "ArrowRight" ? 1 : -1) + panels.length) % panels.length;
 				updateCatalogs();
 				tabs.children[selected].focus();
 			});
-			tabs.append(button);
+			tabs.append(link);
 		});
 		administration.querySelector(".page-head").after(tabs);
 		updateCatalogs();

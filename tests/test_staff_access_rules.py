@@ -64,12 +64,14 @@ def test_validacion_horario_cubre_los_tres_participantes(monkeypatch):
 def test_confirmacion_no_sobrescribe_cancelacion_concurrente(monkeypatch):
     from app import app
     import routes.citas as citas
+    from contextlib import contextmanager
 
     usuario = {"id_usuario": 21, "rol_nombre": "Acudiente"}
     consultas = []
     actualizaciones = []
     notificaciones = []
     auditorias = []
+    escrituras = []
 
     def consultar_mock(sql, params=(), uno=False):
         consultas.append(sql)
@@ -92,11 +94,24 @@ def test_confirmacion_no_sobrescribe_cancelacion_concurrente(monkeypatch):
 
     monkeypatch.setattr(citas, "usuario_actual", lambda: usuario)
     monkeypatch.setattr(citas, "consultar", consultar_mock)
-    monkeypatch.setattr(
-        citas,
-        "ejecutar",
-        lambda sql, params=(): actualizaciones.append((sql, params)),
-    )
+    class CursorPrueba:
+        rowcount = 0
+
+        def execute(self, sql, params=()):
+            escrituras.append((sql, params))
+
+        def close(self):
+            pass
+
+    class ConexionPrueba:
+        def cursor(self, **kwargs):
+            return CursorPrueba()
+
+    @contextmanager
+    def transaccion_prueba():
+        yield ConexionPrueba()
+
+    monkeypatch.setattr(citas, "transaccion", transaccion_prueba)
     monkeypatch.setattr(
         citas,
         "_notificar",
@@ -116,8 +131,8 @@ def test_confirmacion_no_sobrescribe_cancelacion_concurrente(monkeypatch):
         response = citas.cambiar_estado.__wrapped__(7)
 
     assert response.status_code == 302
-    assert "AND id_estado = %s" in actualizaciones[0][0]
-    assert actualizaciones[0][1] == (2, 7, 1)
+    assert "AND id_estado=%s" in escrituras[0][0]
+    assert escrituras[0][1] == (2, 7, 1)
     assert notificaciones == []
     assert auditorias == []
 

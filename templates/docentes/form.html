@@ -1,11 +1,53 @@
-{% extends 'base.html' %}{% block content %}<h1>{{ 'Editar' if docente else 'Nuevo' }} docente</h1><form method="post" class="panel form-grid docente-form">{{ csrf_field()|safe }}<label>Tipo documento<select name="tipo_documento">
-<option value="" selected disabled hidden></option>
-<option value="CC">Cédula de ciudadanía</option><option value="TI">Tarjeta de identidad</option><option value="CE">Cédula de extranjería</option></select></label><label>Documento<input name="documento" value="{{ docente.documento if docente else '' }}" required></label><label>Nombres<input name="nombres" value="{{ docente.nombres if docente else '' }}" required></label><label>Apellidos<input name="apellidos" value="{{ docente.apellidos if docente else '' }}" required></label><label>Correo institucional<input type="email" name="correo" value="{{ docente.correo_institucional if docente else '' }}" required></label><label>Teléfono<input name="telefono" value="{{ docente.telefono if docente else '' }}"></label><label>Sede<select name="sede">
-<option value="" selected disabled hidden></option>
-{% for x in catalogos.sedes %}<option value="{{ x.id }}" {% if docente and docente.id_sede==x.id %}selected{% endif %}>{{ x.nombre }}</option>{% endfor %}</select></label><label>Jornada<select name="jornada">
-<option value="" selected disabled hidden></option>
-{% for x in catalogos.jornadas %}<option value="{{ x.id }}" {% if docente and docente.id_jornada==x.id %}selected{% endif %}>{{ x.nombre }}</option>{% endfor %}</select></label><label>Asignatura<input name="asignatura" value="{{ docente.asignatura if docente else '' }}"></label><div class="full-field form-actions"><button class="boton">Guardar</button> <a class="boton secundario" href="{{ url_for('docentes.lista') }}">Cancelar</a></div></form>
-
-
-
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ 'Editar' if docente else 'Nuevo' }} docente</h1>
+<form method="post" class="panel form-grid docente-form">
+    {{ csrf_field()|safe }}
+    <label>Tipo documento
+        <select name="tipo_documento">
+            <option value="" selected disabled hidden></option>
+            <option value="CC">Cédula de ciudadanía</option>
+            <option value="TI">Tarjeta de identidad</option>
+            <option value="CE">Cédula de extranjería</option>
+        </select>
+    </label>
+    <label>Documento
+        <input name="documento" value="{{ docente.documento if docente else '' }}" required>
+    </label>
+    <label>Nombres
+        <input name="nombres" value="{{ docente.nombres if docente else '' }}" required>
+    </label>
+    <label>Apellidos
+        <input name="apellidos" value="{{ docente.apellidos if docente else '' }}" required>
+    </label>
+    <label>Correo institucional
+        <input type="email" name="correo" value="{{ request.form.get('correo', docente.correo_institucional if docente else '') }}" pattern="[^@\s]+@[jJ][jJ][fF][hH]\.[eE][dD][uU]\.[cC][oO]" title="Usa una dirección terminada en @jjfh.edu.co." required>
+    </label>
+    <label>Teléfono
+        <input name="telefono" value="{{ docente.telefono if docente else '' }}">
+    </label>
+    <label>Sede
+        <select name="sede">
+            <option value="" selected disabled hidden></option>
+            {% for x in catalogos.sedes %}
+            <option value="{{ x.id }}" {% if docente and docente.id_sede==x.id %}selected{% endif %}>{{ x.nombre }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Jornada
+        <select name="jornada">
+            <option value="" selected disabled hidden></option>
+            {% for x in catalogos.jornadas %}
+            <option value="{{ x.id }}" {% if docente and docente.id_jornada==x.id %}selected{% endif %}>{{ x.nombre }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Asignatura
+        <input name="asignatura" value="{{ docente.asignatura if docente else '' }}">
+    </label>
+    <div class="full-field form-actions">
+        <button class="boton">Guardar</button>
+        <a class="boton secundario" href="{{ url_for('docentes.lista') }}">Cancelar</a>
+    </div>
+</form>
 {% endblock %}

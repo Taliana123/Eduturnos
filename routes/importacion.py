@@ -4,6 +4,7 @@ import io
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from routes.helpers import roles_permitidos, auditoria
 from database.db import consultar, ejecutar
+from roles import es_correo_gmail
 
 importacion_bp = Blueprint("importacion", __name__, url_prefix="/importacion")
 ROLES = ("Super Admin", "Rector", "Administrador / Coordinador")
@@ -110,14 +111,17 @@ def acudientes():
             documento = str(_get(row, "documento")).strip()
             nombres = str(_get(row, "nombres")).strip()
             apellidos = str(_get(row, "apellidos")).strip()
+            correo = str(_get(row, "correo")).strip().lower()
             if not all((documento, nombres, apellidos)):
                 raise ValueError("Faltan documento, nombres o apellidos.")
+            if not es_correo_gmail(correo):
+                raise ValueError("El correo del acudiente debe terminar en @gmail.com.")
             if consultar("SELECT id_acudiente FROM acudientes WHERE documento=%s", (documento,), uno=True):
                 raise ValueError("Documento duplicado.")
             ejecutar(
                 """INSERT INTO acudientes(tipo_documento,documento,nombres,apellidos,telefono,correo,direccion,barrio,municipio,estado)
                    VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,1)""",
-                (tipo, documento, nombres, apellidos, _get(row, "telefono"), str(_get(row, "correo")).strip().lower() or None, _get(row, "direccion"), _get(row, "barrio"), _get(row, "municipio") or "Ibagué"),
+                (tipo, documento, nombres, apellidos, _get(row, "telefono"), correo, _get(row, "direccion"), _get(row, "barrio"), _get(row, "municipio") or "Ibagué"),
             )
             ok += 1
         except Exception as exc:

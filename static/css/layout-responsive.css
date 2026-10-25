@@ -1,0 +1,2477 @@
+:root {
+    --layout-gutter: clamp(16px, 2.2vw, 36px);
+    --layout-gap: clamp(12px, 1.6vw, 24px);
+}
+
+html,
+body {
+    max-width: 100%;
+}
+
+img,
+svg,
+video,
+canvas {
+    max-width: 100%;
+}
+
+#contenido,
+#contenido * {
+    min-width: 0;
+}
+
+html body:not(.has-desktop-sidebar):not(.auth-page) > main#contenido.contenedor {
+    width: min(1600px, calc(100% - 2 * var(--layout-gutter)));
+    max-width: 1600px;
+    margin: clamp(20px, 3vw, 40px) auto;
+    padding: var(--layout-gutter);
+}
+
+html body.has-desktop-sidebar > main#contenido.contenedor {
+    width: calc(100% - 272px);
+    max-width: none;
+    margin: 92px 18px 24px 254px;
+    padding: clamp(18px, 2vw, 32px);
+}
+
+#contenido > *,
+#contenido .page-head > *,
+#contenido .form-top-actions > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
+#contenido .page-head,
+#contenido .form-top-actions,
+#contenido .form-actions,
+#contenido .acciones,
+#contenido .page-head-actions {
+    flex-wrap: wrap;
+    gap: var(--layout-gap);
+}
+
+#contenido .panel,
+#contenido .tarjeta,
+#contenido .form-card,
+#contenido .table-wrap,
+#contenido .table-responsive {
+    max-width: 100%;
+}
+
+#contenido .table-wrap,
+#contenido .table-responsive {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+#contenido .table-wrap table,
+#contenido .table-responsive table {
+    margin-inline: 0;
+}
+
+#contenido input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+#contenido select,
+#contenido textarea {
+    max-width: 100%;
+}
+
+#contenido .boton,
+#contenido button,
+#contenido input[type="submit"] {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+#contenido .grid,
+#contenido .registro-grid,
+#contenido .action-grid,
+#contenido .dashboard-action-grid,
+#contenido .dashboard-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: var(--layout-gap);
+}
+
+#contenido .kpi-grid,
+#contenido .dashboard-kpis {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 205px), 1fr));
+    gap: var(--layout-gap);
+}
+
+#contenido .form-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: var(--layout-gap);
+}
+
+#contenido .form-grid > .full-field,
+#contenido .form-grid > .full-width,
+#contenido .form-grid > .form-actions {
+    grid-column: 1 / -1;
+}
+
+.public-info-page > main {
+    width: min(1440px, 100%);
+    padding-inline: clamp(20px, 6vw, 90px);
+}
+
+.public-info-page .grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+}
+
+.public-info-page .card,
+.public-info-page .hero-card {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.public-home-page,
+.public-home-page .pagina,
+.public-home-page .pagina > main {
+    max-width: 100%;
+}
+
+.public-home-page .barra-interior,
+.public-home-page .hero-interior,
+.public-home-page .footer-interior {
+    width: min(1500px, calc(100% - var(--layout-gutter) - var(--layout-gutter)));
+    max-width: 1500px;
+}
+
+@media (min-width: 901px) and (max-width: 1100px) {
+    html body.has-desktop-sidebar > main#contenido.contenedor {
+        width: calc(100% - 241px);
+        margin: 82px 12px 18px 229px;
+        padding: 16px;
+    }
+}
+
+@media (max-width: 900px) {
+    html body:not(.public-home-page):not(.public-info-page) > main#contenido.contenedor {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: clamp(12px, 3vw, 24px);
+    }
+
+    html body #contenido .notificaciones-page > .page-head {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 12px !important;
+    }
+
+    html body #contenido .notificaciones-page > .page-head > div {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+
+    html body #contenido .notificaciones-page > .page-head > form {
+        display: flex !important;
+        flex: 0 0 auto !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        width: auto !important;
+        margin: 0 0 0 auto !important;
+    }
+
+    html body #contenido .notificaciones-page button.eduturnos-marcar-leidas {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        min-height: 32px !important;
+        height: 32px !important;
+        margin: 0 !important;
+        padding: 6px 10px !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-card {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 16px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-content {
+        flex: 1 1 0% !important;
+        width: auto !important;
+        min-width: 0 !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-card > form {
+        display: flex !important;
+        flex: 0 0 auto !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        width: auto !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-card > form button {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        min-height: 34px !important;
+        height: 34px !important;
+        margin: 0 !important;
+        padding: 6px 10px !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-read {
+        flex: 0 0 auto !important;
+        margin-left: auto !important;
+    }
+
+    @media (max-width: 900px) {
+        html body #contenido .notificaciones-page > .page-head {
+            flex-direction: row !important;
+            align-items: flex-end !important;
+            gap: 8px !important;
+        }
+
+        html body #contenido .notificaciones-page > .page-head > form {
+            width: auto !important;
+        }
+
+        html body #contenido .notificaciones-page .notification-card {
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 10px !important;
+            padding: 12px !important;
+        }
+
+        html body #contenido .notificaciones-page .notification-content {
+            flex: 1 1 0% !important;
+            width: auto !important;
+            min-width: 0 !important;
+        }
+
+        html body #contenido .notificaciones-page .notification-card > form {
+            flex: 0 0 auto !important;
+            align-self: center !important;
+            width: auto !important;
+            max-width: 44% !important;
+        }
+
+        html body #contenido .notificaciones-page .notification-card > form button {
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            padding: 6px 8px !important;
+            white-space: normal !important;
+        }
+
+        html body #contenido .notificaciones-page .notification-read {
+            align-self: center !important;
+        }
+
+        html body #contenido .directory-page .directory-search,
+        html body #contenido .estudiantes-directorio-header form.estudiantes-search {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) 56px 56px auto !important;
+            align-items: center !important;
+            gap: 6px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 0 12px !important;
+        }
+
+        html body #contenido .estudiantes-directorio-header {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) !important;
+            align-items: start !important;
+            gap: 8px !important;
+            padding: 12px !important;
+        }
+
+        html body #contenido .estudiantes-directorio-header strong {
+            grid-row: 1 !important;
+        }
+
+        html body #contenido .directory-page .directory-search > label.visually-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            margin: -1px !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        html body #contenido .directory-page .directory-search > input,
+        html body #contenido .estudiantes-directorio-header .estudiantes-search > input {
+            grid-column: 1 !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            height: 38px !important;
+            min-height: 38px !important;
+            margin: 0 !important;
+        }
+
+        html body #contenido .directory-page .directory-search > button,
+        html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-button {
+            grid-column: 2 !important;
+            width: 56px !important;
+            min-width: 56px !important;
+            height: 36px !important;
+            min-height: 36px !important;
+        }
+
+        html body #contenido .directory-page .directory-search > .directory-search-all,
+        html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-all {
+            grid-column: 3 !important;
+            width: 56px !important;
+            min-width: 56px !important;
+            height: 36px !important;
+            min-height: 36px !important;
+        }
+
+        html body #contenido .directory-page .directory-search > .directory-new,
+        html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-new {
+            grid-column: 4 !important;
+            justify-self: end !important;
+            width: auto !important;
+            min-width: 0 !important;
+            height: 36px !important;
+            min-height: 36px !important;
+            margin: 0 !important;
+            padding: 7px 9px !important;
+            white-space: nowrap !important;
+        }
+
+        html body #contenido .directory-page .table-wrap {
+            overflow: visible !important;
+            border: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        html body #contenido .directory-page table.directory-table,
+        html body #contenido table.estudiantes-directorio-table {
+            display: block !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            table-layout: auto !important;
+            border: 0 !important;
+            background: transparent !important;
+        }
+
+        html body #contenido .directory-page table.directory-table thead,
+        html body #contenido table.estudiantes-directorio-table thead {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            margin: -1px !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody,
+        html body #contenido table.estudiantes-directorio-table tbody {
+            display: grid !important;
+            gap: 10px !important;
+            width: 100% !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody tr,
+        html body #contenido table.estudiantes-directorio-table tbody tr {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 0 !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            margin: 0 !important;
+            padding: 6px 12px !important;
+            border: 1px solid #d5e1fa !important;
+            border-radius: 8px !important;
+            background: #ffffff !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody td,
+        html body #contenido table.estudiantes-directorio-table tbody td {
+            display: block !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            padding: 7px 8px !important;
+            border: 0 !important;
+            border-bottom: 1px solid #edf0f5 !important;
+            overflow-wrap: anywhere !important;
+            word-break: normal !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody td[data-label]::before,
+        html body #contenido table.estudiantes-directorio-table tbody td[data-label]::before {
+            content: attr(data-label) !important;
+            display: block !important;
+            margin-bottom: 2px !important;
+            color: #557096 !important;
+            font-weight: 600 !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody td:first-child,
+        html body #contenido table.estudiantes-directorio-table tbody td:first-child {
+            display: block !important;
+            grid-column: 1 / -1 !important;
+            color: #17365d !important;
+            font-weight: 700 !important;
+            padding: 9px 8px !important;
+            border-bottom: 1px solid #edf0f5 !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody td.table-actions-cell {
+            display: flex !important;
+            grid-column: 1 / -1 !important;
+            justify-content: flex-end !important;
+            border-bottom: 0 !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody tr.directory-empty-row td,
+        html body #contenido table.estudiantes-directorio-table tbody tr:has(.estudiantes-directorio-vacio) td {
+            display: block !important;
+            grid-column: 1 / -1 !important;
+            border: 0 !important;
+            text-align: center !important;
+        }
+
+        html body #contenido .estudiantes-desktop {
+            display: block !important;
+        }
+
+        html body #contenido .estudiantes-mobile-legacy {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            margin: -1px !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+        }
+
+        html body #contenido .estudiantes-desktop-head {
+            align-items: flex-start !important;
+            margin-bottom: 12px !important;
+        }
+
+        html body #contenido .estudiantes-desktop-head p {
+            margin: 6px 0 0 !important;
+        }
+
+        html body #contenido .estudiantes-directorio {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
+            border: 1px solid #d5e1fa !important;
+            border-radius: 8px !important;
+            background: #ffffff !important;
+        }
+
+        html body #contenido .estudiantes-directorio-header .estudiantes-search {
+            grid-row: 2 !important;
+            max-width: 100% !important;
+        }
+
+        html body #contenido .estudiantes-directorio-table .estudiantes-identidad {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }
+
+        html body #contenido .estudiantes-directorio-table .estudiantes-avatar {
+            flex: 0 0 34px !important;
+        }
+
+        html body #contenido .estudiantes-directorio-table td[data-label] {
+            color: #557096 !important;
+            font-weight: 400 !important;
+        }
+
+        html body #contenido .estudiantes-directorio-table td small {
+            display: inline !important;
+            margin: 0 0 0 4px !important;
+        }
+
+        html body #contenido .seguimiento-descripcion-desktop {
+            display: block !important;
+            margin: 0 0 16px !important;
+            line-height: 1.5 !important;
+        }
+
+        html body #contenido .seguimiento-procesos {
+            display: block !important;
+            width: 100% !important;
+            margin-top: 16px !important;
+            overflow: hidden !important;
+            border: 1px solid #d5e1fa !important;
+            border-radius: 8px !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+        }
+
+        html body #contenido .seguimiento-procesos-header {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 10px !important;
+            padding: 14px 16px !important;
+            border-bottom: 1px solid #d5e1fa !important;
+        }
+
+        html body #contenido .seguimiento-procesos-header h2 {
+            margin: 0 !important;
+        }
+
+        html body #contenido .seguimiento-procesos-header > span {
+            flex: 0 0 auto !important;
+            white-space: nowrap !important;
+        }
+
+        html body #contenido a.seguimiento-proceso {
+            display: grid !important;
+            grid-template-columns: 74px minmax(0, 1fr) 18px !important;
+            align-items: center !important;
+            gap: 10px !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            padding: 14px 12px !important;
+            border-top: 1px solid #d5e1fa !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            color: inherit !important;
+            text-decoration: none !important;
+        }
+
+        html body #contenido .seguimiento-estado {
+            justify-self: start !important;
+            padding: 6px 7px !important;
+            white-space: normal !important;
+        }
+
+        html body #contenido .seguimiento-proceso-info {
+            min-width: 0 !important;
+        }
+
+        html body #contenido .seguimiento-proceso-info strong {
+            overflow-wrap: anywhere !important;
+        }
+
+        html body #contenido .seguimiento-proceso-info p {
+            margin: 4px 0 0 !important;
+            line-height: 1.4 !important;
+            overflow-wrap: anywhere !important;
+        }
+
+        html body #contenido .seguimiento-proceso-abrir {
+            text-align: right !important;
+        }
+
+        html body #contenido .seguimiento-procesos-vacio {
+            margin: 0 !important;
+            padding: 16px !important;
+        }
+
+        html body #contenido .seguimiento-historial {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            margin: -1px !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+        }
+
+        html body #contenido .reportes-page.reportes-panorama-activo .reportes-filter,
+        html body #contenido .reportes-page.reportes-panorama-activo .reportes-results,
+        html body #contenido .reportes-page.reportes-panorama-activo .reportes-kpi-grid {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            margin: -1px !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+        }
+
+        html body #contenido .reportes-page .reportes-panorama {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) !important;
+            gap: 18px !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            margin: 0 0 16px !important;
+            padding: 16px !important;
+            border: 1px solid #d5e1fa !important;
+            border-radius: 8px !important;
+            background: #ffffff !important;
+            color: #142d50 !important;
+        }
+
+        html body #contenido .reportes-panorama-intro {
+            display: flex !important;
+            justify-content: flex-end !important;
+            min-width: 0 !important;
+        }
+
+        html body #contenido .reportes-panorama-exportar {
+            display: flex !important;
+            justify-content: flex-end !important;
+            gap: 8px !important;
+            width: auto !important;
+        }
+
+        html body #contenido .reportes-panorama-exportar .boton {
+            width: auto !important;
+            min-width: 54px !important;
+            min-height: 36px !important;
+            padding: 6px 9px !important;
+        }
+
+        html body #contenido .reportes-panorama-estados {
+            display: grid !important;
+            gap: 14px !important;
+            min-width: 0 !important;
+        }
+
+        html body #contenido .reportes-panorama-label {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 10px !important;
+            margin: 0 0 7px !important;
+        }
+
+        html body #contenido .reportes-panorama-estado progress {
+            display: block !important;
+            appearance: none !important;
+            width: 100% !important;
+            height: 8px !important;
+            border: 0 !important;
+            border-radius: 5px !important;
+            background: #f0f4fc !important;
+            accent-color: #224fe0 !important;
+        }
+
+        html body #contenido .reportes-panorama-estado progress::-webkit-progress-bar {
+            border-radius: 5px;
+            background: #f0f4fc;
+        }
+
+        html body #contenido .reportes-panorama-estado progress::-webkit-progress-value {
+            border-radius: 5px;
+            background: #224fe0;
+        }
+
+        html body #contenido .reportes-panorama-estado progress::-moz-progress-bar {
+            border-radius: 5px;
+            background: #224fe0;
+        }
+
+        html body #contenido .reportes-panorama-alerta progress::-webkit-progress-value,
+        html body #contenido .reportes-panorama-alerta progress::-moz-progress-bar {
+            background: #d94162;
+        }
+
+        html body #contenido .reportes-panorama-chart {
+            display: block !important;
+            width: 100% !important;
+            height: auto !important;
+            min-width: 0 !important;
+            aspect-ratio: 480 / 320 !important;
+        }
+
+        html body #contenido .reportes-panorama-vacio {
+            margin: 0 !important;
+            color: #557096 !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page {
+            width: 100% !important;
+            min-width: 0 !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page .admin-catalog-tabs {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            gap: 18px !important;
+            width: 100% !important;
+            margin: 12px 0 !important;
+            padding: 0 !important;
+            overflow-x: auto !important;
+            overscroll-behavior-inline: contain !important;
+            border-bottom: 0 !important;
+            scrollbar-width: thin !important;
+        }
+
+        html body #contenido .administracion-page .admin-catalog-tabs > a {
+            flex: 0 0 auto !important;
+            width: auto !important;
+            min-width: 0 !important;
+            min-height: 40px !important;
+            padding: 10px 0 !important;
+            white-space: nowrap !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page > .panel,
+        html body #contenido .administracion-page .configuracion-catalogos > .panel {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            margin: 0 !important;
+            padding: 16px !important;
+            border: 1px solid #d5e1fa !important;
+            border-radius: 8px !important;
+            background: #ffffff !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page .section-heading {
+            margin-bottom: 14px !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page .section-heading h2 {
+            margin: 0 0 6px !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page form.form-grid,
+        html body #contenido .administracion-page .configuracion-page form.stack-form {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 12px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page .institucion-form > .institution-name,
+        html body #contenido .administracion-page .configuracion-page .form-grid > .full-field {
+            grid-column: 1 / -1 !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page .institution-actions,
+        html body #contenido .administracion-page .configuracion-page .catalogo-form-actions {
+            grid-column: 1 / -1 !important;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            justify-content: flex-start !important;
+            gap: 8px !important;
+            margin: 0 !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page form label {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 5px !important;
+            width: auto !important;
+            min-width: 0 !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page form label input,
+        html body #contenido .administracion-page .configuracion-page form label select,
+        html body #contenido .administracion-page .configuracion-page form label textarea {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            min-height: 40px !important;
+            box-sizing: border-box !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page .table-wrap {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-top: 12px !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page .table-wrap table {
+            width: max-content !important;
+            min-width: 620px !important;
+        }
+    }
+
+    @media (max-width: 600px) {
+        html body #contenido .notificaciones-page > .page-head {
+            align-items: flex-end !important;
+            gap: 6px !important;
+        }
+
+        html body #contenido .notificaciones-page > .page-head > form {
+            max-width: 48% !important;
+        }
+
+        html body #contenido .notificaciones-page button.eduturnos-marcar-leidas {
+            white-space: normal !important;
+            text-align: center !important;
+        }
+
+        html body #contenido .notificaciones-page .notification-card {
+            gap: 8px !important;
+            padding: 10px !important;
+        }
+
+        html body #contenido .notificaciones-page .notification-card > form {
+            max-width: 42% !important;
+        }
+
+        html body #contenido .notificaciones-page .notification-card > form button {
+            min-height: 32px !important;
+            height: auto !important;
+        }
+
+        html body #contenido .estudiantes-desktop-head {
+            display: block !important;
+        }
+
+        html body #contenido .estudiantes-desktop-head h1 {
+            margin: 0 !important;
+        }
+
+        html body #contenido .estudiantes-desktop-head p {
+            margin-top: 5px !important;
+        }
+
+        html body #contenido .estudiantes-directorio-header {
+            padding: 10px !important;
+        }
+
+        html body #contenido .estudiantes-directorio-table tbody td {
+            grid-template-columns: minmax(88px, 0.4fr) minmax(0, 1fr) !important;
+            padding: 7px 0 !important;
+        }
+
+        html body #contenido .estudiantes-directorio-table tbody td:first-child {
+            display: block !important;
+        }
+
+        html body #contenido .seguimiento-procesos-header {
+            padding: 12px !important;
+        }
+
+        html body #contenido a.seguimiento-proceso {
+            grid-template-columns: 68px minmax(0, 1fr) 16px !important;
+            gap: 8px !important;
+            padding: 12px 9px !important;
+        }
+
+        html body #contenido .reportes-page .reportes-panorama {
+            gap: 14px !important;
+            padding: 12px !important;
+        }
+
+        html body #contenido .reportes-panorama-exportar {
+            gap: 6px !important;
+        }
+
+        html body #contenido .reportes-panorama-exportar .boton {
+            min-width: 48px !important;
+            min-height: 34px !important;
+            padding: 5px 7px !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page form.form-grid,
+        html body #contenido .administracion-page .configuracion-page form.stack-form {
+            grid-template-columns: minmax(0, 1fr) !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page .institucion-form > .institution-name,
+        html body #contenido .administracion-page .configuracion-page .form-grid > .full-field,
+        html body #contenido .administracion-page .configuracion-page .institution-actions,
+        html body #contenido .administracion-page .configuracion-page .catalogo-form-actions {
+            grid-column: 1 !important;
+        }
+
+        html body #contenido .administracion-page .configuracion-page .catalogo-form-actions {
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+        }
+    }
+
+    @media (max-width: 900px) {
+        html body #contenido .directory-page .table-wrap,
+        html body #contenido .estudiantes-directorio {
+            overflow: hidden !important;
+            border: 1px solid #d5e1fa !important;
+            border-radius: 8px !important;
+            background: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(18, 59, 104, .04) !important;
+        }
+
+        html body #contenido .directory-page .table-wrap {
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody,
+        html body #contenido table.estudiantes-directorio-table tbody {
+            gap: 0 !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody tr,
+        html body #contenido table.estudiantes-directorio-table tbody tr {
+            padding: 8px 14px !important;
+            border: 0 !important;
+            border-bottom: 1px solid #d5e1fa !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody tr:last-child,
+        html body #contenido table.estudiantes-directorio-table tbody tr:last-child {
+            border-bottom: 0 !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody td,
+        html body #contenido table.estudiantes-directorio-table tbody td {
+            padding: 10px 0 !important;
+            line-height: 1.45 !important;
+        }
+
+        html body #contenido .directory-page table.directory-table tbody td:first-child,
+        html body #contenido table.estudiantes-directorio-table tbody td:first-child {
+            color: #17365d !important;
+            font-weight: 700 !important;
+        }
+
+        html body #contenido .estudiantes-directorio-header form.estudiantes-search {
+            display: flex !important;
+            flex-flow: row nowrap !important;
+            align-items: center !important;
+            gap: 6px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            margin: 0 !important;
+        }
+
+        html body #contenido .estudiantes-directorio-header .estudiantes-search > input {
+            flex: 1 1 0% !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            height: 38px !important;
+            min-height: 38px !important;
+            margin: 0 !important;
+        }
+
+        html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-button,
+        html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-all {
+            flex: 0 0 36px !important;
+            width: 36px !important;
+            min-width: 36px !important;
+            height: 36px !important;
+            min-height: 36px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-new {
+            flex: 0 0 auto !important;
+            width: auto !important;
+            min-width: 0 !important;
+            height: 36px !important;
+            min-height: 36px !important;
+            margin: 0 !important;
+            padding: 7px 9px !important;
+            white-space: nowrap !important;
+        }
+
+        html body #contenido a.seguimiento-proceso {
+            grid-template-columns: minmax(76px, max-content) minmax(0, 1fr) 16px !important;
+        }
+
+        html body #contenido .seguimiento-estado {
+            width: max-content !important;
+            max-width: 100% !important;
+            white-space: nowrap !important;
+            overflow-wrap: normal !important;
+        }
+    }
+
+    #contenido .page-head {
+        align-items: flex-start;
+    }
+
+    #contenido .grid,
+    #contenido .registro-grid,
+    #contenido .action-grid,
+    #contenido .dashboard-action-grid,
+    #contenido .dashboard-grid,
+    #contenido .form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .public-info-page > main {
+        padding: 55px clamp(18px, 5vw, 42px) 72px;
+    }
+
+    .public-home-page .barra-interior,
+    .public-home-page .hero-interior,
+    .public-home-page .footer-interior {
+        width: calc(100% - 2 * var(--layout-gutter));
+    }
+}
+
+@media (max-width: 600px) {
+    html body:not(.public-home-page):not(.public-info-page) > main#contenido.contenedor {
+        padding: 12px;
+    }
+
+    #contenido .page-head {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #contenido .page-head .boton,
+    #contenido .page-head .btn,
+    #contenido .form-actions .boton,
+    #contenido .acciones .boton {
+        width: 100%;
+    }
+
+    #contenido .grid,
+    #contenido .registro-grid,
+    #contenido .action-grid,
+    #contenido .dashboard-action-grid,
+    #contenido .dashboard-grid,
+    #contenido .form-grid,
+    #contenido .kpi-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #contenido .form-grid > .full-field,
+    #contenido .form-grid > .full-width,
+    #contenido .form-grid > .form-actions {
+        grid-column: auto;
+    }
+
+    #contenido .panel,
+    #contenido .tarjeta,
+    #contenido .form-card {
+        padding: clamp(14px, 4vw, 22px);
+    }
+
+    .public-info-page > main {
+        padding: 42px 18px 56px;
+    }
+
+    .public-info-page .intro {
+        margin-bottom: 32px;
+    }
+
+    .public-info-page .card {
+        padding: clamp(18px, 6vw, 26px);
+        border-radius: 20px;
+    }
+
+    .public-home-page .barra-interior,
+    .public-home-page .hero-interior,
+    .public-home-page .footer-interior {
+        width: calc(100% - 24px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+#contenido .student-form {
+    align-items: start;
+    gap: clamp(14px, 2vw, 22px);
+}
+
+#contenido .student-form > label {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 7px;
+    min-width: 0;
+    min-height: 0;
+}
+
+#contenido .student-form > label > small {
+    color: #5f7895;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+#contenido .student-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+@media (max-width: 600px) {
+    #contenido .student-form-actions > .boton {
+        flex: 1 1 140px;
+        width: auto;
+    }
+}
+
+html body #contenido .dashboard-page .dashboard-head::before {
+    content: none !important;
+    height: 0 !important;
+    background: none !important;
+}
+
+html body #contenido .directory-page > .page-head {
+    align-items: center !important;
+    margin-bottom: 12px !important;
+}
+
+html body #contenido .directory-page > .page-head .boton {
+    width: auto !important;
+    min-height: 36px !important;
+    padding: 7px 11px !important;
+    border-radius: 6px !important;
+}
+
+html body #contenido .directory-search {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    width: min(100%, 760px) !important;
+    margin: 0 0 14px !important;
+}
+
+html body #contenido .directory-search input {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    margin: 0 !important;
+    padding: 7px 10px !important;
+}
+
+html body #contenido .directory-search > .directory-new,
+html body #contenido .estudiantes-search > .directory-new,
+html body #contenido .estudiantes-mobile-search > div > .directory-new {
+    display: inline-flex !important;
+    flex: 0 0 56px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 56px !important;
+    min-width: 56px !important;
+    max-width: 56px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    margin: 0 !important;
+    padding: 0 4px !important;
+    font-size: 12px !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+}
+
+html body #contenido .directory-search > button,
+html body #contenido .directory-search > .directory-search-all,
+html body #contenido .estudiantes-search > .directory-search-button,
+html body #contenido .estudiantes-search > .directory-search-all,
+html body #contenido .estudiantes-mobile-search > div > .directory-search-button,
+html body #contenido .estudiantes-mobile-search > div > .directory-search-all {
+    display: inline-grid !important;
+    flex: 0 0 56px !important;
+    place-items: center !important;
+    width: 56px !important;
+    min-width: 56px !important;
+    max-width: 56px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid #d5e1fa !important;
+    border-radius: 6px !important;
+    background: #f4f7fb !important;
+    color: #23466f !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+}
+
+html body #contenido .directory-search > button svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+html body #contenido .directory-search > button:focus-visible,
+html body #contenido .directory-search > .directory-search-all:focus-visible,
+html body #contenido .estudiantes-search > .directory-search-button:focus-visible,
+html body #contenido .estudiantes-search > .directory-search-all:focus-visible,
+html body #contenido .estudiantes-mobile-search > div > .directory-search-button:focus-visible,
+html body #contenido .estudiantes-mobile-search > div > .directory-search-all:focus-visible {
+    outline: 2px solid #2875c7 !important;
+    outline-offset: 2px !important;
+}
+
+html body #contenido .estudiantes-search > .directory-search-button svg,
+html body #contenido .estudiantes-mobile-search > div > .directory-search-button svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+html body #contenido .estudiantes-search > input,
+html body #contenido .estudiantes-mobile-search > div > input {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    width: auto !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    margin: 0 !important;
+    padding: 7px 10px !important;
+}
+
+html body #contenido .estudiantes-mobile-search > div {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+}
+
+html body #contenido .estudiantes-mobile-search > div > .directory-search-all {
+    flex: 0 0 36px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+}
+
+html body #contenido .edc-page .eduturnos-barra-real {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    min-height: 48px !important;
+    height: 48px !important;
+    margin: 0 0 8px !important;
+}
+
+html body #contenido .edc-page .eduturnos-barra-real .eduturnos-mes-navegacion {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: max-content !important;
+    gap: 8px !important;
+    transform: translate(-50%, -50%) !important;
+    white-space: nowrap !important;
+}
+
+html body.has-desktop-sidebar #contenido .edc-page .eduturnos-barra-real {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+html body.has-desktop-sidebar #contenido .edc-page .eduturnos-barra-real .eduturnos-mes-navegacion {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: max-content !important;
+    gap: 8px !important;
+    transform: translate(-50%, -50%) !important;
+    white-space: nowrap !important;
+}
+
+html body #contenido .edc-page .eduturnos-barra-real .eduturnos-titulo-mes .edc-month-title {
+    min-width: 150px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    text-transform: capitalize !important;
+    white-space: nowrap !important;
+}
+
+html body.has-desktop-sidebar #contenido .edc-page .eduturnos-barra-real .eduturnos-titulo-mes .edc-month-title {
+    min-width: 150px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    text-transform: capitalize !important;
+    white-space: nowrap !important;
+}
+
+html body #contenido .edc-page .eduturnos-barra-real .eduturnos-flecha a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+}
+
+html body.has-desktop-sidebar #contenido .edc-page .eduturnos-barra-real .eduturnos-flecha a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+}
+
+html body #contenido .edc-page .eduturnos-barra-real > .eduturnos-hoy {
+    position: absolute !important;
+    top: 50% !important;
+    right: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 34px !important;
+    margin: 0 !important;
+    padding: 6px 12px !important;
+    transform: translateY(-50%) !important;
+}
+
+html body.has-desktop-sidebar #contenido .edc-page .eduturnos-barra-real > .eduturnos-hoy {
+    position: absolute !important;
+    top: 50% !important;
+    right: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 34px !important;
+    margin: 0 !important;
+    padding: 6px 12px !important;
+    transform: translateY(-50%) !important;
+}
+
+@media (max-width: 900px) {
+    html body.has-desktop-sidebar #contenido .estudiantes-directorio-header .estudiantes-search {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .estudiantes-search .estudiantes-clear-search {
+        flex: 0 0 36px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        max-width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        grid-column: auto !important;
+        justify-self: auto !important;
+    }
+}
+
+@media (max-width: 600px) {
+    html body #contenido .directory-page > .page-head {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+    }
+
+    html body #contenido .directory-page > .page-head .boton {
+        flex: 0 0 auto !important;
+    }
+
+    html body #contenido .directory-search {
+        width: 100% !important;
+    }
+
+    html body #contenido .estudiantes-search {
+        flex: 1 1 auto !important;
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    html body #contenido .estudiantes-directorio-header {
+        flex-wrap: wrap !important;
+    }
+
+    html body #contenido .estudiantes-mobile-search > div > .directory-search-all {
+        flex-basis: 32px !important;
+        width: 32px !important;
+        min-width: 32px !important;
+        max-width: 32px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+    }
+
+    html body #contenido .edc-page .eduturnos-barra-real {
+        min-height: 44px !important;
+        height: 44px !important;
+    }
+
+    html body #contenido .edc-page .eduturnos-barra-real .eduturnos-mes-navegacion {
+        gap: 3px !important;
+    }
+
+    html body #contenido .edc-page .eduturnos-barra-real .eduturnos-titulo-mes .edc-month-title {
+        min-width: 0 !important;
+    }
+
+    html body #contenido .edc-page .eduturnos-barra-real .eduturnos-flecha a {
+        width: 28px !important;
+        min-width: 28px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+    }
+
+    html body #contenido .edc-page .eduturnos-barra-real > .eduturnos-hoy {
+        min-height: 30px !important;
+        padding: 5px 8px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .edc-page .eduturnos-barra-real {
+        min-height: 44px !important;
+        height: 44px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .edc-page .eduturnos-barra-real .eduturnos-mes-navegacion {
+        gap: 3px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .edc-page .eduturnos-barra-real .eduturnos-titulo-mes .edc-month-title {
+        min-width: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .edc-page .eduturnos-barra-real .eduturnos-flecha a {
+        width: 28px !important;
+        min-width: 28px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .edc-page .eduturnos-barra-real > .eduturnos-hoy {
+        min-height: 30px !important;
+        padding: 5px 8px !important;
+    }
+
+    html body #contenido form.form-grid > .form-actions,
+    html body #contenido .student-form-actions {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+
+    html body #contenido form.form-grid > .form-actions > .boton,
+    html body #contenido .student-form-actions > .boton {
+        flex: 1 1 0 !important;
+        width: auto !important;
+        min-width: 0 !important;
+        min-height: 40px !important;
+        padding: 8px 10px !important;
+    }
+}
+
+@media (max-width: 900px) {
+    html body #contenido .notificaciones-page .page-head {
+        align-items: stretch !important;
+    }
+
+    html body #contenido .notificaciones-page > .page-head > form {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    html body #contenido .notificaciones-page .notifications-list {
+        min-width: 0 !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-card {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        gap: 10px !important;
+        padding: 12px !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-content {
+        flex: 0 1 auto !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-header h2 {
+        min-width: 0 !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-card > form {
+        align-self: flex-start !important;
+        width: auto !important;
+        max-width: 100% !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-card > form button {
+        width: auto !important;
+        min-width: 132px !important;
+        max-width: 100% !important;
+    }
+
+    html body #contenido .directory-page .directory-search {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) 56px 56px auto !important;
+        align-items: center !important;
+        gap: 6px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 0 14px !important;
+    }
+
+    html body #contenido .directory-page .directory-search > label.visually-hidden {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        margin: -1px !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+    }
+
+    html body #contenido .directory-page .directory-search > input {
+        grid-column: 1 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    html body #contenido .directory-page .directory-search > button {
+        grid-column: 2 !important;
+    }
+
+    html body #contenido .directory-page .directory-search > .directory-search-all {
+        grid-column: 3 !important;
+    }
+
+    html body #contenido .directory-page .directory-search > .directory-new {
+        grid-column: 4 !important;
+        justify-self: end !important;
+        padding-inline: 8px !important;
+    }
+
+    html body #contenido .directory-page .table-wrap {
+        overflow: visible !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    html body #contenido .directory-page table.directory-table {
+        display: block !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        table-layout: auto !important;
+        border: 0 !important;
+        background: transparent !important;
+    }
+
+    html body #contenido .directory-page table.directory-table thead {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        margin: -1px !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+    }
+
+    html body #contenido .directory-page table.directory-table tbody {
+        display: grid !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    html body #contenido .directory-page table.directory-table tbody tr {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 0 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 6px 12px !important;
+        border: 1px solid #d5e1fa !important;
+        border-radius: 8px !important;
+        background: #ffffff !important;
+    }
+
+    html body #contenido .directory-page table.directory-table tbody td {
+        display: grid !important;
+        grid-template-columns: minmax(92px, 0.42fr) minmax(0, 1fr) !important;
+        align-items: start !important;
+        gap: 8px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 8px 0 !important;
+        border-bottom: 1px solid #edf0f5 !important;
+        overflow-wrap: anywhere !important;
+        word-break: normal !important;
+    }
+
+    html body #contenido .directory-page table.directory-table tbody td[data-label]::before {
+        content: attr(data-label) !important;
+        color: #557096 !important;
+        font-weight: 600 !important;
+    }
+
+    html body #contenido .directory-page table.directory-table tbody td:first-child {
+        color: #17365d !important;
+        font-weight: 700 !important;
+    }
+
+    html body #contenido .directory-page table.directory-table tbody td.table-actions-cell {
+        display: flex !important;
+        justify-content: flex-end !important;
+        border-bottom: 0 !important;
+    }
+
+    html body #contenido .directory-page table.directory-table tbody tr.directory-empty-row td {
+        display: block !important;
+        border: 0 !important;
+        text-align: center !important;
+    }
+
+    html body #contenido .estudiantes-mobile-search > div {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) 56px 56px auto !important;
+        align-items: center !important;
+        gap: 6px !important;
+        width: 100% !important;
+    }
+
+    html body #contenido .estudiantes-mobile-search > div > input {
+        grid-column: 1 !important;
+        width: 100% !important;
+    }
+
+    html body #contenido .estudiantes-mobile-search > div > .directory-search-button {
+        grid-column: 2 !important;
+    }
+
+    html body #contenido .estudiantes-mobile-search > div > .directory-search-all {
+        grid-column: 3 !important;
+    }
+
+    html body #contenido .estudiantes-mobile-search > div > .directory-new {
+        grid-column: 4 !important;
+        justify-self: end !important;
+        padding-inline: 8px !important;
+    }
+
+}
+
+@media (min-width: 901px) {
+.directory-page {
+    display: block !important;
+    padding: 0 !important;
+}
+
+.directory-page .page-head {
+    margin-bottom: 10px !important;
+}
+
+.directory-page .directory-search {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: min(760px, 100%) !important;
+    max-width: 100% !important;
+    margin: 0 0 12px !important;
+}
+
+.directory-page .table-wrap {
+    background: #ffffff !important;
+    border: 1px solid #d5e1fa !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+}
+
+.directory-page table.directory-table th,
+.directory-page table.directory-table td,
+.estudiantes-directorio-table th,
+.estudiantes-directorio-table td {
+    padding: 8px 10px !important;
+    line-height: 1.35 !important;
+}
+
+.directory-page .directory-search > label.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.directory-page .directory-search > input {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    margin: 0 !important;
+}
+
+.directory-page .directory-search > button,
+.directory-page .directory-search > .directory-search-all {
+    display: inline-grid !important;
+    flex: 0 0 38px !important;
+    place-items: center !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.directory-page .directory-search > button svg {
+    width: 18px !important;
+    height: 18px !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
+}
+
+.directory-page .directory-search > .directory-new {
+    flex: 0 0 auto !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+}
+
+.estudiantes-directorio-header .estudiantes-search > input {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+.estudiantes-directorio-header .estudiantes-search > .directory-search-button,
+.estudiantes-directorio-header .estudiantes-search > .directory-search-all {
+    display: inline-grid !important;
+    flex: 0 0 38px !important;
+    place-items: center !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.estudiantes-directorio-header .estudiantes-search > .directory-new {
+    flex: 0 0 auto !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+}
+}
+
+.notificaciones-page > .page-head {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+}
+
+.notificaciones-page > .page-head > form {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    width: auto !important;
+    margin: 0 0 0 auto !important;
+}
+
+.notificaciones-page button.eduturnos-marcar-leidas {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 34px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 6px 10px !important;
+    line-height: 1.2 !important;
+}
+
+.notificaciones-page .notification-card > form {
+    flex: 0 0 auto !important;
+    align-self: center !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0 0 0 auto !important;
+}
+
+.notificaciones-page .notification-card > form button {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 140px !important;
+    min-height: 34px !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 6px 9px !important;
+    line-height: 1.2 !important;
+}
+
+@media (max-width: 600px) {
+    html body #contenido .notificaciones-page > .page-head {
+        flex-direction: row !important;
+        align-items: center !important;
+    }
+
+    html body #contenido .notificaciones-page > .page-head > div {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+
+    html body #contenido .notificaciones-page > .page-head > form {
+        flex: 0 1 auto !important;
+        width: auto !important;
+        max-width: 48% !important;
+        margin-left: auto !important;
+    }
+
+    html body #contenido .notificaciones-page > .page-head > form button {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 140px !important;
+        min-height: 34px !important;
+        height: auto !important;
+        text-align: center !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-card > form {
+        align-self: flex-end !important;
+        width: auto !important;
+        max-width: 100% !important;
+    }
+
+    html body #contenido .notificaciones-page .notification-card > form button {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 120px !important;
+        min-height: 34px !important;
+        height: auto !important;
+        white-space: normal !important;
+    }
+}
+
+@media (max-width: 900px) {
+    html body.has-desktop-sidebar #contenido .directory-page .table-wrap {
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain !important;
+        -webkit-overflow-scrolling: touch !important;
+        border: 1px solid #d5e1fa !important;
+        border-radius: 8px !important;
+        background: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(18, 59, 104, .04) !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page table.directory-table {
+        display: table !important;
+        width: max-content !important;
+        min-width: 680px !important;
+        max-width: none !important;
+        table-layout: auto !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page table.directory-table thead,
+    html body.has-desktop-sidebar #contenido table.estudiantes-directorio-table thead {
+        position: static !important;
+        display: table-header-group !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        clip: auto !important;
+        white-space: normal !important;
+        border: 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page table.directory-table tbody,
+    html body.has-desktop-sidebar #contenido table.estudiantes-directorio-table tbody {
+        display: table-row-group !important;
+        width: auto !important;
+        gap: 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page table.directory-table tbody tr,
+    html body.has-desktop-sidebar #contenido table.estudiantes-directorio-table tbody tr {
+        display: table-row !important;
+        width: auto !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-bottom: 1px solid #d5e1fa !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page table.directory-table tbody td,
+    html body.has-desktop-sidebar #contenido table.estudiantes-directorio-table tbody td {
+        display: table-cell !important;
+        width: auto !important;
+        min-width: 0 !important;
+        padding: 8px 12px !important;
+        border: 0 !important;
+        border-bottom: 1px solid #edf0f5 !important;
+        line-height: 1.35 !important;
+        overflow-wrap: normal !important;
+        vertical-align: middle !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page table.directory-table tbody td::before,
+    html body.has-desktop-sidebar #contenido table.estudiantes-directorio-table tbody td::before {
+        content: none !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page table.directory-table tbody td:first-child,
+    html body.has-desktop-sidebar #contenido table.estudiantes-directorio-table tbody td:first-child,
+    html body.has-desktop-sidebar #contenido .directory-page table.directory-table tbody td.table-actions-cell {
+        display: table-cell !important;
+        grid-column: auto !important;
+        padding: 8px 12px !important;
+        border-bottom: 1px solid #edf0f5 !important;
+        text-align: left !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .directory-page table.directory-table tbody tr.directory-empty-row td,
+    html body.has-desktop-sidebar #contenido table.estudiantes-directorio-table tbody tr:has(.estudiantes-directorio-vacio) td {
+        display: table-cell !important;
+        grid-column: auto !important;
+        text-align: center !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .estudiantes-directorio {
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    html body.has-desktop-sidebar #contenido table.estudiantes-directorio-table {
+        display: table !important;
+        width: max-content !important;
+        min-width: 720px !important;
+        max-width: none !important;
+        table-layout: auto !important;
+        border: 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido table.estudiantes-directorio-table th,
+    html body.has-desktop-sidebar #contenido table.estudiantes-directorio-table td {
+        padding: 8px 12px !important;
+    }
+}
+
+html body.has-desktop-sidebar #contenido table.estudiantes-directorio-table td {
+    padding: 10px 14px !important;
+    line-height: 1.35 !important;
+}
+
+.account-subpage-title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+}
+
+.account-subpage-title > h1 {
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+
+.account-subpage-title .password-account-back {
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+}
+
+@media (max-width: 720px) {
+    #contenido .page-head,
+    #contenido .section-heading {
+        padding-top: clamp(10px, 2.5vw, 16px) !important;
+    }
+
+    #contenido .dashboard-page .dashboard-head-info {
+        padding-block: 10px !important;
+    }
+
+    #contenido .institucion-page .institucion-heading {
+        padding-top: clamp(10px, 2.5vw, 16px) !important;
+    }
+
+    #contenido .password-account-back,
+    #contenido .account-back-button {
+        display: inline-flex !important;
+        flex: 0 0 36px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        max-width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        max-height: 36px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        align-self: center !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+        border: 1px solid #d5e1fa !important;
+        border-radius: 8px !important;
+        background: #fff !important;
+        color: #1769aa !important;
+        text-decoration: none !important;
+    }
+
+    #contenido .password-account-back svg,
+    #contenido .account-back-button svg {
+        width: 18px !important;
+        height: 18px !important;
+        fill: none !important;
+        stroke: currentColor !important;
+        stroke-width: 2 !important;
+        stroke-linecap: round !important;
+        stroke-linejoin: round !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .password-account-back {
+        flex: 0 0 36px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        max-width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        max-height: 36px !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+    }
+}
+
+html body #contenido .account-settings-back {
+    display: inline-flex !important;
+    flex: 0 0 36px !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: center !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid #d5e1fa !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    color: #1769aa !important;
+    text-decoration: none !important;
+}
+
+html body #contenido .account-settings-back svg {
+    display: block !important;
+    width: 18px !important;
+    height: 18px !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+}
+
+html body #contenido .institucion-page .institucion-title-row,
+html body #contenido .integraciones-page > .page-head {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+}
+
+html body #contenido .integraciones-page > .page-head > div {
+    flex: 1 1 0% !important;
+    width: 0 !important;
+    min-width: 0 !important;
+}
+
+html body #contenido .institucion-page .institucion-title-row > h1,
+html body #contenido .integraciones-page > .page-head h1 {
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+
+@media (max-width: 900px) {
+    html body #contenido .directory-page .directory-search > button svg {
+        width: 22px !important;
+        height: 22px !important;
+        stroke-width: 2.2 !important;
+    }
+
+    html body #contenido .directory-page .directory-search > .directory-search-all {
+        font-size: 22px !important;
+        transform: none !important;
+    }
+
+    html body #contenido .directory-page table.directory-table tbody td:first-child,
+    html body #contenido .directory-page table.directory-table tbody td:first-child a {
+        color: #17365d !important;
+    }
+
+    html body #contenido .directory-page table.directory-table tbody td:first-child a {
+        font-weight: inherit !important;
+        text-decoration: none !important;
+    }
+
+    html body #contenido .directory-page table.directory-table tbody td:first-child a:hover {
+        text-decoration: underline !important;
+    }
+
+    html body #contenido .nueva-cita-form {
+        row-gap: 14px !important;
+    }
+
+    html body #contenido .nueva-cita-form label {
+        gap: 7px !important;
+        margin: 0 !important;
+        line-height: 1.4 !important;
+    }
+
+}
+
+@media (max-width: 720px) {
+    #contenido .account-subpage-title > h1 { line-height: 1.2 !important; }
+
+    #contenido .password-account-back {
+        flex: 0 0 36px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        max-height: 36px !important;
+    }
+}
+
+@media (max-width: 900px) {
+    html body #contenido .directory-page .directory-search,
+    html body #contenido .estudiantes-directorio-header form.estudiantes-search {
+        grid-template-columns: minmax(0, 1fr) 56px 56px auto !important;
+    }
+
+    html body #contenido .directory-page .directory-search > button,
+    html body #contenido .directory-page .directory-search > .directory-search-all,
+    html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-button,
+    html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-all,
+    html body #contenido .estudiantes-mobile-search > div > .directory-search-button,
+    html body #contenido .estudiantes-mobile-search > div > .directory-search-all {
+        flex: 0 0 56px !important;
+        width: 56px !important;
+        min-width: 56px !important;
+        max-width: 56px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+    }
+
+    html body #contenido .directory-page .directory-search > button svg,
+    html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-button svg,
+    html body #contenido .estudiantes-mobile-search > div > .directory-search-button svg {
+        width: 24px !important;
+        height: 24px !important;
+        stroke-width: 2.2 !important;
+    }
+
+    html body #contenido .directory-page .directory-search > .directory-search-all,
+    html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-all,
+    html body #contenido .estudiantes-mobile-search > div > .directory-search-all {
+        font-size: 24px !important;
+    }
+
+    html body #contenido .page-head:not(.config-section-heading) {
+        margin-bottom: 14px !important;
+    }
+
+    html body #contenido .page-head:not(.config-section-heading) h1 {
+        margin: 0 !important;
+        line-height: 1.2 !important;
+    }
+}
+
+@media (max-width: 720px) {
+    html body #contenido .directory-page .directory-search > button,
+    html body #contenido .directory-page .directory-search > .directory-search-all,
+    html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-button,
+    html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-all,
+    html body #contenido .estudiantes-mobile-search > div > .directory-search-button,
+    html body #contenido .estudiantes-mobile-search > div > .directory-search-all {
+        box-sizing: border-box !important;
+        display: inline-grid !important;
+        place-items: center !important;
+        padding: 0 !important;
+        line-height: 1 !important;
+    }
+
+    html body #contenido .directory-page .directory-search > button svg,
+    html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-button svg,
+    html body #contenido .estudiantes-mobile-search > div > .directory-search-button svg {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+}
+
+@media (max-width: 720px) {
+    html body #contenido .cuenta-page > .page-head .account-back-button,
+    html body #contenido .integraciones-page > .page-head .account-back-button {
+        display: inline-flex !important;
+        flex: 0 0 36px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 1px solid #d5e1fa !important;
+        border-radius: 8px !important;
+        background: #fff !important;
+        color: #1769aa !important;
+        text-decoration: none !important;
+    }
+
+    html body #contenido .cuenta-page > .page-head .account-back-button svg,
+    html body #contenido .integraciones-page > .page-head .account-back-button svg {
+        width: 18px !important;
+        height: 18px !important;
+        fill: none !important;
+        stroke: currentColor !important;
+        stroke-width: 2 !important;
+        stroke-linecap: round !important;
+        stroke-linejoin: round !important;
+    }
+
+    html body #contenido .integraciones-page > .page-head {
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 8px !important;
+    }
+
+    html body #contenido .integraciones-page > .page-head > div {
+        min-width: 0 !important;
+    }
+}
+
+@media (max-width: 720px) {
+    html body #contenido .page-head:not(.config-section-heading),
+    html body #contenido .section-heading {
+        box-sizing: border-box !important;
+        align-items: flex-start !important;
+        margin-top: 0 !important;
+        padding-top: 10px !important;
+        text-align: left !important;
+    }
+
+    html body #contenido .integraciones-page > header.page-head {
+        align-items: flex-start !important;
+    }
+
+    html body #contenido .page-head:not(.config-section-heading) h1,
+    html body #contenido .section-heading h1,
+    html body #contenido .edc-header h1,
+    html body #contenido .institucion-heading h1,
+    html body #contenido .dashboard-head h1 {
+        margin: 0 !important;
+        font-size: 22px !important;
+        line-height: 1.2 !important;
+        text-align: left !important;
+    }
+
+    html body #contenido .cuenta-page {
+        padding-top: 0 !important;
+    }
+
+    html body #contenido .cuenta-page > .page-head {
+        margin-inline: 0 !important;
+    }
+
+    html body #contenido .support-page,
+    html body #contenido .integraciones-page {
+        padding-top: 0 !important;
+    }
+
+    html body #contenido .institucion-page {
+        padding-top: 0 !important;
+    }
+
+    html body #contenido .institucion-page > .institucion-heading {
+        margin-inline: -14px !important;
+        padding-top: clamp(10px, 2.5vw, 16px) !important;
+    }
+
+    html body #contenido .edc-page {
+        padding-top: 0 !important;
+    }
+
+    html body #contenido .edc-page > .edc-header {
+        margin-inline: -6px !important;
+        padding-top: clamp(10px, 2.5vw, 16px) !important;
+    }
+
+    html body #contenido .edc-page .edc-kicker,
+    html body #contenido .institucion-page .institucion-kicker {
+        display: none !important;
+    }
+}
+
+@media (max-width: 900px) {
+    html body #contenido .directory-page .directory-search > .directory-search-all svg,
+    html body #contenido .estudiantes-directorio-header .estudiantes-search > .directory-search-all svg,
+    html body #contenido .estudiantes-mobile-search > div > .directory-search-all svg {
+        display: block !important;
+        width: 24px !important;
+        height: 24px !important;
+        fill: none !important;
+        stroke: currentColor !important;
+        stroke-width: 2.2 !important;
+        stroke-linecap: round !important;
+        stroke-linejoin: round !important;
+    }
+}
+
+@media (max-width: 720px) {
+    html body #contenido .page-head:not(.config-section-heading),
+    html body #contenido .section-heading,
+    html body #contenido .institucion-heading,
+    html body #contenido .edc-header {
+        box-sizing: border-box !important;
+        align-items: flex-start !important;
+        margin-top: 0 !important;
+        padding-top: 10px !important;
+        text-align: left !important;
+    }
+
+    html body #contenido .page-head:not(.config-section-heading) {
+        margin-bottom: 8px !important;
+    }
+
+    html body #contenido .page-head:not(.config-section-heading) h1,
+    html body #contenido .section-heading h1,
+    html body #contenido .institucion-heading h1,
+    html body #contenido .edc-header h1 {
+        margin-top: 0 !important;
+        text-align: left !important;
+    }
+
+    html body #contenido .form-card > .section-heading > .account-subpage-title {
+        display: flex !important;
+        flex-flow: row nowrap !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    html body #contenido .form-card > .section-heading > .account-subpage-title > .password-account-back {
+        display: inline-flex !important;
+        flex: 0 0 36px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        align-self: center !important;
+        padding: 0 !important;
+    }
+
+    html body #contenido .form-card > .section-heading > .account-subpage-title > h1 {
+        flex: 1 1 auto !important;
+        width: auto !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+    }
+}
+
+@media (max-width: 720px) {
+    html body #contenido .seguimiento-page-head {
+        gap: 0 !important;
+    }
+
+    html body #contenido .seguimiento-page-head h1 {
+        margin: 0 !important;
+        font-size: 22px !important;
+        line-height: 1.2 !important;
+        text-align: left !important;
+    }
+
+    html body #contenido .seguimiento-descripcion-desktop {
+        display: block !important;
+        margin: 4px 0 0 !important;
+        line-height: 1.35 !important;
+    }
+
+    html body #contenido .seguimiento-procesos {
+        margin-top: 0 !important;
+    }
+}

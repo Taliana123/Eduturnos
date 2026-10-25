@@ -1,7 +1,10 @@
 {% extends 'base.html' %}{% block content %}
-<a class="boton secundario desktop-back-link" href="{{ url_for('auth.dashboard') }}" aria-label="Volver al panel">← Volver</a>
-<h1 data-mobile-cita-url="{{ url_for('citas.index') }}">Seguimiento</h1>
-<p class="muted seguimiento-descripcion-desktop">Consulta la asistencia, las observaciones y los compromisos registrados en las citaciones para dar continuidad al acompañamiento de los estudiantes.</p>
+<header class="page-head seguimiento-page-head">
+	<div>
+		<h1>Seguimiento</h1>
+		<p class="muted seguimiento-descripcion-desktop">Consulta la asistencia, las observaciones y los compromisos registrados en las citaciones para dar continuidad al acompañamiento de los estudiantes.</p>
+	</div>
+</header>
 <section class="seguimiento-procesos" aria-labelledby="seguimiento-procesos-titulo">
 	<header class="seguimiento-procesos-header">
 		<h2 id="seguimiento-procesos-titulo">Compromisos y asistencia</h2>
@@ -40,7 +43,6 @@
 		<p>Acudiente: {{ proceso.acudiente or 'Sin acudiente asignado' }}</p>
 	</div>
 	<p class="muted seguimiento-detail-notes">{{ proceso.observaciones or proceso.descripcion or 'Sin observaciones registradas.' }}</p>
-	<button type="button" class="boton secundario seguimiento-detail-back" data-seguimiento-close>← Volver</button>
 	<button type="button" class="boton secundario seguimiento-detail-print" data-seguimiento-print>Imprimir</button>
 	<section class="seguimiento-detail-history" aria-label="Historial de seguimiento">
 		<h4>Historial de seguimiento</h4>
@@ -80,12 +82,12 @@ html body .seguimiento-detail-history article p{margin:6px 0 0;}
 	body.printing-seguimiento header.eduturnos-header,body.printing-seguimiento #contenido>*:not(dialog.seguimiento-detail-dialog[open]){display:none!important;}
 	html body.printing-seguimiento #contenido{margin:0!important;padding:0!important;max-width:none!important;}
 	html body.printing-seguimiento dialog.seguimiento-detail-dialog[open]{position:static!important;width:100%!important;max-width:none!important;max-height:none!important;overflow:visible!important;border:0!important;margin:0!important;box-shadow:none!important;}
-	html body.printing-seguimiento dialog.seguimiento-detail-dialog button.seguimiento-detail-close,html body.printing-seguimiento dialog.seguimiento-detail-dialog button.seguimiento-detail-print,html body.printing-seguimiento .seguimiento-detail-back{display:none!important;}
+	html body.printing-seguimiento dialog.seguimiento-detail-dialog button.seguimiento-detail-close,html body.printing-seguimiento dialog.seguimiento-detail-dialog button.seguimiento-detail-print{display:none!important;}
 	.seguimiento-detail-dialog::backdrop{background:transparent;}
 }
 @media(min-width:901px){
 	html body #contenido .seguimiento-historial{display:none!important;}
-	html body #contenido .seguimiento-procesos{display:block;background:#fff;border:1px solid #d5e1fa;border-radius:6px;overflow:hidden;margin-top:24px;}
+	html body #contenido .seguimiento-procesos{display:block;background:#fff;border:1px solid #d5e1fa;border-radius:6px;overflow:hidden;margin-top:0;}
 	html body #contenido .seguimiento-procesos-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px;background:transparent;color:inherit;}
 	html body #contenido .seguimiento-procesos-header h2{margin:0;font-family:inherit;font-size:17px;font-weight:700;}
 	html body #contenido .seguimiento-procesos-header>span{font-size:14px;white-space:nowrap;}

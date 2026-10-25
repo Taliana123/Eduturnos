@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sin conexión | EDUTURNOS</title>
+<style>
+  :root { color-scheme: light; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f7fb;
+    color: #172942;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    text-align: center;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+  .card {
+    max-width: 420px;
+    background: #fff;
+    border-radius: 18px;
+    padding: 40px 28px;
+    box-shadow: 0 18px 40px rgba(23, 41, 66, .12);
+  }
+  .icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: #eef2fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  h1 { font-size: 1.25rem; margin: 0 0 10px; }
+  p { margin: 0 0 22px; color: #51607a; line-height: 1.5; }
+  button {
+    border: none;
+    background: #172942;
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: .95rem;
+    cursor: pointer;
+  }
+  button:active { transform: scale(.98); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon" aria-hidden="true">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#172942" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 9a16 16 0 0 1 22 0"></path>
+        <path d="M5 13a10 10 0 0 1 14 0"></path>
+        <path d="M9 17a4 4 0 0 1 6 0"></path>
+        <line x1="2" y1="2" x2="22" y2="22"></line>
+      </svg>
+    </div>
+    <h1>Sin conexión a internet</h1>
+    <p>EDUTURNOS no pudo cargar esta página porque tu dispositivo está sin conexión. Verifica tu red e inténtalo de nuevo.</p>
+    <button onclick="location.reload()">Reintentar</button>
+  </div>
+</body>
+</html>

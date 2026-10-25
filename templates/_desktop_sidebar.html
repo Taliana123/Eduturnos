@@ -1,7 +1,10 @@
 {% if usuario_navegacion %}
 {% set rol = usuario_navegacion.rol_nombre %}
-{% set personal = rol in ['Super Admin', 'Rector', 'Administrador / Coordinador', 'Docente'] %}
-{% set gestion = rol in ['Super Admin', 'Rector', 'Administrador / Coordinador'] %}
+{% set rectoria = rol in ['Super Admin', 'Rector'] %}
+{% set coordinacion = rol == 'Administrador / Coordinador' %}
+{% set visitante = rol in ['Estudiante', 'Acudiente'] %}
+{% set personal = rectoria or coordinacion or rol == 'Docente' %}
+{% set gestion = rectoria or coordinacion %}
 {% set endpoint = request.endpoint or '' %}
 <aside id="eduturnos-mobile-nav" class="eduturnos-desktop-sidebar" aria-label="Navegación institucional">
   <div class="desktop-sidebar-institution">
@@ -9,13 +12,30 @@
     <strong>I. E. José Joaquín Flórez Hernández</strong>
   </div>
   <nav aria-label="Funciones de {{ rol }}">
+    {% set iconos_nav = {
+      'auth.dashboard': 'home',
+      'citas.nueva': 'calendar-plus',
+      'citas.index': 'list',
+      'calendario.index': 'calendar-days',
+      'notificaciones.index': 'bell',
+      'estudiantes.lista': 'users',
+      'seguimiento.lista': 'clipboard-check',
+      'solicitudes.index': 'inbox',
+      'reportes.index': 'bar-chart',
+      'acudientes.lista': 'user',
+      'docentes.lista': 'book',
+      'configuracion.index': 'settings',
+      'justificaciones.index': 'file-text',
+      'soporte.index': 'mail',
+    } %}
     {% set enlaces = [('auth.dashboard', 'Resumen')] %}
     {% if personal %}{% set enlaces = enlaces + [('citas.nueva', 'Nueva citación')] %}{% endif %}
     {% set enlaces = enlaces + [('citas.index', 'Citaciones'), ('calendario.index', 'Ver agenda'), ('notificaciones.index', 'Recordatorios')] %}
     {% if personal %}{% set enlaces = enlaces + [('estudiantes.lista', 'Estudiantes'), ('seguimiento.lista', 'Seguimiento'), ('solicitudes.index', 'Solicitudes')] %}{% endif %}
     {% if gestion %}{% set enlaces = enlaces + [('reportes.index', 'Reportes'), ('acudientes.lista', 'Acudientes'), ('docentes.lista', 'Docentes')] %}{% endif %}
-    {% if rol in ['Rector', 'Super Admin'] %}{% set enlaces = enlaces + [('configuracion.index', 'Administración')] %}{% endif %}
-    {% if rol in ['Estudiante', 'Acudiente'] %}{% set enlaces = enlaces + [('justificaciones.index', 'Justificaciones')] %}{% endif %}
+    {% if rectoria %}{% set enlaces = enlaces + [('configuracion.index', 'Administración')] %}{% endif %}
+    {% if visitante %}{% set enlaces = enlaces + [('justificaciones.index', 'Justificaciones')] %}{% endif %}
+    {% set enlaces = enlaces + [('soporte.index', 'Ayuda y soporte')] %}
     {% for destino, nombre in enlaces %}
     {% if destino == 'citas.nueva' %}
     {% set activo = endpoint == destino %}
@@ -24,14 +44,11 @@
     {% else %}
     {% set activo = endpoint == destino if destino == 'auth.dashboard' else endpoint.split('.')[0] == destino.split('.')[0] %}
     {% endif %}
-    <a href="{{ url_for(destino) }}" {% if activo %}aria-current="page"{% endif %}>{{ nombre }}</a>
+    <a {% if destino == 'soporte.index' %}class="support-nav-link" {% endif %}href="{{ url_for(destino) }}"{% if activo %} aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#{{ iconos_nav.get(destino, 'list') }}"></use></svg></span><span class="nav-label">{{ nombre }}</span></a>
     {% endfor %}
-    <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=coliejjfh@hotmail.com&amp;su=Soporte%20EDUTURNOS&amp;body=Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS." target="_blank" rel="noopener noreferrer">Soporte por Gmail</a>
   </nav>
-  {% if beepy_disponible or personal %}
-  {% with usuario = usuario_navegacion %}{% include '_asistente_widget.html' %}{% endwith %}
-  {% endif %}
-  <a class="desktop-sidebar-account-link" href="{{ url_for('cuenta.index') }}" {% if endpoint.startswith('cuenta.') %}aria-current="page"{% endif %}>Mi cuenta</a>
+  {% include '_asistente_widget.html' %}
+  <a class="desktop-sidebar-account-link" href="{{ url_for('cuenta.index') }}" {% if endpoint.startswith('cuenta.') %}aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#user-circle"></use></svg></span><span class="nav-label">Mi cuenta</span></a>
   <div class="desktop-sidebar-account">
     <span class="desktop-sidebar-account-avatar" aria-hidden="true">ET</span>
     <div class="desktop-sidebar-account-info"><strong>Acceso institucional</strong><small>{{ usuario_navegacion.nombres }} {{ usuario_navegacion.apellidos }}</small></div>

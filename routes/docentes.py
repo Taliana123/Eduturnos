@@ -11,7 +11,41 @@ def catalogos():
 @docentes_bp.route("/")
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador")
 def lista():
-    return render_template("docentes/lista.html",docentes=consultar("SELECT d.*,s.nombre sede,j.nombre jornada FROM docentes d JOIN sedes s ON s.id=d.id_sede JOIN jornadas j ON j.id=d.id_jornada ORDER BY d.apellidos,d.nombres"))
+    q = request.args.get("q", "").strip()
+    like = f"%{q}%"
+    docentes = consultar(
+        """SELECT d.*,s.nombre sede,j.nombre jornada,
+                  asignaciones.estudiantes,asignaciones.grados_grupos
+           FROM docentes d
+           LEFT JOIN sedes s ON s.id=d.id_sede
+           LEFT JOIN jornadas j ON j.id=d.id_jornada
+           LEFT JOIN (
+               SELECT ad.id_docente,
+                      GROUP_CONCAT(DISTINCT CONCAT(e.nombres,' ',e.apellidos)
+                                   ORDER BY e.apellidos,e.nombres SEPARATOR ', ') estudiantes,
+                      GROUP_CONCAT(DISTINCT CONCAT(COALESCE(gr.nombre,'-'),' / ',COALESCE(g.nombre,'-'))
+                                   ORDER BY gr.nombre,g.nombre SEPARATOR ', ') grados_grupos
+               FROM asignaciones_docentes ad
+               LEFT JOIN estudiantes e ON e.estado='Activo'
+                   AND (ad.id_estudiante=e.id_estudiante
+                        OR (ad.id_grupo IS NOT NULL AND ad.id_grupo=e.id_grupo))
+               LEFT JOIN grupos g ON g.id=COALESCE(ad.id_grupo,e.id_grupo)
+               LEFT JOIN grados gr ON gr.id=COALESCE(g.id_grado,e.id_grado)
+               WHERE ad.estado=1
+               GROUP BY ad.id_docente
+           ) asignaciones ON asignaciones.id_docente=d.id_docente
+           WHERE CONCAT(d.nombres,' ',d.apellidos) LIKE %s
+              OR d.documento LIKE %s
+              OR d.correo_institucional LIKE %s
+              OR COALESCE(d.asignatura,'') LIKE %s
+              OR COALESCE(s.nombre,'') LIKE %s
+              OR COALESCE(j.nombre,'') LIKE %s
+              OR COALESCE(asignaciones.estudiantes,'') LIKE %s
+              OR COALESCE(asignaciones.grados_grupos,'') LIKE %s
+           ORDER BY d.apellidos,d.nombres""",
+        (like, like, like, like, like, like, like, like),
+    )
+    return render_template("docentes/lista.html", docentes=docentes, q=q)
 
 @docentes_bp.route("/nuevo",methods=["GET","POST"])
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador")

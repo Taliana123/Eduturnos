@@ -131,41 +131,35 @@ def test_panorama_reportes_solo_rector_y_coordinador(monkeypatch):
     for rol in ("Rector", "Administrador / Coordinador", "Super Admin", "Docente", "Estudiante", "Acudiente"):
         usuario = _usuario(rol)
         monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
-        monkeypatch.setattr(reportes, "usuario_actual", lambda: usuario)
         response = app.test_client().get("/reportes/?desde=2026-10-01&hasta=2026-10-10&estado=Pendiente")
         if rol in ("Docente", "Estudiante", "Acudiente"):
             assert response.status_code == 403
             continue
         assert response.status_code == 200
         html = response.get_data(as_text=True)
-        assert ('aria-label="Reportes de citaciones"' in html) == (rol != "Super Admin")
-        if rol != "Super Admin":
-            assert 'value="2" max="5"' in html
-            assert 'class="reportes-page reportes-panorama-activo"' in html
-            panorama = html.split('aria-label="Reportes de citaciones"', 1)[1].split('<section class="tarjeta reportes-filter">', 1)[0]
-            for texto in ("Panorama institucional", "Del registro a la decisión.", "Resumen de citaciones"):
-                assert texto not in panorama
-            assert '<span>Total de citaciones</span><strong>5</strong>' in panorama
-            for extension in ("csv", "xlsx", "pdf"):
-                assert f'/reportes/exportar.{extension}?desde=2026-10-01&amp;hasta=2026-10-10&amp;estado=Pendiente' in panorama
-        else:
-            assert 'class="reportes-page reportes-panorama-activo"' not in html
+        assert 'class="reportes-page reportes-panorama-activo"' in html
+        assert 'class="reportes-panorama-chart"' in html
+        assert 'class="tarjeta reportes-filter"' in html
+        assert 'class="tarjeta reportes-results"' in html
+        assert 'class="report-mobile-list" id="reportes-lista"' in html
+        assert 'value="2" max="5"' in html
+        for extension in ("csv", "xlsx", "pdf"):
+            assert f'/reportes/exportar.{extension}?desde=2026-10-01&amp;hasta=2026-10-10&amp;estado=Pendiente' in html
 
 
-def test_panorama_reportes_sin_citaciones(monkeypatch):
+def test_reportes_sin_citaciones_muestra_tabla_y_vacio(monkeypatch):
     from routes import reportes
 
     usuario = _usuario("Rector")
     monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
-    monkeypatch.setattr(reportes, "usuario_actual", lambda: usuario)
     monkeypatch.setattr(reportes, "consultar", lambda *args, **kwargs: {} if kwargs.get("uno") else [])
     monkeypatch.setattr(reportes, "_filas_reporte", lambda: [])
     response = app.test_client().get("/reportes/")
     assert response.status_code == 200
     html = response.get_data(as_text=True)
-    assert 'value="0" max="1"' in html
-    assert '<span>Total de citaciones</span><strong>0</strong>' in html
-    assert "No hay citaciones en este periodo." in html
+    assert 'class="tarjeta reportes-filter"' in html
+    assert 'class="tarjeta reportes-results"' in html
+    assert "No hay datos con esos filtros." in html
 
 
 def test_seguimiento_lista_procesos_y_respeta_docente(monkeypatch):
@@ -243,12 +237,14 @@ def test_directorio_estudiantes_pc_busqueda_y_permisos(monkeypatch):
         response = app.test_client().get("/estudiantes/?q=Principal")
         assert response.status_code == 200
         html = response.get_data(as_text=True)
-        desktop = html.split('class="estudiantes-desktop"', 1)[1].split('class="estudiantes-mobile-legacy"', 1)[0]
-        assert "1 estudiante" in desktop
-        assert "Laura Perez" in desktop
-        assert "Grado / Grupo" in desktop
-        assert ("Registrar estudiante" in desktop) == (rol != "Docente")
-        assert ('/estudiantes/17/editar' in desktop) == (rol != "Docente")
+        assert 'class="directory-page"' in html
+        assert 'class="directory-table"' in html
+        assert "Laura Perez" in html
+        assert "Grado" in html
+        assert "Sede" in html
+        assert "Documento" in html
+        assert ("directory-new" in html) == (rol != "Docente")
+        assert ('/estudiantes/17/editar' in html) == (rol != "Docente")
         sql, params = consultas[0]
         assert "ea.estado=1 AND a.estado=1" in sql
         assert "COALESCE(s.nombre,'') LIKE %s" in sql

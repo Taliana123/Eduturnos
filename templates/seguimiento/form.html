@@ -1,6 +1,5 @@
 {% extends 'base.html' %}{% block content %}
-<a class="boton secundario desktop-back-link" href="{{ url_for('seguimiento.lista') }}" aria-label="Volver a seguimiento">← Volver</a>
-<h1 data-mobile-cita-url="{{ url_for('citas.index', _anchor='cita-dialog-' ~ cita.id) }}">Registrar seguimiento</h1><div class="panel"><p><strong>Estudiante:</strong> {{ cita.estudiante_n }} {{ cita.estudiante_a }}</p><p><strong>Estado actual:</strong> {{ cita.estado }}</p><form method="post" class="seguimiento-form">{{ csrf_field()|safe }}<label>Asistencia<select name="asistencia">
+<h1>Registrar seguimiento</h1><div class="panel"><p><strong>Estudiante:</strong> {{ cita.estudiante_n }} {{ cita.estudiante_a }}</p><p><strong>Estado actual:</strong> {{ cita.estado }}</p><form method="post" class="seguimiento-form">{{ csrf_field()|safe }}<label>Asistencia<select name="asistencia">
 <option value="" selected disabled hidden></option>
 <option>Pendiente</option><option>Asistió</option><option>No asistió</option></select></label><div class="seguimiento-actions" style="display:contents"><button class="boton" type="submit">Guardar</button><a class="boton seguimiento-cancel" style="display:none" href="{{ url_for('citas.index') }}">Cancelar</a></div></form></div>
 

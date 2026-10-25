@@ -110,14 +110,9 @@ def reservar_cita(sql, params):
             comprobar_hueco(cursor, params[2], params[0], params[1], params[6], params[7])
             cursor.execute(sql, params)
             cita_id = cursor.lastrowid
+            from servicios.google_calendar import encolar_cita_cursor
+
+            encolar_cita_cursor(cursor, cita_id, params[10])
         finally:
             cursor.close()
-    try:
-        from servicios.google_calendar import sincronizar_cita
-
-        sincronizar_cita(cita_id, params[10])
-    except Exception:
-        from flask import current_app
-
-        current_app.logger.exception("La cita %s se guardó, pero falló la sincronización opcional con Google.", cita_id)
     return cita_id

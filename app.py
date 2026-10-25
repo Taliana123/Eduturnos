@@ -1,6 +1,7 @@
-﻿from flask import Flask, render_template, jsonify, request, current_app, send_from_directory, session
+from flask import Flask, flash, jsonify, redirect, render_template, request, current_app, send_from_directory, session, url_for
 from mysql.connector import Error as MySQLError
 from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.exceptions import BadRequest
 from urllib.parse import quote
 
 from config import Config
@@ -24,11 +25,24 @@ from routes.passwords import passwords_bp
 from routes.reportes import reportes_bp
 from routes.seguimiento import seguimiento_bp
 from routes.solicitudes import solicitudes_bp
+from routes.soporte import soporte_bp
 from roles import SEDES_INSTITUCIONALES
 
 from security import csrf_token, require_configured_secret, validar_csrf
 from servicios.mail import mail
 from servicios.reuniones import HORARIOS_CITAS, formatear_hora
+
+
+def _beepy_home_enabled():
+    if not current_app.config.get("BEEPY_ENABLED", False) or request.endpoint != "inicio":
+        return False
+    domains = current_app.config.get("BEEPY_DOMAINS")
+    if domains is None:
+        domains = (current_app.config.get("BEEPY_DOMAIN", ""),)
+    if isinstance(domains, str):
+        domains = domains.split(",")
+    allowed_domains = {str(domain).strip().lower() for domain in domains if str(domain).strip()}
+    return request.host.split(":")[0].lower() in allowed_domains
 
 
 def create_app():
@@ -82,7 +96,11 @@ def create_app():
 
     @app.context_processor
     def disponibilidad_asistente():
-        return {"asistente_disponible": bool(current_app.config.get("GEMINI_API_KEY")), "beepy_disponible": current_app.config.get("BEEPY_ENABLED", False), "beepy_inicio": current_app.config.get("BEEPY_ENABLED", False) and request.endpoint == "inicio" and request.host.split(":")[0] == current_app.config.get("BEEPY_DOMAIN")}
+        return {
+            "asistente_disponible": bool(current_app.config.get("GROQ_API_KEY")),
+            "beepy_disponible": current_app.config.get("BEEPY_ENABLED", False),
+            "beepy_inicio": _beepy_home_enabled(),
+        }
 
     @app.context_processor
     def navegacion_institucional():
@@ -113,6 +131,7 @@ def create_app():
         passwords_bp,
         justificaciones_bp,
         solicitudes_bp,
+        soporte_bp,
         importacion_bp,
     ):
         app.register_blueprint(bp)
@@ -124,12 +143,27 @@ def create_app():
             session["mobile_mode"] = True
 
         if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
-            validar_csrf()
+            try:
+                validar_csrf()
+            except BadRequest:
+                current_app.logger.warning(
+                    "Validación CSRF rechazada: método=%s endpoint=%s",
+                    request.method,
+                    request.endpoint,
+                )
+                if request.method == "POST" and request.endpoint == "auth.login":
+                    flash(
+                        "El formulario de acceso venció o quedó desactualizado. "
+                        "Vuelve a ingresar tus datos.",
+                        "error",
+                    )
+                    return redirect(url_for("auth.login"))
+                raise
 
     # Encabezados de seguridad
     @app.after_request
     def headers(response):
-        beepy_home = current_app.config.get("BEEPY_ENABLED", False) and request.endpoint == "inicio" and request.host.split(":")[0] == current_app.config.get("BEEPY_DOMAIN")
+        beepy_home = _beepy_home_enabled()
         beepy_origin = " https://www.beepychatbot.com" if current_app.config.get("BEEPY_ENABLED", False) else ""
         response.headers.setdefault(
             "X-Content-Type-Options",
@@ -158,7 +192,9 @@ def create_app():
             "media-src 'self'" + (beepy_origin if beepy_home else "") + "; "
             "frame-src 'self' https://maps.google.com https://www.google.com" + beepy_origin + "; "
             "style-src 'self' 'unsafe-inline'" + (beepy_origin if beepy_home else "") + "; "
-            "script-src 'self'" + (beepy_origin if beepy_home else "") + "; "
+            "font-src 'self' data:; "
+            "script-src 'self' 'sha256-62/dacoeWnOfkToAKl3FGOLvpTyGZeCV/L/BoJUygnQ=' "
+            "'sha256-Ob9XMylXxoM1xB3YQRjyJ+SzKYw5tIGjuDixpXDlHwc='" + (beepy_origin if beepy_home else "") + "; "
             "connect-src 'self'" + (beepy_origin if beepy_home else "") + "; "
             "object-src 'none'; "
             "base-uri 'self'; "
@@ -177,7 +213,9 @@ def create_app():
     # PÃ¡gina principal
     @app.route("/")
     def inicio():
-        return render_template("index.html")
+        respuesta = current_app.make_response(render_template("index.html"))
+        respuesta.headers["Cache-Control"] = "no-store"
+        return respuesta
 
     # Páginas públicas adicionales
     @app.route("/como-funciona")

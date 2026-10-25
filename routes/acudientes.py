@@ -1,20 +1,51 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from database.db import consultar, ejecutar
 from routes.helpers import roles_permitidos, auditoria
+from roles import es_correo_gmail
 
 acudientes_bp=Blueprint("acudientes",__name__,url_prefix="/acudientes")
 
 @acudientes_bp.route("/")
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador")
-def lista(): return render_template("acudientes/lista.html",acudientes=consultar("SELECT * FROM acudientes ORDER BY apellidos,nombres"))
+def lista():
+    q = request.args.get("q", "").strip()
+    like = f"%{q}%"
+    acudientes = consultar(
+        """SELECT a.*,
+                  GROUP_CONCAT(DISTINCT CONCAT(e.nombres,' ',e.apellidos)
+                               ORDER BY e.apellidos,e.nombres SEPARATOR ', ') estudiantes,
+                  GROUP_CONCAT(DISTINCT CONCAT(COALESCE(gr.nombre,'-'),' / ',COALESCE(g.nombre,'-'))
+                               ORDER BY gr.nombre,g.nombre SEPARATOR ', ') grados_grupos,
+                  GROUP_CONCAT(DISTINCT s.nombre ORDER BY s.nombre SEPARATOR ', ') sedes,
+                  GROUP_CONCAT(DISTINCT j.nombre ORDER BY j.nombre SEPARATOR ', ') jornadas
+           FROM acudientes a
+           LEFT JOIN estudiante_acudiente ea ON ea.id_acudiente=a.id_acudiente AND ea.estado=1
+           LEFT JOIN estudiantes e ON e.id_estudiante=ea.id_estudiante AND e.estado='Activo'
+           LEFT JOIN sedes s ON s.id=e.id_sede
+           LEFT JOIN jornadas j ON j.id=e.id_jornada
+           LEFT JOIN grados gr ON gr.id=e.id_grado
+           LEFT JOIN grupos g ON g.id=e.id_grupo
+           WHERE CONCAT(a.nombres,' ',a.apellidos) LIKE %s
+              OR a.documento LIKE %s
+              OR COALESCE(a.correo,'') LIKE %s
+              OR COALESCE(a.telefono,'') LIKE %s
+           GROUP BY a.id_acudiente
+           ORDER BY a.apellidos,a.nombres""",
+        (like, like, like, like),
+    )
+    return render_template("acudientes/lista.html", acudientes=acudientes, q=q)
 
 @acudientes_bp.route("/nuevo",methods=["GET","POST"])
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador")
 def nuevo():
     if request.method=="POST":
         d=request.form
+        correo=(d.get("correo") or "").strip().lower()
+        if not es_correo_gmail(correo):
+            flash("El correo del acudiente debe terminar en @gmail.com.","error")
+            return render_template("acudientes/form.html",acudiente=None,correo=correo)
         try:
-            aid=ejecutar("INSERT INTO acudientes(tipo_documento,documento,nombres,apellidos,telefono,correo,direccion,barrio,municipio,estado) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,1)",(d["tipo_documento"],d["documento"],d["nombres"],d["apellidos"],d.get("telefono"),d.get("correo"),d.get("direccion"),d.get("barrio"),d.get("municipio") or "Ibagué")); auditoria("CREAR","Acudientes",aid); flash("Acudiente creado.","success"); return redirect(url_for("acudientes.lista"))
+            aid=ejecutar("INSERT INTO acudientes(tipo_documento,documento,nombres,apellidos,telefono,correo,direccion,barrio,municipio,estado) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,1)",(d["tipo_documento"],d["documento"],d["nombres"],d["apellidos"],d.get("telefono"),correo,d.get("direccion"),d.get("barrio"),d.get("municipio") or "Ibagué")); auditoria("CREAR","Acudientes",aid); flash("Acudiente creado.","success"); return redirect(url_for("acudientes.lista"))
         except Exception: flash("No se pudo crear el acudiente.","error")
     return render_template("acudientes/form.html",acudiente=None)
 
@@ -25,8 +56,12 @@ def editar(id):
     if not a: return redirect(url_for("acudientes.lista"))
     if request.method=="POST":
         d=request.form
+        correo=(d.get("correo") or "").strip().lower()
+        if not es_correo_gmail(correo):
+            flash("El correo del acudiente debe terminar en @gmail.com.","error")
+            return render_template("acudientes/form.html",acudiente=a,correo=correo)
         try:
-            ejecutar("UPDATE acudientes SET tipo_documento=%s,documento=%s,nombres=%s,apellidos=%s,telefono=%s,correo=%s,direccion=%s,barrio=%s,municipio=%s,estado=%s WHERE id_acudiente=%s",(d["tipo_documento"],d["documento"],d["nombres"],d["apellidos"],d.get("telefono"),d.get("correo"),d.get("direccion"),d.get("barrio"),d.get("municipio"),d.get("estado","1"),id)); auditoria("ACTUALIZAR","Acudientes",id); flash("Acudiente actualizado.","success"); return redirect(url_for("acudientes.lista"))
+            ejecutar("UPDATE acudientes SET tipo_documento=%s,documento=%s,nombres=%s,apellidos=%s,telefono=%s,correo=%s,direccion=%s,barrio=%s,municipio=%s,estado=%s WHERE id_acudiente=%s",(d["tipo_documento"],d["documento"],d["nombres"],d["apellidos"],d.get("telefono"),correo,d.get("direccion"),d.get("barrio"),d.get("municipio"),d.get("estado","1"),id)); auditoria("ACTUALIZAR","Acudientes",id); flash("Acudiente actualizado.","success"); return redirect(url_for("acudientes.lista"))
         except Exception: flash("No se pudo actualizar el acudiente.","error")
     return render_template("acudientes/form.html",acudiente=a)
 

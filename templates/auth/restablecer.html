@@ -1,10 +1,11 @@
 {% extends 'base.html' %}{% block title %}Nueva contraseña · EDUTURNOS{% endblock %}{% block content %}
 <section class="formulario"><div class="tarjeta form-card">
   <div class="form-top-actions"><a class="link-back" href="{{ url_for('auth.login') }}">← Iniciar sesión</a></div>
-  <div class="section-heading"><span class="badge">Seguridad de cuenta</span><h1>Nueva contraseña</h1><p>Crea una contraseña de mínimo 12 caracteres con mayúsculas, minúsculas y números.</p></div>
+  <div class="section-heading"><span class="badge">Seguridad de cuenta</span><h1>Nueva contraseña</h1><p>Debe tener entre 12 y 15 caracteres e incluir al menos una mayúscula, una minúscula y un número.</p></div>
   <form method="post" class="stack-form form-uniform">{{ csrf_field()|safe }}
-    <label>Contraseña nueva<input type="password" name="password_nueva" minlength="12" required autocomplete="new-password"></label>
-    <label>Confirmar contraseña<input type="password" name="password_confirmacion" minlength="12" required autocomplete="new-password"></label>
+    <label>Contraseña nueva<input type="password" name="password_nueva" minlength="12" maxlength="15" required autocomplete="new-password" aria-describedby="ayuda-password-nueva"></label>
+    <small id="ayuda-password-nueva" class="form-help">Entre 12 y 15 caracteres, con mayúsculas, minúsculas y números.</small>
+    <label>Confirmar contraseña<input type="password" name="password_confirmacion" minlength="12" maxlength="15" required autocomplete="new-password"></label>
     <button class="boton boton-full" type="submit">Guardar contraseña</button>
   </form>
 </div></section>

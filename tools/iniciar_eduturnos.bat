@@ -7,7 +7,11 @@ set "LANIF="
 set "LANIP="
 for /f "delims=" %%I in ('powershell -NoProfile -Command "Get-NetConnectionProfile | Where-Object NetworkCategory -eq Private | Select-Object -First 1 -ExpandProperty InterfaceIndex"') do set "LANIF=%%I"
 if not defined LANIF (
-  echo [ERROR] Configura la red de Windows como Privada para habilitar acceso LAN seguro.
+  echo [AVISO] La red no esta marcada como Privada; se usara igualmente la conexion activa con Internet.
+  for /f "delims=" %%I in ('powershell -NoProfile -Command "Get-NetConnectionProfile | Where-Object IPv4Connectivity -eq Internet | Select-Object -First 1 -ExpandProperty InterfaceIndex"') do set "LANIF=%%I"
+)
+if not defined LANIF (
+  echo [ERROR] No se encontro ninguna conexion de red activa.
   goto :fail
 )
 for /f "delims=" %%I in ('powershell -NoProfile -Command "Get-NetIPAddress -InterfaceIndex %LANIF% -AddressFamily IPv4 | Where-Object AddressState -eq Preferred | Select-Object -First 1 -ExpandProperty IPAddress"') do set "LANIP=%%I"
