@@ -1,0 +1,5 @@
+{% macro dashboard_back_button() -%}
+<a class="menu-page-back account-settings-back" href="{{ url_for('auth.dashboard') }}" aria-label="Volver al resumen" title="Volver al resumen">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
+</a>
+{%- endmacro %}

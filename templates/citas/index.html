@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from "_menu_back_button.html" import dashboard_back_button %}
 
 {% block title %}Citas · EDUTURNOS{% endblock %}
 
@@ -8,7 +9,10 @@
 
 <section class="citas-desktop-view">
     <div class="page-head">
-        <div><h1>Citaciones escolares</h1><p>Consulta, organiza y da seguimiento a cada encuentro.</p></div>
+        <div class="menu-page-heading">
+            {{ dashboard_back_button() }}
+            <div class="menu-page-heading-copy"><h1>Citaciones escolares</h1><p>Consulta, organiza y da seguimiento a cada encuentro.</p></div>
+        </div>
     </div>
     <section class="citas-desktop-directory" aria-label="Citaciones escolares">
         <div class="citas-desktop-toolbar">
@@ -336,7 +340,7 @@
         {% endif %}
         {% endif %}
         {% if puede_anotar %}
-        {% if c.estado == 'Realizada' %}
+        {% if c.estado == 'Realizada' and c.creado_por == usuario_id %}
         <details class="cita-workflow-panel">
             <summary>Reprogramar</summary>
             <form method="post" action="{{ url_for('citas.reprogramar_cita', cita_id=c.id) }}" class="cita-workflow-form">
@@ -364,12 +368,27 @@
     </section>
     {% endif %}
     <div class="mobile-dialog-actions cita-info-actions">
-        {% if rol == 'Acudiente' and c.estado == 'Pendiente' %}
+        {% if rol == 'Acudiente' and c.estado in ['Pendiente', 'Reprogramada'] %}
         <form method="post" action="{{ url_for('citas.cambiar_estado', cita_id=c.id) }}" class="inline-form">
             {{ csrf_field()|safe }}
             <input type="hidden" name="estado" value="Confirmada">
             <button class="boton" type="submit">Confirmar</button>
         </form>
+        {% endif %}
+        {% if rol == 'Acudiente'
+              and c.estado in ['Pendiente', 'Confirmada', 'Reprogramada']
+              and c.creador_rol in ['Docente', 'Administrador / Coordinador', 'Rector'] %}
+        <details class="cita-workflow-panel cita-reschedule-request">
+            <summary>Solicitar cambio de fecha</summary>
+            <form method="post" action="{{ url_for('citas.solicitar_reprogramacion_cita', cita_id=c.id) }}" class="cita-workflow-form">
+                {{ csrf_field()|safe }}
+                <label>Fecha propuesta<input type="date" name="fecha" min="{{ fecha_minima }}" required></label>
+                {% from '_hora_cita.html' import selector_hora %}
+                <label>Hora propuesta{{ selector_hora('hora') }}</label>
+                <label>Motivo del cambio<textarea name="motivo" maxlength="2000" rows="2" required></textarea></label>
+                <button class="boton" type="submit">Enviar solicitud</button>
+            </form>
+        </details>
         {% endif %}
         <button class="boton" type="button" data-mobile-dialog-close>Cancelar</button>
     </div>

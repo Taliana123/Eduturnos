@@ -120,6 +120,7 @@ def citas_visibles(usuario=None):
             c.id_motivo,
             c.id_estado,
             c.id_periodo,
+            c.creado_por,
             c.fecha,
             c.hora,
             c.lugar,
@@ -155,7 +156,8 @@ def citas_visibles(usuario=None):
 
             s.nombre AS sede_nombre,
 
-            j.nombre AS jornada_nombre
+            j.nombre AS jornada_nombre,
+            creador_rol.nombre AS creador_rol
 
         FROM citas c
 
@@ -173,6 +175,12 @@ def citas_visibles(usuario=None):
 
         INNER JOIN estados_cita ec
             ON ec.id = c.id_estado
+
+        LEFT JOIN usuarios creador
+            ON creador.id_usuario = c.creado_por
+
+        LEFT JOIN roles creador_rol
+            ON creador_rol.id = creador.id_rol
 
         LEFT JOIN sedes s
             ON s.id = e.id_sede
@@ -649,12 +657,14 @@ def index():
         semanas=semanas,
         citas=citas,
         usuario=usuario,
+        usuario_id=usuario["id_usuario"],
         rol_usuario=usuario["rol_nombre"],
         citas_proximas=citas_proximas,
         sedes=sedes,
         jornadas=jornadas,
         docentes=docentes,
         citas_hoy=citas_hoy,
+        fecha_minima=hoy.isoformat(),
         pendientes=pendientes,
         confirmadas=confirmadas,
         anio_anterior=anio_anterior,

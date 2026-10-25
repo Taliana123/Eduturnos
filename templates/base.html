@@ -1719,7 +1719,7 @@ header.eduturnos-header .eduturnos-logo span {
         </header>
         {% else %}<header class="eduturnos-header"><div class="eduturnos-logo"><img class="eduturnos-header-logo" src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional">EDUTURNOS<span>.</span></div></header>{% endif %}
     {% else %}
-        <header class="barra">{% if usuario_navegacion %}<button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-controls="eduturnos-mobile-nav" aria-expanded="false" aria-label="Abrir men�" title="Abrir men�"><span class="mobile-nav-toggle-lines" aria-hidden="true"><i></i><i></i><i></i></span></button>{% endif %}{% if request.endpoint != 'soporte.index' %}<div class="logo"><img class="eduturnos-header-logo" src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional">EDUTURNOS<span>.</span></div>{% endif %}{% if not usuario_navegacion %}<nav><a href="{{ url_for('auth.login') }}">Iniciar sesi�n</a><a href="{{ url_for('auth.registro', portal='estudiante') }}">Crear cuenta</a></nav>{% endif %}</header>
+        <header class="barra">{% if usuario_navegacion %}<button class="mobile-nav-toggle" type="button" data-mobile-nav-toggle aria-controls="eduturnos-mobile-nav" aria-expanded="false" aria-label="Abrir menú" title="Abrir menú"><span class="mobile-nav-toggle-lines" aria-hidden="true"><i></i><i></i><i></i></span></button>{% endif %}{% if request.endpoint != 'soporte.index' %}<div class="logo"><img class="eduturnos-header-logo" src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional">EDUTURNOS<span>.</span></div>{% endif %}{% if not usuario_navegacion %}<nav><a href="{{ url_for('auth.login') }}">Iniciar sesión</a><a href="{{ url_for('auth.registro', portal='estudiante') }}">Crear cuenta</a></nav>{% endif %}</header>
     {% endif %}
 
 
@@ -4920,4 +4920,4 @@ html body #contenido .dashboard-page[class*="dashboard-"]
 <link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-sidebar.css') }}?v=20261021_mobile_only_support_v13">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/citas-desktop.css') }}?v=20261023_citas_header_spacing_v1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/password-controls.css') }}?v=20261023_account_actions_fit_v2">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/layout-responsive.css') }}?v=20261024_account_back_targeted_v1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layout-responsive.css') }}?v=20261026_menu_title_back_v1">

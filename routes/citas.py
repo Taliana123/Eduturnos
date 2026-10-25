@@ -16,6 +16,11 @@ from routes.helpers import (
 
 
 citas_bp = Blueprint("citas", __name__, url_prefix="/citas")
+ROLES_CREADORES_CITA = {
+    "Rector",
+    "Administrador / Coordinador",
+    "Docente",
+}
 
 
 def _acudiente_puede_confirmar(estado_actual, estado_nuevo):
@@ -76,6 +81,14 @@ def _validar_cierre_cita(asistencia, resultado):
     if not resultado or len(resultado) > 10000:
         raise ValueError("Registra un resultado de entre 1 y 10000 caracteres.")
     return "Realizada" if asistencia == "Asistió" else "No asistió", resultado
+
+
+def _es_creador_habilitado(usuario, cita):
+    return (
+        usuario["rol_nombre"] in ROLES_CREADORES_CITA
+        and cita.get("creado_por") is not None
+        and int(cita["creado_por"]) == int(usuario["id_usuario"])
+    )
 
 
 @citas_bp.post("/<int:cita_id>/cerrar")
@@ -216,8 +229,9 @@ def consultar_citas(usuario):
         SELECT
             c.id,
             c.id_estudiante,
+            c.id_acudiente,
+            c.creado_por,
             c.fecha,
-            c.id_estudiante,
             c.hora,
             c.lugar,
             c.observaciones,
@@ -234,7 +248,8 @@ def consultar_citas(usuario):
 
             m.nombre AS motivo,
 
-            ec.nombre AS estado
+            ec.nombre AS estado,
+            creador_rol.nombre AS creador_rol
 
         FROM citas c
 
@@ -257,6 +272,10 @@ def consultar_citas(usuario):
 
         JOIN estados_cita ec
             ON ec.id = c.id_estado
+        LEFT JOIN usuarios creador
+            ON creador.id_usuario = c.creado_por
+        LEFT JOIN roles creador_rol
+            ON creador_rol.id = creador.id_rol
 
         {where}
 
@@ -652,6 +671,7 @@ def index():
         citas=citas,
         notas_por_cita=notas_por_cita,
         puede_anotar=puede_anotar,
+        usuario_id=usuario["id_usuario"],
         detalles_escolares=detalles_escolares,
         eventos_google_por_cita=eventos_google_por_cita,
         fecha_minima=fecha_minima,
@@ -1412,6 +1432,8 @@ def actualizar_compromiso(cita_id, compromiso_id):
 def reprogramar_cita(cita_id):
     usuario = usuario_actual()
     cita = _cita_autorizada(usuario, cita_id)
+    if not _es_creador_habilitado(usuario, cita):
+        abort(403)
     try:
         fecha = _validar_fecha_cita(request.form.get("fecha", ""))
         hora = datetime.strptime(request.form.get("hora", ""), "%H:%M").time()
@@ -1451,6 +1473,330 @@ def reprogramar_cita(cita_id):
     _notificar(nueva_cita_id, "Citación reprogramada", f"La nueva fecha de tu citación es {fecha} a las {formatear_hora(hora)}.")
     flash("Cita reprogramada y participantes notificados.", "success")
     return redirect(url_for("calendario.index", dia=fecha.isoformat()))
+
+
+@citas_bp.post("/<int:cita_id>/solicitar-reprogramacion")
+@roles_permitidos("Acudiente")
+def solicitar_reprogramacion_cita(cita_id):
+    usuario = usuario_actual()
+    try:
+        fecha = _validar_fecha_cita(request.form.get("fecha", ""))
+        hora = datetime.strptime(
+            request.form.get("hora", ""),
+            "%H:%M",
+        ).time()
+        motivo = request.form.get("motivo", "").strip()
+        if not motivo or len(motivo) > 2000:
+            raise ValueError("Indica el motivo del cambio, hasta 2000 caracteres.")
+
+        with transaccion() as conexion:
+            cursor = conexion.cursor(dictionary=True)
+            try:
+                cursor.execute(
+                    """
+                    SELECT c.id, c.id_estudiante, c.id_acudiente,
+                           c.id_docente, c.creado_por, c.fecha, c.hora,
+                           ec.nombre AS estado, r.nombre AS creador_rol
+                    FROM citas c
+                    JOIN estados_cita ec ON ec.id = c.id_estado
+                    JOIN acudientes a ON a.id_acudiente = c.id_acudiente
+                    JOIN usuarios creador ON creador.id_usuario = c.creado_por
+                    JOIN roles r ON r.id = creador.id_rol
+                    WHERE c.id = %s AND a.id_usuario = %s
+                    FOR UPDATE
+                    """,
+                    (cita_id, usuario["id_usuario"]),
+                )
+                cita = cursor.fetchone()
+                if not cita:
+                    abort(404)
+                if cita["creador_rol"] not in ROLES_CREADORES_CITA:
+                    raise ValueError(
+                        "Esta citación no tiene un creador habilitado para revisar cambios."
+                    )
+                if cita["estado"] not in ("Pendiente", "Confirmada", "Reprogramada"):
+                    raise ValueError(
+                        "Solo puedes solicitar cambios para una cita activa."
+                    )
+                validar_disponibilidad(cita["id_docente"], fecha, hora)
+
+                bloquear_agenda(
+                    cursor,
+                    cita["id_docente"],
+                    cita["id_estudiante"],
+                    cita["id_acudiente"],
+                )
+                cursor.execute(
+                    """
+                    SELECT id
+                    FROM solicitudes_reprogramacion_cita
+                    WHERE id_cita = %s AND estado = 'Pendiente'
+                    LIMIT 1
+                    FOR UPDATE
+                    """,
+                    (cita_id,),
+                )
+                if cursor.fetchone():
+                    raise ValueError(
+                        "Ya hay una solicitud de cambio pendiente para esta cita."
+                    )
+                comprobar_hueco(
+                    cursor,
+                    cita["id_docente"],
+                    cita["id_estudiante"],
+                    cita["id_acudiente"],
+                    fecha,
+                    hora,
+                    excluir=cita_id,
+                )
+                cursor.execute(
+                    """
+                    INSERT INTO solicitudes_reprogramacion_cita (
+                        id_cita, solicitante_usuario_id, creador_usuario_id,
+                        fecha_anterior, hora_anterior, fecha_solicitada,
+                        hora_solicitada, motivo
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    (
+                        cita_id,
+                        usuario["id_usuario"],
+                        cita["creado_por"],
+                        cita["fecha"],
+                        cita["hora"],
+                        fecha,
+                        hora,
+                        motivo,
+                    ),
+                )
+                solicitud_id = cursor.lastrowid
+            finally:
+                cursor.close()
+    except ValueError as exc:
+        flash(str(exc), "error")
+        return redirect(url_for("citas.index", _anchor=f"cita-dialog-{cita_id}"))
+
+    notificar(
+        cita["creado_por"],
+        "Solicitud para cambiar una citación",
+        f"El acudiente solicitó cambiar la cita #{cita_id} para "
+        f"{fecha.isoformat()} a las {formatear_hora(hora)}. "
+        "Revisa la solicitud en Solicitudes.",
+        "Solicitud",
+    )
+    auditoria(
+        "SOLICITAR_REPROGRAMACION",
+        "Citas",
+        cita_id,
+        f"Solicitud #{solicitud_id} enviada por acudiente",
+    )
+    flash("Solicitud enviada a la persona que creó la citación.", "success")
+    return redirect(url_for("citas.index", _anchor=f"cita-dialog-{cita_id}"))
+
+
+@citas_bp.post("/solicitudes-reprogramacion/<int:solicitud_id>/resolver")
+@roles_permitidos(*PERSONAL)
+def resolver_solicitud_reprogramacion(solicitud_id):
+    usuario = usuario_actual()
+    if not _es_creador_habilitado(usuario, {"creado_por": usuario["id_usuario"]}):
+        abort(403)
+
+    accion = request.form.get("accion", "").strip()
+    respuesta = request.form.get("respuesta", "").strip()
+    if accion not in ("aceptar", "rechazar"):
+        abort(400)
+    if len(respuesta) > 2000:
+        flash("La respuesta no puede superar 2000 caracteres.", "error")
+        return redirect(url_for("solicitudes.index"))
+
+    solicitud = None
+    aceptada = accion == "aceptar"
+    try:
+        with transaccion() as conexion:
+            cursor = conexion.cursor(dictionary=True)
+            try:
+                cursor.execute(
+                    """
+                    SELECT *
+                    FROM solicitudes_reprogramacion_cita
+                    WHERE id = %s
+                    FOR UPDATE
+                    """,
+                    (solicitud_id,),
+                )
+                solicitud = cursor.fetchone()
+                if not solicitud:
+                    abort(404)
+                if int(solicitud["creador_usuario_id"]) != int(usuario["id_usuario"]):
+                    abort(403)
+                if solicitud["estado"] != "Pendiente":
+                    abort(409, description="La solicitud ya fue resuelta.")
+
+                if accion == "rechazar":
+                    cursor.execute(
+                        """
+                        UPDATE solicitudes_reprogramacion_cita
+                        SET estado='Rechazada', respuesta=%s,
+                            revisado_por=%s, fecha_revision=NOW()
+                        WHERE id=%s AND estado='Pendiente'
+                        """,
+                        (
+                            respuesta or "La persona responsable rechazó el cambio.",
+                            usuario["id_usuario"],
+                            solicitud_id,
+                        ),
+                    )
+                    if cursor.rowcount != 1:
+                        abort(409, description="La solicitud ya fue resuelta.")
+                else:
+                    fecha = _validar_fecha_cita(
+                        solicitud["fecha_solicitada"].isoformat()
+                        if hasattr(solicitud["fecha_solicitada"], "isoformat")
+                        else solicitud["fecha_solicitada"]
+                    )
+                    hora = datetime.strptime(
+                        str(solicitud["hora_solicitada"])[:5],
+                        "%H:%M",
+                    ).time()
+                    cursor.execute(
+                        """
+                        SELECT c.id, c.id_docente, c.id_estudiante, c.id_acudiente,
+                               c.creado_por, ec.nombre AS estado
+                        FROM citas c
+                        JOIN estados_cita ec ON ec.id = c.id_estado
+                        WHERE c.id = %s
+                        FOR UPDATE
+                        """,
+                        (solicitud["id_cita"],),
+                    )
+                    cita = cursor.fetchone()
+                    if (
+                        not cita
+                        or int(cita["creado_por"]) != int(usuario["id_usuario"])
+                        or cita["estado"] not in ("Pendiente", "Confirmada", "Reprogramada")
+                    ):
+                        abort(409, description="La citación ya no admite cambios.")
+
+                    validar_disponibilidad(cita["id_docente"], fecha, hora)
+                    bloquear_agenda(
+                        cursor,
+                        cita["id_docente"],
+                        cita["id_estudiante"],
+                        cita["id_acudiente"],
+                    )
+                    comprobar_hueco(
+                        cursor,
+                        cita["id_docente"],
+                        cita["id_estudiante"],
+                        cita["id_acudiente"],
+                        fecha,
+                        hora,
+                        excluir=solicitud["id_cita"],
+                    )
+                    cursor.execute(
+                        "SELECT id FROM estados_cita WHERE nombre='Reprogramada' AND estado=1"
+                    )
+                    estado = cursor.fetchone()
+                    if not estado:
+                        abort(409, description="No está disponible el estado Reprogramada.")
+                    cursor.execute(
+                        """
+                        UPDATE citas
+                        SET fecha=%s, hora=%s, id_estado=%s
+                        WHERE id=%s AND creado_por=%s
+                          AND fecha=%s AND hora=%s
+                          AND id_estado IN (
+                              SELECT id FROM estados_cita
+                              WHERE nombre IN ('Pendiente','Confirmada','Reprogramada')
+                          )
+                        """,
+                        (
+                            fecha,
+                            hora,
+                            estado["id"],
+                            solicitud["id_cita"],
+                            usuario["id_usuario"],
+                            solicitud["fecha_anterior"],
+                            solicitud["hora_anterior"],
+                        ),
+                    )
+                    if cursor.rowcount != 1:
+                        abort(409, description="La cita cambió desde que se envió la solicitud.")
+                    cursor.execute(
+                        """
+                        INSERT INTO reprogramaciones_cita (
+                            id_cita, fecha_anterior, hora_anterior,
+                            fecha_nueva, hora_nueva, motivo, realizado_por
+                        )
+                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        """,
+                        (
+                            solicitud["id_cita"],
+                            solicitud["fecha_anterior"],
+                            solicitud["hora_anterior"],
+                            fecha,
+                            hora,
+                            solicitud["motivo"],
+                            usuario["id_usuario"],
+                        ),
+                    )
+                    from servicios.google_calendar import encolar_cita_cursor
+
+                    encolar_cita_cursor(
+                        cursor,
+                        solicitud["id_cita"],
+                        usuario["id_usuario"],
+                    )
+                    cursor.execute(
+                        """
+                        UPDATE solicitudes_reprogramacion_cita
+                        SET estado='Aceptada', respuesta=%s,
+                            revisado_por=%s, fecha_revision=NOW()
+                        WHERE id=%s AND estado='Pendiente'
+                        """,
+                        (
+                            respuesta or "La persona responsable aceptó el cambio.",
+                            usuario["id_usuario"],
+                            solicitud_id,
+                        ),
+                    )
+                    if cursor.rowcount != 1:
+                        abort(409, description="La solicitud ya fue resuelta.")
+            finally:
+                cursor.close()
+    except ValueError as exc:
+        flash(str(exc), "error")
+        return redirect(url_for("solicitudes.index"))
+
+    if aceptada:
+        auditoria(
+            "ACEPTAR_REPROGRAMACION",
+            "Citas",
+            solicitud["id_cita"],
+            f"Solicitud #{solicitud_id} aceptada",
+        )
+        _notificar(
+            solicitud["id_cita"],
+            "Citación reprogramada",
+            f"La nueva fecha de la citación es {fecha.isoformat()} "
+            f"a las {formatear_hora(hora)}.",
+        )
+        flash("Solicitud aceptada y citación actualizada.", "success")
+    else:
+        notificar(
+            solicitud["solicitante_usuario_id"],
+            "Solicitud de cambio rechazada",
+            respuesta or "La persona responsable rechazó el cambio solicitado.",
+            "Solicitud",
+        )
+        auditoria(
+            "RECHAZAR_REPROGRAMACION",
+            "Citas",
+            solicitud["id_cita"],
+            f"Solicitud #{solicitud_id} rechazada",
+        )
+        flash("Solicitud rechazada.", "success")
+    return redirect(url_for("solicitudes.index"))
 
 
 @citas_bp.post("/disponibilidad/<int:docente_id>")

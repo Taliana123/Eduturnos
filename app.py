@@ -213,6 +213,10 @@ def create_app():
     # PÃ¡gina principal
     @app.route("/")
     def inicio():
+        from routes.helpers import usuario_actual
+
+        if session.get("usuario_id") and usuario_actual():
+            return redirect(url_for("auth.dashboard"))
         respuesta = current_app.make_response(render_template("index.html"))
         respuesta.headers["Cache-Control"] = "no-store"
         return respuesta

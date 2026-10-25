@@ -21,13 +21,72 @@ document.addEventListener("DOMContentLoaded", () => {
         field.value = values[field.name];
     }
 
-    form.querySelectorAll('input[type="email"][pattern]').forEach((field) => {
-        field.addEventListener("blur", () => {
-            if (!field.value || !field.checkValidity()) {
+    let blockedEmail = null;
+    const emailFields = Array.from(
+        form.querySelectorAll('input[type="email"][pattern]')
+    );
+
+    emailFields.forEach((field) => {
+        const message = field.title || "Ingresa un correo con el dominio permitido.";
+
+        const validateEmail = () => {
+            field.setCustomValidity("");
+            if (!field.checkValidity()) {
+                field.setCustomValidity(message);
+                blockedEmail = field;
+                return false;
+            }
+            if (blockedEmail === field) blockedEmail = null;
+            return true;
+        };
+
+        field.addEventListener("input", () => {
+            field.setCustomValidity("");
+            if (field.checkValidity() && blockedEmail === field) {
+                blockedEmail = null;
+            }
+        });
+        field.addEventListener("keydown", (event) => {
+            if (event.key === "Tab" && !validateEmail()) {
+                event.preventDefault();
                 field.reportValidity();
             }
         });
+        field.addEventListener("blur", () => {
+            if (validateEmail()) return;
+            field.reportValidity();
+            window.requestAnimationFrame(() => field.focus());
+        });
     });
+
+    form.addEventListener("pointerdown", (event) => {
+        const focusedEmail = emailFields.find(
+            (field) => field === document.activeElement
+        );
+        const email = focusedEmail || blockedEmail;
+        if (!email || email.contains(event.target)) return;
+
+        email.setCustomValidity("");
+        if (email.checkValidity()) {
+            if (blockedEmail === email) blockedEmail = null;
+            return;
+        }
+
+        email.setCustomValidity(
+            email.title || "Ingresa un correo con el dominio permitido."
+        );
+        blockedEmail = email;
+        event.preventDefault();
+        email.reportValidity();
+        email.focus();
+    }, true);
+
+    form.addEventListener("focusin", (event) => {
+        if (blockedEmail && !blockedEmail.contains(event.target) && !blockedEmail.checkValidity()) {
+            blockedEmail.focus();
+            blockedEmail.reportValidity();
+        }
+    }, true);
 
     form.querySelectorAll("select[data-grupo-de]").forEach((groupSelect) => {
         const gradeSelect = form.querySelector(

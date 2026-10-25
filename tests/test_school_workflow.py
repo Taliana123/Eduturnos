@@ -34,10 +34,10 @@ def test_respaldo_rechaza_archivo_modificado(tmp_path):
 
 def test_migracion_escolar_no_elimina_datos():
     sql = (Path(__file__).resolve().parents[1] / "sql" / "school_workflow.sql").read_text(encoding="utf-8")
-    assert sql.count("CREATE TABLE IF NOT EXISTS") == 7
+    assert sql.count("CREATE TABLE IF NOT EXISTS") == 8
     assert "DROP " not in sql
     assert "DELETE FROM " not in sql
-    for nombre in ("compromisos_cita", "cierres_cita", "reprogramaciones_cita", "disponibilidad_docente", "entregas_correo", "integraciones_google", "eventos_google"):
+    for nombre in ("compromisos_cita", "cierres_cita", "reprogramaciones_cita", "disponibilidad_docente", "entregas_correo", "integraciones_google", "eventos_google", "solicitudes_reprogramacion_cita"):
         assert f"CREATE TABLE IF NOT EXISTS {nombre}" in sql
 
 

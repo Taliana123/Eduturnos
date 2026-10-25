@@ -306,12 +306,14 @@ def test_botones_de_mi_cuenta_comparten_diseno_sin_flecha_extra_en_titulo():
     assert "background:#2f78ff!important;" in template
 
 
-def test_homepage_hero_title_and_copy_lift_eight_pixels():
+def test_homepage_hero_title_and_copy_are_lifted_together():
     homepage = Path("templates/index.html").read_text(encoding="utf-8")
+    row_styles = homepage.split("html body.public-home-page .hero-message-row {", 1)[1].split("}", 1)[0]
     title_styles = homepage.split("html body.public-home-page .hero-message-row h1", 1)[1].split("}", 1)[0]
     copy_styles = homepage.split("html body.public-home-page .hero-texto", 1)[1].split("}", 1)[0]
 
-    assert "transform: translateY(-8px) !important;" in title_styles
+    assert "transform: translateY(-6px) !important;" in row_styles
+    assert "transform: none !important;" in title_styles
     assert "transform: translateY(-8px) !important;" in copy_styles
 
 
@@ -495,7 +497,7 @@ def test_back_buttons_use_same_origin_history_and_student_picker_is_spaced():
     assert "flex-wrap:nowrap!important" in calendar
     assert "width:0!important" in calendar
     assert 'config-page-title' in config
-    assert 'config-institution-back history-back-button' in config
+    assert 'config-institution-back account-settings-back history-back-button' in config
     assert '".link-back"' in back_script
     assert "new URL(document.referrer).origin === location.origin" in back_script
     assert "history.back();" in back_script
@@ -593,7 +595,7 @@ def test_configuration_catalog_forms_follow_motives_layout_without_changing_inst
     assert "background: #2f78ff !important;" in css
     assert "config-entry-form" not in template.split('action="{{ url_for(\'configuracion.nuevo_periodo\') }}"', 1)[1].split("</form>", 1)[0]
     assert "config-entry-form" not in template.split('action="{{ url_for(\'configuracion.guardar_institucion\') }}"', 1)[1].split("</form>", 1)[0]
-    assert 'class="config-institution-back history-back-button"' in template
+    assert 'class="config-institution-back account-settings-back history-back-button"' in template
     assert ".configuracion-page .institucion-form .institution-name input," in css
     assert "font-size: 24px !important;" in css
     assert "field-sizing: fixed !important;" in css
@@ -636,7 +638,7 @@ def test_homepage_artwork_is_next_to_slogan_and_login_back_link_is_symbol_only()
     assert "align-items: center;" in login.split(".login-page {", 1)[1].split("}", 1)[0]
     assert "36px 30px;" in login
     assert 'aria-label="Volver al inicio de sesión"' in recovery
-    assert 'class="eduturnos-recuperar-final-back"' in recovery
+    assert 'class="eduturnos-recuperar-final-back account-settings-back"' in recovery
     assert '<svg aria-hidden="true" viewBox="0 0 24 24">' in recovery
     assert 'aria-label="Volver al inicio"' in login
 
@@ -732,7 +734,7 @@ def test_gmail_support_form_uses_account_email_and_automatic_receipt():
     email = Path("servicios/email.py").read_text(encoding="utf-8")
 
     assert "('soporte.index', 'Ayuda y soporte')" in sidebar
-    assert 'class="support-nav-link"' in sidebar
+    assert "'soporte.index': 'mail'" in sidebar
     assert 'class="support-nav-link" href="{{ url_for(\'soporte.index\') }}"' not in assistant_widget
     assert "mail.google.com/mail/" not in sidebar
     assert 'readonly autocomplete="email"' in template
@@ -801,6 +803,7 @@ def test_support_is_available_in_sidebar_and_legacy_gmail_composer_is_removed():
     assert "mail.google.com/mail/" not in sidebar
     assert "soporte_bp" in app_source
     assert "supportEmailLink" not in app_js
+    assert "mailto:coliejjfh@hotmail.com" in Path("templates/soporte/index.html").read_text(encoding="utf-8")
 
 
 def test_administracion_usa_enlaces_de_seccion_y_un_panel_activo():
@@ -826,12 +829,14 @@ def test_titulos_de_secciones_comparten_encabezado():
             "solicitudes/index.html",
             rol="Rector",
             solicitudes=[],
+            solicitudes_reprogramacion=[],
+            usuario_id=1,
         )
 
     assert '<header class="page-head seguimiento-page-head">' in seguimiento
     assert '<header class="page-head solicitudes-encabezado">' in solicitudes
     assert re.search(
-        r'<header class="page-head solicitudes-encabezado">\s*<div>\s*<h1>Solicitudes de cita</h1>',
+        r'(?s)<header class="page-head solicitudes-encabezado">\s*<div class="menu-page-heading">.*?<h1>Solicitudes de cita</h1>',
         solicitudes_html,
     )
     assert "margin: 0 0 8px !important;" in solicitudes

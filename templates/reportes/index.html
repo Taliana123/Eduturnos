@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
+{% from "_menu_back_button.html" import dashboard_back_button %}
 {% block title %}Reportes · EDUTURNOS{% endblock %}
 {% block content %}
 <div class="reportes-page reportes-panorama-activo">
   <section class="page-head reportes-head">
-    <div>
-      <h1>Reportes</h1>
-      <p>Consulta citaciones y genera archivos.</p>
+    <div class="menu-page-heading">
+      {{ dashboard_back_button() }}
+      <div class="menu-page-heading-copy">
+        <h1>Reportes</h1>
+        <p>Consulta citaciones y genera archivos.</p>
+      </div>
     </div>
   </section>
 

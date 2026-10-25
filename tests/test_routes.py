@@ -5,6 +5,7 @@ import time
 from urllib.parse import parse_qs, urlsplit
 
 import pytest
+import re
 from werkzeug.exceptions import Conflict, Forbidden, NotFound
 
 from app import app
@@ -66,6 +67,21 @@ def test_usuario_actual_expira_sesion_despues_de_30_dias(monkeypatch):
         session_helpers.session["creado_en"] = now - datetime_timedelta(days=31).total_seconds()
         assert session_helpers.usuario_actual() is None
         assert not session_helpers.session
+
+
+def test_sesion_activa_abre_dashboard_desde_inicio_y_login(monkeypatch):
+    usuario = {"id_usuario": 42, "rol_nombre": "Docente"}
+    monkeypatch.setattr(session_helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(auth_routes, "usuario_actual", lambda: usuario)
+    client = app.test_client()
+    with client.session_transaction() as sesion:
+        sesion["usuario_id"] = usuario["id_usuario"]
+        sesion.permanent = True
+
+    for path in ("/", "/auth/login"):
+        respuesta = client.get(path)
+        assert respuesta.status_code == 302
+        assert urlsplit(respuesta.location).path == "/auth/dashboard"
 
 
 def test_blueprints_principales_registrados():
@@ -340,6 +356,34 @@ def test_registro_crea_cuenta_con_grupo_bloqueado_como_diccionario(
     assert respuesta.status_code == 302
     assert respuesta.location.endswith("/auth/login")
     assert grupos_bloqueados
+
+
+def test_registro_invalido_redirige_y_preserva_datos_sin_contrasena(monkeypatch):
+    monkeypatch.setattr(auth_routes, "consultar", lambda *args, **kwargs: [])
+    monkeypatch.setattr(auth_routes, "_sedes", lambda: [])
+    monkeypatch.setattr(auth_routes, "_jornadas", lambda: [])
+    datos = {
+        "nombres": "Ana",
+        "correo": "ana@outlook.com",
+        "password": "No guardar esta clave",
+        "csrf_token": "token",
+    }
+    client = app.test_client()
+    pagina = client.get("/auth/registro/estudiante").get_data(as_text=True)
+    token = re.search(r'name="csrf_token"\s+value="([^"]+)"', pagina).group(1)
+    respuesta = client.post(
+        "/auth/registro/estudiante",
+        data={**datos, "csrf_token": token},
+    )
+    assert respuesta.status_code == 302
+    assert respuesta.location.endswith("/auth/registro/estudiante")
+
+    respuesta = client.get(respuesta.location)
+    html = respuesta.get_data(as_text=True)
+    assert respuesta.status_code == 200
+    assert "data-form-values=" in html
+    assert "Ana" in html
+    assert "No guardar esta clave" not in html
 
 
 def test_fallo_smtp_no_muestra_mensaje_de_envio_correcto(monkeypatch):
@@ -954,7 +998,12 @@ def test_hora_agenda_calendario_no_incluye_segundos():
 @pytest.mark.parametrize("estado_actual", ["Pendiente", "Confirmada", "Reprogramada", "Realizada"])
 def test_reprogramar_solo_realizada_conserva_cita_anterior(monkeypatch, estado_actual):
     usuario = {"id_usuario": 7, "rol_nombre": "Rector"}
-    cita = {"id_docente": 1, "id_estudiante": 2, "id_acudiente": 3}
+    cita = {
+        "id_docente": 1,
+        "id_estudiante": 2,
+        "id_acudiente": 3,
+        "creado_por": 7,
+    }
     escrituras = []
     avisos = []
 
@@ -1005,6 +1054,189 @@ def test_reprogramar_solo_realizada_conserva_cita_anterior(monkeypatch, estado_a
     assert not any("UPDATE citas" in sql or "DELETE" in sql for sql, _ in escrituras)
     assert next(params[0] for sql, params in escrituras if "INSERT INTO reprogramaciones_cita" in sql) == 901
     assert avisos[0][0] == 901
+
+
+def test_reprogramar_cita_rechaza_a_personal_que_no_es_creador(monkeypatch):
+    monkeypatch.setattr(
+        citas_routes,
+        "usuario_actual",
+        lambda: {"id_usuario": 7, "rol_nombre": "Rector"},
+    )
+    monkeypatch.setattr(
+        citas_routes,
+        "_cita_autorizada",
+        lambda *args: {"creado_por": 42},
+    )
+
+    with app.test_request_context(
+        "/citas/5/reprogramar",
+        method="POST",
+        data={"fecha": "2030-01-01", "hora": "11:30", "motivo": "Cambio"},
+    ):
+        with pytest.raises(Forbidden):
+            citas_routes.reprogramar_cita.__wrapped__(5)
+
+
+def test_acudiente_solicita_cambio_al_creador_original(monkeypatch):
+    from datetime import date
+
+    solicitud_cita = {
+        "id": 5,
+        "id_docente": 1,
+        "id_estudiante": 2,
+        "id_acudiente": 3,
+        "creado_por": 42,
+        "fecha": date.today() + timedelta(days=1),
+        "hora": "10:30:00",
+        "estado": "Confirmada",
+        "creador_rol": "Rector",
+    }
+    escrituras = []
+
+    class CursorPrueba:
+        lastrowid = 61
+        sql = ""
+
+        def execute(self, sql, params=()):
+            self.sql = sql
+            escrituras.append((sql, params))
+
+        def fetchone(self):
+            if "SELECT c.id, c.id_estudiante" in self.sql:
+                return solicitud_cita
+            return None
+
+        def close(self):
+            pass
+
+    class ConexionPrueba:
+        def cursor(self, **_kwargs):
+            return CursorPrueba()
+
+    @contextmanager
+    def transaccion_prueba():
+        yield ConexionPrueba()
+
+    avisos = []
+    monkeypatch.setattr(
+        citas_routes,
+        "usuario_actual",
+        lambda: {"id_usuario": 9, "rol_nombre": "Acudiente"},
+    )
+    monkeypatch.setattr(citas_routes, "transaccion", transaccion_prueba)
+    monkeypatch.setattr(citas_routes, "validar_disponibilidad", lambda *args: None)
+    monkeypatch.setattr(citas_routes, "bloquear_agenda", lambda *args: None)
+    monkeypatch.setattr(citas_routes, "comprobar_hueco", lambda *args, **kwargs: None)
+    monkeypatch.setattr(citas_routes, "notificar", lambda *args: avisos.append(args))
+    monkeypatch.setattr(citas_routes, "auditoria", lambda *args: None)
+
+    fecha_propuesta = (date.today() + timedelta(days=2)).isoformat()
+    with app.test_request_context(
+        "/citas/5/solicitar-reprogramacion",
+        method="POST",
+        data={"fecha": fecha_propuesta, "hora": "11:30", "motivo": "No podemos asistir"},
+    ):
+        respuesta = citas_routes.solicitar_reprogramacion_cita.__wrapped__(5)
+
+    insert = next(
+        (params for sql, params in escrituras if "INSERT INTO solicitudes_reprogramacion_cita" in sql),
+        None,
+    )
+    assert respuesta.status_code == 302
+    assert insert is not None
+    assert insert[:3] == (5, 9, 42)
+    assert insert[3:5] == (solicitud_cita["fecha"], solicitud_cita["hora"])
+    assert avisos[0][0] == 42
+
+
+def test_creador_acepta_solicitud_y_actualiza_cita(monkeypatch):
+    from datetime import date
+
+    fecha_anterior = date.today() + timedelta(days=1)
+    fecha_solicitada = date.today() + timedelta(days=2)
+    solicitud = {
+        "id": 61,
+        "id_cita": 5,
+        "solicitante_usuario_id": 9,
+        "creador_usuario_id": 7,
+        "fecha_anterior": fecha_anterior,
+        "hora_anterior": "10:30:00",
+        "fecha_solicitada": fecha_solicitada,
+        "hora_solicitada": "11:30:00",
+        "motivo": "No podemos asistir",
+        "estado": "Pendiente",
+    }
+    cita = {
+        "id": 5,
+        "id_docente": 1,
+        "id_estudiante": 2,
+        "id_acudiente": 3,
+        "creado_por": 7,
+        "estado": "Confirmada",
+    }
+    escrituras = []
+
+    class CursorPrueba:
+        rowcount = 1
+        sql = ""
+
+        def execute(self, sql, params=()):
+            self.sql = sql
+            escrituras.append((sql, params))
+
+        def fetchone(self):
+            if "FROM solicitudes_reprogramacion_cita" in self.sql and "FOR UPDATE" in self.sql:
+                return solicitud
+            if "FROM citas c" in self.sql and "FOR UPDATE" in self.sql:
+                return cita
+            if "SELECT id FROM estados_cita" in self.sql:
+                return {"id": 4}
+            return None
+
+        def close(self):
+            pass
+
+    class ConexionPrueba:
+        def cursor(self, **_kwargs):
+            return CursorPrueba()
+
+    @contextmanager
+    def transaccion_prueba():
+        yield ConexionPrueba()
+
+    avisos = []
+    monkeypatch.setattr(
+        citas_routes,
+        "usuario_actual",
+        lambda: {"id_usuario": 7, "rol_nombre": "Rector"},
+    )
+    monkeypatch.setattr(citas_routes, "transaccion", transaccion_prueba)
+    monkeypatch.setattr(citas_routes, "validar_disponibilidad", lambda *args: None)
+    monkeypatch.setattr(citas_routes, "bloquear_agenda", lambda *args: None)
+    monkeypatch.setattr(citas_routes, "comprobar_hueco", lambda *args, **kwargs: None)
+    monkeypatch.setattr(citas_routes, "auditoria", lambda *args: None)
+    monkeypatch.setattr(citas_routes, "_notificar", lambda *args: avisos.append(args))
+    monkeypatch.setattr(
+        "servicios.google_calendar.encolar_cita_cursor",
+        lambda *args: None,
+    )
+
+    with app.test_request_context(
+        "/citas/solicitudes-reprogramacion/61/resolver",
+        method="POST",
+        data={"accion": "aceptar"},
+    ):
+        respuesta = citas_routes.resolver_solicitud_reprogramacion.__wrapped__(61)
+
+    actualizacion = next(
+        params for sql, params in escrituras if "UPDATE citas" in sql
+    )
+    assert respuesta.status_code == 302
+    assert actualizacion[0] == fecha_solicitada
+    assert actualizacion[1].strftime("%H:%M") == "11:30"
+    assert actualizacion[2:5] == (4, 5, 7)
+    assert any("UPDATE solicitudes_reprogramacion_cita" in sql for sql, _ in escrituras)
+    assert avisos[0][0] == 5
 
 
 def test_crear_cita_movil_aparece_en_calendario_sin_segunda_creacion(monkeypatch):
