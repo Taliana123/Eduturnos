@@ -673,6 +673,8 @@ def test_mobile_notification_and_directory_layouts_use_available_width():
     assert ".directory-page .directory-search" in responsive
     assert ".notificaciones-page > .page-head > form" in responsive
     assert ".notificaciones-page .notification-card > form button" in responsive
+    assert "border-left: 1px solid #e5e7eb;" in notifications
+    assert "transform: translateY(-4px);" in notifications
     assert "align-self: flex-end !important;" in responsive
     assert responsive.count("display: none !important;") == 1
     assert "grid-template-columns: repeat(2, minmax(0, 1fr)) !important;" in responsive
