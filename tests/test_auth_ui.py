@@ -156,6 +156,8 @@ def test_password_reset_login_link_is_below_save_button_and_uses_blue_text():
     assert template.index("Guardar contraseña") < template.index("Iniciar sesión")
     assert '<div class="restablecer-login-link"><a href="{{ url_for(\'auth.login\') }}">Iniciar sesión</a></div>' in template
     assert ".restablecer-login-link a{color:#2f78ff;" in template
+    assert 'class="tarjeta form-card restablecer-card"' in template
+    assert ".restablecer-card > .section-heading{margin-bottom:12px}" in template
 
 
 def test_login_illustration_is_restored_only_on_desktop():

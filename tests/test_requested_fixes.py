@@ -709,7 +709,7 @@ def test_public_mobile_navigation_dropdown_is_not_clipped_by_header():
     assert "overflow: visible !important;" in mobile.split(
         "html body.public-info-page > header.barra", 1
     )[1].split("}", 1)[0]
-    assert "v=20261026_mobile_recovery_v64" in public_base
+    assert "v=20261026_public_menu_title_v65" in public_base
     assert "padding: 6px 12px !important;" in mobile.split(
         "html body.public-info-page > header.barra", 1
     )[1].split("}", 1)[0]
