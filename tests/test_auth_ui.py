@@ -639,8 +639,8 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
     assert "request.endpoint != 'soporte.index'" not in base
-    assert "css/edubot.css') }}?v=20261025_assistant_resize_v2" in base
-    assert "js/asistente.js') }}?v=20261025_assistant_resize_v2" in base
+    assert "css/edubot.css') }}?v=20261025_assistant_resize_v3" in base
+    assert "js/asistente.js') }}?v=20261025_assistant_resize_v3" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
     assert 'if (isOpen) {\n            clearChatPosition();\n            const defaultBounds = root.getBoundingClientRect();' in assistant_script
     assert 'assistantWidget' not in app_js

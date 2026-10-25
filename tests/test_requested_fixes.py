@@ -851,6 +851,29 @@ def test_support_is_available_in_sidebar_and_legacy_gmail_composer_is_removed():
     assert "mailto:coliejjfh@hotmail.com" in sidebar
 
 
+def test_requested_visual_fixes_are_scoped_to_desktop():
+    desktop_css = Path("static/css/desktop-ui-fixes.css").read_text(encoding="utf-8")
+    base = Path("templates/base.html").read_text(encoding="utf-8")
+    public_base = Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
+    homepage = Path("templates/index.html").read_text(encoding="utf-8")
+    sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
+
+    assert desktop_css.startswith("@media (min-width: 901px)")
+    assert "@media (max-width:" not in desktop_css
+    assert desktop_css.count("@media (min-width: 901px)") >= 1
+    for template in (base, public_base, homepage):
+        assert 'css/desktop-ui-fixes.css' in template
+        assert 'media="(min-width: 901px)"' in template
+
+    assert 'button[data-citas-state="Pendiente"]' in desktop_css
+    assert 'button[data-citas-state="Realizada"]' in desktop_css
+    assert ".edc-page .edc-buttons > button" in desktop_css
+    assert ".config-page-title > .config-institution-back" in desktop_css
+    assert ".cita-print-header img" in desktop_css
+    assert "window.matchMedia('(min-width: 901px)')" in sidebar
+    assert "outlook.live.com/mail/0/deeplink/compose" in sidebar
+
+
 def test_administracion_usa_enlaces_de_seccion_y_un_panel_activo():
     app_js = Path("static/js/app.js").read_text(encoding="utf-8")
     config_css = Path("static/css/configuracion.css").read_text(encoding="utf-8")

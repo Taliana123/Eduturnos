@@ -45,7 +45,7 @@
     {% set activo = endpoint == destino if destino == 'auth.dashboard' else endpoint.split('.')[0] == destino.split('.')[0] %}
     {% endif %}
     {% set enlace = 'mailto:coliejjfh@hotmail.com?subject=Ayuda%20con%20EDUTURNOS&body=Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS' if destino == 'soporte.index' else url_for(destino) %}
-    <a href="{{ enlace }}"{% if activo %} aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#{{ iconos_nav.get(destino, 'list') }}"></use></svg></span><span class="nav-label">{{ nombre }}</span></a>
+    <a href="{{ enlace }}"{% if destino == 'soporte.index' %} class="desktop-support-link"{% endif %}{% if activo %} aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#{{ iconos_nav.get(destino, 'list') }}"></use></svg></span><span class="nav-label">{{ nombre }}</span></a>
     {% endfor %}
   </nav>
   {% include '_asistente_widget.html' %}
@@ -56,4 +56,23 @@
     <form class="desktop-sidebar-logout-form" method="post" action="{{ url_for('auth.logout') }}">{{ csrf_field()|safe }}<button class="desktop-sidebar-logout-button" type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><img src="{{ url_for('static', filename='icons/lucide-log-out.svg') }}" alt=""></button></form>
   </div>
 </aside>
+<script>
+    if (window.matchMedia('(min-width: 901px)').matches) {
+        document.querySelectorAll('.desktop-support-link').forEach((link) => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const supportUrl = new URL('https://outlook.live.com/mail/0/deeplink/compose');
+                supportUrl.searchParams.set('to', 'coliejjfh@hotmail.com');
+                supportUrl.searchParams.set('subject', 'Ayuda con EDUTURNOS');
+                supportUrl.searchParams.set('body', 'Hola, necesito ayuda con EDUTURNOS');
+                const supportWindow = window.open(supportUrl.href, '_blank');
+                if (!supportWindow) {
+                    window.location.assign(supportUrl.href);
+                } else {
+                    supportWindow.opener = null;
+                }
+            });
+        });
+    }
+</script>
 {% endif %}
