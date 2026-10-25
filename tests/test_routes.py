@@ -336,12 +336,20 @@ def test_registro_crea_cuenta_con_grupo_bloqueado_como_diccionario(
         "id_grupo": "1",
     }
     if portal == "acudiente":
+        data.pop("id_sede")
+        data.pop("id_jornada")
+        data.pop("id_grado")
+        data.pop("id_grupo")
         data.update(
             {
                 "estudiante_tipo_documento": "TI",
                 "estudiante_documento": "987654321",
                 "estudiante_nombres": "Luis",
                 "estudiante_apellidos": "Perez",
+                "estudiante_id_sede": "1",
+                "estudiante_id_jornada": "1",
+                "estudiante_id_grado": "6",
+                "estudiante_id_grupo": "1",
                 "parentesco": "Madre",
             }
         )
