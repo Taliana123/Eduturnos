@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_menu_back_button.html" import dashboard_back_button %}
 
 {% block title %}Solicitudes de cita{% endblock %}
 
@@ -8,12 +9,14 @@
 
     <header class="page-head solicitudes-encabezado">
 
-        <div>
-            <h1>Solicitudes de cita</h1>
-
-            <p class="descripcion-seccion solicitudes-final-descripcion">
-                Flujo formal de solicitud, revisión, propuesta y confirmación.
-            </p>
+        <div class="menu-page-heading">
+            {{ dashboard_back_button() }}
+            <div class="menu-page-heading-copy">
+                <h1>Solicitudes de cita</h1>
+                <p class="descripcion-seccion solicitudes-final-descripcion">
+                    Flujo formal de solicitud, revisión, propuesta y confirmación.
+                </p>
+            </div>
         </div>
 
         {% if rol == "Docente" %}
@@ -297,45 +300,86 @@
     </div>
 
 
-    {% else %}
+    {% endif %}
 
-
-    <div class="card solicitudes-final-card">
-
-        <div class="empty-state solicitudes-final-vacio">
-
-            <div class="empty-state-icon solicitudes-final-icono">
-                📋
+    {% if solicitudes_reprogramacion %}
+    <section class="card solicitudes-final-card solicitudes-reprogramacion-card">
+        <div class="card-header">
+            <div>
+                <h2>Solicitudes para cambiar una cita</h2>
+                <p>Las revisa la persona que creó cada citación.</p>
             </div>
-
-
-            <h2>
-                No hay solicitudes
-            </h2>
-
-
-            <p>
-                Cuando se registre una solicitud, aparecerá aquí.
-            </p>
-
-
-            {% if rol == "Acudiente" %}
-
-                <a
-                    href="{{ url_for('solicitudes.nueva_acudiente') }}"
-                    class="btn btn-primary solicitudes-final-seguimiento"
-                >
-                    + Solicitar cita
-                </a>
-
-
-            {% endif %}
-
         </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Citación</th>
+                        <th>Estudiante</th>
+                        <th>Solicitante</th>
+                        <th>Fecha actual</th>
+                        <th>Fecha solicitada</th>
+                        <th>Motivo</th>
+                        <th>Estado</th>
+                        {% if rol in ["Rector", "Administrador / Coordinador", "Docente"] %}
+                        <th>Acciones</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in solicitudes_reprogramacion %}
+                    <tr>
+                        <td>#{{ s.id_cita }}</td>
+                        <td>{{ s.estudiante }}</td>
+                        <td>{{ s.acudiente }}</td>
+                        <td>{{ s.fecha_anterior }} · {{ s.hora_anterior|hora_ampm }}</td>
+                        <td>{{ s.fecha_solicitada }} · {{ s.hora_solicitada|hora_ampm }}</td>
+                        <td>{{ s.motivo }}</td>
+                        <td>
+                            <span class="badge {% if s.estado == 'Pendiente' %}badge-warning{% elif s.estado == 'Aceptada' %}badge-success{% else %}badge-danger{% endif %}">{{ s.estado }}</span>
+                            {% if s.respuesta %}<small>{{ s.respuesta }}</small>{% endif %}
+                        </td>
+                        {% if rol in ["Rector", "Administrador / Coordinador", "Docente"] %}
+                        <td>
+                            {% if s.estado == "Pendiente" and s.creador_usuario_id == usuario_id %}
+                            <div class="acciones-tabla">
+                                <form method="post" action="{{ url_for('citas.resolver_solicitud_reprogramacion', solicitud_id=s.id) }}">
+                                    {{ csrf_field()|safe }}
+                                    <input type="hidden" name="accion" value="aceptar">
+                                    <button type="submit" class="btn btn-success btn-sm">Aceptar</button>
+                                </form>
+                                <form method="post" action="{{ url_for('citas.resolver_solicitud_reprogramacion', solicitud_id=s.id) }}">
+                                    {{ csrf_field()|safe }}
+                                    <input type="hidden" name="accion" value="rechazar">
+                                    <label class="visually-hidden" for="respuesta-reprogramacion-{{ s.id }}">Respuesta</label>
+                                    <input id="respuesta-reprogramacion-{{ s.id }}" name="respuesta" maxlength="2000" placeholder="Motivo del rechazo">
+                                    <button type="submit" class="btn btn-danger btn-sm" name="accion" value="rechazar">Rechazar</button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span class="texto-secundario">Sin acciones</span>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
 
+    {% if not solicitudes and not solicitudes_reprogramacion %}
+    <div class="card solicitudes-final-card">
+        <div class="empty-state solicitudes-final-vacio">
+            <div class="empty-state-icon solicitudes-final-icono">📋</div>
+            <h2>No hay solicitudes</h2>
+            <p>Cuando se registre una solicitud, aparecerá aquí.</p>
+            {% if rol == "Acudiente" %}
+            <a href="{{ url_for('solicitudes.nueva_acudiente') }}" class="btn btn-primary solicitudes-final-seguimiento">+ Solicitar cita</a>
+            {% endif %}
+        </div>
     </div>
-
-
     {% endif %}
 
 </div>
@@ -466,7 +510,7 @@ a.solicitudes-final-seguimiento:hover {
         padding-top: 10px !important;
     }
     .solicitudes-header-actions, a.solicitudes-seguimiento { width:100% !important; }
-    .solicitudes-header-actions { margin-top:-4px !important; }
+    .solicitudes-header-actions { margin-top:-8px !important; }
     a.solicitudes-seguimiento { justify-content:center !important; }
 }
 </style>

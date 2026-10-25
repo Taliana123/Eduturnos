@@ -44,7 +44,7 @@
     {% else %}
     {% set activo = endpoint == destino if destino == 'auth.dashboard' else endpoint.split('.')[0] == destino.split('.')[0] %}
     {% endif %}
-    <a {% if destino == 'soporte.index' %}class="support-nav-link" {% endif %}href="{{ url_for(destino) }}"{% if activo %} aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#{{ iconos_nav.get(destino, 'list') }}"></use></svg></span><span class="nav-label">{{ nombre }}</span></a>
+    <a href="{{ url_for(destino) }}"{% if activo %} aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#{{ iconos_nav.get(destino, 'list') }}"></use></svg></span><span class="nav-label">{{ nombre }}</span></a>
     {% endfor %}
   </nav>
   {% include '_asistente_widget.html' %}

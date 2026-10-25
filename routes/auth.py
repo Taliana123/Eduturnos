@@ -204,15 +204,15 @@ def _mostrar_registro(
     sedes,
     jornadas,
 ):
-    # Conserva lo que el usuario ya había escrito para que un error de
-    # validación no borre todo el formulario, solo el/los campos con problema.
-    datos = {}
     if request.method == "POST":
-        datos = {
+        session[f"registro_datos_{portal}"] = {
             clave: valor
             for clave, valor in request.form.items()
             if clave != "csrf_token" and "password" not in clave
         }
+        return redirect(url_for("auth.registro_portal", portal=portal))
+
+    datos = session.pop(f"registro_datos_{portal}", {})
 
     try:
         grados = consultar(
@@ -1141,6 +1141,8 @@ def _relacionar_tx(
 def login():
 
     if request.method == "GET":
+        if session.get("usuario_id") and usuario_actual():
+            return redirect(url_for("auth.dashboard"))
         return _mostrar_login()
 
     identificador = request.form.get(

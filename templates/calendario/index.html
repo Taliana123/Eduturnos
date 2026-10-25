@@ -1,5 +1,6 @@
 
 {% extends 'base.html' %}
+{% from "_menu_back_button.html" import dashboard_back_button %}
 
 {% block title %}Calendario · EDUTURNOS{% endblock %}
 
@@ -898,13 +899,13 @@
                 Agenda institucional · EDUTURNOS
             </div>
 
-            <h1>
-                Calendario de citas
-            </h1>
-
-            <p>
-                Consulta tus citaciones de forma rápida y organizada.
-            </p>
+            <div class="menu-page-heading">
+                {{ dashboard_back_button() }}
+                <div class="menu-page-heading-copy">
+                    <h1>Calendario de citas</h1>
+                    <p>Consulta tus citaciones de forma rápida y organizada.</p>
+                </div>
+            </div>
 
         </div>
 
@@ -1456,6 +1457,21 @@
                     {% if cita.acudiente %}<p>Acudiente: {{ cita.acudiente }}</p>{% endif %}
                     <p>{{ cita.motivo_nombre }}{% if cita.lugar %} · {{ cita.lugar }}{% endif %}</p>
                     <span>{{ cita.estado_nombre }}</span>
+                    {% if rol_usuario == 'Acudiente'
+                          and cita.estado_nombre in ['Pendiente', 'Confirmada', 'Reprogramada']
+                          and cita.creador_rol in ['Docente', 'Administrador / Coordinador', 'Rector'] %}
+                    <details class="cita-workflow-panel cita-reschedule-request">
+                        <summary>Solicitar cambio de fecha</summary>
+                        <form method="post" action="{{ url_for('citas.solicitar_reprogramacion_cita', cita_id=cita.id) }}" class="cita-workflow-form">
+                            {{ csrf_field()|safe }}
+                            <label>Fecha propuesta<input type="date" name="fecha" min="{{ fecha_minima }}" required></label>
+                            {% from '_hora_cita.html' import selector_hora %}
+                            <label>Hora propuesta{{ selector_hora('hora') }}</label>
+                            <label>Motivo del cambio<textarea name="motivo" maxlength="2000" rows="2" required></textarea></label>
+                            <button class="boton" type="submit">Enviar solicitud</button>
+                        </form>
+                    </details>
+                    {% endif %}
                 </div>
             </article>
             {% endfor %}
@@ -1583,8 +1599,22 @@
 
                                                         Estado:
                                                         {{ cita.estado_nombre }}
-
                                                     </small>
+                                                    {% if rol_usuario == 'Acudiente'
+                                                          and cita.estado_nombre in ['Pendiente', 'Confirmada', 'Reprogramada']
+                                                          and cita.creador_rol in ['Docente', 'Administrador / Coordinador', 'Rector'] %}
+                                                        <details class="cita-workflow-panel cita-reschedule-request">
+                                                            <summary>Solicitar cambio de fecha</summary>
+                                                            <form method="post" action="{{ url_for('citas.solicitar_reprogramacion_cita', cita_id=cita.id) }}" class="cita-workflow-form">
+                                                                {{ csrf_field()|safe }}
+                                                                <label>Fecha propuesta<input type="date" name="fecha" min="{{ fecha_minima }}" required></label>
+                                                                {% from '_hora_cita.html' import selector_hora %}
+                                                                <label>Hora propuesta{{ selector_hora('hora') }}</label>
+                                                                <label>Motivo del cambio<textarea name="motivo" maxlength="2000" rows="2" required></textarea></label>
+                                                                <button class="boton" type="submit">Enviar solicitud</button>
+                                                            </form>
+                                                        </details>
+                                                    {% endif %}
 
 
                                                     {% if cita.observaciones %}

@@ -9,6 +9,8 @@ from flask_mail import Message
 
 from servicios.mail import mail
 
+SOPORTE_DESTINATARIO = "coliejjfh@hotmail.com"
+
 
 def correo_configurado() -> bool:
     """Comprueba si EDUTURNOS tiene configurado un remitente SMTP."""
@@ -110,7 +112,7 @@ def enviar_solicitud_soporte(
         raise ValueError("El correo de respuesta no es válido.")
     if not correo_configurado():
         raise RuntimeError("El correo de EDUTURNOS no está configurado.")
-    soporte = (current_app.config.get("SUPPORT_EMAIL") or "").strip()
+    soporte = SOPORTE_DESTINATARIO
     if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", soporte):
         raise RuntimeError("El buzón de soporte de EDUTURNOS no está configurado.")
 

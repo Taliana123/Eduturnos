@@ -1,4 +1,4 @@
-{% extends 'base.html' %}{% from '_hora_cita.html' import selector_hora %}{% block content %}<div class="page-head nueva-cita-heading"><h1>Nueva citación</h1></div><form method="post" class="panel form-grid nueva-cita-form">{{ csrf_field()|safe }}<input type="hidden" name="vista_movil" value="1" data-mobile-only disabled>
+{% extends 'base.html' %}{% from '_hora_cita.html' import selector_hora %}{% from "_menu_back_button.html" import dashboard_back_button %}{% block content %}<div class="page-head nueva-cita-heading"><div class="menu-page-heading">{{ dashboard_back_button() }}<div class="menu-page-heading-copy"><h1>Nueva citación</h1></div></div></div><form method="post" class="panel form-grid nueva-cita-form">{{ csrf_field()|safe }}<input type="hidden" name="vista_movil" value="1" data-mobile-only disabled>
 {% if periodos %}<input type="hidden" name="id_periodo" value="{{ periodos[0].id }}">{% endif %}
 <label class="citation-student-field">Estudiante<select class="citation-student-select" name="id_estudiante" required>
 <option value="" selected disabled hidden></option>

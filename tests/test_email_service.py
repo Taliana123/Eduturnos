@@ -45,7 +45,7 @@ def test_support_sends_request_and_receipt_with_safe_html():
             MAIL_USERNAME="sender@example.com",
             MAIL_PASSWORD="app-password",
             MAIL_DEFAULT_SENDER="sender@example.com",
-            SUPPORT_EMAIL="support@example.com",
+            SUPPORT_EMAIL="ignored@example.com",
         )
         with patch.object(email_service.mail, "send") as send:
             email_service.enviar_solicitud_soporte(
@@ -57,7 +57,7 @@ def test_support_sends_request_and_receipt_with_safe_html():
             )
             assert send.call_count == 2
             solicitud, acuse = (call.args[0] for call in send.call_args_list)
-            assert solicitud.recipients == ["support@example.com"]
+            assert solicitud.recipients == ["coliejjfh@hotmail.com"]
             assert solicitud.reply_to == "persona@example.com"
             assert "&lt;script&gt;" in solicitud.html
             assert "Respuesta automática de EDUBOT" in solicitud.body
@@ -126,7 +126,7 @@ def test_support_reports_when_receipt_fails_after_request_delivery():
             MAIL_USERNAME="sender@example.com",
             MAIL_PASSWORD="app-password",
             MAIL_DEFAULT_SENDER="sender@example.com",
-            SUPPORT_EMAIL="support@example.com",
+            SUPPORT_EMAIL="ignored@example.com",
         )
         with patch.object(email_service.mail, "send", side_effect=[None, OSError("SMTP unavailable")]) as send:
             try:
@@ -138,3 +138,4 @@ def test_support_reports_when_receipt_fails_after_request_delivery():
             else:
                 raise AssertionError("El servicio ocultó el fallo al enviar el acuse")
             assert send.call_count == 2
+            assert send.call_args_list[0].args[0].recipients == ["coliejjfh@hotmail.com"]

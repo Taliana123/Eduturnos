@@ -8,6 +8,11 @@ from servicios.reuniones import formatear_hora, reservar_cita
 solicitudes_bp = Blueprint("solicitudes", __name__, url_prefix="/solicitudes")
 
 STAFF = ("Super Admin", "Rector", "Administrador / Coordinador")
+ROLES_REVISAN_REPROGRAMACION = (
+    "Rector",
+    "Administrador / Coordinador",
+    "Docente",
+)
 
 
 def _validar_fecha_cita(valor):
@@ -136,7 +141,47 @@ def index():
                ORDER BY s.fecha_creacion DESC,s.id DESC LIMIT 200""",
             (u["id_usuario"],),
         )
-    return render_template("solicitudes/index.html", solicitudes=rows, rol=u["rol_nombre"])
+    solicitudes_reprogramacion = []
+    if u["rol_nombre"] in ROLES_REVISAN_REPROGRAMACION:
+        solicitudes_reprogramacion = consultar(
+            """
+            SELECT sr.*, c.creado_por AS creador_usuario_id,
+                   CONCAT(e.nombres,' ',e.apellidos) AS estudiante,
+                   CONCAT(a.nombres,' ',a.apellidos) AS acudiente
+            FROM solicitudes_reprogramacion_cita sr
+            JOIN citas c ON c.id = sr.id_cita
+            JOIN estudiantes e ON e.id_estudiante = c.id_estudiante
+            JOIN acudientes a ON a.id_usuario = sr.solicitante_usuario_id
+            WHERE sr.creador_usuario_id = %s
+            ORDER BY FIELD(sr.estado,'Pendiente','Aceptada','Rechazada'),
+                     sr.fecha_creacion DESC, sr.id DESC
+            LIMIT 200
+            """,
+            (u["id_usuario"],),
+        )
+    elif u["rol_nombre"] == "Acudiente":
+        solicitudes_reprogramacion = consultar(
+            """
+            SELECT sr.*, c.creado_por AS creador_usuario_id,
+                   CONCAT(e.nombres,' ',e.apellidos) AS estudiante,
+                   CONCAT(a.nombres,' ',a.apellidos) AS acudiente
+            FROM solicitudes_reprogramacion_cita sr
+            JOIN citas c ON c.id = sr.id_cita
+            JOIN estudiantes e ON e.id_estudiante = c.id_estudiante
+            JOIN acudientes a ON a.id_usuario = sr.solicitante_usuario_id
+            WHERE sr.solicitante_usuario_id = %s
+            ORDER BY sr.fecha_creacion DESC, sr.id DESC
+            LIMIT 200
+            """,
+            (u["id_usuario"],),
+        )
+    return render_template(
+        "solicitudes/index.html",
+        solicitudes=rows,
+        solicitudes_reprogramacion=solicitudes_reprogramacion,
+        rol=u["rol_nombre"],
+        usuario_id=u["id_usuario"],
+    )
 
 
 @solicitudes_bp.route("/nueva/acudiente", methods=["GET", "POST"])

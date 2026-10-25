@@ -23,7 +23,7 @@ def test_recovery_back_button_matches_institutional_square_and_messages_precede_
     assert 'height: 36px !important;' in text
     assert 'border-radius: 8px;' in text
     assert '<svg aria-hidden="true" viewBox="0 0 24 24">' in title_row
-    assert title_row.index('class="eduturnos-recuperar-final-back"') < title_row.index("<h1>Recuperar acceso</h1>")
+    assert title_row.index('class="eduturnos-recuperar-final-back account-settings-back"') < title_row.index("<h1>Recuperar acceso</h1>")
     assert messages < form
     assert "margin: 0 0 16px;" in text
     assert 'aria-live="polite"' in text
@@ -144,17 +144,76 @@ def test_account_title_and_description_align_with_personal_info_heading_on_mobil
     assert 'class="account-back-button"' not in template
 
 
-def test_support_form_route_and_automatic_receipt_are_available_from_sidebar():
+def test_support_form_is_available_from_sidebar_and_emails_institution():
     sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
     assistant_widget = Path("templates/_asistente_widget.html").read_text(encoding="utf-8")
     template = Path("templates/soporte/index.html").read_text(encoding="utf-8")
     route = Path("routes/soporte.py").read_text(encoding="utf-8")
     assert "('soporte.index', 'Ayuda y soporte')" in sidebar
-    assert "class=\"support-nav-link\"" in sidebar
+    assert "'soporte.index': 'mail'" in sidebar
     assert "url_for('soporte.index')" not in assistant_widget
     assert "{% include '_asistente_widget.html' %}" in sidebar
     assert 'readonly autocomplete="email"' in template
+    assert "mailto:coliejjfh@hotmail.com" in template
+    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in template
+    assert 'placeholder="Hola, necesito ayuda con EDUTURNOS"' in template
     assert "enviar_solicitud_soporte" in route
+
+
+def test_registration_email_domain_blocks_blur_and_tab_until_valid():
+    script = Path("static/js/registro.js").read_text(encoding="utf-8")
+    template = Path("templates/auth/registro_portal.html").read_text(encoding="utf-8")
+
+    assert 'input[type="email"][pattern]' in script
+    assert 'field.addEventListener("keydown"' in script
+    assert 'event.key === "Tab" && !validateEmail()' in script
+    assert "event.preventDefault();" in script
+    assert 'form.addEventListener("pointerdown"' in script
+    assert "const focusedEmail = emailFields.find(" in script
+    assert "window.requestAnimationFrame(() => field.focus());" in script
+    assert 'pattern="{% if portal in (\'estudiante\', \'acudiente\') %}' in template
+    assert "@gmail.com" in template
+    assert "@jjfh.edu.co" in template
+
+
+def test_main_menu_pages_share_aligned_dashboard_back_button():
+    pages = (
+        "templates/citas/index.html",
+        "templates/citas/nueva.html",
+        "templates/calendario/index.html",
+        "templates/notificaciones/index.html",
+        "templates/estudiantes/lista.html",
+        "templates/seguimiento/lista.html",
+        "templates/solicitudes/index.html",
+        "templates/reportes/index.html",
+        "templates/docentes/lista.html",
+        "templates/acudientes/lista.html",
+        "templates/justificaciones/index.html",
+    )
+    for page in pages:
+        source = Path(page).read_text(encoding="utf-8")
+        assert "dashboard_back_button" in source
+        assert "menu-page-heading" in source
+
+    macro = Path("templates/_menu_back_button.html").read_text(encoding="utf-8")
+    css = Path("static/css/layout-responsive.css").read_text(encoding="utf-8")
+    assert 'href="{{ url_for(\'auth.dashboard\') }}"' in macro
+    assert "menu-page-back account-settings-back" in macro
+    assert "#contenido .menu-page-heading" in css
+
+
+def test_home_hero_and_recovery_actions_are_raised_and_aligned():
+    home = Path("templates/index.html").read_text(encoding="utf-8")
+    recovery = Path("templates/auth/recuperar.html").read_text(encoding="utf-8")
+    verification = Path("templates/auth/verificar_codigo.html").read_text(encoding="utf-8")
+    base = Path("templates/base.html").read_text(encoding="utf-8")
+
+    assert "margin: 0 0 20px !important;" in home
+    assert "transform: translateY(-6px) !important;" in home
+    assert "translateY(-4px)" in recovery
+    assert "eduturnos-recuperar-final-back account-settings-back" in recovery
+    assert verification.count('class="boton boton-full recovery-code-action"') == 2
+    assert ">Iniciar sesión<" in base
 
 
 def test_solicitudes_docente_no_duplica_solicitar_y_acudiente_conserva_acceso():
@@ -177,7 +236,7 @@ def test_solicitudes_docente_no_duplica_solicitar_y_acudiente_conserva_acceso():
     assert 'class="btn btn-primary solicitudes-final-seguimiento"' not in docente
     assert acudiente.count("+ Solicitar cita") == 1
     assert 'class="btn btn-primary solicitudes-final-seguimiento"' in acudiente
-    assert ".solicitudes-header-actions { margin-top:-4px !important; }" in docente
+    assert ".solicitudes-header-actions { margin-top:-8px !important; }" in docente
 
 
 def test_student_registration_has_no_student_code_field():
@@ -374,12 +433,11 @@ def test_barra_lateral_respeta_roles_y_seccion_activa():
         assert ('aria-current="page"' in html) == (rol not in ('Estudiante', 'Acudiente'))
         assert 'aria-label="Cerrar sesión"' in html
         assert 'desktop-sidebar-logout-form' in html
-        assert 'class="support-nav-link"' in html
-        assert 'Bandeja de soporte' not in html
         assert 'Ayuda y soporte' in html
+        assert 'href="/soporte/"' in html
+        assert 'Bandeja de soporte' not in html
         assert 'Soporte por Gmail' not in html
         assert 'mail.google.com/mail/' not in html
-        assert html.index('Ayuda y soporte') < html.index('Mi cuenta')
         assert ('/configuracion/' in html) == (rol in ('Rector', 'Super Admin'))
         assert ('/justificaciones/' in html) == (rol in ('Estudiante', 'Acudiente'))
     with app.test_request_context('/auth/login'):

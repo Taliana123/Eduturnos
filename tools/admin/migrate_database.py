@@ -557,6 +557,35 @@ try:
 
         print("solicitudes_cita ya existe.")
 
+    print("Verificando solicitudes_reprogramacion_cita...")
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS solicitudes_reprogramacion_cita (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            id_cita INT NOT NULL,
+            solicitante_usuario_id INT NOT NULL,
+            creador_usuario_id INT NOT NULL,
+            fecha_anterior DATE NOT NULL,
+            hora_anterior TIME NOT NULL,
+            fecha_solicitada DATE NOT NULL,
+            hora_solicitada TIME NOT NULL,
+            motivo TEXT NOT NULL,
+            respuesta TEXT NULL,
+            estado ENUM('Pendiente','Aceptada','Rechazada') NOT NULL DEFAULT 'Pendiente',
+            revisado_por INT NULL,
+            fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            fecha_revision DATETIME NULL,
+            fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (id_cita) REFERENCES citas(id) ON DELETE RESTRICT,
+            FOREIGN KEY (solicitante_usuario_id) REFERENCES usuarios(id_usuario) ON DELETE RESTRICT,
+            FOREIGN KEY (creador_usuario_id) REFERENCES usuarios(id_usuario) ON DELETE RESTRICT,
+            FOREIGN KEY (revisado_por) REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
+            INDEX idx_solicitud_reprogramacion_cita (id_cita, estado),
+            INDEX idx_solicitud_reprogramacion_creador (creador_usuario_id, estado, fecha_creacion),
+            INDEX idx_solicitud_reprogramacion_solicitante (solicitante_usuario_id, fecha_creacion)
+        ) ENGINE=InnoDB
+        """
+    )
 
     # =====================================================
     # INSTITUCIÓN
