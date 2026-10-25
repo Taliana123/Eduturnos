@@ -312,9 +312,35 @@ def test_homepage_hero_title_and_copy_are_lifted_together():
     title_styles = homepage.split("html body.public-home-page .hero-message-row h1", 1)[1].split("}", 1)[0]
     copy_styles = homepage.split("html body.public-home-page .hero-texto", 1)[1].split("}", 1)[0]
 
-    assert "transform: translateY(-6px) !important;" in row_styles
+    assert "transform: translateY(-10px) !important;" in row_styles
     assert "transform: none !important;" in title_styles
-    assert "transform: translateY(-8px) !important;" in copy_styles
+    assert "transform: translateY(-12px) !important;" in copy_styles
+    assert "margin: 0 0 16px !important;" in row_styles
+    illustration_styles = homepage.split(
+        '<style id="eduturnos-home-hero-illustration">', 1
+    )[1]
+    mobile_styles = illustration_styles.split(
+        "@media (max-width: 900px)", 1
+    )[1].split("}", 1)[0]
+    assert "margin-bottom: 14px !important;" in mobile_styles
+    assert "Descargar app Android" not in homepage
+    assert "downloads/EDUTURNOS-Android-v1.1.apk" not in homepage
+
+
+def test_recovery_illustration_keeps_mobile_proportions():
+    recovery = Path("templates/auth/recuperar.html").read_text(encoding="utf-8")
+    mobile = Path("static/css/mobile/eduturnos-mobile.css").read_text(encoding="utf-8")
+    illustration = recovery.split(
+        "@media (max-width: 760px)", 1
+    )[1].split("</style>", 1)[0]
+
+    assert "min-height: 190px;" in illustration
+    assert "width: 250px;" in illustration
+    assert "height: 225px;" in illustration
+    assert "transform: scale(.88);" in illustration
+    assert "min-height: 190px !important;" in mobile.split(
+        "html body #contenido .eduturnos-recuperar-final-illustration", 1
+    )[1].split("}", 1)[0]
 
 
 def test_mobile_account_creation_choices_share_one_button_style():
@@ -683,7 +709,7 @@ def test_public_mobile_navigation_dropdown_is_not_clipped_by_header():
     assert "overflow: visible !important;" in mobile.split(
         "html body.public-info-page > header.barra", 1
     )[1].split("}", 1)[0]
-    assert "v=20261026_mobile_recovery_v63" in public_base
+    assert "v=20261026_mobile_recovery_v64" in public_base
     assert "padding: 6px 12px !important;" in mobile.split(
         "html body.public-info-page > header.barra", 1
     )[1].split("}", 1)[0]

@@ -30,7 +30,8 @@ class Config:
     SESSION_COOKIE_SECURE = _first("SESSION_COOKIE_SECURE", default="1" if APP_ENV == "production" else "0") == "1"
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
-    PERMANENT_SESSION_LIFETIME = 30 * 24 * 60 * 60
+    PERMANENT_SESSION_LIFETIME = 365 * 24 * 60 * 60
+    SESSION_REFRESH_EACH_REQUEST = True
     WTF_CSRF_ENABLED = True
     MAX_CONTENT_LENGTH = 2 * 1024 * 1024
     # Correo: una única cuenta remitente del sistema. Los usuarios reciben en su propio correo.
