@@ -337,23 +337,14 @@ def test_recovery_illustration_keeps_mobile_proportions():
     assert "min-height: 190px;" in illustration
     assert "width: 250px;" in illustration
     assert "height: 225px;" in illustration
-    assert "transform: scale(.81);" in illustration
-    assert ".eduturnos-recovery-art-content" in illustration
-    assert "left: 15px;" in illustration
-    assert "top: 37.5px;" in illustration
-    assert "width: 72px;" in illustration
-    assert "height: 56px;" in illustration
-    assert "right: -17px;" in illustration
-    assert "top: 148px;" in illustration
-    assert "width: 38px;" in illustration
-    assert "height: 36px;" in illustration
-    assert "left: 17px;" in illustration
-    assert "top: -34px;" in illustration
-    assert "border-width: 6px;" in illustration
-    assert "width: 11px;" in illustration
-    assert "height: 20px;" in illustration
-    assert "left: 30px;" in illustration
-    assert "top: 18px;" in illustration
+    assert "transform: scale(.88);" in illustration
+    assert ".eduturnos-recovery-art-content" not in illustration
+    assert "width: 72px;" in recovery
+    assert "height: 66px;" in recovery
+    assert "width: 34px;" in recovery
+    assert "height: 35px;" in recovery
+    assert "width: 9px;" in recovery
+    assert "height: 18px;" in recovery
     assert "min-height: 190px !important;" in mobile.split(
         "html body #contenido .eduturnos-recuperar-final-illustration", 1
     )[1].split("}", 1)[0]
