@@ -27,6 +27,13 @@ def test_plaintext_directory_codes_are_not_distributed():
     assert (ROOT / "data" / "directorio_institucional.csv.example").exists()
 
 
+def test_service_worker_version_invalidates_stale_app_assets():
+    service_worker = (ROOT / "static" / "service-worker.js").read_text(encoding="utf-8")
+
+    assert 'const CACHE_VERSION = "eduturnos-v9";' in service_worker
+    assert "keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key))" in service_worker
+
+
 def test_report_exports_neutralize_spreadsheet_formulas():
     from routes.reportes import _valor_hoja_calculo
 
