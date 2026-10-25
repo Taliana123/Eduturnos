@@ -90,6 +90,10 @@ def test_registro_conserva_campos_y_aplica_reglas_de_password_y_documento():
     assert "@jjfh.edu.co" in template
     assert 'field.type === "password"' in script
     assert "field.value = values[field.name]" in script
+    assert 'field.addEventListener("blur"' in script
+    assert "field.reportValidity()" in script
+    assert "option.dataset.idGrado === gradeId" in script
+    assert 'groupSelect.disabled = !gradeId' in script
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
@@ -125,6 +129,40 @@ def test_registro_renderiza_el_dominio_de_correo_correspondiente(portal, domain_
         )
 
     assert f'pattern="{domain_pattern}"' in html
+
+
+@pytest.mark.parametrize("portal", ["estudiante", "acudiente"])
+def test_registro_filtra_grupos_por_grado_para_ambos_portales(portal):
+    grupos = [
+        SimpleNamespace(id=18, id_grado=6, nombre="1"),
+        SimpleNamespace(id=24, id_grado=7, nombre="1"),
+    ]
+    with app.test_request_context(f"/auth/registro/{portal}"):
+        html = render_template(
+            "auth/registro_portal.html",
+            portal=portal,
+            info={"descripcion": "Registro"},
+            datos={},
+            sedes=[],
+            jornadas=[],
+            grados=[
+                SimpleNamespace(id=6, nombre="6"),
+                SimpleNamespace(id=7, nombre="7"),
+            ],
+            grupos=grupos,
+            csrf_token=lambda: "csrf-test",
+        )
+
+    assert 'data-grupo-de="id_grado"' in html
+    assert 'data-id-grado="6"' in html
+    assert 'data-id-grado="7"' in html
+
+
+def test_mensaje_de_verificacion_separa_el_formulario_en_escritorio_y_movil():
+    template = Path("templates/auth/verificar_codigo.html").read_text(encoding="utf-8")
+
+    assert "#contenido:has(.verification-code-page) > .alerta{margin-bottom:14px!important;}" in template
+    assert "#contenido .verification-code-page{padding-top:14px!important;}" in template
 
 
 def test_barra_movil_mantiene_mes_flechas_y_hoy_en_una_fila():
@@ -513,7 +551,7 @@ def test_requested_visual_updates_are_present():
     assert "verification-code-page" in verification
     assert "Solicitar otro código" in verification
     assert "Iniciar sesión" not in verification
-    assert "margin-bottom:8px!important" in verification
+    assert "margin-bottom:14px!important" in verification
     assert account.count('class="boton cuenta-action-button"') == 4
 
 
@@ -641,7 +679,7 @@ def test_public_mobile_navigation_dropdown_is_not_clipped_by_header():
     assert "overflow: visible !important;" in mobile.split(
         "html body.public-info-page > header.barra", 1
     )[1].split("}", 1)[0]
-    assert "v=20261021_mobile_tuning_v62" in public_base
+    assert "v=20261026_mobile_recovery_v63" in public_base
     assert "padding: 6px 12px !important;" in mobile.split(
         "html body.public-info-page > header.barra", 1
     )[1].split("}", 1)[0]

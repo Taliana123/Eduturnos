@@ -21,6 +21,65 @@ document.addEventListener("DOMContentLoaded", () => {
         field.value = values[field.name];
     }
 
+    form.querySelectorAll('input[type="email"][pattern]').forEach((field) => {
+        field.addEventListener("blur", () => {
+            if (!field.value || !field.checkValidity()) {
+                field.reportValidity();
+            }
+        });
+    });
+
+    form.querySelectorAll("select[data-grupo-de]").forEach((groupSelect) => {
+        const gradeSelect = form.querySelector(
+            `select[name="${groupSelect.dataset.grupoDe}"]`
+        );
+        if (!gradeSelect) return;
+
+        const placeholder = groupSelect.querySelector('option[value=""]');
+        const groupOptions = Array.from(groupSelect.options)
+            .filter((option) => option.dataset.idGrado)
+            .map((option) => option.cloneNode(true));
+        let selectedGroup = groupSelect.value;
+
+        const updateGroups = () => {
+            const gradeId = gradeSelect.value;
+            const matchingGroups = groupOptions.filter(
+                (option) => option.dataset.idGrado === gradeId
+            );
+
+            groupSelect.replaceChildren(
+                placeholder.cloneNode(true),
+                ...matchingGroups.map((option) => option.cloneNode(true))
+            );
+            groupSelect.disabled = !gradeId;
+            groupSelect.options[0].textContent = gradeId
+                ? "Selecciona un grupo"
+                : "Primero selecciona un grado";
+
+            if (matchingGroups.some((option) => option.value === selectedGroup)) {
+                groupSelect.value = selectedGroup;
+            } else {
+                selectedGroup = "";
+                groupSelect.value = "";
+            }
+        };
+
+        gradeSelect.addEventListener("change", () => {
+            selectedGroup = "";
+            updateGroups();
+        });
+        groupSelect.addEventListener("change", () => {
+            selectedGroup = groupSelect.value;
+        });
+        groupSelect.addEventListener("blur", () => {
+            if (gradeSelect.value && !groupSelect.value) {
+                groupSelect.reportValidity();
+            }
+        });
+
+        updateGroups();
+    });
+
     form.querySelectorAll("[data-digits-only]").forEach((field) => {
         field.addEventListener("input", () => {
             field.value = field.value.replace(/[^0-9]/g, "");

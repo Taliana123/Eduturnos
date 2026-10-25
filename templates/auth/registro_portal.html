@@ -355,19 +355,17 @@ Registro - EDUTURNOS
                     <select
                         name="id_grupo"
                         id="id_grupo"
+                        data-grupo-de="id_grado"
                         required
                     >
 <option value="" selected disabled hidden></option>
-
-
-                        
-
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
+                        {% for grupo in grupos %}
+                            {% if grupo.nombre|string in ["1", "2", "3", "4", "5", "6"] %}
+                                <option value="{{ grupo.nombre }}" data-id-grado="{{ grupo.id_grado }}">
+                                    {{ grupo.nombre }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
 
                     </select>
 
@@ -716,19 +714,17 @@ Registro - EDUTURNOS
                     <select
                         name="id_grupo"
                         id="id_grupo"
+                        data-grupo-de="id_grado"
                         required
                     >
 <option value="" selected disabled hidden></option>
-
-
-                        
-
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
+                        {% for grupo in grupos %}
+                            {% if grupo.nombre|string in ["1", "2", "3", "4", "5", "6"] %}
+                                <option value="{{ grupo.nombre }}" data-id-grado="{{ grupo.id_grado }}">
+                                    {{ grupo.nombre }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
 
                     </select>
 
@@ -1033,7 +1029,7 @@ Registro - EDUTURNOS
 
     </div>
 
-<script src="{{ url_for('static', filename='js/registro.js') }}?v=20261020_form_flow_v1" defer></script>
+<script src="{{ url_for('static', filename='js/registro.js') }}?v=20261026_form_validation_v2" defer></script>
 
 <style id="portal-registro-visual-unificado">
     body:has(.portal-registro-page),

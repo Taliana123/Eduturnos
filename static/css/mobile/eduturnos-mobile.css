@@ -3594,7 +3594,7 @@ html body.auth-page .registro-contenedor h1 {
     }
 
     html body #contenido .eduturnos-recuperar-final-page {
-        padding: 16px 14px 24px !important;
+        padding: 8px 14px 24px !important;
     }
 
     html body #contenido .eduturnos-recuperar-final-box {
@@ -3604,6 +3604,15 @@ html body.auth-page .registro-contenedor h1 {
         margin: 0 auto !important;
         transform: none !important;
         box-sizing: border-box !important;
+    }
+
+    html body #contenido:has(.eduturnos-recuperar-final-page) > .alerta {
+        width: calc(100% - 28px) !important;
+        margin: 8px 14px 0 !important;
+    }
+
+    html body #contenido .eduturnos-recuperar-final-illustration {
+        min-height: 120px !important;
     }
 
     html body #contenido .eduturnos-recuperar-final-content {

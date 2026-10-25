@@ -214,7 +214,7 @@ def test_mobile_navigation_reuses_role_sidebar_as_drawer():
     assert "mobile-nav-open" in app_js
     assert "mobile-nav-toggle-lines" in sidebar_css
     assert "v=20261024_account_back_targeted_v1" in base
-    assert "v=20261021_mobile_tuning_v62" in base
+    assert "v=20261026_mobile_recovery_v63" in base
     assert "overflow-y:auto!important" in sidebar_css
     assert "Volver al inicio" not in publico
     assert 'filename=\'js/public-back.js\'' in publico
@@ -222,9 +222,9 @@ def test_mobile_navigation_reuses_role_sidebar_as_drawer():
     assert "margin-top: auto;" in publico
     assert ".dashboard-assistant[open]>.dashboard-assistant-panel{position:fixed;" in sidebar_css
     assert ".dashboard-assistant[open]>.dashboard-assistant-panel" in sidebar_css
-    assert "v=20261021_mobile_tuning_v62" in base
+    assert "v=20261026_mobile_recovery_v63" in base
     for template in (publico, portada):
-        assert "v=20261021_mobile_tuning_v62" in template
+        assert "v=20261026_mobile_recovery_v63" in template
 
 
 def test_portada_muestra_ilustracion_junto_al_lema_y_login_mantiene_registro_compacto():
@@ -661,7 +661,7 @@ def test_formularios_y_acciones_de_listas_conservan_contexto():
     assert '<th>Área</th>' not in lista_docentes
     assert 'url_for(\'docentes.asignaciones\'' not in lista_docentes
     assert 'url_for(\'acudientes.relaciones\'' not in lista_acudientes
-    assert portada.count('v=20261021_mobile_tuning_v62') == 2
+    assert portada.count('v=20261026_mobile_recovery_v63') == 2
     assert 'font-size: 16px;' in portada
     assert 'font-size: 14px;' in portada
     assert 'eduturnos-footer-mobile-text' in portada

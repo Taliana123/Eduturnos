@@ -222,6 +222,8 @@ def test_recuperacion_rechaza_dominio_no_permitido_sin_buscar_cuenta(monkeypatch
         ("estudiante", "estudiante@jjfh.edu.co"),
         ("acudiente", "acudiente@outlook.com"),
         ("docente", "docente@gmail.com"),
+        ("coordinador", "coordinador@gmail.com"),
+        ("rector", "rector@gmail.com"),
     ],
 )
 def test_registro_rechaza_correo_que_no_corresponde_al_portal(
@@ -243,6 +245,101 @@ def test_registro_rechaza_correo_que_no_corresponde_al_portal(
         respuesta = auth_routes.registro_portal(portal)
 
     assert respuesta == "blocked-by-domain-validation"
+
+
+@pytest.mark.parametrize("portal", ["estudiante", "acudiente"])
+def test_registro_crea_cuenta_con_grupo_bloqueado_como_diccionario(
+    monkeypatch, portal
+):
+    class Cursor:
+        def __init__(self):
+            self.lastrowid = 100
+
+        def execute(self, _sql, _params=None):
+            self.lastrowid += 1
+
+        def fetchone(self):
+            return None
+
+        def close(self):
+            pass
+
+    class Connection:
+        def cursor(self, **_kwargs):
+            return Cursor()
+
+    @contextmanager
+    def transaction():
+        yield Connection()
+
+    grupo = {"id": 18, "nombre": "1", "id_grado": 6}
+    grupos_bloqueados = []
+
+    monkeypatch.setattr(auth_routes, "_sedes", lambda: [])
+    monkeypatch.setattr(auth_routes, "_jornadas", lambda: [])
+    monkeypatch.setattr(auth_routes, "_rol_id", lambda _rol: 3)
+    monkeypatch.setattr(
+        auth_routes,
+        "_grado_estudiante_valido",
+        lambda _grado: {"id": 6},
+    )
+    monkeypatch.setattr(auth_routes, "_obtener_grupo_real", lambda *_args: grupo)
+    monkeypatch.setattr(
+        auth_routes,
+        "_bloquear_grupo_y_comprobar_cupo",
+        lambda *_args, **_kwargs: grupos_bloqueados.append(True) or grupo,
+    )
+    monkeypatch.setattr(
+        auth_routes,
+        "_asignar_codigo_estudiantil_tx",
+        lambda *_args: "EST-TEST",
+    )
+    monkeypatch.setattr(auth_routes, "_codigo_estudiantil", lambda _id: "EST-TEST")
+    monkeypatch.setattr(auth_routes, "transaccion", transaction)
+
+    def consultar_mock(sql, *_args, **_kwargs):
+        if "FROM periodos_academicos" in sql:
+            return {"id": 1}
+        if "SELECT codigo_estudiantil" in sql:
+            return {"codigo_estudiantil": "EST-TEST"}
+        return None
+
+    monkeypatch.setattr(auth_routes, "consultar", consultar_mock)
+
+    data = {
+        "tipo_documento": "TI" if portal == "estudiante" else "CC",
+        "documento": "123456789",
+        "nombres": "Ana",
+        "apellidos": "Perez",
+        "correo": "persona@gmail.com",
+        "telefono": "3001234567",
+        "password": "ClaveSegura123",
+        "id_sede": "1",
+        "id_jornada": "1",
+        "id_grado": "6",
+        "id_grupo": "1",
+    }
+    if portal == "acudiente":
+        data.update(
+            {
+                "estudiante_tipo_documento": "TI",
+                "estudiante_documento": "987654321",
+                "estudiante_nombres": "Luis",
+                "estudiante_apellidos": "Perez",
+                "parentesco": "Madre",
+            }
+        )
+
+    with app.test_request_context(
+        f"/auth/registro/{portal}",
+        method="POST",
+        data=data,
+    ):
+        respuesta = auth_routes.registro_portal(portal)
+
+    assert respuesta.status_code == 302
+    assert respuesta.location.endswith("/auth/login")
+    assert grupos_bloqueados
 
 
 def test_fallo_smtp_no_muestra_mensaje_de_envio_correcto(monkeypatch):

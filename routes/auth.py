@@ -9,6 +9,7 @@ import hashlib
 
 from flask import (
     Blueprint,
+    current_app,
     render_template,
     request,
     redirect,
@@ -1692,24 +1693,28 @@ def registro_portal(portal):
         "estudiante_id_sede",
         "estudiante_sede_id",
         "id_sede_estudiante",
+        "id_sede",
     )
 
     estudiante_jornada_id = _form_value(
         "estudiante_id_jornada",
         "estudiante_jornada_id",
         "id_jornada_estudiante",
+        "id_jornada",
     )
 
     estudiante_grado_id = _form_value(
         "estudiante_id_grado",
         "estudiante_grado_id",
         "id_grado_estudiante",
+        "id_grado",
     )
 
     estudiante_grupo_id = _form_value(
         "estudiante_id_grupo",
         "estudiante_grupo_id",
         "id_grupo_estudiante",
+        "id_grupo",
     )
 
     estudiante_curso = request.form.get(
@@ -2511,12 +2516,10 @@ def registro_portal(portal):
                     # BLOQUEAR GRUPO Y COMPROBAR CUPO
                     # ----------------------------------------
 
-                    grupo_real, total_grupo = (
-                        _bloquear_grupo_y_comprobar_cupo(
-                            cnx,
-                            grado_id,
-                            grupo_id,
-                        )
+                    grupo_real = _bloquear_grupo_y_comprobar_cupo(
+                        cnx,
+                        grado_id,
+                        grupo_id,
                     )
 
                     # ----------------------------------------
@@ -3002,12 +3005,10 @@ def registro_portal(portal):
                     else:
 
                         # Bloqueo definitivo del grupo.
-                        grupo_real, total_grupo = (
-                            _bloquear_grupo_y_comprobar_cupo(
-                                cnx,
-                                estudiante_grado_id,
-                                estudiante_grupo_id,
-                            )
+                        grupo_real = _bloquear_grupo_y_comprobar_cupo(
+                            cnx,
+                            estudiante_grado_id,
+                            estudiante_grupo_id,
                         )
 
                         codigo_tmp = codigo_temporal()
@@ -3195,21 +3196,11 @@ def registro_portal(portal):
             f"Portal no soportado: {portal}"
         )
 
-    except Exception as exc:
-
-        mensaje_error = (
-            f"{type(exc).__name__}: {str(exc)}"
-        )
-
-        print(
-            "ERROR EN REGISTRO EDUTURNOS:",
-            mensaje_error,
-            flush=True,
-        )
+    except Exception:
+        current_app.logger.exception("No se pudo completar el registro de EDUTURNOS")
 
         flash(
-            "No se pudo completar el registro: "
-            f"{mensaje_error}",
+            "No se pudo completar el registro. Revisa los datos e inténtalo nuevamente.",
             "error",
         )
 

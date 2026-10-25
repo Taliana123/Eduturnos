@@ -79,8 +79,8 @@ body:has(.eduturnos-recuperar-final-page) main.contenedor {
     box-sizing: border-box;
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 18px 24px 34px !important;
+    align-items: flex-start;
+    padding: 14px 24px 34px !important;
     background: #f4f7fa !important;
     border: 0 !important;
     box-shadow: none !important;
@@ -102,7 +102,7 @@ body:has(.eduturnos-recuperar-final-page) main.contenedor {
 
     display: grid;
     grid-template-columns: 1fr 1fr;
-    align-items: center;
+    align-items: flex-start;
 
     gap: 32px;
 
@@ -474,7 +474,17 @@ body:has(.eduturnos-recuperar-final-page) main.contenedor {
    ========================================================= */
 
 .eduturnos-recuperar-final-messages {
-    margin: 0 0 16px;
+    margin: 0;
+}
+
+#contenido:has(.eduturnos-recuperar-final-page) > .alerta {
+    width: min(900px, calc(100% - 32px)) !important;
+    margin: 12px auto 0 !important;
+    box-sizing: border-box !important;
+}
+
+.eduturnos-recuperar-final-messages + form {
+    margin-top: 14px;
 }
 
 .eduturnos-recuperar-final-message {
@@ -564,7 +574,7 @@ body:has(.eduturnos-recuperar-final-page) main.contenedor {
 
     .eduturnos-recuperar-final-page {
         align-items: flex-start;
-        padding: 12px 16px 28px !important;
+        padding: 8px 16px 28px !important;
     }
 
     .eduturnos-recuperar-final-box {
@@ -578,13 +588,13 @@ body:has(.eduturnos-recuperar-final-page) main.contenedor {
     }
 
     .eduturnos-recuperar-final-illustration {
-        min-height: 190px;
+        min-height: 120px;
     }
 
     .eduturnos-recovery-art {
-        width: 250px;
-        height: 225px;
-        transform: scale(.88);
+        width: 200px;
+        height: 180px;
+        transform: scale(.72);
     }
 
     .eduturnos-recuperar-final-content {
