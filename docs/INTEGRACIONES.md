@@ -2,6 +2,11 @@
 
 ## Google Calendar
 
+Como alternativa al cliente OAuth web, EDUTURNOS puede usar el puente gratuito de Google
+Apps Script para enviar citas a una sola agenda institucional. Requiere una autorización
+administrativa inicial y no elimina la necesidad de compartir la agenda con quienes deban
+verla o recibir avisos en sus teléfonos. Consulta [Puente gratuito con Google Calendar](./GOOGLE_APPS_SCRIPT.md).
+
 EDUTURNOS mantiene MySQL como fuente oficial y usa una cola persistente para crear, actualizar
 y cancelar eventos genéricos en Google Calendar. La sincronización requiere una cuenta
 institucional autorizada y una tarea programada en el servidor; los usuarios finales no
