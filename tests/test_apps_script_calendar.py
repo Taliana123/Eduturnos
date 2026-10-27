@@ -158,7 +158,7 @@ def test_apps_script_worker_invites_registered_citation_participants(monkeypatch
         "id": 92, "fecha": date(2026, 11, 2), "hora": time(9, 30), "lugar": "Sede",
         "sede": "Sede", "estado": "Pendiente", "estudiante_correo": "student@example.com",
         "acudiente_correo": "guardian@example.com", "docente_correo": None,
-        "destinatario_correo": "rector@example.com",
+        "destinatario_correo": "rector@example.com", "creador_correo": "teacher@example.com",
     }
     monkeypatch.setattr(
         google_calendar,
@@ -175,7 +175,7 @@ def test_apps_script_worker_invites_registered_citation_participants(monkeypatch
         })
 
     assert payloads[0]["attendees"] == [
-        "coordinator@example.com", "guardian@example.com", "rector@example.com", "student@example.com",
+        "coordinator@example.com", "guardian@example.com", "rector@example.com", "student@example.com", "teacher@example.com",
     ]
     assert "student@example.com" not in payloads[0]["description"]
 

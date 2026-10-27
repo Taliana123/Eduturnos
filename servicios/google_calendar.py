@@ -635,7 +635,8 @@ def _procesar_tarea_apps_script(tarea: dict) -> None:
     cita = consultar(
         "SELECT c.id,c.fecha,c.hora,c.lugar,c.creado_por,ec.nombre estado,s.direccion sede, "
         "COALESCE(eu.correo, ef.correo) estudiante_correo,COALESCE(au.correo,a.correo) acudiente_correo, "
-        "COALESCE(du.correo,d.correo_institucional) docente_correo,td.correo destinatario_correo "
+        "COALESCE(du.correo,d.correo_institucional) docente_correo,td.correo destinatario_correo, "
+        "cu.correo creador_correo "
         "FROM citas c JOIN estados_cita ec ON ec.id=c.id_estado "
         "LEFT JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
         "LEFT JOIN usuarios eu ON eu.id_usuario=e.id_usuario AND eu.estado=1 "
@@ -645,6 +646,7 @@ def _procesar_tarea_apps_script(tarea: dict) -> None:
         "LEFT JOIN docentes d ON d.id_docente=c.id_docente "
         "LEFT JOIN usuarios du ON du.id_usuario=d.id_usuario AND du.estado=1 "
         "LEFT JOIN usuarios td ON td.id_usuario=c.destinatario_usuario_id AND td.estado=1 "
+        "LEFT JOIN usuarios cu ON cu.id_usuario=c.creado_por AND cu.estado=1 "
         "LEFT JOIN sedes s ON s.id=e.id_sede WHERE c.id=%s",
         (tarea["id_cita"],), uno=True,
     )
@@ -666,7 +668,7 @@ def _procesar_tarea_apps_script(tarea: dict) -> None:
     if operacion == "upsert":
         emails = {
             str(cita.get(key) or "").strip().lower()
-            for key in ("estudiante_correo", "acudiente_correo", "docente_correo", "destinatario_correo")
+            for key in ("estudiante_correo", "acudiente_correo", "docente_correo", "destinatario_correo", "creador_correo")
             if cita.get(key) and "@" in str(cita[key])
         }
         for participante in consultar(

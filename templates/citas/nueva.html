@@ -85,22 +85,20 @@
   function filterStudents() {
     const digits = search.value.replace(/\D/g, '');
     const options = [...student.options].slice(1);
-    let matches = [];
     options.forEach((option) => {
       const match = !digits || (option.dataset.documento || '').includes(digits);
       option.hidden = !match;
-      if (match) matches.push(option);
     });
-    if (digits && matches.length === 1) {
-      student.value = matches[0].value;
-      student.dispatchEvent(new Event('change', { bubbles: true }));
-    }
   }
   student.addEventListener('change', () => {
     const option = student.selectedOptions[0];
     if (option && option.dataset.acudiente && guardian.querySelector(`option[value="${option.dataset.acudiente}"]`)) guardian.value = option.dataset.acudiente;
   });
-  search.addEventListener('input', filterStudents);
+  search.addEventListener('input', () => {
+    student.value = '';
+    guardian.value = '';
+    filterStudents();
+  });
   type.addEventListener('change', applyType);
   personal.addEventListener('change', () => {
     const option = personal.selectedOptions[0];
