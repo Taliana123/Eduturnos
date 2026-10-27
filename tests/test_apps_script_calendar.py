@@ -122,7 +122,11 @@ def test_apps_script_worker_sends_generic_event_and_records_id(monkeypatch):
         "sede": "Sede Central",
         "estado": "Pendiente",
     }
-    monkeypatch.setattr(google_calendar, "consultar", lambda *args, **kwargs: cita)
+    monkeypatch.setattr(
+        google_calendar,
+        "consultar",
+        lambda *args, **kwargs: [] if "cita_participantes" in str(args[0]) else cita,
+    )
     payloads = []
     monkeypatch.setattr(
         google_calendar,
@@ -146,6 +150,36 @@ def test_apps_script_worker_sends_generic_event_and_records_id(monkeypatch):
     assert writes[0][1] == (91, "institucional", "google-event-id")
 
 
+def test_apps_script_worker_invites_registered_citation_participants(monkeypatch):
+    monkeypatch.setitem(app.config, "GOOGLE_APPS_SCRIPT_URL", "https://script.google.com/macros/s/test-id/exec")
+    monkeypatch.setitem(app.config, "GOOGLE_APPS_SCRIPT_SECRET", "s" * 32)
+    monkeypatch.setattr(google_calendar, "apps_script_configurada", lambda: True)
+    cita = {
+        "id": 92, "fecha": date(2026, 11, 2), "hora": time(9, 30), "lugar": "Sede",
+        "sede": "Sede", "estado": "Pendiente", "estudiante_correo": "student@example.com",
+        "acudiente_correo": "guardian@example.com", "docente_correo": None,
+        "destinatario_correo": "rector@example.com",
+    }
+    monkeypatch.setattr(
+        google_calendar,
+        "consultar",
+        lambda sql, *args, **kwargs: ([{"correo": "coordinator@example.com"}] if "cita_participantes" in sql else cita),
+    )
+    payloads = []
+    monkeypatch.setattr(google_calendar, "_solicitud_apps_script", lambda payload: payloads.append(payload) or {"ok": True, "eventId": "event-92"})
+    monkeypatch.setattr(google_calendar, "ejecutar", lambda *args, **kwargs: None)
+
+    with app.app_context():
+        google_calendar._procesar_tarea_google({
+            "id_cita": 92, "scope_key": "institucional", "operacion": "upsert", "google_event_id": None,
+        })
+
+    assert payloads[0]["attendees"] == [
+        "coordinator@example.com", "guardian@example.com", "rector@example.com", "student@example.com",
+    ]
+    assert "student@example.com" not in payloads[0]["description"]
+
+
 def test_apps_script_source_sets_two_popup_reminders():
     from pathlib import Path
 
@@ -153,8 +187,9 @@ def test_apps_script_source_sets_two_popup_reminders():
     assert "const EDUTURNOS_PROTOCOL = 'payload-json-v2'" in source
     assert "const payloadJson = typeof envelope.payload_json" in source
     assert "const canonicalPayload = payloadJson || canonical_(envelope.payload)" in source
-    assert "event.addPopupReminder(1440)" in source
-    assert "event.addPopupReminder(120)" in source
+    assert "{ method: 'popup', minutes: 1440 }" in source
+    assert "{ method: 'popup', minutes: 120 }" in source
+    assert "sendUpdates: 'all'" in source
     assert "event.setTag(EDUTURNOS_TAG, payload.external_id)" in source
 
 

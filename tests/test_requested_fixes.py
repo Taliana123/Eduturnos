@@ -387,7 +387,7 @@ def test_requested_account_calendar_search_and_followup_navigation():
     seguimiento_form = Path("templates/seguimiento/form.html").read_text(encoding="utf-8")
 
     assert "← Panel" not in cuenta
-    assert calendarios.count('">Conectar</a>') == 2
+    assert calendarios.count('">Conectar</a>') == 1
     assert 'class="link-back institucion-back account-settings-back history-back-button"' in institucion
     assert 'aria-label="Volver al inicio"' in institucion
     assert "url_for('cuenta.index')" not in institucion
@@ -578,14 +578,16 @@ def test_new_citation_picker_shows_name_grade_and_jornada_without_personal_detai
     assert catalogs["estudiantes"] == []
     assert catalogs["docentes"] == []
     assert catalogs["acudientes"] == []
-    assert "e.documento" not in queries[0]
+    assert "e.documento" in queries[0]
+    assert 'id="buscar-documento-estudiante"' in template
+    assert 'data-acudiente="{{ e.acudiente_principal_id or' in template
     assert "grado" in queries[0] and "jornada.nombre AS jornada" in queries[0]
     assert "GROUP_CONCAT" in queries[1] and "jornada.nombre AS jornada" in queries[1]
     assert "GROUP_CONCAT" in queries[2] and "contexto.jornadas AS jornada" in queries[2]
     for persona in ("e", "d", "a"):
         assert f"{persona}.grado" in template
         assert f"{persona}.jornada" in template
-    assert "e.documento" not in template
+    assert "Documento {{ e.documento }}" in template
     assert ".sede" not in template
     assert "detalle" not in template
     assert ".citation-student-select" not in Path("static/css/layout-responsive.css").read_text(encoding="utf-8")

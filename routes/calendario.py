@@ -37,39 +37,39 @@ def _filtros_usuario(usuario):
 
     if rol == "Docente":
         filtros.append(
-            """
-            c.id_docente = (
+            """(c.id_docente = (
                 SELECT d.id_docente
                 FROM docentes d
                 WHERE d.id_usuario = %s
-            )
-            """
+            ) OR c.destinatario_usuario_id=%s OR c.creado_por=%s OR EXISTS (
+                SELECT 1 FROM cita_participantes cp WHERE cp.id_cita=c.id AND cp.id_usuario=%s
+            ))"""
         )
-        params.append(usuario["id_usuario"])
+        params.extend([usuario["id_usuario"]] * 4)
 
     elif rol == "Estudiante":
         filtros.append(
             """
-            c.id_estudiante = (
+            (c.id_estudiante = (
                 SELECT e.id_estudiante
                 FROM estudiantes e
                 WHERE e.id_usuario = %s
-            )
+            ) OR EXISTS (SELECT 1 FROM cita_participantes cp WHERE cp.id_cita=c.id AND cp.id_usuario=%s))
             """
         )
-        params.append(usuario["id_usuario"])
+        params.extend([usuario["id_usuario"]] * 2)
 
     elif rol == "Acudiente":
         filtros.append(
             """
-            c.id_acudiente = (
+            (c.id_acudiente = (
                 SELECT a.id_acudiente
                 FROM acudientes a
                 WHERE a.id_usuario = %s
-            )
+            ) OR EXISTS (SELECT 1 FROM cita_participantes cp WHERE cp.id_cita=c.id AND cp.id_usuario=%s))
             """
         )
-        params.append(usuario["id_usuario"])
+        params.extend([usuario["id_usuario"]] * 2)
 
     else:
         filtros.append("1 = 0")
@@ -121,6 +121,8 @@ def citas_visibles(usuario=None):
             c.id_estado,
             c.id_periodo,
             c.creado_por,
+            c.destinatario_tipo,
+            c.destinatario_usuario_id,
             c.fecha,
             c.hora,
             c.lugar,
@@ -132,10 +134,8 @@ def citas_visibles(usuario=None):
             e.documento AS estudiante_documento,
             e.codigo_estudiantil,
 
-            CONCAT(
-                e.nombres,
-                ' ',
-                e.apellidos
+            COALESCE(NULLIF(CONCAT(e.nombres,' ',e.apellidos),' '),
+                CASE WHEN c.destinatario_tipo IS NOT NULL THEN CONCAT(dest.nombres,' ',dest.apellidos) ELSE '' END
             ) AS estudiante,
 
             CONCAT(
@@ -161,13 +161,13 @@ def citas_visibles(usuario=None):
 
         FROM citas c
 
-        INNER JOIN estudiantes e
+        LEFT JOIN estudiantes e
             ON e.id_estudiante = c.id_estudiante
 
-        INNER JOIN acudientes a
+        LEFT JOIN acudientes a
             ON a.id_acudiente = c.id_acudiente
 
-        INNER JOIN docentes d
+        LEFT JOIN docentes d
             ON d.id_docente = c.id_docente
 
         INNER JOIN motivos m
@@ -178,6 +178,9 @@ def citas_visibles(usuario=None):
 
         LEFT JOIN usuarios creador
             ON creador.id_usuario = c.creado_por
+
+        LEFT JOIN usuarios dest
+            ON dest.id_usuario = c.destinatario_usuario_id
 
         LEFT JOIN roles creador_rol
             ON creador_rol.id = creador.id_rol
@@ -721,10 +724,8 @@ def descargar_ics(cita_id):
 
             ec.nombre AS estado,
 
-            CONCAT(
-                e.nombres,
-                ' ',
-                e.apellidos
+            COALESCE(NULLIF(CONCAT(e.nombres,' ',e.apellidos),' '),
+                CASE WHEN c.destinatario_tipo IS NOT NULL THEN CONCAT(dest.nombres,' ',dest.apellidos) ELSE '' END
             ) AS estudiante,
 
             CONCAT(
@@ -741,14 +742,17 @@ def descargar_ics(cita_id):
 
         FROM citas c
 
-        INNER JOIN estudiantes e
+        LEFT JOIN estudiantes e
             ON e.id_estudiante = c.id_estudiante
 
-        INNER JOIN docentes d
+        LEFT JOIN docentes d
             ON d.id_docente = c.id_docente
 
-        INNER JOIN acudientes a
+        LEFT JOIN acudientes a
             ON a.id_acudiente = c.id_acudiente
+
+        LEFT JOIN usuarios dest
+            ON dest.id_usuario = c.destinatario_usuario_id
 
         INNER JOIN motivos m
             ON m.id = c.id_motivo

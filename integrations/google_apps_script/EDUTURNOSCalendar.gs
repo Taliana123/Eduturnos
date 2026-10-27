@@ -119,10 +119,23 @@ function upsert_(calendar, payload) {
     });
     event.setTag(EDUTURNOS_TAG, payload.external_id);
   }
-  event.removeAllReminders();
-  event.addPopupReminder(1440);
-  event.addPopupReminder(120);
-  return { ok: true, eventId: event.getId() };
+  const attendees = Array.from(new Set((Array.isArray(payload.attendees) ? payload.attendees : [])
+    .map(function (email) { return String(email || '').trim().toLowerCase(); })
+    .filter(function (email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); })));
+  const apiEvent = findCalendarApiEvent_(calendar, event.getId());
+  if (!apiEvent) throw new Error('No se pudo localizar el evento creado en Google Calendar.');
+
+  Calendar.Events.patch({
+    attendees: attendees.map(function (email) { return { email: email }; }),
+    guestsCanModify: false,
+    guestsCanInviteOthers: false,
+    guestsCanSeeOtherGuests: false,
+    reminders: { useDefault: false, overrides: [
+      { method: 'popup', minutes: 1440 },
+      { method: 'popup', minutes: 120 },
+    ] },
+  }, calendar.getId(), apiEvent.id, { sendUpdates: 'all' });
+  return { ok: true, eventId: event.getId(), invited: attendees.length };
 }
 
 function delete_(calendar, payload) {
@@ -132,13 +145,22 @@ function delete_(calendar, payload) {
     const start = new Date(payload.start);
     if (!isNaN(start.getTime())) {
       const nearby = calendar.getEvents(new Date(start.getTime() - 86400000), new Date(start.getTime() + 86400000));
-      event = nearby.find(function (candidate) {
-        return candidate.getTag(EDUTURNOS_TAG) === payload.external_id;
-      }) || null;
+      event = nearby.find(function (candidate) { return candidate.getTag(EDUTURNOS_TAG) === payload.external_id; }) || null;
     }
   }
-  if (event) event.deleteEvent();
+  if (event) {
+    const apiEvent = findCalendarApiEvent_(calendar, event.getId());
+    if (apiEvent) Calendar.Events.remove(calendar.getId(), apiEvent.id, { sendUpdates: 'all' });
+    else event.deleteEvent();
+  }
   return { ok: true };
+}
+
+function findCalendarApiEvent_(calendar, iCalUID) {
+  const result = Calendar.Events.list(calendar.getId(), { iCalUID: iCalUID, maxResults: 10, showDeleted: false });
+  return (result.items || []).find(function (item) {
+    return item.status === 'confirmed' && item.iCalUID === iCalUID && item.id;
+  }) || null;
 }
 
 function json_(value) {

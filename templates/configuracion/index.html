@@ -192,6 +192,31 @@
   </div>
 </section>
 
+{% if puede_editar_institucion %}
+<section class="panel config-accounts">
+  <div class="section-heading"><h2>Cuentas inscritas</h2><p>Total registrado: <strong>{{ total_cuentas }}</strong>. Bloquear impide iniciar sesi?n temporalmente; retirar acceso desactiva la cuenta sin borrar citas ni auditor?a.</p></div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Persona</th><th>Documento</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>{% for cuenta in cuentas %}
+      <tr>
+        <td>{{ cuenta.nombres }} {{ cuenta.apellidos }}</td><td>{{ cuenta.tipo_documento }} {{ cuenta.documento }}</td><td>{{ cuenta.correo }}</td><td>{{ cuenta.rol_nombre }}</td>
+        <td>{% if not cuenta.estado %}Acceso retirado{% elif cuenta.bloqueado_hasta %}Bloqueada{% else %}Activa{% endif %}</td>
+        <td class="acciones">
+          {% if cuenta.id_usuario == usuario_sesion_id %}<span class="muted">Tu cuenta</span>
+          {% elif not cuenta.estado %}
+            <form method="post" action="{{ url_for('configuracion.reactivar_cuenta', usuario_id=cuenta.id_usuario) }}">{{ csrf_field()|safe }}<button class="boton pequeno" type="submit">Reactivar</button></form>
+          {% else %}
+            {% if cuenta.bloqueado_hasta %}<form method="post" action="{{ url_for('configuracion.desbloquear_cuenta', usuario_id=cuenta.id_usuario) }}">{{ csrf_field()|safe }}<button class="boton pequeno secundario" type="submit">Desbloquear</button></form>
+            {% else %}<form method="post" action="{{ url_for('configuracion.bloquear_cuenta', usuario_id=cuenta.id_usuario) }}">{{ csrf_field()|safe }}<button class="boton pequeno secundario" type="submit">Bloquear</button></form>{% endif %}
+            <form method="post" action="{{ url_for('configuracion.retirar_acceso_cuenta', usuario_id=cuenta.id_usuario) }}" onsubmit="return confirm('?Retirar el acceso de esta cuenta? El historial se conservar?.');">{{ csrf_field()|safe }}<button class="boton pequeno peligro" type="submit">Retirar acceso</button></form>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}<tr><td colspan="6">No hay cuentas registradas.</td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+{% endif %}
+
 </div>
 </div>
 

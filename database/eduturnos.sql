@@ -222,9 +222,11 @@ CREATE TABLE IF NOT EXISTS directorio_institucional (
 
 CREATE TABLE IF NOT EXISTS citas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    id_estudiante INT NOT NULL,
-    id_acudiente INT NOT NULL,
-    id_docente INT NOT NULL,
+    id_estudiante INT NULL,
+    id_acudiente INT NULL,
+    id_docente INT NULL,
+    destinatario_tipo ENUM('Estudiante','Docente','Rector','Administrador / Coordinador') NULL,
+    destinatario_usuario_id INT NULL,
     id_motivo INT NOT NULL,
     id_estado INT NOT NULL,
     id_periodo INT NOT NULL,
@@ -239,17 +241,31 @@ CREATE TABLE IF NOT EXISTS citas (
     FOREIGN KEY (id_estudiante) REFERENCES estudiantes(id_estudiante) ON DELETE RESTRICT,
     FOREIGN KEY (id_acudiente) REFERENCES acudientes(id_acudiente) ON DELETE RESTRICT,
     FOREIGN KEY (id_docente) REFERENCES docentes(id_docente) ON DELETE RESTRICT,
+    FOREIGN KEY (destinatario_usuario_id) REFERENCES usuarios(id_usuario) ON DELETE RESTRICT,
     FOREIGN KEY (id_motivo) REFERENCES motivos(id) ON DELETE RESTRICT,
     FOREIGN KEY (id_estado) REFERENCES estados_cita(id) ON DELETE RESTRICT,
     FOREIGN KEY (id_periodo) REFERENCES periodos_academicos(id) ON DELETE RESTRICT,
     FOREIGN KEY (creado_por) REFERENCES usuarios(id_usuario) ON DELETE RESTRICT,
     INDEX idx_cita_fecha (fecha, hora),
     INDEX idx_cita_estudiante (id_estudiante, fecha),
+    INDEX idx_cita_destinatario (destinatario_usuario_id, fecha, hora),
     INDEX idx_cita_docente (id_docente, fecha),
     UNIQUE KEY uq_cita_docente_hora (id_docente, fecha, hora),
     UNIQUE KEY uq_cita_estudiante_hora (id_estudiante, fecha, hora),
     UNIQUE KEY uq_cita_acudiente_hora (id_acudiente, fecha, hora),
     INDEX idx_cita_recordatorios (fecha, hora, recordatorio_24h_enviado, recordatorio_2h_enviado)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS cita_participantes (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_cita INT NOT NULL,
+    id_usuario INT NOT NULL,
+    tipo ENUM('Organizador','Destinatario','Participante') NOT NULL DEFAULT 'Participante',
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_cita_participante (id_cita,id_usuario),
+    INDEX idx_cita_participante_usuario (id_usuario,id_cita),
+    CONSTRAINT fk_cita_participante_cita FOREIGN KEY (id_cita) REFERENCES citas(id) ON DELETE CASCADE,
+    CONSTRAINT fk_cita_participante_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS solicitudes_cita (

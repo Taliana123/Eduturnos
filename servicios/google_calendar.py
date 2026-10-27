@@ -471,15 +471,15 @@ def encolar_citas_futuras(scope_key: str, user_id: int | None = None) -> dict:
         if user_id is None:
             return {"citas": 0, "encoladas": 0}
         filtros.append(
-            "(c.creado_por=%s OR e.id_usuario=%s OR a.id_usuario=%s OR d.id_usuario=%s "
+            "(c.creado_por=%s OR c.destinatario_usuario_id=%s OR e.id_usuario=%s OR a.id_usuario=%s OR d.id_usuario=%s "
             "OR EXISTS (SELECT 1 FROM usuarios u JOIN roles r ON r.id=u.id_rol "
             "WHERE u.id_usuario=%s AND u.estado=1 "
             "AND r.nombre IN ('Super Admin','Rector','Administrador / Coordinador')))"
         )
-        parametros.extend([user_id] * 5)
+        parametros.extend([user_id] * 6)
     citas = consultar(
         "SELECT DISTINCT c.id,c.creado_por FROM citas c "
-        "JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
+        "LEFT JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
         "LEFT JOIN acudientes a ON a.id_acudiente=c.id_acudiente "
         "LEFT JOIN docentes d ON d.id_docente=c.id_docente "
         "JOIN estados_cita ec ON ec.id=c.id_estado WHERE " + " AND ".join(filtros)
@@ -501,7 +501,7 @@ def sincronizar_cita(
         return []
     cita = consultar(
         "SELECT c.id,c.fecha,c.hora,c.lugar,c.creado_por,s.direccion sede "
-        "FROM citas c JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
+        "FROM citas c LEFT JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
         "LEFT JOIN sedes s ON s.id=e.id_sede WHERE c.id=%s",
         (cita_id,), uno=True,
     )
@@ -633,12 +633,20 @@ def _eliminar_evento_google(calendar_id: str, event_id: str, access_token: str) 
 
 def _procesar_tarea_apps_script(tarea: dict) -> None:
     cita = consultar(
-        "SELECT c.id,c.fecha,c.hora,c.lugar,c.creado_por,ec.nombre estado,s.direccion sede "
+        "SELECT c.id,c.fecha,c.hora,c.lugar,c.creado_por,ec.nombre estado,s.direccion sede, "
+        "COALESCE(eu.correo, ef.correo) estudiante_correo,COALESCE(au.correo,a.correo) acudiente_correo, "
+        "COALESCE(du.correo,d.correo_institucional) docente_correo,td.correo destinatario_correo "
         "FROM citas c JOIN estados_cita ec ON ec.id=c.id_estado "
         "LEFT JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
+        "LEFT JOIN usuarios eu ON eu.id_usuario=e.id_usuario AND eu.estado=1 "
+        "LEFT JOIN usuarios ef ON ef.documento=e.documento AND ef.estado=1 "
+        "LEFT JOIN acudientes a ON a.id_acudiente=c.id_acudiente "
+        "LEFT JOIN usuarios au ON au.id_usuario=a.id_usuario AND au.estado=1 "
+        "LEFT JOIN docentes d ON d.id_docente=c.id_docente "
+        "LEFT JOIN usuarios du ON du.id_usuario=d.id_usuario AND du.estado=1 "
+        "LEFT JOIN usuarios td ON td.id_usuario=c.destinatario_usuario_id AND td.estado=1 "
         "LEFT JOIN sedes s ON s.id=e.id_sede WHERE c.id=%s",
-        (tarea["id_cita"],),
-        uno=True,
+        (tarea["id_cita"],), uno=True,
     )
     operacion = tarea["operacion"]
     if not cita or cita.get("estado") == "Cancelada":
@@ -651,19 +659,30 @@ def _procesar_tarea_apps_script(tarea: dict) -> None:
     }
     if cita:
         inicio = datetime.combine(
-            cita["fecha"],
-            _normalizar_hora_cita(cita["hora"]),
+            cita["fecha"], _normalizar_hora_cita(cita["hora"]),
             tzinfo=timezone(timedelta(hours=-5)),
         )
-        payload.update({
-            "start": inicio.isoformat(),
-        })
+        payload["start"] = inicio.isoformat()
     if operacion == "upsert":
+        emails = {
+            str(cita.get(key) or "").strip().lower()
+            for key in ("estudiante_correo", "acudiente_correo", "docente_correo", "destinatario_correo")
+            if cita.get(key) and "@" in str(cita[key])
+        }
+        for participante in consultar(
+            "SELECT DISTINCT u.correo FROM cita_participantes cp "
+            "JOIN usuarios u ON u.id_usuario=cp.id_usuario AND u.estado=1 WHERE cp.id_cita=%s",
+            (tarea["id_cita"],),
+        ):
+            correo = str(participante.get("correo") or "").strip().lower()
+            if "@" in correo:
+                emails.add(correo)
         payload.update({
-            "title": "Citación escolar",
+            "title": "Citaci\u00f3n escolar",
             "description": "Consulta los detalles de la cita en EDUTURNOS.",
-            "location": cita.get("lugar") or cita.get("sede") or "Ibagué, Tolima",
+            "location": cita.get("lugar") or cita.get("sede") or "Ibagu\u00e9, Tolima",
             "end": (inicio + timedelta(minutes=30)).isoformat(),
+            "attendees": sorted(emails),
         })
     respuesta = _solicitud_apps_script(payload)
     if operacion == "delete":
@@ -681,7 +700,6 @@ def _procesar_tarea_apps_script(tarea: dict) -> None:
         "google_event_id=VALUES(google_event_id),estado='Sincronizado',ultimo_error=NULL",
         (tarea["id_cita"], tarea["scope_key"], actual_id),
     )
-
 
 def _procesar_tarea_google(tarea: dict) -> None:
     if tarea["scope_key"] == "institucional" and apps_script_configurada():

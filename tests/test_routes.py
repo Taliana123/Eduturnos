@@ -934,7 +934,7 @@ def test_nota_docente_restringe_cita_asignada(monkeypatch):
         with pytest.raises(NotFound):
             citas_routes.guardar_nota.__wrapped__(5)
     assert "c.id_docente" in consultas[0][0]
-    assert consultas[0][1] == (8, 5)
+    assert consultas[0][1] == (8, 8, 8, 8, 5)
     assert not escrituras
 
 
@@ -1269,7 +1269,7 @@ def test_crear_cita_movil_aparece_en_calendario_sin_segunda_creacion(monkeypatch
     usuario = {"id_usuario": 7, "rol_nombre": "Rector"}
     creadas = []
     monkeypatch.setattr(citas_routes, "usuario_actual", lambda: usuario)
-    monkeypatch.setattr(citas_routes, "catalogos", lambda: {})
+    monkeypatch.setattr(citas_routes, "catalogos", lambda *args: {})
     monkeypatch.setattr(citas_routes, "consultar", lambda *args, **kwargs: {"id": 1, "id_usuario": 7})
     monkeypatch.setattr(citas_routes, "_cita_horario_ocupado", lambda *args: None)
     monkeypatch.setattr(citas_routes, "_notificar", lambda *args, **kwargs: None)

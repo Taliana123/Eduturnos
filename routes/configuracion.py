@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from mysql.connector import Error as MySQLError
 
 from database.db import consultar, ejecutar
@@ -58,6 +58,16 @@ def _institucion_actual():
 @configuracion_bp.get("/")
 @roles_permitidos(*CONFIG_ROLES)
 def index():
+    cuentas = []
+    total_cuentas = 0
+    if usuario_rol() in OWNER:
+        cuentas = consultar(
+            "SELECT u.id_usuario,u.tipo_documento,u.documento,u.nombres,u.apellidos,u.correo, "
+            "u.estado,u.bloqueado_hasta,u.fecha_creacion,r.nombre AS rol_nombre "
+            "FROM usuarios u JOIN roles r ON r.id=u.id_rol "
+            "ORDER BY u.fecha_creacion DESC,u.id_usuario DESC"
+        )
+        total_cuentas = (consultar("SELECT COUNT(*) total FROM usuarios", uno=True) or {}).get("total", 0)
     return render_template(
         "configuracion/index.html",
         institucion=_institucion_actual(),
@@ -79,6 +89,9 @@ def index():
         motivos=consultar("SELECT * FROM motivos ORDER BY estado DESC, nombre"),
         estados=consultar("SELECT * FROM estados_cita ORDER BY estado DESC, id"),
         puede_editar_institucion=usuario_rol() in OWNER,
+        cuentas=cuentas,
+        total_cuentas=total_cuentas,
+        usuario_sesion_id=session.get("usuario_id"),
     )
 
 
@@ -371,6 +384,64 @@ def toggle_estado(estado_id):
         flash("Estado de citación actualizado.", "success")
     except MySQLError as exc:
         flash(f"No se pudo cambiar el estado: {exc}", "error")
+    return redirect(url_for("configuracion.index"))
+
+
+
+
+@configuracion_bp.post("/cuenta/<int:usuario_id>/bloquear")
+@roles_permitidos(*OWNER)
+def bloquear_cuenta(usuario_id):
+    if usuario_id == session.get("usuario_id"):
+        flash("No puedes bloquear tu propia cuenta mientras tienes la sesi?n abierta.", "error")
+        return redirect(url_for("configuracion.index"))
+    cuenta = consultar("SELECT id_usuario,estado FROM usuarios WHERE id_usuario=%s", (usuario_id,), uno=True)
+    if not cuenta or not cuenta.get("estado"):
+        flash("La cuenta no est? activa.", "error")
+    else:
+        ejecutar("UPDATE usuarios SET bloqueado_hasta='9999-12-31 23:59:59' WHERE id_usuario=%s", (usuario_id,))
+        auditoria("BLOQUEAR", "Usuarios", usuario_id, "Cuenta bloqueada desde Configuraci?n institucional")
+        flash("Cuenta bloqueada. Su historial se conserva.", "success")
+    return redirect(url_for("configuracion.index"))
+
+
+@configuracion_bp.post("/cuenta/<int:usuario_id>/desbloquear")
+@roles_permitidos(*OWNER)
+def desbloquear_cuenta(usuario_id):
+    ejecutar("UPDATE usuarios SET bloqueado_hasta=NULL WHERE id_usuario=%s AND estado=1", (usuario_id,))
+    auditoria("DESBLOQUEAR", "Usuarios", usuario_id, "Bloqueo de cuenta retirado")
+    flash("Cuenta desbloqueada.", "success")
+    return redirect(url_for("configuracion.index"))
+
+
+@configuracion_bp.post("/cuenta/<int:usuario_id>/reactivar")
+@roles_permitidos(*OWNER)
+def reactivar_cuenta(usuario_id):
+    cuenta = consultar("SELECT id_usuario FROM usuarios WHERE id_usuario=%s", (usuario_id,), uno=True)
+    if not cuenta:
+        flash("La cuenta no existe.", "error")
+    else:
+        ejecutar("UPDATE usuarios SET estado=1,bloqueado_hasta=NULL WHERE id_usuario=%s", (usuario_id,))
+        auditoria("REACTIVAR", "Usuarios", usuario_id, "Cuenta reactivada desde Configuraci?n institucional")
+        flash("Cuenta reactivada.", "success")
+    return redirect(url_for("configuracion.index"))
+
+
+@configuracion_bp.post("/cuenta/<int:usuario_id>/retirar-acceso")
+@roles_permitidos(*OWNER)
+def retirar_acceso_cuenta(usuario_id):
+    if usuario_id == session.get("usuario_id"):
+        flash("No puedes retirar el acceso de tu propia cuenta.", "error")
+        return redirect(url_for("configuracion.index"))
+    cuenta = consultar("SELECT u.id_usuario,u.estado,r.nombre rol FROM usuarios u JOIN roles r ON r.id=u.id_rol WHERE u.id_usuario=%s", (usuario_id,), uno=True)
+    if not cuenta:
+        flash("La cuenta no existe.", "error")
+    elif cuenta["rol"] == "Super Admin" and int((consultar("SELECT COUNT(*) total FROM usuarios u JOIN roles r ON r.id=u.id_rol WHERE r.nombre='Super Admin' AND u.estado=1", uno=True) or {}).get("total", 0)) <= 1:
+        flash("No se puede retirar el acceso del ?ltimo Super Admin activo.", "error")
+    else:
+        ejecutar("UPDATE usuarios SET estado=0,bloqueado_hasta=NULL WHERE id_usuario=%s", (usuario_id,))
+        auditoria("RETIRAR_ACCESO", "Usuarios", usuario_id, "Cuenta desactivada; historial conservado")
+        flash("Acceso retirado. El registro y las citas hist?ricas se conservan.", "success")
     return redirect(url_for("configuracion.index"))
 
 

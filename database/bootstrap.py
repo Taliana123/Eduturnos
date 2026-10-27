@@ -64,6 +64,36 @@ def ensure_database(config=None):
                 "(fecha, hora, recordatorio_24h_enviado, recordatorio_2h_enviado)"
             )
 
+        # Admite citas dirigidas a personal sin inventar estudiante/acudiente.
+        for columna, definicion in (
+            ("destinatario_tipo", "ENUM('Estudiante','Docente','Rector','Administrador / Coordinador') NULL"),
+            ("destinatario_usuario_id", "INT NULL"),
+        ):
+            cursor.execute(f"SHOW COLUMNS FROM citas LIKE '{columna}'")
+            if cursor.fetchone() is None:
+                cursor.execute(f"ALTER TABLE citas ADD COLUMN {columna} {definicion}")
+        for columna in ("id_estudiante", "id_acudiente", "id_docente"):
+            cursor.execute(f"SHOW COLUMNS FROM citas LIKE '{columna}'")
+            definicion = cursor.fetchone()
+            if definicion and str(definicion[2]).upper() == "NO":
+                cursor.execute(f"ALTER TABLE citas MODIFY COLUMN {columna} INT NULL")
+        cursor.execute("SHOW INDEX FROM citas WHERE Key_name='idx_cita_destinatario'")
+        if cursor.fetchone() is None:
+            cursor.execute("CREATE INDEX idx_cita_destinatario ON citas(destinatario_usuario_id,fecha,hora)")
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS cita_participantes (
+                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                id_cita INT NOT NULL,
+                id_usuario INT NOT NULL,
+                tipo ENUM('Organizador','Destinatario','Participante') NOT NULL DEFAULT 'Participante',
+                fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uq_cita_participante (id_cita,id_usuario),
+                INDEX idx_cita_participante_usuario (id_usuario,id_cita),
+                CONSTRAINT fk_cita_participante_cita FOREIGN KEY (id_cita) REFERENCES citas(id) ON DELETE CASCADE,
+                CONSTRAINT fk_cita_participante_usuario FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE RESTRICT
+            ) ENGINE=InnoDB
+        """)
+
         migracion_escolar = Path(__file__).resolve().parents[1] / "sql" / "school_workflow.sql"
         cursor.execute(migracion_escolar.read_text(encoding="utf-8"))
         while cursor.nextset():
@@ -118,3 +148,4 @@ def inicializar_datos_base():
 if __name__ == "__main__":
     ok, mensaje = inicializar_datos_base()
     print(mensaje)
+
