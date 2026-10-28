@@ -49,34 +49,18 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 	const citationsView = document.querySelector('.citas-desktop-view');
 	if (citationsView) {
-		const tabs = [...citationsView.querySelectorAll('[data-citas-state]')];
 		const search = citationsView.querySelector('[data-citas-search]');
 		const status = citationsView.querySelector('[data-citas-status]');
-		let selectedState = '';
 		const filterCitations = () => {
 			let visible = 0;
 			citationsView.querySelectorAll('[data-citas-row]').forEach((row) => {
-				row.hidden = !row.dataset.student.toLocaleLowerCase().includes(search.value.trim().toLocaleLowerCase()) || (selectedState && row.dataset.state !== selectedState) || (status.value && row.dataset.state !== status.value);
+				row.hidden = !row.dataset.student.toLocaleLowerCase().includes(search.value.trim().toLocaleLowerCase()) || (status.value && row.dataset.state !== status.value);
 				if (!row.hidden) visible++;
 			});
 			citationsView.querySelector('[data-citas-empty]').hidden = visible > 0;
 		};
-		const selectTab = (tab) => {
-			selectedState = tab.dataset.citasState;
-			tabs.forEach((button) => { button.setAttribute('aria-selected', String(button === tab)); button.tabIndex = button === tab ? 0 : -1; });
-			filterCitations();
-		};
-		tabs.forEach((tab, index) => {
-			tab.addEventListener('click', () => selectTab(tab));
-			tab.addEventListener('keydown', (event) => {
-				if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-				event.preventDefault();
-				const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
-				selectTab(tabs[next]); tabs[next].focus();
-			});
-		});
 		search.addEventListener('input', filterCitations);
-		status.addEventListener('change', () => selectTab(tabs[0]));
+		status.addEventListener('change', filterCitations);
 	}
 	const administration = document.querySelector(".administracion-page .configuracion-page");
 	if (administration) {
@@ -279,6 +263,15 @@ document.addEventListener("DOMContentLoaded", () => {
 	};
 	document.addEventListener("click", (event) => {
 		if (!(event.target instanceof Element)) return;
+		const calendarLink = event.target.closest("[data-google-calendar-open]");
+		if (calendarLink && /Android/i.test(navigator.userAgent)) {
+			event.preventDefault();
+			const providedStart = Number(calendarLink.dataset.calendarStart);
+			const startMillis = Number.isFinite(providedStart) && providedStart > 0 ? providedStart : Date.now();
+			const appIntent = `intent://com.android.calendar/time/${startMillis}#Intent;scheme=content;action=android.intent.action.VIEW;package=com.google.android.calendar;end`;
+			window.location.href = appIntent;
+			return;
+		}
 		const tab = event.target.closest("[data-cita-tab]");
 		if (tab && (mobileDialogMedia.matches || tab.closest('.desktop-cita-open'))) {
 			const tabDialog = tab.closest("dialog");
@@ -286,12 +279,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 		const trigger = event.target.closest("[data-mobile-dialog]");
 		const desktopTrigger = event.target.closest('[data-desktop-cita-dialog]');
-		if (desktopTrigger && !mobileDialogMedia.matches) {
+		if (desktopTrigger) {
 			const detail = document.getElementById(desktopTrigger.dataset.desktopCitaDialog);
 			if (detail instanceof HTMLDialogElement) {
-				desktopTrigger.closest('dialog[open]')?.close();
+				if (!mobileDialogMedia.matches) desktopTrigger.closest('dialog[open]')?.close();
 				event.preventDefault(); detail.classList.add('desktop-cita-open');
-				activateCitaTab(detail, 'info'); if (!detail.open) detail.showModal();
+				if (detail.querySelector('[data-cita-tab="info"]')) activateCitaTab(detail, 'info');
+				if (!detail.open) detail.showModal();
 			}
 		}
 		if (trigger && mobileDialogMedia.matches) {
@@ -299,6 +293,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			if (dialog instanceof HTMLDialogElement) {
 				event.preventDefault();
 				if (dialog.querySelector('[data-cita-tab="info"]')) activateCitaTab(dialog, "info");
+				const currentDialog = trigger.closest('dialog[open]');
+				if (currentDialog && currentDialog !== dialog) currentDialog.close();
 				if (!dialog.open) dialog.showModal();
 			}
 		}
@@ -312,9 +308,14 @@ document.addEventListener("DOMContentLoaded", () => {
 				sheet.removeAttribute('data-cita-print-content');
 				document.body.append(sheet);
 				document.body.classList.add('printing-cita');
-				try { window.print(); } catch (error) {
+				const imprimir = () => {
+					try { window.print(); } catch (error) {
 					document.body.classList.remove('printing-cita'); sheet.remove(); throw error;
-				}
+					}
+				};
+				const logo = sheet.querySelector('.cita-print-header img');
+				if (logo && typeof logo.decode === 'function') logo.decode().catch(() => {}).finally(imprimir);
+				else imprimir();
 			}
 		}
 		const dialog = closeButton?.closest("dialog.mobile-record-dialog");

@@ -47,6 +47,8 @@ class Config:
     GOOGLE_OAUTH_CLIENT_ID = _first("GOOGLE_OAUTH_CLIENT_ID", default="")
     GOOGLE_OAUTH_CLIENT_SECRET = _first("GOOGLE_OAUTH_CLIENT_SECRET", default="")
     GOOGLE_CALENDAR_ID = _first("GOOGLE_CALENDAR_ID", default="primary")
+    GOOGLE_APPS_SCRIPT_URL = _first("GOOGLE_APPS_SCRIPT_URL", default="")
+    GOOGLE_APPS_SCRIPT_SECRET = _first("GOOGLE_APPS_SCRIPT_SECRET", default="")
     GROQ_API_KEY = _first("GROQ_API_KEY", default="")
     GROQ_MODEL = _first("GROQ_MODEL", default="openai/gpt-oss-120b")
     BEEPY_DOMAINS = tuple(

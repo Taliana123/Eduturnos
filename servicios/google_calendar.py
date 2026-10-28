@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import hmac
 import json
 import time
 import uuid
@@ -11,7 +12,7 @@ from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import Request, urlopen
 
 from cryptography.fernet import Fernet, InvalidToken
-from flask import current_app, url_for
+from flask import after_this_request, current_app, has_request_context, request, url_for
 
 from database.db import consultar, ejecutar, transaccion
 
@@ -30,6 +31,10 @@ class GoogleCalendarError(RuntimeError):
 
 
 def configuracion_lista() -> bool:
+    return apps_script_configurada() or configuracion_oauth_lista()
+
+
+def configuracion_oauth_lista() -> bool:
     origen = current_app.config.get("APP_ORIGIN", "").strip()
     try:
         parsed_origin = urlsplit(origen)
@@ -43,6 +48,86 @@ def configuracion_lista() -> bool:
         and not parsed_origin.username
         and not parsed_origin.password
     )
+
+
+def apps_script_configurada() -> bool:
+    url = (current_app.config.get("GOOGLE_APPS_SCRIPT_URL") or "").strip()
+    secret = current_app.config.get("GOOGLE_APPS_SCRIPT_SECRET") or ""
+    try:
+        parsed = urlsplit(url)
+    except ValueError:
+        return False
+    return bool(
+        parsed.scheme == "https"
+        and parsed.hostname == "script.google.com"
+        and parsed.path.startswith("/macros/s/")
+        and parsed.path.endswith("/exec")
+        and len(secret) >= 32
+    )
+
+
+def probar_apps_script() -> None:
+    respuesta = _solicitud_apps_script({"action": "test"})
+    if not respuesta.get("ok"):
+        raise GoogleCalendarError("El puente no pudo acceder al calendario institucional.")
+    if respuesta.get("protocol") != "payload-json-v2":
+        raise GoogleCalendarError(
+            "Actualiza y vuelve a implementar EDUTURNOSCalendar.gs en Apps Script para corregir la verificación de firma."
+        )
+
+
+def _canonical_json(value: dict) -> str:
+    # ASCII escapes make the signed bytes identical across Python, Apps Script,
+    # and Google Apps Script's UTF-16 string runtime, including unusual place names.
+    return json.dumps(value, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+
+
+def _solicitud_apps_script(payload: dict) -> dict:
+    if not apps_script_configurada():
+        raise GoogleCalendarError("El puente institucional de Google Calendar no está configurado.", 400)
+    timestamp = str(int(time.time()))
+    nonce = uuid.uuid4().hex
+    payload_json = _canonical_json(payload)
+    message = f"{timestamp}\n{nonce}\n{payload_json}".encode("utf-8")
+    digest = hmac.new(
+        current_app.config["GOOGLE_APPS_SCRIPT_SECRET"].encode("utf-8"),
+        message,
+        hashlib.sha256,
+    ).digest()
+    signature = base64.urlsafe_b64encode(digest).decode("ascii").rstrip("=")
+    envelope = {
+        "timestamp": timestamp,
+        "nonce": nonce,
+        "payload": payload,
+        "payload_json": payload_json,
+        "signature": signature,
+    }
+    request = Request(
+        current_app.config["GOOGLE_APPS_SCRIPT_URL"].strip(),
+        data=json.dumps(envelope, ensure_ascii=False, separators=(",", ":")).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urlopen(request, timeout=20) as response:
+            result = json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        if exc.code == 401:
+            raise GoogleCalendarError(
+                "Google Apps Script requiere acceso anónimo. En la implementación web selecciona Ejecutar como: yo y Acceso: Cualquier persona, y vuelve a implementar.",
+                exc.code,
+            ) from exc
+        raise GoogleCalendarError(f"El puente respondió HTTP {exc.code}.", exc.code) from exc
+    except (URLError, TimeoutError, json.JSONDecodeError) as exc:
+        raise GoogleCalendarError("No se pudo contactar el puente de Google Calendar.") from exc
+    if not isinstance(result, dict):
+        raise GoogleCalendarError("El puente devolvió una respuesta no válida.")
+    if not result.get("ok"):
+        raise GoogleCalendarError(
+            str(result.get("error") or "El puente rechazó la operación.")[:180],
+            int(result.get("status") or 503),
+        )
+    return result
 
 
 def uri_callback() -> str:
@@ -221,7 +306,7 @@ def _renovar_token(connection: dict, token: dict) -> dict:
 
 
 def _conexiones_para_cita(cita_id: int, creador_id: int) -> list[dict]:
-    return consultar(
+    conexiones = consultar(
         "SELECT DISTINCT i.* FROM integraciones_google i "
         "LEFT JOIN citas c ON c.id=%s "
         "LEFT JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
@@ -234,6 +319,18 @@ def _conexiones_para_cita(cita_id: int, creador_id: int) -> list[dict]:
         "OR r.nombre IN ('Super Admin','Rector','Administrador / Coordinador'))) ",
         (cita_id, creador_id),
     )
+    if apps_script_configurada():
+        # El puente representa una única agenda institucional, sin guardar tokens OAuth.
+        if not configuracion_oauth_lista():
+            conexiones = []
+        else:
+            conexiones = [item for item in conexiones if item.get("scope_key") != "institucional"]
+        conexiones.append({
+            "scope_key": "institucional",
+            "calendar_id": calendar_id_objetivo("institucional"),
+            "apps_script": True,
+        })
+    return conexiones
 
 
 def _normalizar_hora_cita(hora):
@@ -248,6 +345,30 @@ def _normalizar_hora_cita(hora):
 def _event_id(cita_id: int, scope_key: str) -> str:
     digest = hashlib.sha256(f"{scope_key}:{cita_id}".encode()).hexdigest()
     return "eduturnos" + digest
+
+
+def _programar_sincronizacion_inmediata() -> None:
+    if not apps_script_configurada() or not has_request_context():
+        return
+    if request.environ.get("eduturnos_google_sync_scheduled"):
+        return
+    request.environ["eduturnos_google_sync_scheduled"] = True
+    app = current_app._get_current_object()
+
+    @after_this_request
+    def iniciar_worker(response):
+        try:
+            with app.app_context():
+                resultado = procesar_cola_google(limite=20)
+            app.logger.info(
+                "Sincronización inmediata de Google Calendar: %s procesadas, %s correctas, %s fallidas.",
+                resultado["procesadas"],
+                resultado["sincronizadas"],
+                resultado["fallidas"],
+            )
+        except Exception:
+            app.logger.exception("No se pudo completar la sincronización inmediata con Google Calendar")
+        return response
 
 
 def _encolar_scope_cursor(cursor, cita_id: int, scope_key: str, operacion: str) -> None:
@@ -290,8 +411,17 @@ def encolar_cita_cursor(cursor, cita_id: int, creador_id: int, operacion: str = 
         (cita_id, creador_id),
     )
     scopes = cursor.fetchall()
+    if apps_script_configurada():
+        if configuracion_oauth_lista():
+            scopes = [row for row in scopes if row["scope_key"] != "institucional"]
+        else:
+            scopes = []
+    if apps_script_configurada() and not any(row["scope_key"] == "institucional" for row in scopes):
+        scopes.append({"scope_key": "institucional"})
     for row in scopes:
         _encolar_scope_cursor(cursor, cita_id, row["scope_key"], operacion)
+    if scopes:
+        _programar_sincronizacion_inmediata()
     return len(scopes)
 
 
@@ -326,6 +456,8 @@ def encolar_cita(cita_id: int, creador_id: int, operacion: str = "upsert") -> in
             ),
         )
         cantidad += 1
+    if cantidad:
+        _programar_sincronizacion_inmediata()
     return cantidad
 
 
@@ -499,7 +631,62 @@ def _eliminar_evento_google(calendar_id: str, event_id: str, access_token: str) 
         raise GoogleCalendarError("No se pudo completar la cancelación en Google.") from exc
 
 
+def _procesar_tarea_apps_script(tarea: dict) -> None:
+    cita = consultar(
+        "SELECT c.id,c.fecha,c.hora,c.lugar,c.creado_por,ec.nombre estado,s.direccion sede "
+        "FROM citas c JOIN estados_cita ec ON ec.id=c.id_estado "
+        "LEFT JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
+        "LEFT JOIN sedes s ON s.id=e.id_sede WHERE c.id=%s",
+        (tarea["id_cita"],),
+        uno=True,
+    )
+    operacion = tarea["operacion"]
+    if not cita or cita.get("estado") == "Cancelada":
+        operacion = "delete"
+    event_id = tarea.get("google_event_id") or _event_id(tarea["id_cita"], tarea["scope_key"])
+    payload = {
+        "action": operacion,
+        "external_id": _event_id(tarea["id_cita"], tarea["scope_key"]),
+        "google_event_id": event_id,
+    }
+    if cita:
+        inicio = datetime.combine(
+            cita["fecha"],
+            _normalizar_hora_cita(cita["hora"]),
+            tzinfo=timezone(timedelta(hours=-5)),
+        )
+        payload.update({
+            "start": inicio.isoformat(),
+        })
+    if operacion == "upsert":
+        payload.update({
+            "title": "Citación escolar",
+            "description": "Consulta los detalles de la cita en EDUTURNOS.",
+            "location": cita.get("lugar") or cita.get("sede") or "Ibagué, Tolima",
+            "end": (inicio + timedelta(minutes=30)).isoformat(),
+        })
+    respuesta = _solicitud_apps_script(payload)
+    if operacion == "delete":
+        ejecutar(
+            "INSERT INTO eventos_google(id_cita,scope_key,google_event_id,estado,ultimo_error) "
+            "VALUES(%s,%s,%s,'Cancelado',NULL) ON DUPLICATE KEY UPDATE "
+            "google_event_id=VALUES(google_event_id),estado='Cancelado',ultimo_error=NULL",
+            (tarea["id_cita"], tarea["scope_key"], event_id),
+        )
+        return
+    actual_id = str(respuesta.get("eventId") or event_id)[:100]
+    ejecutar(
+        "INSERT INTO eventos_google(id_cita,scope_key,google_event_id,estado,ultimo_error) "
+        "VALUES(%s,%s,%s,'Sincronizado',NULL) ON DUPLICATE KEY UPDATE "
+        "google_event_id=VALUES(google_event_id),estado='Sincronizado',ultimo_error=NULL",
+        (tarea["id_cita"], tarea["scope_key"], actual_id),
+    )
+
+
 def _procesar_tarea_google(tarea: dict) -> None:
+    if tarea["scope_key"] == "institucional" and apps_script_configurada():
+        _procesar_tarea_apps_script(tarea)
+        return
     conexion = consultar(
         "SELECT * FROM integraciones_google WHERE scope_key=%s",
         (tarea["scope_key"],),
@@ -633,6 +820,27 @@ def estado_cola_google(scope_key: str) -> dict:
         "ultima_correcta": None,
         "ultimo_error": None,
     }
+
+
+def reintentar_fallidas_google(scope_key: str) -> int:
+    """Devuelve a la cola las tareas fallidas de un calendario conectado."""
+    cantidad = consultar(
+        "SELECT COUNT(*) cantidad FROM google_calendar_sync_queue "
+        "WHERE scope_key=%s AND estado='Fallido'",
+        (scope_key,),
+        uno=True,
+    )
+    total = int((cantidad or {}).get("cantidad") or 0)
+    if not total:
+        return 0
+    ejecutar(
+        "UPDATE google_calendar_sync_queue SET estado='Pendiente',intentos=0,"
+        "ultimo_intento=NULL,proximo_intento=NOW(),ultimo_error=NULL,"
+        "claim_token=NULL,lease_until=NULL "
+        "WHERE scope_key=%s AND estado='Fallido'",
+        (scope_key,),
+    )
+    return total
 
 
 def _actualizar_evento_google(url: str, event: dict, access_token: str) -> None:

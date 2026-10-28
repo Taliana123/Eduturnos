@@ -1,0 +1,160 @@
+/* Mantiene el listado móvil conocido y suaviza el encabezado y el detalle. */
+.citas-count-badge {
+    display: inline-grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    margin-left: 8px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #edf3fc;
+    color: #2458d6;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.citas-page .cita-calendar-open {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    margin: 8px 0;
+    padding: 7px 11px;
+    border: 1px solid #d5e1fa;
+    border-radius: 7px;
+    background: #f7faff;
+    color: #2458d6;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+html body dialog.citas-reference-detail {
+    box-sizing: border-box;
+    width: min(560px, calc(100vw - 28px));
+    max-width: calc(100vw - 28px);
+    max-height: calc(100dvh - 32px);
+    overflow: auto;
+    padding: 20px;
+    border: 1px solid #d5e1fa;
+    border-radius: 10px;
+    background: #fff;
+    color: #142d50;
+}
+
+html body dialog.citas-reference-detail .citas-reference-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e6edf7;
+}
+
+html body dialog.citas-reference-detail .citas-reference-heading h2 {
+    margin: 0;
+    font-size: 21px;
+    line-height: 1.35;
+}
+
+html body dialog.citas-reference-detail .citas-reference-student {
+    padding: 16px 0 13px;
+}
+
+html body dialog.citas-reference-detail .citas-reference-student h3 {
+    margin: 13px 0 9px;
+    font-size: 23px;
+    line-height: 1.3;
+}
+
+html body dialog.citas-reference-detail p {
+    font-size: 13px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+html body dialog.citas-reference-detail .citas-reference-data {
+    padding: 14px 0;
+    border-top: 1px solid #e6edf7;
+    border-bottom: 1px solid #e6edf7;
+    font-size: 13px;
+}
+
+html body dialog.citas-reference-detail .citas-reference-data p {
+    margin: 7px 0 0;
+}
+
+html body dialog.citas-reference-detail .citas-reference-notes {
+    margin: 14px 0;
+    white-space: pre-wrap;
+}
+
+html body dialog.citas-reference-detail .citas-reference-history {
+    margin-top: 19px;
+}
+
+html body dialog.citas-reference-detail .citas-reference-history h4 {
+    margin: 0 0 10px;
+    font-size: 14px;
+}
+
+html body dialog.citas-reference-detail .citas-reference-history article {
+    padding: 11px 0;
+    border-top: 1px solid #e6edf7;
+    font-size: 12px;
+}
+
+html body dialog.citas-reference-detail .citas-reference-history article p {
+    margin: 5px 0;
+}
+
+@media (max-width: 900px) {
+    /* Vuelve al resumen compacto de móvil; no convierte cada fila en una tabla nueva. */
+    html body #contenido .citas-desktop-view {
+        display: none !important;
+    }
+
+    html body #contenido .citas-page > .page-head {
+        display: flex !important;
+    }
+
+    html body #contenido .citas-page > .table-wrap {
+        display: block !important;
+    }
+}
+
+@media (max-width: 480px) {
+    html body dialog.citas-reference-detail {
+        padding: 17px;
+    }
+
+    html body dialog.citas-reference-detail .citas-reference-heading h2 {
+        font-size: 19px;
+    }
+
+    html body dialog.citas-reference-detail .citas-reference-student h3 {
+        font-size: 21px;
+    }
+}
+
+.cita-mobile-actions-open {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    html body dialog.citas-reference-detail .cita-mobile-actions-open {
+        display: inline-flex;
+        align-items: center;
+        min-height: 38px;
+        margin: 8px 8px 8px 0;
+        padding: 7px 11px;
+        border: 1px solid #d5e1fa;
+        border-radius: 7px;
+        background: #fff;
+        color: #2458d6;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+}

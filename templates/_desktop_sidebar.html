@@ -44,6 +44,8 @@
     {% else %}
     {% set activo = endpoint == destino if destino == 'auth.dashboard' else endpoint.split('.')[0] == destino.split('.')[0] %}
     {% endif %}
+    {% set plataforma = request.user_agent.platform or '' %}
+    {% set es_movil = plataforma in ('android', 'iphone', 'ipad') %}
     {% set enlace = 'mailto:coliejjfh@hotmail.com?subject=Ayuda%20con%20EDUTURNOS&body=Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS' if destino == 'soporte.index' else url_for(destino) %}
     <a href="{{ enlace }}"{% if activo %} aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#{{ iconos_nav.get(destino, 'list') }}"></use></svg></span><span class="nav-label">{{ nombre }}</span></a>
     {% endfor %}

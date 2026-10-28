@@ -453,6 +453,7 @@
     bottom: max(20px, env(safe-area-inset-bottom));
     width: min(320px, calc(100vw - 32px));
     height: min(400px, calc(100vh - 48px));
+    box-sizing: border-box;
     min-height: 0;
     margin: 0;
     grid-template-rows: auto minmax(0, 1fr);
@@ -461,9 +462,69 @@
     box-shadow: 0 18px 48px rgba(16, 38, 70, .22);
 }
 
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-handle {
+    position: absolute;
+    z-index: 2;
+    display: block !important;
+    flex: 0 0 32px !important;
+    width: 32px;
+    max-width: 32px !important;
+    height: 32px;
+    max-height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #71829a;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    appearance: none;
+    outline: 0;
+    touch-action: none;
+    cursor: nwse-resize;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-handle:focus-visible {
+    outline: 2px solid #8fb0ff !important;
+    outline-offset: -3px;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-nw {
+    top: 0;
+    left: 0;
+    cursor: nwse-resize;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-ne {
+    top: 0;
+    right: 0;
+    height: 16px;
+    max-height: 16px !important;
+    min-height: 16px !important;
+    cursor: nesw-resize;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-sw {
+    bottom: 0;
+    left: 0;
+    cursor: nesw-resize;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat .assistant-resize-se {
+    right: 0;
+    bottom: 0;
+    cursor: nwse-resize;
+}
+
 .eduturnos-desktop-sidebar .dashboard-help-chat .assistant-header {
     cursor: grab;
     touch-action: none;
+    user-select: none;
+}
+
+.eduturnos-desktop-sidebar .dashboard-help-chat.is-resizing {
     user-select: none;
 }
 
@@ -476,6 +537,8 @@
 }
 
 .eduturnos-desktop-sidebar .dashboard-help-chat .assistant-actions button {
+    position: relative;
+    z-index: 3;
     flex: 0 0 36px !important;
     width: 36px !important;
     min-width: 36px !important;

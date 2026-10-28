@@ -139,8 +139,11 @@ const initializeEduturnosAssistant = () => {
     };
 
     const dragHandle = root.querySelector(".assistant-header");
+    const resizeHandles = [...root.querySelectorAll("[data-assistant-resize]")];
     const chatPositionKey = "eduturnos-assistant-position-v1";
     let dragState = null;
+    let resizeState = null;
+    let defaultChatSize = null;
 
     const positionLimits = () => {
         const bounds = root.getBoundingClientRect();
@@ -168,12 +171,86 @@ const initializeEduturnosAssistant = () => {
         root.style.removeProperty("right");
         root.style.removeProperty("bottom");
         root.style.removeProperty("transform");
+        root.style.removeProperty("width");
+        root.style.removeProperty("height");
         try {
             localStorage.removeItem(chatPositionKey);
         } catch {
             return;
         }
     };
+
+    const resizeLimits = () => {
+        const maxWidth = Math.max(1, Math.min(600, window.innerWidth - 16));
+        const mobileViewport = window.innerWidth <= 900;
+        const availableHeight = window.innerHeight - (mobileViewport ? 100 : 16);
+        const maxHeight = Math.max(1, Math.min(700, availableHeight));
+        return {
+            minWidth: Math.min(defaultChatSize?.width ?? 260, maxWidth),
+            maxWidth,
+            minHeight: Math.min(defaultChatSize?.height ?? 280, maxHeight),
+            maxHeight,
+        };
+    };
+
+    root.addEventListener("pointerdown", (event) => {
+        const handle = event.target instanceof Element
+            ? event.target.closest("[data-assistant-resize]")
+            : null;
+        if (!handle || !event.isPrimary || event.button !== 0) return;
+        const bounds = root.getBoundingClientRect();
+        resizeState = {
+            pointerId: event.pointerId,
+            direction: handle.dataset.assistantResize,
+            startX: event.clientX,
+            startY: event.clientY,
+            startWidth: bounds.width,
+            startHeight: bounds.height,
+            startLeft: bounds.left,
+            startTop: bounds.top,
+        };
+        root.style.left = `${bounds.left}px`;
+        root.style.top = `${bounds.top}px`;
+        root.style.right = "auto";
+        root.style.bottom = "auto";
+        root.setPointerCapture(event.pointerId);
+        root.classList.add("is-resizing");
+        event.preventDefault();
+    });
+
+    root.addEventListener("pointermove", (event) => {
+        if (!resizeState || event.pointerId !== resizeState.pointerId) return;
+        const { direction, startX, startY, startWidth, startHeight, startLeft, startTop } = resizeState;
+        const deltaX = event.clientX - startX;
+        const deltaY = event.clientY - startY;
+        const limits = resizeLimits();
+        const growsLeft = direction.includes("w");
+        const growsTop = direction.includes("n");
+        const widthDelta = growsLeft ? -deltaX : deltaX;
+        const heightDelta = growsTop ? -deltaY : deltaY;
+        const fixedRight = startLeft + startWidth;
+        const fixedBottom = startTop + startHeight;
+        const maxWidth = limits.maxWidth;
+        const maxHeight = limits.maxHeight;
+        const width = Math.min(maxWidth, Math.max(Math.min(limits.minWidth, maxWidth), startWidth + widthDelta));
+        const height = Math.min(maxHeight, Math.max(Math.min(limits.minHeight, maxHeight), startHeight + heightDelta));
+        const left = growsLeft ? fixedRight - width : startLeft;
+        const top = growsTop ? fixedBottom - height : startTop;
+
+        root.style.width = `${width}px`;
+        root.style.height = `${height}px`;
+        root.style.left = `${Math.min(Math.max(8, left), window.innerWidth - width - 8)}px`;
+        root.style.top = `${Math.min(Math.max(8, top), window.innerHeight - height - 8)}px`;
+    });
+
+    const finishResizing = (event) => {
+        if (!resizeState || event.pointerId !== resizeState.pointerId) return;
+        resizeState = null;
+        root.classList.remove("is-resizing");
+    };
+
+    root.addEventListener("pointerup", finishResizing);
+    root.addEventListener("pointercancel", finishResizing);
 
     dragHandle?.addEventListener("pointerdown", (event) => {
         if (!event.isPrimary || event.button !== 0 || event.target.closest("button")) return;
@@ -226,6 +303,7 @@ const initializeEduturnosAssistant = () => {
         if (!isOpen) {
             resetConversation();
             clearChatPosition();
+            defaultChatSize = null;
         }
         root.hidden = !isOpen;
         root.classList.toggle("is-open", isOpen);
@@ -234,6 +312,11 @@ const initializeEduturnosAssistant = () => {
         });
         if (isOpen) {
             clearChatPosition();
+            const defaultBounds = root.getBoundingClientRect();
+            defaultChatSize = {
+                width: defaultBounds.width,
+                height: defaultBounds.height,
+            };
         } else {
             (sourceButton?.hasAttribute("data-assistant-open") ? sourceButton : openButton).focus();
         }

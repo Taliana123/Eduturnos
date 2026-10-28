@@ -188,6 +188,8 @@ def test_support_link_opens_prefilled_email_to_institution():
     assert "'soporte.index': 'mail'" in sidebar
     assert "mailto:coliejjfh@hotmail.com" in sidebar
     assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
+    assert "desktop-support-link" not in sidebar
+    assert "outlook.live.com" not in sidebar
     assert "url_for('soporte.index')" not in assistant_widget
     assert "redirect(" in route
     assert "mailto:coliejjfh@hotmail.com" in route
@@ -243,7 +245,7 @@ def test_home_hero_and_recovery_actions_are_raised_and_aligned():
     verification = Path("templates/auth/verificar_codigo.html").read_text(encoding="utf-8")
     base = Path("templates/base.html").read_text(encoding="utf-8")
 
-    assert "margin: 0 0 16px !important;" in home
+    assert "margin: 0 0 12px !important;" in home
     assert "transform: translateY(-10px) !important;" in home
     assert "transform: translateY(-12px) !important;" in home
     assert "translateY(-4px)" in recovery
@@ -319,7 +321,7 @@ def test_mobile_navigation_reuses_role_sidebar_as_drawer():
     assert ".dashboard-assistant[open]>.dashboard-assistant-panel" in sidebar_css
     assert "v=20261026_mobile_recovery_v64" in base
     assert "v=20261026_public_menu_title_v65" in publico
-    assert "v=20261026_mobile_recovery_v64" in portada
+    assert "v=20261026_home_copy_lift_v67" in portada
 
 
 def test_portada_muestra_ilustracion_junto_al_lema_y_login_mantiene_registro_compacto():
@@ -471,6 +473,7 @@ def test_barra_lateral_respeta_roles_y_seccion_activa():
         assert 'desktop-sidebar-logout-form' in html
         assert 'Ayuda y soporte' in html
         assert 'href="mailto:coliejjfh@hotmail.com' in html
+        assert 'desktop-support-link' not in html
         assert 'Bandeja de soporte' not in html
         assert 'Soporte por Gmail' not in html
         assert 'mail.google.com/mail/' not in html
@@ -639,10 +642,10 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
     assert "request.endpoint != 'soporte.index'" not in base
-    assert "css/edubot.css') }}?v=20261023_assistant_compact_v2" in base
-    assert "js/asistente.js') }}?v=20261023_assistant_compact_v2" in base
+    assert "css/edubot.css') }}?v=20261025_assistant_resize_v3" in base
+    assert "js/asistente.js') }}?v=20261025_assistant_resize_v3" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
-    assert 'if (isOpen) {\n            clearChatPosition();\n        } else {' in assistant_script
+    assert 'if (isOpen) {\n            clearChatPosition();\n            const defaultBounds = root.getBoundingClientRect();' in assistant_script
     assert 'assistantWidget' not in app_js
 
 
@@ -662,8 +665,31 @@ def test_edubot_tiene_compositor_compacto_y_sin_indicador_ia():
     assert 'cursor: grab;' in styles
     assert 'touch-action: none;' in styles
     assistant_script = Path('static/js/asistente.js').read_text(encoding='utf-8')
-    assert 'setPointerCapture(event.pointerId)' in assistant_script
+    assert 'root.setPointerCapture(event.pointerId)' in assistant_script
+    assert 'root.addEventListener("pointermove"' in assistant_script
+    assert 'let defaultChatSize = null;' in assistant_script
+    assert 'minWidth: Math.min(defaultChatSize?.width ?? 260, maxWidth)' in assistant_script
+    assert 'minHeight: Math.min(defaultChatSize?.height ?? 280, maxHeight)' in assistant_script
+    assert 'width: defaultBounds.width' in assistant_script
+    assert 'height: defaultBounds.height' in assistant_script
+    assert 'root.querySelectorAll("[data-assistant-resize]")' in assistant_script
+    assert 'root.style.removeProperty("width")' in assistant_script
+    assert 'root.style.removeProperty("height")' in assistant_script
     assert 'localStorage.removeItem(chatPositionKey)' in assistant_script
+    assert 'data-assistant-resize="nw"' in widget
+    assert 'data-assistant-resize="ne"' in widget
+    assert 'data-assistant-resize="sw"' in widget
+    assert 'data-assistant-resize="se"' in widget
+    assert 'width: 32px;' in styles
+    assert 'height: 32px;' in styles
+    assert '.assistant-resize-ne' in styles
+    assert 'max-height: 16px !important;' in styles
+    assert '.assistant-resize-handle::after' not in styles
+    assert 'repeating-linear-gradient(' not in styles
+    assert 'const fixedRight = startLeft + startWidth;' in assistant_script
+    assert 'const fixedBottom = startTop + startHeight;' in assistant_script
+    assert 'Math.min(Math.max(8, left), window.innerWidth - width - 8)' in assistant_script
+    assert 'Math.min(Math.max(8, top), window.innerHeight - height - 8)' in assistant_script
     assert 'width: min(320px, calc(100vw - 32px));' in styles
     assert 'height: min(400px, calc(100vh - 48px));' in styles
     assert 'Arrastra este encabezado para mover el chat' in widget
@@ -753,7 +779,8 @@ def test_formularios_y_acciones_de_listas_conservan_contexto():
     assert '<th>Área</th>' not in lista_docentes
     assert 'url_for(\'docentes.asignaciones\'' not in lista_docentes
     assert 'url_for(\'acudientes.relaciones\'' not in lista_acudientes
-    assert portada.count('v=20261026_mobile_recovery_v64') == 2
+    assert portada.count('v=20261026_mobile_recovery_v64') == 1
+    assert portada.count('v=20261026_home_copy_lift_v67') == 1
     assert 'font-size: 16px;' in portada
     assert 'font-size: 14px;' in portada
     assert 'eduturnos-footer-mobile-text' in portada

@@ -1,0 +1,12 @@
+.citas-desktop-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+}
+
+.citas-desktop-summary-label {
+    color: #17365d;
+    font-size: 13px;
+    font-weight: 600;
+}
