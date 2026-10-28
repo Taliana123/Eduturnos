@@ -226,6 +226,7 @@ CREATE TABLE IF NOT EXISTS citas (
     id_acudiente INT NOT NULL,
     id_docente INT NOT NULL,
     id_motivo INT NOT NULL,
+    motivo_otro VARCHAR(255) NULL,
     id_estado INT NOT NULL,
     id_periodo INT NOT NULL,
     fecha DATE NOT NULL,

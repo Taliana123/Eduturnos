@@ -32,6 +32,13 @@ def ensure_database(config=None):
         cursor.fetchone()
 
         # Migraciones pequeñas y seguras para instalaciones existentes.
+        # Guarda la descripcion del motivo personalizado.
+        cursor.execute("SHOW COLUMNS FROM citas LIKE 'motivo_otro'")
+        if cursor.fetchone() is None:
+            cursor.execute(
+                "ALTER TABLE citas ADD COLUMN motivo_otro VARCHAR(255) NULL"
+            )
+
         # La creación inicial completa sigue estando en database/eduturnos.sql.
 
         cursor.execute(

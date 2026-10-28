@@ -39,6 +39,26 @@ TRANSICIONES_ESTADO = {
     "Cancelada": set(),
     "Justificada": set(),
 }
+ROLES_MOTIVO_PERSONALIZADO = {"Administrador / Coordinador", "Docente"}
+
+
+def _motivo_cita(motivo_id, usuario):
+    motivo = consultar(
+        "SELECT id,nombre FROM motivos WHERE id=%s AND estado=1",
+        (motivo_id,),
+        uno=True,
+    )
+    if not motivo:
+        raise ValueError("El motivo seleccionado no está disponible.")
+    texto = None
+    if (
+        str(motivo.get("nombre", "")).strip().casefold() == "otro"
+        and usuario.get("rol_nombre") in ROLES_MOTIVO_PERSONALIZADO
+    ):
+        texto = (request.form.get("motivo_otro") or "").strip()
+        if not texto or len(texto) > 255:
+            raise ValueError("Describe el motivo en un máximo de 255 caracteres.")
+    return motivo, texto
 
 
 def _transicion_estado_permitida(rol, actual, nuevo):
@@ -229,7 +249,7 @@ def consultar_citas(usuario):
             CONCAT(COALESCE(d.nombres,''), ' ', COALESCE(d.apellidos,'')) AS docente,
             CONCAT(COALESCE(a.nombres,''), ' ', COALESCE(a.apellidos,'')) AS acudiente,
 
-            m.nombre AS motivo,
+            COALESCE(NULLIF(c.motivo_otro,''),m.nombre) AS motivo,
 
             ec.nombre AS estado,
             creador_rol.nombre AS creador_rol
@@ -490,7 +510,7 @@ def buscar_destinatario_documento():
         "Super Admin": {"Docente", "Administrador / Coordinador"},
         "Rector": {"Docente", "Administrador / Coordinador"},
         "Administrador / Coordinador": {"Rector"},
-        "Docente": {"Rector", "Administrador / Coordinador"},
+        "Docente": {"Rector", "Administrador / Coordinador", "Docente"},
     }
     if not documento or len(documento) > 30:
         return jsonify({"ok": False, "error": "Ingresa un número de documento válido."}), 400
@@ -821,7 +841,7 @@ def _crear_cita_para_personal(usuario):
         "Super Admin": {"Docente", "Administrador / Coordinador"},
         "Rector": {"Docente", "Administrador / Coordinador"},
         "Administrador / Coordinador": {"Rector"},
-        "Docente": {"Rector", "Administrador / Coordinador"},
+        "Docente": {"Rector", "Administrador / Coordinador", "Docente"},
     }
     if tipo not in matriz.get(usuario["rol_nombre"], set()):
         raise ValueError("Tu rol no puede crear una citaci?n para ese tipo de destinatario.")
@@ -850,7 +870,7 @@ def _crear_cita_para_personal(usuario):
     except ValueError:
         raise ValueError("La hora de la citaci?n no es v?lida.")
     validar_disponibilidad(persona.get("id_docente"), fecha_obj, hora)
-    motivo = consultar("SELECT id FROM motivos WHERE id=%s AND estado=1", (motivo_id,), uno=True)
+    motivo, motivo_otro = _motivo_cita(motivo_id, usuario)
     periodo = consultar("SELECT id FROM periodos_academicos WHERE id=%s AND activo=1 AND cerrado=0", (periodo_id,), uno=True)
     estado = consultar("SELECT id FROM estados_cita WHERE nombre='Pendiente' AND estado=1", uno=True)
     if not motivo or not periodo or not estado:
@@ -871,9 +891,9 @@ def _crear_cita_para_personal(usuario):
                 raise ValueError("El destinatario dej? de estar activo. Recarga y vuelve a intentar.")
             cursor.execute(
                 "INSERT INTO citas(id_estudiante,id_acudiente,id_docente,destinatario_tipo,destinatario_usuario_id,"
-                "id_motivo,id_estado,id_periodo,fecha,hora,lugar,observaciones,creado_por) "
-                "VALUES(NULL,NULL,%s,%s,%s,%s,%s,%s,%s,%s,'Coordinaci?n','',%s)",
-                (persona.get("id_docente"), tipo, destinatario_id, motivo_id, estado["id"], periodo_id, fecha, hora, usuario["id_usuario"]),
+        "id_motivo,motivo_otro,id_estado,id_periodo,fecha,hora,lugar,observaciones,creado_por) "
+        "VALUES(NULL,NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Coordinación','',%s)",
+        (persona.get("id_docente"), tipo, destinatario_id, motivo_id, motivo_otro, estado["id"], periodo_id, fecha, hora, usuario["id_usuario"]),
             )
             cita_id = cursor.lastrowid
             cursor.execute("INSERT INTO cita_participantes(id_cita,id_usuario,tipo) VALUES(%s,%s,'Organizador')", (cita_id, usuario["id_usuario"]))
@@ -912,6 +932,13 @@ def nueva():
 
             estudiante_id = int(request.form["id_estudiante"])
             docente_id = int(request.form["id_docente"]) if request.form.get("id_docente") else None
+            if usuario["rol_nombre"] == "Docente" and docente_id is None:
+                perfil_docente = consultar(
+                    "SELECT id_docente FROM docentes WHERE id_usuario=%s AND estado=1 LIMIT 1",
+                    (usuario["id_usuario"],),
+                    uno=True,
+                )
+                docente_id = (perfil_docente or {}).get("id_docente")
             acudiente_id = int(request.form["id_acudiente"]) if request.form.get("id_acudiente") else None
             motivo_id = int(request.form["id_motivo"])
             periodo_id = int(request.form["id_periodo"])
@@ -1100,27 +1127,7 @@ def nueva():
             # VALIDAR MOTIVO
             # ---------------------------------------------
 
-            motivo = consultar(
-                """
-                SELECT
-                    id,
-                    nombre
-
-                FROM motivos
-
-                WHERE id = %s
-                  AND estado = 1
-
-                LIMIT 1
-                """,
-                (motivo_id,),
-                uno=True,
-            )
-
-            if not motivo:
-                raise ValueError(
-                    "El motivo seleccionado no es válido."
-                )
+            motivo, motivo_otro = _motivo_cita(motivo_id, usuario)
 
             # ---------------------------------------------
             # VALIDAR PERIODO
@@ -1201,12 +1208,12 @@ def nueva():
             cita_id = reservar_cita(
                 """
                 INSERT INTO citas (
-                    id_estudiante,id_acudiente,id_docente,id_motivo,id_estado,id_periodo,
+                    id_estudiante,id_acudiente,id_docente,id_motivo,motivo_otro,id_estado,id_periodo,
                     fecha,hora,lugar,observaciones,creado_por,destinatario_tipo,destinatario_usuario_id
-                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Estudiante',%s)
+                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Estudiante',%s)
                 """,
                 (
-                    estudiante_id, acudiente_id, docente_id, motivo_id, estado["id"],
+                    estudiante_id, acudiente_id, docente_id, motivo_id, motivo_otro, estado["id"],
                     periodo_id, fecha, hora, lugar, observaciones, usuario["id_usuario"],
                     estudiante.get("id_usuario"),
                 ),
@@ -1507,7 +1514,7 @@ def _cita_autorizada(usuario, cita_id):
     cita = consultar(
         "SELECT c.*,ec.nombre estado,CONCAT(e.nombres,' ',e.apellidos) estudiante,"
         "CONCAT(d.nombres,' ',d.apellidos) docente,CONCAT(a.nombres,' ',a.apellidos) acudiente,"
-        "m.nombre motivo FROM citas c JOIN estados_cita ec ON ec.id=c.id_estado "
+        "COALESCE(NULLIF(c.motivo_otro,''),m.nombre) motivo FROM citas c JOIN estados_cita ec ON ec.id=c.id_estado "
         "LEFT JOIN estudiantes e ON e.id_estudiante=c.id_estudiante LEFT JOIN docentes d ON d.id_docente=c.id_docente "
         "LEFT JOIN acudientes a ON a.id_acudiente=c.id_acudiente JOIN motivos m ON m.id=c.id_motivo" + where,
         tuple(params + [cita_id]), uno=True,

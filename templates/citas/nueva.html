@@ -1,6 +1,6 @@
 ﻿{% extends 'base.html' %}
 {% from '_hora_cita.html' import selector_hora %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva-cita.css') }}?v=20261028_recipient_sections_v2"><link rel="stylesheet" href="{{ url_for('static', filename='css/citas-form-visibility.css') }}?v=20261028_recipient_sections_v2">{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva-cita.css') }}?v=20261028_motive_recipient_roles_v1"><link rel="stylesheet" href="{{ url_for('static', filename='css/citas-form-visibility.css') }}?v=20261028_motive_recipient_roles_v1">{% endblock %}
 {% block content %}
 <div class="page-head nueva-cita-heading"><div class="menu-page-heading"><div class="menu-page-heading-copy"><h1>Nueva citación</h1><p>Completa los datos del destinatario y agenda la fecha, hora y motivo del encuentro.</p></div></div></div>
 <form method="post" class="panel form-grid nueva-cita-form" data-cita-form data-creator-role="{{ usuario.rol_nombre }}" data-student-lookup-url="{{ url_for('citas.buscar_estudiante_documento') }}" data-personal-lookup-url="{{ url_for('citas.buscar_destinatario_documento') }}">
@@ -12,7 +12,7 @@
       <option value="Estudiante" selected>Estudiante</option>
       {% if usuario.rol_nombre in ['Super Admin','Rector'] %}<option value="Docente">Docente</option><option value="Administrador / Coordinador">Coordinación</option>{% endif %}
       {% if usuario.rol_nombre in ['Administrador / Coordinador','Docente'] %}<option value="Rector">Rector</option>{% endif %}
-      {% if usuario.rol_nombre == 'Docente' %}<option value="Administrador / Coordinador">Coordinación</option>{% endif %}
+      {% if usuario.rol_nombre == 'Docente' %}<option value="Administrador / Coordinador">Coordinación</option><option value="Docente">Docente</option>{% endif %}
     </select>
   </label>
   <section class="citation-mode-panel" data-student-panel aria-labelledby="student-mode-title">
@@ -46,13 +46,17 @@
   </section>
   <section class="citation-mode-panel citation-details-panel" aria-labelledby="details-mode-title">
     <h2 id="details-mode-title">Detalles de la cita</h2>
-    <label>Motivo<select name="id_motivo" required><option value="" selected disabled>Selecciona el motivo</option>{% for m in motivos %}<option value="{{ m.id }}">{{ m.nombre }}</option>{% endfor %}</select></label>
+    <label>Motivo<select name="id_motivo" id="id-motivo" required><option value="" selected disabled>Selecciona el motivo</option>{% for m in motivos %}<option value="{{ m.id }}">{{ m.nombre }}</option>{% endfor %}</select></label>
+    <div class="citation-other-motive full-field" data-other-motive hidden style="display:none!important">
+      <label for="motivo-otro">Describe el motivo</label>
+      <input type="text" name="motivo_otro" id="motivo-otro" maxlength="255" placeholder="Escribe el motivo de la citación" disabled>
+    </div>
     <label>Fecha<input type="date" name="fecha" min="{{ fecha_minima }}" required></label>
     <label>Hora{{ selector_hora('hora') }}</label>
   </section>
   <div class="full-field mobile-command-group citation-form-actions"><button class="boton" type="submit">Crear citación</button><button class="boton secundario" type="reset">Cancelar</button></div>
 </form>
-<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261028_recipient_sections_v2" defer></script>
+<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261028_motive_recipient_roles_v1" defer></script>
 <style>
 .nueva-cita-form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;width:min(100%,820px);margin:0 auto;padding:18px}
 .citation-mode-field,.citation-mode-panel{grid-column:1/-1;min-width:0}
@@ -60,6 +64,9 @@
 .citation-mode-field select{width:100%;min-height:46px}
 .citation-mode-panel{display:grid;grid-template-columns:1fr;align-content:start;gap:10px;padding:16px;border:1px solid #dce5ef;border-radius:14px;background:#fff}
 .citation-mode-panel[hidden]{display:none!important}
+.citation-other-motive[hidden]{display:none!important}
+.citation-other-motive{display:grid;gap:6px;min-width:0;color:#36506e;font-size:13px;font-weight:700}
+.citation-other-motive input{width:100%;min-width:0;min-height:44px;box-sizing:border-box}
 .nueva-cita-form > section[data-personal-panel][hidden]{display:none!important;visibility:hidden!important}
 .citation-mode-panel h2{margin:0 0 4px;color:#17365d;font-size:18px}
 .citation-mode-panel label{display:grid;gap:6px;min-width:0;color:#36506e;font-size:13px;font-weight:700}
