@@ -1320,3 +1320,77 @@ html body.has-desktop-sidebar #contenido .administracion-page .configuracion-pag
         padding-inline: 6px !important;
     }
 }
+
+/* Keep the sede editor compact and visually ordered on desktop screens. */
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-entry-sede {
+        display: grid !important;
+        grid-template-columns: minmax(180px, 1.1fr) minmax(145px, .8fr) minmax(220px, 1.4fr) minmax(135px, .7fr) !important;
+        align-items: end !important;
+        gap: 10px 12px !important;
+        width: 100% !important;
+        max-width: 960px !important;
+        margin: 0 !important;
+        padding: 8px 0 12px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-entry-sede > label,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede > label {
+        grid-column: auto !important;
+        min-width: 0 !important;
+        align-self: end !important;
+        white-space: normal !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-entry-sede > label.full-field {
+        grid-column: 1 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-entry-sede > label:nth-of-type(2) {
+        grid-column: 2 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-entry-sede > label:nth-of-type(3) {
+        grid-column: 3 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-entry-sede > label:nth-of-type(4) {
+        grid-column: 4 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-entry-sede .catalogo-form-actions {
+        grid-column: 1 / -1 !important;
+        justify-content: flex-start !important;
+        padding-top: 2px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede {
+        grid-template-columns: minmax(180px, 1.1fr) minmax(145px, .8fr) minmax(220px, 1.4fr) minmax(135px, .7fr) !important;
+        align-items: end !important;
+        gap: 10px 12px !important;
+        width: 100% !important;
+        max-width: 960px !important;
+        padding: 10px 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede > .config-field-name {
+        grid-column: 1 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede > label:nth-of-type(2) {
+        grid-column: 4 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede > label:nth-of-type(3) {
+        grid-column: 2 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede > label:nth-of-type(4) {
+        grid-column: 3 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede .config-record-actions {
+        grid-column: 1 / -1 !important;
+        justify-content: flex-start !important;
+    }
+}

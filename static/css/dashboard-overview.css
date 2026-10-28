@@ -1789,3 +1789,80 @@ html body #contenido .dashboard-page.dashboard-overview a:focus-visible {
         animation: none !important;
     }
 }
+
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-greeting-row {
+        grid-template-columns: 104px minmax(0, 1fr) !important;
+        align-items: center !important;
+        gap: 16px !important;
+    }
+
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-left-art,
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-dibujo {
+        width: 96px !important;
+        max-width: 96px !important;
+        height: 96px !important;
+    }
+
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-head {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        justify-content: flex-start !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+    }
+
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-head-info {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) max-content !important;
+        grid-template-areas: "role date" "greeting greeting" "description description" !important;
+        align-items: center !important;
+        justify-items: start !important;
+        gap: 5px 12px !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        text-align: left !important;
+        transform: none !important;
+    }
+
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-head-info > .badge {
+        grid-area: role !important;
+        justify-self: start !important;
+    }
+
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-head-info > h1 {
+        grid-area: greeting !important;
+        justify-self: start !important;
+    }
+
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-head-info > .dashboard-current-date {
+        grid-area: date !important;
+        justify-self: end !important;
+        white-space: nowrap !important;
+    }
+
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-head-info > p.muted {
+        grid-area: description !important;
+        justify-self: start !important;
+        margin: 0 !important;
+    }
+
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-attention-items.attention-two-items {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-attention-item {
+        grid-template-columns: 38px minmax(0, 1fr) minmax(116px, max-content) !important;
+        gap: 12px !important;
+        min-height: 72px !important;
+        padding: 11px 14px !important;
+    }
+
+    html body.has-desktop-sidebar > main#contenido.contenedor .dashboard-page.dashboard-overview .dashboard-attention-action {
+        min-width: 116px !important;
+        white-space: nowrap !important;
+    }
+}

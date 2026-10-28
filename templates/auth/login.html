@@ -1480,7 +1480,10 @@ html body.login-page .personal-login .personal-field-jornada select {
 
                                 <select
                                     name="sede_id"
+                                    required
                                 >
+
+                                    <option value="" selected disabled></option>
 
                                     {% for sede in sedes %}
 
@@ -1519,7 +1522,10 @@ html body.login-page .personal-login .personal-field-jornada select {
 
                                 <select
                                     name="jornada_id"
+                                    required
                                 >
+
+                                    <option value="" selected disabled></option>
 
                                     {% for jornada in jornadas %}
 

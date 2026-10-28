@@ -1,0 +1,178 @@
+.nueva-cita-page {
+    width: min(100%, 980px);
+    margin: 0 auto;
+    padding: 10px 0 36px;
+}
+
+.nueva-cita-heading {
+    margin: 0 0 16px;
+}
+
+.nueva-cita-heading h1 {
+    margin: 0 0 5px;
+    color: #17365d;
+}
+
+.nueva-cita-heading p {
+    margin: 0;
+    color: #66788a;
+    font-size: 13px;
+}
+
+.nueva-cita-form {
+    display: grid;
+    gap: 14px;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 18px;
+    border: 1px solid #dce7f4;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(18, 59, 104, .05);
+}
+
+.nueva-cita-section {
+    min-width: 0;
+    padding: 15px 16px 16px;
+    border: 1px solid #dce7f4;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.nueva-cita-section > header {
+    margin: 0 0 13px;
+}
+
+.nueva-cita-section h2 {
+    margin: 0 0 3px;
+    color: #17365d;
+    font-size: 17px;
+}
+
+.nueva-cita-section > header p {
+    margin: 0;
+    color: #71839a;
+    font-size: 12px;
+}
+
+.nueva-cita-fields {
+    display: grid;
+    align-items: end;
+    gap: 12px;
+}
+
+.participantes-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.detalles-fields {
+    grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(150px, .8fr));
+}
+
+.nueva-cita-fields label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    margin: 0;
+    color: #36506e;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.nueva-cita-fields input,
+.nueva-cita-fields select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 42px;
+    margin: 0;
+    padding: 9px 11px;
+    border: 1px solid #cfdaea;
+    border-radius: 8px;
+    background: #fff;
+    color: #17365d;
+    font: inherit;
+    font-weight: 500;
+}
+
+.nueva-cita-fields input:focus,
+.nueva-cita-fields select:focus {
+    border-color: #4c82e8;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(76, 130, 232, .13);
+}
+
+.nueva-cita-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 2px;
+}
+
+.nueva-cita-actions .boton {
+    width: auto;
+    min-width: 124px;
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .nueva-cita-page {
+        width: min(100%, 760px);
+        padding: 8px 0 28px;
+    }
+
+    .participantes-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .participantes-fields label:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 600px) {
+    .nueva-cita-page {
+        padding: 5px 0 22px;
+    }
+
+    .nueva-cita-heading {
+        margin-bottom: 12px;
+    }
+
+    .nueva-cita-heading h1 {
+        font-size: 25px;
+    }
+
+    .nueva-cita-form {
+        gap: 10px;
+        padding: 11px;
+        border-radius: 10px;
+    }
+
+    .nueva-cita-section {
+        padding: 13px;
+        border-radius: 9px;
+    }
+
+    .participantes-fields,
+    .detalles-fields {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .participantes-fields label:first-child {
+        grid-column: auto;
+    }
+
+    .nueva-cita-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .nueva-cita-actions .boton {
+        width: 100%;
+        min-width: 0;
+    }
+}

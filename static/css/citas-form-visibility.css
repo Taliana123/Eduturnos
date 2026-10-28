@@ -1,0 +1,18 @@
+/* Keep the selected recipient panel consistent on desktop and mobile. */
+html body #contenido .nueva-cita-form .citation-mode-panel[hidden],
+html body #contenido .nueva-cita-form [data-recipient-panel][hidden] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+html body #contenido .nueva-cita-form > section[data-personal-panel][hidden] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+@media (min-width: 901px) {
+    html body #contenido .nueva-cita-form .citation-mode-panel:not([hidden]),
+    html body #contenido .nueva-cita-form [data-recipient-panel]:not([hidden]) {
+        display: block;
+    }
+}

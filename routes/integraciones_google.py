@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import secrets
+from datetime import date, datetime, time, timedelta, timezone
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
 
 from database.db import consultar, ejecutar
@@ -15,7 +16,12 @@ from servicios.google_calendar import (
     encolar_citas_futuras,
     estado_cola_google,
     calendar_id_objetivo,
+    apps_script_configurada,
+    configuracion_oauth_lista,
+    procesar_cola_google,
     probar_conexion_calendario,
+    probar_apps_script,
+    reintentar_fallidas_google,
     uri_callback,
     url_autorizacion,
 )
@@ -31,13 +37,52 @@ def _permite(scope: str, rol: str) -> bool:
     return scope == "institucional" and rol in ("Super Admin", "Rector")
 
 
+def _inicio_proxima_cita_ms(usuario):
+    from routes.calendario import citas_visibles
+
+    bogota = timezone(timedelta(hours=-5))
+    ahora = datetime.now(bogota)
+    for cita in citas_visibles(usuario):
+        if (cita.get("estado_nombre") or "").strip().lower() == "cancelada":
+            continue
+        fecha = cita.get("fecha")
+        hora = cita.get("hora")
+        try:
+            fecha_obj = fecha if isinstance(fecha, date) else date.fromisoformat(str(fecha)[:10])
+            if isinstance(hora, time):
+                hora_obj = hora
+            else:
+                hora_obj = time.fromisoformat(str(hora))
+            inicio = datetime.combine(fecha_obj, hora_obj, tzinfo=bogota)
+        except (TypeError, ValueError):
+            continue
+        if inicio >= ahora:
+            return int(inicio.timestamp() * 1000)
+    return int(ahora.timestamp() * 1000)
+
+
+def _url_abrir_calendario(inicio_ms=None):
+    web_url = "https://calendar.google.com/calendar/u/0/r/month"
+    if "Android" not in request.user_agent.string:
+        return web_url
+    inicio_ms = int(inicio_ms or datetime.now(timezone(timedelta(hours=-5))).timestamp() * 1000)
+    return (
+        f"intent://com.android.calendar/time/{inicio_ms}"
+        "#Intent;scheme=content;action=android.intent.action.VIEW;"
+        "package=com.google.android.calendar;end"
+    )
+
+
 @integraciones_google_bp.get("/")
 @login_requerido
 def index():
     usuario = usuario_actual()
+    calendar_open_start_ms = _inicio_proxima_cita_ms(usuario)
+    oauth_activo = configuracion_oauth_lista()
+    puente_activo = apps_script_configurada()
     personal = None
     personal_sync = None
-    if usuario["rol_nombre"] in ROLES_PERSONAL:
+    if usuario["rol_nombre"] in ROLES_PERSONAL and oauth_activo:
         personal = consultar(
             "SELECT correo_google,calendar_id,fecha_actualizacion,fecha_prueba FROM integraciones_google WHERE scope_key=%s",
             (f"usuario:{usuario['id_usuario']}",), uno=True,
@@ -45,11 +90,18 @@ def index():
         personal_sync = estado_cola_google(f"usuario:{usuario['id_usuario']}")
     institucional = None
     institucional_sync = None
+    institucional_conectado = puente_activo or bool(
+        consultar("SELECT 1 FROM integraciones_google WHERE scope_key='institucional'", uno=True)
+    )
     if usuario["rol_nombre"] in ("Super Admin", "Rector"):
-        institucional = consultar(
-            "SELECT correo_google,calendar_id,fecha_actualizacion,fecha_prueba FROM integraciones_google WHERE scope_key='institucional'",
-            uno=True,
-        )
+        if puente_activo:
+            institucional = {"correo_google": "Puente institucional (Apps Script)", "fecha_prueba": None}
+        else:
+            institucional = consultar(
+                "SELECT correo_google,calendar_id,fecha_actualizacion,fecha_prueba FROM integraciones_google WHERE scope_key='institucional'",
+                uno=True,
+            )
+        institucional_conectado = bool(institucional)
         institucional_sync = estado_cola_google("institucional")
     return render_template(
         "integraciones_google.html",
@@ -58,10 +110,15 @@ def index():
         institucional=institucional,
         personal_sync=personal_sync,
         institucional_sync=institucional_sync,
-        puede_personal=usuario["rol_nombre"] in ROLES_PERSONAL,
+        puede_personal=usuario["rol_nombre"] in ROLES_PERSONAL and oauth_activo,
         puede_institucional=usuario["rol_nombre"] in ("Super Admin", "Rector"),
+        apps_script_activo=puente_activo,
+        institucional_conectado=institucional_conectado,
+        oauth_activo=oauth_activo,
+        calendar_open_url=_url_abrir_calendario(calendar_open_start_ms),
+        calendar_open_start_ms=calendar_open_start_ms,
         configuracion_lista=configuracion_lista(),
-        callback_url=(uri_callback() if configuracion_lista() else "/integraciones-google/callback"),
+        callback_url=(uri_callback() if oauth_activo else "/integraciones-google/callback"),
     )
 
 
@@ -73,6 +130,18 @@ def conectar(scope):
     usuario = usuario_actual()
     if not _permite(scope, usuario["rol_nombre"]):
         abort(403)
+    if scope == "institucional" and apps_script_configurada():
+        try:
+            probar_apps_script()
+            flash("El puente de Google Calendar está conectado y puede acceder a la agenda institucional.", "success")
+        except Exception as exc:
+            current_app.logger.exception("Falló la prueba del puente de Google Calendar")
+            flash(f"No se pudo probar el puente de Google Calendar: {error_google_seguro(exc)}", "error")
+        return redirect(url_for("integraciones_google.index"))
+    if not configuracion_oauth_lista():
+        tipo = "personal" if scope == "personal" else "institucional"
+        flash(f"La conexión {tipo} de Google Calendar no está configurada en el servidor.", "error")
+        return redirect(url_for("integraciones_google.index"))
     if not configuracion_lista():
         flash("Configura dominio HTTPS y credenciales OAuth de Google en el servidor para habilitar la conexión.", "error")
         return redirect(url_for("integraciones_google.index"))
@@ -80,6 +149,30 @@ def conectar(scope):
     session["google_oauth_state"] = state
     session["google_oauth_scope"] = scope
     return redirect(url_autorizacion(state))
+
+
+@integraciones_google_bp.post("/reintentar-institucional")
+@roles_permitidos("Super Admin", "Rector")
+def reintentar_institucional():
+    if not apps_script_configurada():
+        flash("El puente de Google Calendar no está configurado en el servidor.", "error")
+        return redirect(url_for("integraciones_google.index"))
+    try:
+        probar_apps_script()
+        cantidad = reintentar_fallidas_google("institucional")
+        if cantidad:
+            resultado = procesar_cola_google(limite=20)
+            if not resultado["fallidas"]:
+                if not resultado["procesadas"]:
+                    flash("No había tareas listas para enviar a Google Calendar.", "info")
+                else:
+                    flash(f"Google Calendar aceptó {resultado['sincronizadas']} citas.", "success")
+        else:
+            flash("No hay citas fallidas pendientes de reintento.", "info")
+    except Exception as exc:
+        current_app.logger.exception("Falló el reintento de citas del calendario institucional")
+        flash(f"No se pudieron reintentar las citas: {error_google_seguro(exc)}", "error")
+    return redirect(url_for("integraciones_google.index"))
 
 
 @integraciones_google_bp.get("/callback")
@@ -136,6 +229,9 @@ def desconectar(scope):
     usuario = usuario_actual()
     if not _permite(scope, usuario["rol_nombre"]):
         abort(403)
+    if scope == "institucional" and apps_script_configurada():
+        flash("El puente institucional se administra en la configuración protegida del servidor.", "info")
+        return redirect(url_for("integraciones_google.index"))
     scope_key = "institucional" if scope == "institucional" else f"usuario:{usuario['id_usuario']}"
     ejecutar("DELETE FROM integraciones_google WHERE scope_key=%s", (scope_key,))
     flash("Calendario de Google desconectado.", "success")
