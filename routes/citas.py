@@ -509,8 +509,8 @@ def buscar_destinatario_documento():
     tipos_permitidos = {
         "Super Admin": {"Docente", "Administrador / Coordinador"},
         "Rector": {"Docente", "Administrador / Coordinador"},
-        "Administrador / Coordinador": {"Rector"},
-        "Docente": {"Rector", "Administrador / Coordinador", "Docente"},
+        "Administrador / Coordinador": {"Rector", "Docente"},
+        "Docente": {"Rector", "Administrador / Coordinador"},
     }
     if not documento or len(documento) > 30:
         return jsonify({"ok": False, "error": "Ingresa un número de documento válido."}), 400
@@ -840,8 +840,8 @@ def _crear_cita_para_personal(usuario):
     matriz = {
         "Super Admin": {"Docente", "Administrador / Coordinador"},
         "Rector": {"Docente", "Administrador / Coordinador"},
-        "Administrador / Coordinador": {"Rector"},
-        "Docente": {"Rector", "Administrador / Coordinador", "Docente"},
+        "Administrador / Coordinador": {"Rector", "Docente"},
+        "Docente": {"Rector", "Administrador / Coordinador"},
     }
     if tipo not in matriz.get(usuario["rol_nombre"], set()):
         raise ValueError("Tu rol no puede crear una citaci?n para ese tipo de destinatario.")
