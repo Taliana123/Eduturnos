@@ -7,6 +7,7 @@ import unicodedata
 
 from config import Config
 from database.bootstrap import ensure_database
+from database.db import consultar
 
 from routes.acudientes import acudientes_bp
 from routes.auth import auth_bp
