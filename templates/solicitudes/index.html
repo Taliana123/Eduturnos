@@ -60,7 +60,9 @@
 
                         <th>Solicitud</th>
 
-                        <th>Estudiante</th>
+                        <th>Destinatario</th>
+
+                        <th>Motivo</th>
 
                         <th>Docente</th>
 
@@ -94,6 +96,12 @@
 
                         <td>
                             {{ s.estudiante }}
+                            {% if s.destinatario_tipo %}<br><small>{{ 'Padre / acudiente' if s.destinatario_tipo == 'Acudiente' else 'Estudiante' if s.destinatario_tipo == 'Estudiante' else s.destinatario_tipo }}</small>{% endif %}
+                        </td>
+
+
+                        <td>
+                            {{ s.motivo or "—" }}
                         </td>
 
 

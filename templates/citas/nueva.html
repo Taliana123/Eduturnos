@@ -10,10 +10,9 @@
   <label class="citation-mode-field">Tipo de destinatario
     <select name="destinatario_tipo" id="destinatario-tipo" required>
       <option value="Estudiante" selected>Estudiante</option>
-      {% if usuario.rol_nombre in ['Super Admin','Rector'] %}<option value="Docente">Docente</option><option value="Administrador / Coordinador">Coordinación</option>{% endif %}
-      {% if usuario.rol_nombre == 'Administrador / Coordinador' %}<option value="Docente">Docente</option>{% endif %}
-      {% if usuario.rol_nombre in ['Administrador / Coordinador','Docente'] %}<option value="Rector">Rector</option>{% endif %}
-      {% if usuario.rol_nombre == 'Docente' %}<option value="Administrador / Coordinador">Coordinación</option>{% endif %}
+      {% if usuario.rol_nombre in ['Super Admin','Rector'] %}<option value="Docente">Docente</option><option value="Administrador / Coordinador">Coordinación</option><option value="Acudiente">Padre / acudiente</option>{% endif %}
+      {% if usuario.rol_nombre == 'Administrador / Coordinador' %}<option value="Docente">Docente</option><option value="Rector">Rector</option><option value="Acudiente">Padre / acudiente</option>{% endif %}
+      {% if usuario.rol_nombre == 'Docente' %}<option value="Rector">Rector</option><option value="Administrador / Coordinador">Coordinación</option><option value="Acudiente">Padre / acudiente</option>{% endif %}
     </select>
   </label>
   <section class="citation-mode-panel" data-student-panel aria-labelledby="student-mode-title">

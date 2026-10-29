@@ -122,7 +122,7 @@
 
       personalId.value = data.destinatario.id_usuario;
       personalSearch.setCustomValidity('');
-      const displayRole = type.value === 'Administrador / Coordinador' ? 'Coordinador' : type.value;
+      const displayRole = type.value === 'Administrador / Coordinador' ? 'Coordinador' : type.value === 'Acudiente' ? 'Padre / acudiente' : type.value;
       form.querySelector('[data-personal-role-label]').textContent = displayRole;
       form.querySelector('#nombre-destinatario-personal').textContent =
         `${data.destinatario.nombres} ${data.destinatario.apellidos}`;
@@ -172,7 +172,12 @@
         ? 'docente'
         : type.value === 'Administrador / Coordinador'
           ? 'coordinador'
-          : 'rector';
+          : type.value === 'Acudiente'
+            ? 'padre o acudiente'
+            : 'rector';
+      form.querySelector('#personal-mode-title').textContent = type.value === 'Acudiente'
+        ? 'Citación para padre o acudiente'
+        : 'Citación para personal institucional';
       personalSearch.placeholder = `Documento del ${roleLabel}`;
       form.querySelector('[data-personal-search-label]').textContent =
         `Buscar ${roleLabel} por número de documento`;

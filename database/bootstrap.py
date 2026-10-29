@@ -41,6 +41,32 @@ def ensure_database(config=None):
 
         # La creación inicial completa sigue estando en database/eduturnos.sql.
 
+        # Las citas dirigidas a personal o acudientes no necesariamente están
+        # asociadas a un estudiante ni a un docente organizador.
+        for columna in ("id_estudiante", "id_acudiente", "id_docente"):
+            cursor.execute(f"SHOW COLUMNS FROM citas LIKE '{columna}'")
+            campo = cursor.fetchone()
+            if campo is not None and str(campo[2]).upper() != "YES":
+                cursor.execute(f"ALTER TABLE citas MODIFY COLUMN {columna} INT NULL")
+        for columna, tipo in (("destinatario_tipo", "VARCHAR(40) NULL"), ("destinatario_usuario_id", "INT NULL")):
+            cursor.execute(f"SHOW COLUMNS FROM citas LIKE '{columna}'")
+            if cursor.fetchone() is None:
+                cursor.execute(f"ALTER TABLE citas ADD COLUMN {columna} {tipo}")
+
+        cursor.execute("SHOW COLUMNS FROM solicitudes_cita LIKE 'tipo_solicitante'")
+        tipo_solicitante = cursor.fetchone()
+        if tipo_solicitante is not None and str(tipo_solicitante[1]).upper().startswith("ENUM("):
+            cursor.execute("ALTER TABLE solicitudes_cita MODIFY COLUMN tipo_solicitante VARCHAR(40) NOT NULL")
+        for columna in ("id_estudiante", "id_docente"):
+            cursor.execute(f"SHOW COLUMNS FROM solicitudes_cita LIKE '{columna}'")
+            campo = cursor.fetchone()
+            if campo is not None and str(campo[2]).upper() != "YES":
+                cursor.execute(f"ALTER TABLE solicitudes_cita MODIFY COLUMN {columna} INT NULL")
+        for columna, tipo in (("destinatario_tipo", "VARCHAR(40) NULL"), ("destinatario_usuario_id", "INT NULL"), ("motivo_otro", "VARCHAR(255) NULL"), ("id_periodo", "INT NULL")):
+            cursor.execute(f"SHOW COLUMNS FROM solicitudes_cita LIKE '{columna}'")
+            if cursor.fetchone() is None:
+                cursor.execute(f"ALTER TABLE solicitudes_cita ADD COLUMN {columna} {tipo}")
+
         cursor.execute(
             "SHOW COLUMNS FROM citas LIKE 'recordatorio_24h_enviado'"
         )
@@ -75,6 +101,13 @@ def ensure_database(config=None):
         cursor.execute(migracion_escolar.read_text(encoding="utf-8"))
         while cursor.nextset():
             pass
+        for columna in ("requiere_otra_cita", "requiere_acompanamiento"):
+            cursor.execute(f"SHOW COLUMNS FROM cierres_cita LIKE '{columna}'")
+            if cursor.fetchone() is None:
+                cursor.execute(
+                    f"ALTER TABLE cierres_cita ADD COLUMN {columna} "
+                    "TINYINT(1) NOT NULL DEFAULT 0"
+                )
         migracion_google = Path(__file__).resolve().parents[1] / "sql" / "google_calendar_sync.sql"
         for sentencia in migracion_google.read_text(encoding="utf-8").split(";"):
             sentencia = sentencia.strip()

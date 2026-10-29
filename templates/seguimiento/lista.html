@@ -13,7 +13,7 @@
 		<span>{{ procesos|length }} {{ 'proceso' if procesos|length == 1 else 'procesos' }}</span>
 	</header>
 	{% for proceso in procesos %}
-	<a class="seguimiento-proceso" href="{{ url_for('seguimiento.registrar', id=proceso.id) }}" data-seguimiento-dialog="seguimiento-detalle-{{ proceso.id }}" aria-haspopup="dialog" aria-label="Abrir seguimiento de {{ proceso.nombres }} {{ proceso.apellidos }}">
+	<a class="seguimiento-proceso" href="#seguimiento-detalle-{{ proceso.id }}" data-seguimiento-dialog="seguimiento-detalle-{{ proceso.id }}" aria-haspopup="dialog" aria-label="Ver compromisos de {{ proceso.nombres }} {{ proceso.apellidos }}">
 		<span class="badge seguimiento-estado seguimiento-estado-{{ proceso.estado|lower|replace(' ', '-') }}">{{ proceso.estado }}</span>
 		<div class="seguimiento-proceso-info">
 			<strong>{{ proceso.nombres }} {{ proceso.apellidos }}</strong>
@@ -45,6 +45,17 @@
 		<p>Acudiente: {{ proceso.acudiente or 'Sin acudiente asignado' }}</p>
 	</div>
 	<p class="muted seguimiento-detail-notes">{{ proceso.observaciones or proceso.descripcion or 'Sin observaciones registradas.' }}</p>
+	<section class="seguimiento-detail-history" aria-label="Revisión de acompañamiento">
+		<h4>Revisión de acompañamiento</h4>
+		<p><strong>¿Requiere otra cita?</strong> {{ 'Sí' if proceso.requiere_otra_cita else 'No' }}</p>
+		<p><strong>¿Requiere acompañamiento?</strong> {{ 'Sí' if proceso.requiere_acompanamiento else 'No' }}</p>
+	</section>
+	<section class="seguimiento-detail-history" aria-label="Compromisos">
+		<h4>Compromisos</h4>
+		{% for compromiso in compromisos_por_cita.get(proceso.id, []) %}
+		<article><strong>{{ compromiso.descripcion }}</strong><p>{{ compromiso.responsable }} · Plazo: {{ compromiso.fecha_limite }} · {{ compromiso.estado }}</p></article>
+		{% else %}<p class="muted">No hay compromisos registrados.</p>{% endfor %}
+	</section>
 	<button type="button" class="boton secundario seguimiento-detail-print" data-seguimiento-print>Imprimir</button>
 	<section class="seguimiento-detail-history" aria-label="Historial de seguimiento">
 		<h4>Historial de seguimiento</h4>

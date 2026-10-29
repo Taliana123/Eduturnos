@@ -140,7 +140,14 @@ def cerrar_cita(cita_id):
                 "VALUES(%s,%s,%s,%s,%s)",
                 (cita_id, estado_nombre, request.form["asistencia"], resultado, usuario["id_usuario"]),
             )
-            cursor.execute("INSERT INTO cierres_cita(id_cita,asistencia,resultado,cerrado_por) VALUES(%s,%s,%s,%s)", (cita_id, request.form["asistencia"], resultado, usuario["id_usuario"]))
+            cursor.execute(
+                "INSERT INTO cierres_cita(id_cita,asistencia,resultado,requiere_otra_cita,requiere_acompanamiento,cerrado_por) "
+                "VALUES(%s,%s,%s,%s,%s,%s)",
+                (cita_id, request.form["asistencia"], resultado,
+                 1 if request.form.get("requiere_otra_cita") == "1" else 0,
+                 1 if request.form.get("requiere_acompanamiento") == "1" else 0,
+                 usuario["id_usuario"]),
+            )
             cursor.execute("UPDATE citas SET id_estado=%s WHERE id=%s AND id_estado=%s", (estado["id"], cita_id, cita["id_estado"]))
             if cursor.rowcount != 1:
                 abort(409, description="La cita cambió mientras se guardaba. Recarga la página.")
@@ -501,10 +508,10 @@ def buscar_destinatario_documento():
     tipo = request.args.get("tipo", "").strip()
     usuario = usuario_actual()
     tipos_permitidos = {
-        "Super Admin": {"Docente", "Administrador / Coordinador"},
-        "Rector": {"Docente", "Administrador / Coordinador"},
-        "Administrador / Coordinador": {"Rector", "Docente"},
-        "Docente": {"Rector", "Administrador / Coordinador"},
+        "Super Admin": {"Docente", "Administrador / Coordinador", "Acudiente"},
+        "Rector": {"Docente", "Administrador / Coordinador", "Acudiente"},
+        "Administrador / Coordinador": {"Rector", "Docente", "Acudiente"},
+        "Docente": {"Rector", "Administrador / Coordinador", "Acudiente"},
     }
     if not documento or len(documento) > 30:
         return jsonify({"ok": False, "error": "Ingresa un número de documento válido."}), 400
@@ -513,12 +520,13 @@ def buscar_destinatario_documento():
 
     destinatario = consultar(
         "SELECT u.id_usuario,u.nombres,u.apellidos, "
-        "COALESCE(NULLIF(d.documento,''),u.documento,'') AS documento, "
-        "r.nombre AS rol_nombre,d.id_docente "
+        "COALESCE(NULLIF(d.documento,''),NULLIF(a.documento,''),u.documento,'') AS documento, "
+        "r.nombre AS rol_nombre,d.id_docente,a.id_acudiente "
         "FROM usuarios u JOIN roles r ON r.id=u.id_rol "
         "LEFT JOIN docentes d ON d.id_usuario=u.id_usuario AND d.estado=1 "
+        "LEFT JOIN acudientes a ON a.id_usuario=u.id_usuario AND a.estado=1 "
         "WHERE u.estado=1 AND r.nombre=%s "
-        "AND COALESCE(NULLIF(d.documento,''),u.documento,'')=%s LIMIT 1",
+        "AND COALESCE(NULLIF(d.documento,''),NULLIF(a.documento,''),u.documento,'')=%s LIMIT 1",
         (tipo, documento),
         uno=True,
     )
@@ -526,6 +534,8 @@ def buscar_destinatario_documento():
         return jsonify({"ok": False, "error": "No se encontró una cuenta activa con ese documento y rol."}), 404
     if tipo == "Docente" and not destinatario.get("id_docente"):
         return jsonify({"ok": False, "error": "El docente no está vinculado al directorio institucional."}), 404
+    if tipo == "Acudiente" and not destinatario.get("id_acudiente"):
+        return jsonify({"ok": False, "error": "El padre o acudiente no tiene un perfil institucional activo."}), 404
     return jsonify({"ok": True, "destinatario": destinatario})
 
 
@@ -829,13 +839,33 @@ def guardar_nota(cita_id):
 # CREAR NUEVA CITA
 # =========================================================
 
+def _crear_solicitud_desde_nueva(usuario, tipo, destinatario_usuario_id, estudiante_id, acudiente_id, docente_id, motivo_id, motivo_otro, periodo_id, fecha, hora, lugar, observaciones):
+    solicitud_id = ejecutar(
+        """INSERT INTO solicitudes_cita(
+               solicitante_usuario_id,tipo_solicitante,id_estudiante,id_acudiente,id_docente,
+               destinatario_tipo,destinatario_usuario_id,id_motivo,motivo_otro,id_periodo,
+               fecha_solicitada,hora_solicitada,lugar,observaciones,estado
+           ) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Pendiente')""",
+        (usuario["id_usuario"], usuario["rol_nombre"], estudiante_id, acudiente_id, docente_id,
+         tipo, destinatario_usuario_id, motivo_id, motivo_otro, periodo_id, fecha, hora, lugar, observaciones),
+    )
+    revisores = consultar(
+        "SELECT u.id_usuario FROM usuarios u JOIN roles r ON r.id=u.id_rol "
+        "WHERE u.estado=1 AND r.nombre IN ('Super Admin','Rector','Administrador / Coordinador')"
+    )
+    for revisor in revisores:
+        notificar(revisor["id_usuario"], "Nueva solicitud de cita", f"La solicitud #{solicitud_id} enviada por {usuario['rol_nombre']} requiere revision.", "Solicitud")
+    auditoria("CREAR", "Solicitudes de cita", solicitud_id, f"Nueva cita para {tipo}; pendiente de aprobacion")
+    return solicitud_id
+
+
 def _crear_cita_para_personal(usuario):
     tipo = (request.form.get("destinatario_tipo") or "").strip()
     matriz = {
-        "Super Admin": {"Docente", "Administrador / Coordinador"},
-        "Rector": {"Docente", "Administrador / Coordinador"},
-        "Administrador / Coordinador": {"Rector", "Docente"},
-        "Docente": {"Rector", "Administrador / Coordinador"},
+        "Super Admin": {"Docente", "Administrador / Coordinador", "Acudiente"},
+        "Rector": {"Docente", "Administrador / Coordinador", "Acudiente"},
+        "Administrador / Coordinador": {"Rector", "Docente", "Acudiente"},
+        "Docente": {"Rector", "Administrador / Coordinador", "Acudiente"},
     }
     if tipo not in matriz.get(usuario["rol_nombre"], set()):
         raise ValueError("Tu rol no puede crear una citaci?n para ese tipo de destinatario.")
@@ -848,14 +878,17 @@ def _crear_cita_para_personal(usuario):
     if destinatario_id == int(usuario["id_usuario"]):
         raise ValueError("No puedes crear una citaci?n para tu propia cuenta.")
     persona = consultar(
-        "SELECT u.id_usuario,r.nombre AS rol_nombre,d.id_docente FROM usuarios u "
+        "SELECT u.id_usuario,r.nombre AS rol_nombre,d.id_docente,a.id_acudiente FROM usuarios u "
         "JOIN roles r ON r.id=u.id_rol LEFT JOIN docentes d ON d.id_usuario=u.id_usuario AND d.estado=1 "
+        "LEFT JOIN acudientes a ON a.id_usuario=u.id_usuario AND a.estado=1 "
         "WHERE u.id_usuario=%s AND u.estado=1", (destinatario_id,), uno=True,
     )
     if not persona or persona["rol_nombre"] != tipo:
         raise ValueError("El destinatario no corresponde al rol seleccionado o est? inactivo.")
     if tipo == "Docente" and not persona.get("id_docente"):
         raise ValueError("El docente no est? vinculado al directorio institucional.")
+    if tipo == "Acudiente" and not persona.get("id_acudiente"):
+        raise ValueError("El padre o acudiente no tiene un perfil institucional activo.")
     fecha = (request.form.get("fecha") or "").strip()
     fecha_obj = _validar_fecha_cita(fecha)
     hora = (request.form.get("hora") or "").strip()
@@ -877,29 +910,13 @@ def _crear_cita_para_personal(usuario):
     )
     if conflicto:
         raise ValueError("El destinatario o quien crea la cita ya tiene una citaci?n a esa hora.")
-    with transaccion() as conexion:
-        cursor = conexion.cursor(dictionary=True)
-        try:
-            cursor.execute("SELECT id_usuario FROM usuarios WHERE id_usuario=%s AND estado=1 FOR UPDATE", (destinatario_id,))
-            if not cursor.fetchone():
-                raise ValueError("El destinatario dej? de estar activo. Recarga y vuelve a intentar.")
-            cursor.execute(
-                "INSERT INTO citas(id_estudiante,id_acudiente,id_docente,destinatario_tipo,destinatario_usuario_id,"
-        "id_motivo,motivo_otro,id_estado,id_periodo,fecha,hora,lugar,observaciones,creado_por) "
-        "VALUES(NULL,NULL,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Coordinación','',%s)",
-        (persona.get("id_docente"), tipo, destinatario_id, motivo_id, motivo_otro, estado["id"], periodo_id, fecha, hora, usuario["id_usuario"]),
-            )
-            cita_id = cursor.lastrowid
-            cursor.execute("INSERT INTO cita_participantes(id_cita,id_usuario,tipo) VALUES(%s,%s,'Organizador')", (cita_id, usuario["id_usuario"]))
-            cursor.execute("INSERT INTO cita_participantes(id_cita,id_usuario,tipo) VALUES(%s,%s,'Destinatario')", (cita_id, destinatario_id))
-            from servicios.google_calendar import encolar_cita_cursor
-            encolar_cita_cursor(cursor, cita_id, usuario["id_usuario"])
-        finally:
-            cursor.close()
-    _notificar(cita_id, "Nueva citaci?n en EDUTURNOS", f"Tienes una citaci?n programada para el {fecha} a las {formatear_hora(hora)}.", creador_id=usuario["id_usuario"])
-    auditoria("CREAR", "Citas", cita_id, "Citaci?n institucional dirigida a " + tipo)
-    flash("Citaci?n creada y enviada al destinatario.", "success")
-    return redirect(_destino_cita_creada(fecha))
+    solicitud_id = _crear_solicitud_desde_nueva(
+        usuario, tipo, destinatario_id, None, persona.get("id_acudiente"),
+        persona.get("id_docente"), motivo_id, motivo_otro, periodo_id, fecha, hora,
+        "Coordinacion", "",
+    )
+    flash(f"Solicitud #{solicitud_id} enviada para aprobacion.", "success")
+    return redirect(url_for("solicitudes.index"))
 
 
 @citas_bp.route("/nueva", methods=["GET", "POST"])
@@ -1198,53 +1215,13 @@ def nueva():
             # CREAR CITA
             # ---------------------------------------------
 
-            validar_disponibilidad(docente_id, fecha_obj, hora)
-            cita_id = reservar_cita(
-                """
-                INSERT INTO citas (
-                    id_estudiante,id_acudiente,id_docente,id_motivo,motivo_otro,id_estado,id_periodo,
-                    fecha,hora,lugar,observaciones,creado_por,destinatario_tipo,destinatario_usuario_id
-                ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Estudiante',%s)
-                """,
-                (
-                    estudiante_id, acudiente_id, docente_id, motivo_id, motivo_otro, estado["id"],
-                    periodo_id, fecha, hora, lugar, observaciones, usuario["id_usuario"],
-                    estudiante.get("id_usuario"),
-                ),
+            _crear_solicitud_desde_nueva(
+                usuario, "Estudiante", estudiante.get("id_usuario"), estudiante_id,
+                acudiente_id, docente_id, motivo_id, motivo_otro, periodo_id, fecha, hora,
+                lugar, observaciones,
             )
-
-            # NOTIFICAR CREACIÓN
-            # ---------------------------------------------
-
-            _notificar(
-                cita_id,
-                "Nueva citación en EDUTURNOS",
-                (
-                    f"Tienes una citación programada para "
-                    f"el {fecha} a las {formatear_hora(hora)}."
-                ),
-                creador_id=usuario["id_usuario"],
-            )
-
-            # ---------------------------------------------
-            # AUDITORÍA
-            # ---------------------------------------------
-
-            auditoria(
-                "CREAR",
-                "Citas",
-                cita_id,
-                f"Cita creada para {fecha} {formatear_hora(hora)}",
-            )
-
-            flash(
-                "Citación creada correctamente.",
-                "success",
-            )
-
-            return redirect(
-                _destino_cita_creada(fecha)
-            )
+            flash("Solicitud de cita enviada para aprobacion.", "success")
+            return redirect(url_for("solicitudes.index"))
 
         except Exception as exc:
 

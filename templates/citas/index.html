@@ -20,7 +20,7 @@
             <div class="citas-desktop-search">
                 <input type="search" data-citas-search placeholder="Buscar estudiante..." aria-label="Buscar estudiante">
                 <select class="citas-desktop-state-filter" data-citas-status aria-label="Filtrar por estado">
-                    <option value="">Todos los estados</option><option value="Pendiente">Pendiente</option><option value="Confirmada">Confirmada</option><option value="Realizada">Atendida</option><option value="No asistió">Incumplida</option>
+                    <option value="">Todos los estados</option><option value="Pendiente">Pendiente</option><option value="Confirmada">Confirmada</option><option value="Realizada">Realizada</option><option value="No asistió">No asistió</option>
                     {% for estado in citas|map(attribute='estado')|unique|sort if estado not in ['Pendiente','Confirmada','Realizada','No asistió'] %}<option>{{ estado }}</option>{% endfor %}
                 </select>
             </div>
@@ -452,6 +452,8 @@
                 {{ csrf_field()|safe }}
                 <label>Asistencia<select name="asistencia" required><option value="" selected disabled>Selecciona</option><option>Asistió</option><option>No asistió</option></select></label>
                 <label>Resultado<textarea name="resultado" maxlength="10000" rows="3" required></textarea></label>
+                <label><input type="checkbox" name="requiere_otra_cita" value="1"> Requiere otra cita</label>
+                <label><input type="checkbox" name="requiere_acompanamiento" value="1"> Requiere acompañamiento</label>
                 <button class="boton" type="submit">Guardar cierre</button>
             </form>
         </details>
@@ -488,5 +490,10 @@
 {% endfor %}
 
 </div>
+
+<style>
+html body #contenido .citas-page .citas-desktop-directory tbody tr[data-citas-row][hidden],
+html body #contenido .citas-page .citas-desktop-directory tbody tr[data-citas-empty][hidden]{display:none!important;}
+</style>
 
 {% endblock %}
