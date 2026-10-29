@@ -39,9 +39,6 @@ TRANSICIONES_ESTADO = {
     "Cancelada": set(),
     "Justificada": set(),
 }
-ROLES_MOTIVO_PERSONALIZADO = {"Administrador / Coordinador", "Docente"}
-
-
 def _motivo_cita(motivo_id, usuario):
     motivo = consultar(
         "SELECT id,nombre FROM motivos WHERE id=%s AND estado=1",
@@ -51,10 +48,7 @@ def _motivo_cita(motivo_id, usuario):
     if not motivo:
         raise ValueError("El motivo seleccionado no está disponible.")
     texto = None
-    if (
-        str(motivo.get("nombre", "")).strip().casefold() == "otro"
-        and usuario.get("rol_nombre") in ROLES_MOTIVO_PERSONALIZADO
-    ):
+    if str(motivo.get("nombre", "")).strip().casefold() == "otro":
         texto = (request.form.get("motivo_otro") or "").strip()
         if not texto or len(texto) > 255:
             raise ValueError("Describe el motivo en un máximo de 255 caracteres.")

@@ -43,7 +43,6 @@
                 <td colspan="6">
                     <article class="citas-mobile-card">
                         <header class="citas-mobile-card-heading">
-                            <span class="citas-desktop-avatar" aria-hidden="true">{{ cita.estudiante[:1] }}</span>
                             <div><strong>{{ cita.estudiante }}</strong><small>{% if cita.grado %}Grado {{ cita.grado }}{% endif %} · {% if cita.grupo %}{{ cita.grupo }} · {% endif %}{{ cita.jornada or '' }}</small></div>
                         </header>
                         <a class="citas-mobile-arrow" href="#cita-desktop-detail-{{ cita.id }}" data-desktop-cita-dialog="cita-desktop-detail-{{ cita.id }}" aria-haspopup="dialog" aria-label="Ver detalle de {{ cita.estudiante }}" title="Ver detalle">↗</a>
@@ -358,6 +357,10 @@
   html body #contenido .citas-page .citas-desktop-directory .citas-mobile-card-meta>div>strong{color:#17365d;font-size:12px;font-weight:600;line-height:1.4;overflow-wrap:anywhere;}
   html body #contenido .citas-page .citas-desktop-directory tr[data-citas-empty]{display:block!important;margin:0!important;border:1px solid #d5e1fa!important;border-radius:10px!important;}
   html body #contenido .citas-page .citas-desktop-directory tr[data-citas-empty]>td{display:block!important;padding:14px!important;}
+  html body #contenido .citas-page .citas-desktop-directory tr[data-citas-empty]>td::before{display:none!important;content:none!important;}
+  html body #contenido .citas-page .citas-desktop-directory tr[data-citas-empty][hidden]{display:none!important;}
+  html body #contenido dialog.citas-reference-detail.desktop-cita-open .citas-reference-heading{position:relative!important;padding-right:42px!important;}
+  html body #contenido dialog.citas-reference-detail.desktop-cita-open .citas-reference-heading>button[data-mobile-dialog-close]{position:absolute!important;top:0!important;right:0!important;display:grid!important;place-items:center!important;flex:0 0 36px!important;width:36px!important;min-width:36px!important;max-width:36px!important;height:36px!important;min-height:36px!important;margin:0!important;padding:0!important;border:0!important;border-radius:50%!important;background:transparent!important;color:#557096!important;box-shadow:none!important;font-size:28px!important;font-weight:400!important;line-height:1!important;}
 }
 @media(max-width:480px){html body #contenido .citas-page .citas-desktop-directory .citas-mobile-card{gap:10px;padding:12px!important;}html body #contenido .citas-page .citas-desktop-directory .citas-mobile-card-meta{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}}
 </style>

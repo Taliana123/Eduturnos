@@ -5,9 +5,6 @@
   if (!form) return;
 
   const type = form.querySelector('#destinatario-tipo');
-  const motive = form.querySelector('#id-motivo');
-  const otherMotivePanel = form.querySelector('[data-other-motive]');
-  const otherMotiveInput = form.querySelector('#motivo-otro');
   const studentPanel = form.querySelector('[data-student-panel]');
   const personalPanel = form.querySelector('[data-personal-panel]');
   const personal = form.querySelector('#destinatario-personal');
@@ -24,18 +21,6 @@
   let requestSerial = 0;
   let personalRequestSerial = 0;
   let personalTimer = 0;
-
-  function applyMotive() {
-    const selected = motive.options[motive.selectedIndex];
-    const roleCanDescribeOther = ['Administrador / Coordinador', 'Docente'].includes(form.dataset.creatorRole);
-    const showOther = roleCanDescribeOther && selected?.textContent.trim().toLocaleLowerCase() === 'otro';
-    otherMotivePanel.hidden = !showOther;
-    if (showOther) otherMotivePanel.style.removeProperty('display');
-    else otherMotivePanel.style.setProperty('display', 'none', 'important');
-    otherMotiveInput.disabled = !showOther;
-    otherMotiveInput.required = showOther;
-    if (!showOther) otherMotiveInput.value = '';
-  }
 
   function clearStudent(message) {
     studentId.value = '';
@@ -208,7 +193,6 @@
     clearStudent('Documento modificado. Pulsa Buscar para cargar los datos.');
   });
   type.addEventListener('change', applyType);
-  motive.addEventListener('change', applyMotive);
   personalSearch.addEventListener('input', () => {
     personalRequestSerial += 1;
     personalSearch.setCustomValidity('');
@@ -239,10 +223,8 @@
       personalSearch.value = '';
       clearPersonal('Escribe el documento para seleccionar automáticamente el destinatario.');
       applyType();
-      applyMotive();
     }, 0);
   });
 
   applyType();
-  applyMotive();
 })();
