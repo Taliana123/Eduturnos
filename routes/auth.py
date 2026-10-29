@@ -286,7 +286,6 @@ def _mostrar_login():
                 "SELECT id,nombre FROM instituciones WHERE estado=1 AND requiere_codigo_institucional=0 "
                 "AND nombre NOT LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY nombre"
             ),
-            institucion_login_id=(request.form.get("institucion_id") or ""),
         )
     )
     respuesta.headers["Cache-Control"] = "no-store"

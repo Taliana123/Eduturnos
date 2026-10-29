@@ -1433,9 +1433,9 @@ html body.login-page .personal-login .personal-field-jornada select {
                     <label class="login-institution-select" data-other-institutions {% if tipo_acceso != 'otra' %}hidden{% endif %}>
                         <span>Selecciona la instituci&oacute;n</span>
                         <select name="institucion_id" data-institution-list {% if tipo_acceso != 'otra' %}disabled{% else %}required{% endif %}>
-                            <option value="">Elige una instituci&oacute;n</option>
+                            <option value="" selected>Elige una instituci&oacute;n</option>
                             {% for institucion in instituciones_login %}
-                            <option value="{{ institucion.id }}" {% if institucion_login_id|string == institucion.id|string %}selected{% endif %}>{{ institucion.nombre }}</option>
+                            <option value="{{ institucion.id }}">{{ institucion.nombre }}</option>
                             {% else %}
                             <option value="" disabled>No hay otras instituciones registradas</option>
                             {% endfor %}
