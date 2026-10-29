@@ -1325,6 +1325,14 @@ html body.login-page .personal-login .personal-field-jornada select {
     .personal-login[hidden],.other-institution-hint[hidden]{display:none!important}
     @media(max-width:600px){.login-institution-option{padding:12px}.login-institution-option strong{font-size:13px}.login-institution-options legend{font-size:14px}}
 </style>
+
+<style>
+    .login-page .form-links{display:grid;grid-template-columns:1fr;gap:12px;text-align:center}
+    .login-page .form-links-primary{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:12px}
+    .login-page .form-links-primary a{min-width:0}
+    .login-page .form-links-institution{display:block;text-align:center}
+    @media(max-width:600px){.login-page .form-links-primary{grid-template-columns:1fr 1fr;gap:8px}.login-page .form-links-primary a{font-size:12px}.login-page .form-links-institution{font-size:12px}}
+</style>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261023_login_center_v2" media="(max-width: 900px)">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/password-controls.css') }}?v=20261012_password_desktop_v1">
 </head>
@@ -1415,7 +1423,7 @@ html body.login-page .personal-login .personal-field-jornada select {
                         <legend>Elige tu institución</legend>
                         <label class="login-institution-option">
                             <input type="radio" name="tipo_acceso" value="jjfh" {% if tipo_acceso != 'otra' %}checked{% endif %}>
-                            <span><strong>Institución Educativa José Joaquín</strong><small>Acceso institucional actual</small></span>
+                            <span><strong>Institución Educativa José Joaquín Flórez Hernández</strong><small>Acceso institucional actual</small></span>
                         </label>
                         <label class="login-institution-option">
                             <input type="radio" name="tipo_acceso" value="otra" {% if tipo_acceso == 'otra' %}checked{% endif %}>
@@ -1597,23 +1605,11 @@ html body.login-page .personal-login .personal-field-jornada select {
 
 
                 <div class="form-links">
-
-                    <a
-                        href="{{ url_for('passwords.recuperar') }}"
-                    >
-                        ¿Olvidaste tu contraseña?
-                    </a>
-
-                    <a
-                        href="{{ url_for('auth.registro') }}"
-                    >
-                        Crear una cuenta
-                    </a>
-
-                    <a href="{{ url_for('auth.crear_institucion') }}">
-                        ¿Eres Rector de otra institución? Regístrala aquí
-                    </a>
-
+                    <div class="form-links-primary">
+                        <a href="{{ url_for('passwords.recuperar') }}">?Olvidaste tu contrase?a?</a>
+                        <a href="{{ url_for('auth.registro') }}">Crear una cuenta</a>
+                    </div>
+                    <a class="form-links-institution" href="{{ url_for('auth.crear_institucion') }}">?Eres Rector de otra instituci?n? Reg?strala aqu?</a>
                 </div>
 
 
