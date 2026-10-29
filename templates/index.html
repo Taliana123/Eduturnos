@@ -722,6 +722,7 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
             <nav class="nav" aria-label="Navegaci&oacute;n principal">
                 <div class="nav-desktop-links">
                     <a href="{{ url_for('como_funciona') }}">C&oacute;mo funciona</a>
+                    <a href="#creadores">Creadores</a>
                     <a href="{{ url_for('beneficios') }}">Beneficios</a>
                     <a href="{{ url_for('institucion') }}">Instituci&oacute;n</a>
                     <a href="{{ url_for('privacidad') }}">Privacidad</a>
@@ -734,6 +735,7 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
                     </summary>
                     <div class="nav-menu-links">
                         <a href="{{ url_for('como_funciona') }}">C&oacute;mo funciona</a>
+                        <a href="#creadores">Creadores</a>
                         <a href="{{ url_for('beneficios') }}">Beneficios</a>
                         <a href="{{ url_for('institucion') }}">Instituci&oacute;n</a>
                         <a href="{{ url_for('privacidad') }}">Privacidad</a>
@@ -870,6 +872,41 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
 
             </div>
 
+        </section>
+
+        <section class="creadores-section" id="creadores" aria-labelledby="creadores-title">
+            <div class="creadores-heading">
+                <span>EL EQUIPO</span>
+                <h2 id="creadores-title">Creadores de EDUTURNOS</h2>
+                <p>Seis participantes trabajaron en una herramienta para organizar las citaciones y el acompañamiento escolar.</p>
+            </div>
+
+            <div class="creadores-grid">
+                {% set creadores = [
+                    ('Taliana Cardozo Guzmán', 'Líder'),
+                    ('Jaiver Stiven Saavedra', ''),
+                    ('Sandy Tatiana Velasquez', ''),
+                    ('Stiven Diaz Cupitra', ''),
+                    ('David Figueroa Camargo', ''),
+                    ('Jared Mendez Torres', '')
+                ] %}
+                {% for nombre, cargo in creadores %}
+                <article class="creador-card">
+                    <div class="creador-foto" role="img" aria-label="Espacio para la foto de {{ nombre }}">
+                        <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="17" r="8"></circle><path d="M9 42c1-9 7-14 15-14s14 5 15 14"></path></svg>
+                    </div>
+                    <h3>{{ nombre }}</h3>
+                    {% if cargo %}<span class="creador-rol">{{ cargo }}</span>{% endif %}
+                </article>
+                {% endfor %}
+            </div>
+
+            <div class="creadores-historia">
+                <article><h3>El problema</h3><p>La información de las reuniones podía quedar repartida entre llamadas, mensajes y registros separados. Eso hacía más difícil confirmar horarios, saber quién había sido informado y dar continuidad a los acuerdos.</p></article>
+                <article><h3>Por qué nació la solución</h3><p>EDUTURNOS nació para reunir en un mismo lugar las citaciones, la comunicación con las familias y el seguimiento de cada encuentro, con información clara para la comunidad educativa.</p></article>
+                <article><h3>Cómo se desarrolló</h3><p>El equipo organizó el flujo de solicitud, confirmación, reunión y seguimiento; definió permisos por rol y construyó pantallas para computador y celular. También incorporó avisos y conexión con Google Calendar.</p></article>
+                <article><h3>Estructura y programación</h3><p>La aplicación usa Python y Flask en el servidor, rutas modulares por función, plantillas Jinja, HTML, CSS y JavaScript en la interfaz, y MySQL para los datos. La autenticación y los roles controlan el acceso; servicios separados atienden notificaciones y la sincronización con Google Calendar.</p></article>
+            </div>
         </section>
 
     </main>
@@ -1712,5 +1749,42 @@ body {
     html body.public-home-page .hero-message-row > .hero-illustration {
         max-width: 188px !important;
     }
+}
+
+html body.public-home-page .creadores-section {
+    width: min(100% - 32px, 1180px);
+    margin: 0 auto 56px;
+    padding: clamp(24px, 5vw, 52px);
+    border: 1px solid #d7e6f2;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 16px 38px rgba(24, 67, 103, .08);
+    color: #17365d;
+    box-sizing: border-box;
+}
+
+html body.public-home-page .creadores-heading { max-width: 720px; margin-bottom: 24px; }
+html body.public-home-page .creadores-heading > span { color: #c5922e; font-size: 12px; font-weight: 800; letter-spacing: .16em; }
+html body.public-home-page .creadores-heading h2 { margin: 8px 0; color: #12345a; font-family: Georgia, serif; font-size: clamp(26px, 4vw, 38px); line-height: 1.15; }
+html body.public-home-page .creadores-heading p { margin: 0; color: #58728c; line-height: 1.6; }
+html body.public-home-page .creadores-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+html body.public-home-page .creador-card { display: grid; justify-items: center; align-content: start; min-width: 0; padding: 20px 12px; border: 1px solid #e0eaf2; border-radius: 16px; background: #f9fcff; text-align: center; }
+html body.public-home-page .creador-foto { display: grid; place-items: center; width: 86px; height: 96px; margin-bottom: 12px; border: 1px dashed #9ab5ce; border-radius: 14px; background: linear-gradient(145deg, #eef7fc, #dcecf7); color: #6488a8; }
+html body.public-home-page .creador-foto svg { width: 42px; height: 42px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+html body.public-home-page .creador-card h3 { margin: 0; color: #17365d; font-size: 15px; line-height: 1.4; }
+html body.public-home-page .creador-rol { margin-top: 6px; padding: 4px 9px; border-radius: 20px; background: #eaf3ff; color: #2458a6; font-size: 11px; font-weight: 700; }
+html body.public-home-page .creadores-historia { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 28px; }
+html body.public-home-page .creadores-historia article { padding: 18px; border-left: 3px solid #2a72b8; border-radius: 8px; background: #f2f7fc; }
+html body.public-home-page .creadores-historia h3 { margin: 0 0 7px; color: #17365d; font-family: Georgia, serif; font-size: 18px; }
+html body.public-home-page .creadores-historia p { margin: 0; color: #526d86; font-size: 14px; line-height: 1.65; }
+
+@media (max-width: 620px) {
+    html body.public-home-page .creadores-section { width: calc(100% - 28px); margin-bottom: 30px; padding: 22px 16px; border-radius: 18px; }
+    html body.public-home-page .creadores-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    html body.public-home-page .creador-card { padding: 14px 8px; }
+    html body.public-home-page .creador-foto { width: 72px; height: 82px; }
+    html body.public-home-page .creador-card h3 { font-size: 13px; }
+    html body.public-home-page .creadores-historia { grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+    html body.public-home-page .creadores-historia article { padding: 15px; }
 }
 </style>

@@ -263,15 +263,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	};
 	document.addEventListener("click", (event) => {
 		if (!(event.target instanceof Element)) return;
-		const calendarLink = event.target.closest("[data-google-calendar-open]");
-		if (calendarLink && /Android/i.test(navigator.userAgent)) {
-			event.preventDefault();
-			const providedStart = Number(calendarLink.dataset.calendarStart);
-			const startMillis = Number.isFinite(providedStart) && providedStart > 0 ? providedStart : Date.now();
-			const appIntent = `intent://com.android.calendar/time/${startMillis}#Intent;scheme=content;action=android.intent.action.VIEW;package=com.google.android.calendar;end`;
-			window.location.href = appIntent;
-			return;
-		}
 		const tab = event.target.closest("[data-cita-tab]");
 		if (tab && (mobileDialogMedia.matches || tab.closest('.desktop-cita-open'))) {
 			const tabDialog = tab.closest("dialog");

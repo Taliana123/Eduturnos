@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import secrets
 from datetime import date, datetime, time, timedelta, timezone
+from urllib.parse import quote
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
 
 from database.db import consultar, ejecutar
@@ -62,14 +63,17 @@ def _inicio_proxima_cita_ms(usuario):
 
 
 def _url_abrir_calendario(inicio_ms=None):
-    web_url = "https://calendar.google.com/calendar/u/0/r/month"
+    inicio_ms = int(inicio_ms or datetime.now(timezone(timedelta(hours=-5))).timestamp() * 1000)
+    bogota = timezone(timedelta(hours=-5))
+    fecha = datetime.fromtimestamp(inicio_ms / 1000, tz=bogota).date()
+    web_url = f"https://calendar.google.com/calendar/u/0/r/day/{fecha.year}/{fecha.month}/{fecha.day}"
     if "Android" not in request.user_agent.string:
         return web_url
-    inicio_ms = int(inicio_ms or datetime.now(timezone(timedelta(hours=-5))).timestamp() * 1000)
+    fallback = quote(web_url, safe="")
     return (
-        f"intent://com.android.calendar/time/{inicio_ms}"
-        "#Intent;scheme=content;action=android.intent.action.VIEW;"
-        "package=com.google.android.calendar;end"
+        f"intent://calendar.google.com/calendar/u/0/r/day/{fecha.year}/{fecha.month}/{fecha.day}"
+        "#Intent;scheme=https;package=com.google.android.calendar;"
+        f"S.browser_fallback_url={fallback};end"
     )
 
 

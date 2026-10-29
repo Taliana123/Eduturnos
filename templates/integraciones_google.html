@@ -8,16 +8,12 @@
         </a>
         <div>
             <h1>Calendarios conectados</h1>
-            <p class="muted">Las citas se guardan primero en EDUTURNOS. Google Calendar es una copia adicional.</p>
+            <p class="muted">Consulta aquí cómo se sincronizan y abren las citas de Google Calendar.</p>
         </div>
     </header>
 
-    <div class="alerta info" role="note">
-        {% if apps_script_activo %}
-        EDUTURNOS envía las citas como eventos genéricos a la agenda institucional. La cuenta institucional autoriza el puente una sola vez; los usuarios no conectan cuentas personales. No se envían nombres de estudiantes, acudientes ni observaciones. Consulta la <a href="{{ url_for('privacidad') }}">Política de Privacidad</a>.
-        {% else %}
-        Al conectar Google, EDUTURNOS guarda el correo de la cuenta y tokens cifrados para sincronizar eventos genéricos con fecha, hora y lugar. No envía nombres de estudiantes, acudientes ni observaciones. Puedes detener futuras sincronizaciones desconectando el calendario; los eventos que ya se copiaron se administran desde Google Calendar. Consulta la <a href="{{ url_for('privacidad') }}">Política de Privacidad</a>.
-        {% endif %}
+    <div class="alerta info calendar-description" role="note">
+        EDUTURNOS es el registro principal; si el calendario institucional está conectado, recibe una copia genérica de cada cita con fecha, hora y lugar, sin nombres de estudiantes o acudientes ni observaciones. La cuenta propietaria recibe avisos 24 y 2 horas antes; otras cuentas necesitan acceso compartido. Desconectar detiene futuras copias; las ya enviadas se administran en Google Calendar. En Android, el botón intenta abrir la app en el día de la próxima cita y usa la web como alternativa; en PC abre ese día en el navegador. Los recordatorios internos dependen de la tarea de notificaciones. <a href="{{ url_for('privacidad') }}">Política de Privacidad</a>.
     </div>
 
     {% if not oauth_activo and not apps_script_activo %}
@@ -31,11 +27,6 @@
     <section class="integracion-row">
         <div>
             <h2>Mi calendario personal</h2>
-            {% if usuario.rol_nombre in ['Super Admin','Rector','Administrador / Coordinador'] %}
-            <p class="muted">Al conectar, copia las citas futuras que puedes consultar y sincroniza las nuevas, con recordatorios 24 h y 2 h antes.</p>
-            {% else %}
-            <p class="muted">Al conectar, copia las citas futuras asignadas a tu cuenta y sincroniza las nuevas, con recordatorios 24 h y 2 h antes.</p>
-            {% endif %}
             {% if personal %}<small>Conectado: {{ personal.correo_google or 'Cuenta Google' }} · Prueba de conexión: {% if personal.fecha_prueba %}correcta el {{ personal.fecha_prueba.strftime('%d/%m/%Y %H:%M') }}{% else %}pendiente{% endif %}</small>{% else %}<small>Sin conectar</small>{% endif %}
             {% if personal_sync %}
             <p class="muted">Pendientes: {{ personal_sync.pendientes or 0 }} · Fallidas: {{ personal_sync.fallidas or 0 }} · Última sincronización correcta: {% if personal_sync.ultima_correcta %}{{ personal_sync.ultima_correcta.strftime('%d/%m/%Y %H:%M') }}{% else %}Sin sincronizaciones{% endif %}</p>
@@ -52,14 +43,6 @@
     <section class="integracion-row">
         <div>
             <h2>Agenda en Google Calendar</h2>
-            {% if apps_script_activo %}
-            <p class="muted">Al crear, cambiar o cancelar una cita en EDUTURNOS, se copia automáticamente como evento genérico en la agenda institucional de Google. La cuenta propietaria recibe avisos configurados 24 horas y 2 horas antes. En Android se intentará abrir la app Google Calendar; si no está disponible, se abrirá la versión web. En PC se abrirá Google Calendar en el navegador.</p>
-            {% elif institucional_conectado %}
-            <p class="muted">Las citas se copian automáticamente a la agenda institucional de Google conectada. En Android se intentará abrir la app Google Calendar; si no está disponible, se abrirá la versión web. En PC se abrirá Google Calendar en el navegador.</p>
-            {% else %}
-            <p class="muted">La agenda institucional de Google todavía no está conectada; las citas se guardan en EDUTURNOS. Un Rector o Super Admin puede conectar la agenda para activar la copia automática. En Android se intentará abrir la app Google Calendar; si no está disponible, se abrirá la versión web. En PC se abrirá Google Calendar en el navegador.</p>
-            {% endif %}
-            <p class="muted">Para ver la agenda desde otra cuenta, esa cuenta debe tener acceso compartido y sus notificaciones habilitadas. Los recordatorios internos de EDUTURNOS a los participantes requieren que esté programada la tarea de notificaciones.</p>
             {% if institucional_sync %}
             <small>{% if apps_script_activo %}Puente institucional configurado{% else %}Agenda institucional conectada{% endif %} · Pendientes: {{ institucional_sync.pendientes or 0 }} · Fallidas: {{ institucional_sync.fallidas or 0 }} · Última sincronización correcta: {% if institucional_sync.ultima_correcta %}{{ institucional_sync.ultima_correcta.strftime('%d/%m/%Y %H:%M') }}{% else %}Sin sincronizaciones{% endif %}</small>
             {% if institucional_sync.fallidas %}
@@ -68,7 +51,7 @@
             {% endif %}
         </div>
         <div class="google-calendar-actions">
-            <a class="boton google-calendar-open" data-google-calendar-open data-calendar-start="{{ calendar_open_start_ms }}" href="{{ calendar_open_url }}">{% if 'Android' in request.headers.get('User-Agent', '') %}Abrir app de Google Calendar{% else %}Abrir Google Calendar{% endif %}</a>
+            <a class="boton google-calendar-open" href="{{ calendar_open_url }}">{% if 'Android' in request.headers.get('User-Agent', '') %}Abrir app de Google Calendar{% else %}Abrir Google Calendar{% endif %}</a>
             {% if puede_institucional and not apps_script_activo and oauth_activo %}
             {% if institucional %}
             <form method="post" action="{{ url_for('integraciones_google.desconectar', scope='institucional') }}">{{ csrf_field()|safe }}<button class="boton secundario" type="submit">Desconectar agenda</button></form>
