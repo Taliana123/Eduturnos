@@ -1312,6 +1312,19 @@ html body.login-page .personal-login .personal-field-jornada select {
         }
 
 </style>
+<style>
+    .login-institution-options{display:grid;gap:9px;margin:0 0 8px;padding:0;border:0}
+    .login-institution-options legend{margin:0 0 8px;color:#24364b;font-weight:750;font-size:15px}
+    .login-institution-option{display:flex;align-items:flex-start;gap:11px;padding:13px 14px;border:1px solid #d5dfeb;border-radius:13px;background:#fff;cursor:pointer}
+    .login-institution-option:has(input:checked){border-color:#2f76d2;background:#f2f7ff;box-shadow:0 0 0 2px rgba(47,118,210,.10)}
+    .login-institution-option input{width:18px;height:18px;flex:0 0 18px;margin:2px 0 0;accent-color:#2f76d2}
+    .login-institution-option span{display:grid;gap:4px}
+    .login-institution-option strong{color:#1b3048;font-size:14px}
+    .login-institution-option small,.other-institution-hint{color:#63758a;font-size:12px;line-height:1.45}
+    .other-institution-hint{margin:0;padding:10px 12px;border-radius:10px;background:#eef5fc}
+    .personal-login[hidden],.other-institution-hint[hidden]{display:none!important}
+    @media(max-width:600px){.login-institution-option{padding:12px}.login-institution-option strong{font-size:13px}.login-institution-options legend{font-size:14px}}
+</style>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261023_login_center_v2" media="(max-width: 900px)">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/password-controls.css') }}?v=20261012_password_desktop_v1">
 </head>
@@ -1393,10 +1406,23 @@ html body.login-page .personal-login .personal-field-jornada select {
                 <form
                     method="post"
                     autocomplete="off"
-                    class="stack-form"
+                    class="stack-form login-form"
                 >
 
                     {{ csrf_field()|safe }}
+
+                    <fieldset class="login-institution-options">
+                        <legend>Elige tu institución</legend>
+                        <label class="login-institution-option">
+                            <input type="radio" name="tipo_acceso" value="jjfh" {% if tipo_acceso != 'otra' %}checked{% endif %}>
+                            <span><strong>Institución Educativa José Joaquín</strong><small>Acceso institucional actual</small></span>
+                        </label>
+                        <label class="login-institution-option">
+                            <input type="radio" name="tipo_acceso" value="otra" {% if tipo_acceso == 'otra' %}checked{% endif %}>
+                            <span><strong>Otra institución</strong><small>Ingresa con tu documento o correo y contraseña, sin código institucional</small></span>
+                        </label>
+                    </fieldset>
+                    <p class="other-institution-hint" data-other-institution-hint hidden>Usa el documento o correo y la contraseÃ±a de tu cuenta. EDUTURNOS reconocerÃ¡ tu instituciÃ³n automÃ¡ticamente.</p>
 
 
                     <!-- Documento -->
@@ -1433,14 +1459,14 @@ html body.login-page .personal-login .personal-field-jornada select {
 
                     <!-- Personal institucional -->
 
-                    <div class="personal-login">
+                    <div class="personal-login" data-jjfh-fields>
 
                         <h3>
-                            Personal institucional
+                            Acceso del personal de José Joaquín
                         </h3>
 
                         <p>
-                            Docentes, Coordinadores y Rectoría deben usar su correo
+                            Docentes, Coordinadores y Rectoría usan su correo
                             <strong>@jjfh.edu.co</strong>, código de 6 dígitos,
                             sede y jornada.
                         </p>
@@ -1485,7 +1511,7 @@ html body.login-page .personal-login .personal-field-jornada select {
 
                                     <option value="" selected disabled></option>
 
-                                    {% for sede in sedes %}
+                                    {% for sede in login_sedes %}
 
                                         {% if sede is mapping %}
 
@@ -1498,9 +1524,9 @@ html body.login-page .personal-login .personal-field-jornada select {
                                         {% else %}
 
                                             <option
-                                                value="{{ sede[0] }}"
+                                                value="{{ sede.id }}"
                                             >
-                                                {{ sede[1] }}
+                                                {{ sede.nombre }}
                                             </option>
 
                                         {% endif %}
@@ -1643,6 +1669,7 @@ html body.login-page .personal-login .personal-field-jornada select {
 
 
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20261012_password_controls_v19" defer></script>
+<script src="{{ url_for('static', filename='js/institution-login.js') }}?v=20261029_v1" defer></script>
 <script src="{{ url_for('static', filename='js/pwa.js') }}?v=2" defer></script>
 </body>
 

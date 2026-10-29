@@ -279,11 +279,26 @@ def _mostrar_login():
         render_template(
             "auth/login.html",
             sedes=_sedes(),
+            login_sedes=_sedes_jjfh(),
             jornadas=_jornadas(),
+            tipo_acceso=(request.form.get("tipo_acceso") or "jjfh"),
         )
     )
     respuesta.headers["Cache-Control"] = "no-store"
     return respuesta
+
+
+def _sedes_jjfh():
+    """Sedes que se usan para validar el acceso heredado de José Joaquín."""
+    try:
+        sedes = consultar(
+            "SELECT s.id,s.nombre,s.direccion FROM sedes s "
+            "JOIN instituciones i ON i.id=s.id_institucion "
+            "WHERE s.estado=1 AND i.nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY s.nombre"
+        )
+        return sedes or _sedes()
+    except Exception:
+        return _sedes()
 
 
 @auth_bp.route("/crear-institucion", methods=["GET", "POST"])
@@ -712,9 +727,21 @@ def _limpiar_intentos(clave_hash):
 # BUSCAR USUARIO
 # ============================================================
 
-def _buscar_usuario(identificador):
+def _buscar_usuario(identificador, tipo_acceso="jjfh"):
     valor = (identificador or "").strip()
     correo = _correo(valor)
+    if tipo_acceso == "otra":
+        institucion_filtro = (
+            "i.id IS NOT NULL AND i.requiere_codigo_institucional=0 "
+            "AND i.nombre NOT LIKE '%Jos%Joaqu%n%Fl%rez%' AND ("
+            "u.id_institucion IS NOT NULL OR EXISTS ("
+            "SELECT 1 FROM directorio_institucional di JOIN sedes s ON s.id=di.id_sede "
+            "WHERE di.id_usuario=u.id_usuario AND s.id_institucion=i.id))"
+        )
+    else:
+        institucion_filtro = (
+            "(i.nombre LIKE '%Jos%Joaqu%n%Fl%rez%' OR u.id_institucion IS NULL)"
+        )
 
     return consultar(
         """
@@ -724,9 +751,12 @@ def _buscar_usuario(identificador):
         FROM usuarios u
         INNER JOIN roles r
             ON r.id = u.id_rol
+        LEFT JOIN instituciones i ON i.id=u.id_institucion
         WHERE
-            u.documento = %s
-            OR LOWER(TRIM(u.correo)) = %s
+            (u.documento = %s OR LOWER(TRIM(u.correo)) = %s)
+            AND (
+                """ + institucion_filtro + """
+            )
         LIMIT 1
         """,
         (
@@ -1265,6 +1295,9 @@ def login():
         "codigo_institucional",
         "",
     ).strip()
+    tipo_acceso = (request.form.get("tipo_acceso") or "jjfh").strip().lower()
+    if tipo_acceso not in {"jjfh", "otra"}:
+        tipo_acceso = "jjfh"
 
     sede_id = _form_value(
         "id_sede",
@@ -1323,9 +1356,7 @@ def login():
 
         return _mostrar_login()
 
-    usuario = _buscar_usuario(
-        identificador
-    )
+    usuario = _buscar_usuario(identificador, tipo_acceso)
 
     if not usuario:
 
@@ -1440,10 +1471,42 @@ def login():
 
     _asignar_institucion_cuenta(usuario)
     institucion = consultar(
-        "SELECT requiere_codigo_institucional FROM instituciones WHERE id=%s",
+        "SELECT id,nombre,requiere_codigo_institucional FROM instituciones WHERE id=%s",
         (usuario.get("id_institucion"),), uno=True,
     ) if usuario.get("id_institucion") else None
     requiere_codigo = bool(institucion.get("requiere_codigo_institucional", 1)) if institucion else True
+    institucion_jjfh = consultar(
+        "SELECT id FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1",
+        uno=True,
+    )
+    jjfh_id = (institucion_jjfh or {}).get("id")
+    usuario_id_institucion = usuario.get("id_institucion")
+
+    if tipo_acceso == "otra":
+        if (
+            not institucion
+            or not usuario_id_institucion
+            or (jjfh_id and int(usuario_id_institucion) == int(jjfh_id))
+        ):
+            flash(
+                "Esta cuenta no pertenece a otra institución habilitada. Selecciona José Joaquín o consulta con el rector de tu institución.",
+                "error",
+            )
+            return _mostrar_login()
+        # En el portal multiinstitucional, la cuenta y su institución asignada
+        # sustituyen el código, la sede y la jornada del acceso heredado.
+        requiere_codigo = False
+    elif (
+        usuario.get("rol_nombre") != "Super Admin"
+        and jjfh_id
+        and usuario_id_institucion
+        and int(usuario_id_institucion) != int(jjfh_id)
+    ):
+        flash(
+            "Esta cuenta pertenece a otra institución. Selecciona la opción de otra institución para ingresar.",
+            "error",
+        )
+        return _mostrar_login()
 
     if requiere_codigo and "@" in identificador and not es_correo_valido_para_rol(
         usuario.get("rol_nombre", ""),
