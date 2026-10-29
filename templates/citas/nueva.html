@@ -3,7 +3,8 @@
 {% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva-cita.css') }}?v=20261028_recipient_text_motive_v1"><link rel="stylesheet" href="{{ url_for('static', filename='css/citas-form-visibility.css') }}?v=20261028_recipient_text_motive_v1">{% endblock %}
 {% block content %}
 <div class="page-head nueva-cita-heading"><div class="menu-page-heading"><div class="menu-page-heading-copy"><h1>Nueva citación</h1><p>Completa los datos del destinatario y agenda la fecha, hora y motivo del encuentro.</p></div></div></div>
-<form method="post" class="panel form-grid nueva-cita-form" data-cita-form data-creator-role="{{ usuario.rol_nombre }}" data-student-lookup-url="{{ url_for('citas.buscar_estudiante_documento') }}" data-personal-lookup-url="{{ url_for('citas.buscar_destinatario_documento') }}">
+{% set motivo_otro_id = namespace(value='') %}{% for motivo in motivos %}{% if motivo.nombre|lower == 'otro' %}{% set motivo_otro_id.value = motivo.id %}{% endif %}{% endfor %}
+<form method="post" class="panel form-grid nueva-cita-form" data-cita-form data-other-reason-id="{{ motivo_otro_id.value }}" data-creator-role="{{ usuario.rol_nombre }}" data-student-lookup-url="{{ url_for('citas.buscar_estudiante_documento') }}" data-personal-lookup-url="{{ url_for('citas.buscar_destinatario_documento') }}">
   {{ csrf_field()|safe }}
   <input type="hidden" name="vista_movil" value="1" data-mobile-only disabled>
   {% if periodos %}<input type="hidden" name="id_periodo" value="{{ periodos[0].id }}">{% endif %}
@@ -46,15 +47,20 @@
   </section>
   <section class="citation-mode-panel citation-details-panel" aria-labelledby="details-mode-title">
     <h2 id="details-mode-title">Detalles de la cita</h2>
-    {% set motivo_otro_id = namespace(value='') %}{% for motivo in motivos %}{% if motivo.nombre|lower == 'otro' %}{% set motivo_otro_id.value = motivo.id %}{% endif %}{% endfor %}
-    <label class="full-field">Motivo<textarea name="motivo_otro" id="motivo-otro" maxlength="255" rows="3" placeholder="Explica el motivo de la citación" required></textarea></label>
+    <label class="full-field" data-student-reason-field>Motivo
+      <select id="motivo-estudiante" required>
+        <option value="">Selecciona el motivo</option>
+        {% for motivo in motivos %}{% if motivo.nombre|lower != 'otro' %}<option value="{{ motivo.id }}">{{ motivo.nombre }}</option>{% endif %}{% endfor %}
+      </select>
+    </label>
+    <label class="full-field" data-personal-reason-field hidden>Motivo<textarea name="motivo_otro" id="motivo-otro" maxlength="255" rows="3" placeholder="Explica el motivo de la citación" disabled></textarea></label>
     <input type="hidden" name="id_motivo" id="id-motivo" value="{{ motivo_otro_id.value }}">
     <label>Fecha<input type="date" name="fecha" min="{{ fecha_minima }}" required></label>
     <label>Hora{{ selector_hora('hora') }}</label>
   </section>
   <div class="full-field mobile-command-group citation-form-actions"><button class="boton" type="submit">Crear citación</button><button class="boton secundario" type="reset">Cancelar</button></div>
 </form>
-<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261028_recipient_text_motive_v1" defer></script>
+<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261028_reason_by_recipient_v2" defer></script>
 <style>
 .nueva-cita-form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;width:min(100%,820px);margin:0 auto;padding:18px}
 .citation-mode-field,.citation-mode-panel{grid-column:1/-1;min-width:0}
@@ -62,6 +68,7 @@
 .citation-mode-field select{width:100%;min-height:46px}
 .citation-mode-panel{display:grid;grid-template-columns:1fr;align-content:start;gap:10px;padding:16px;border:1px solid #dce5ef;border-radius:14px;background:#fff}
 .citation-mode-panel[hidden]{display:none!important}
+.citation-mode-panel label[hidden]{display:none!important}
 .citation-details-panel textarea{width:100%;min-width:0;min-height:88px;box-sizing:border-box;resize:vertical}
 .nueva-cita-form > section[data-personal-panel][hidden]{display:none!important;visibility:hidden!important}
 .citation-mode-panel h2{margin:0 0 4px;color:#17365d;font-size:18px}

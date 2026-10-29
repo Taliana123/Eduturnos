@@ -18,6 +18,11 @@
   const personalSearch = form.querySelector('#buscar-documento-personal');
   const personalStatus = form.querySelector('#estado-busqueda-personal');
   const personalCard = form.querySelector('#datos-destinatario-personal');
+  const studentReasonField = form.querySelector('[data-student-reason-field]');
+  const personalReasonField = form.querySelector('[data-personal-reason-field]');
+  const studentReason = form.querySelector('#motivo-estudiante');
+  const reasonId = form.querySelector('#id-motivo');
+  const personalReason = form.querySelector('#motivo-otro');
   let requestSerial = 0;
   let personalRequestSerial = 0;
   let personalTimer = 0;
@@ -147,6 +152,13 @@
     };
     setPanelVisible(studentPanel, isStudent);
     setPanelVisible(personalPanel, !isStudent);
+    studentReasonField.hidden = !isStudent;
+    studentReason.disabled = !isStudent;
+    studentReason.required = isStudent;
+    personalReasonField.hidden = isStudent;
+    personalReason.disabled = isStudent;
+    personalReason.required = !isStudent;
+    reasonId.value = isStudent ? studentReason.value : form.dataset.otherReasonId;
 
     search.disabled = !isStudent;
     searchButton.disabled = !isStudent;
@@ -198,6 +210,7 @@
     clearStudent('Documento modificado. Pulsa Buscar para cargar los datos.');
   });
   type.addEventListener('change', applyType);
+  studentReason.addEventListener('change', () => { reasonId.value = studentReason.value; });
   personalSearch.addEventListener('input', () => {
     personalRequestSerial += 1;
     personalSearch.setCustomValidity('');

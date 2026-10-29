@@ -233,6 +233,10 @@ def create_app():
     def beneficios():
         return render_template("publico/beneficios.html")
 
+    @app.route("/creadores")
+    def creadores():
+        return render_template("publico/creadores.html")
+
     @app.route("/privacidad")
     def privacidad():
         return render_template("publico/privacidad.html")

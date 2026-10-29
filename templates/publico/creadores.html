@@ -1,0 +1,52 @@
+{% set titulo = "Creadores de EDUTURNOS" %}
+{% set contenido %}
+<span class="etiqueta">El equipo</span>
+<div class="public-title-row">
+    <a class="public-back-button" href="{{ url_for('inicio') }}" aria-label="Volver al inicio" title="Volver al inicio">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
+    </a>
+    <h1>Creadores de EDUTURNOS</h1>
+</div>
+<p class="intro">Seis participantes trabajaron en una herramienta para organizar las citaciones y el acompañamiento escolar.</p>
+
+<section class="creadores-grid" aria-label="Participantes de la creación de EDUTURNOS">
+    {% set creadores = [
+        ('Taliana Cardozo Guzmán', 'Líder'),
+        ('Jaiver Stiven Saavedra', ''),
+        ('Sandy Tatiana Velasquez', ''),
+        ('Stiven Diaz Cupitra', ''),
+        ('David Figueroa Camargo', ''),
+        ('Jared Mendez Torres', '')
+    ] %}
+    {% for nombre, cargo in creadores %}
+    <article class="creador-card">
+        <div class="creador-foto" role="img" aria-label="Espacio para la foto de {{ nombre }}">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="17" r="8"></circle><path d="M9 42c1-9 7-14 15-14s14 5 15 14"></path></svg>
+        </div>
+        <h2>{{ nombre }}</h2>
+        {% if cargo %}<span class="creador-rol">{{ cargo }}</span>{% endif %}
+    </article>
+    {% endfor %}
+</section>
+
+<section class="creadores-historia" aria-label="Historia y desarrollo de EDUTURNOS">
+    <article><h2>El problema</h2><p>La información de las reuniones podía quedar repartida entre llamadas, mensajes y registros separados. Eso hacía más difícil confirmar horarios, saber quién había sido informado y dar continuidad a los acuerdos.</p></article>
+    <article><h2>Por qué nació la solución</h2><p>EDUTURNOS nació para reunir en un mismo lugar las citaciones, la comunicación con las familias y el seguimiento de cada encuentro, con información clara para la comunidad educativa.</p></article>
+    <article><h2>Cómo se desarrolló</h2><p>El equipo organizó el flujo de solicitud, confirmación, reunión y seguimiento; definió permisos por rol y construyó pantallas para computador y celular. También incorporó avisos y conexión con Google Calendar.</p></article>
+    <article><h2>Estructura y programación</h2><p>La aplicación usa Python y Flask en el servidor, rutas modulares por función, plantillas Jinja, HTML, CSS y JavaScript en la interfaz, y MySQL para los datos. La autenticación y los roles controlan el acceso; servicios separados atienden notificaciones y la sincronización con Google Calendar.</p></article>
+</section>
+<style>
+.creadores-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:24px 0 30px}
+.creador-card{display:grid;justify-items:center;align-content:start;min-width:0;padding:20px 12px;border:1px solid #e0eaf2;border-radius:16px;background:#fff;text-align:center;box-shadow:0 8px 20px rgba(24,67,103,.06)}
+.creador-foto{display:grid;place-items:center;width:104px;height:116px;margin-bottom:12px;overflow:hidden;border:1px dashed #9ab5ce;border-radius:14px;background:linear-gradient(145deg,#eef7fc,#dcecf7);color:#6488a8}
+.creador-foto svg{width:46px;height:46px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.creador-card h2{margin:0;color:#17365d;font-size:16px;line-height:1.4}
+.creador-rol{margin-top:6px;padding:4px 9px;border-radius:20px;background:#eaf3ff;color:#2458a6;font-size:11px;font-weight:700}
+.creadores-historia{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.creadores-historia article{padding:19px;border-left:3px solid #2a72b8;border-radius:8px;background:#f2f7fc}
+.creadores-historia h2{margin:0 0 7px;color:#17365d;font-size:19px}
+.creadores-historia p{margin:0;color:#526d86;font-size:14px;line-height:1.65}
+@media(max-width:650px){.creadores-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0 22px}.creador-card{padding:14px 8px}.creador-foto{width:78px;height:88px}.creador-card h2{font-size:14px}.creadores-historia{grid-template-columns:1fr;gap:10px}.creadores-historia article{padding:15px}}
+</style>
+{% endset %}
+{% include "publico/base_publica.html" %}

@@ -49,6 +49,8 @@ def _motivo_cita(motivo_id, usuario):
         raise ValueError("El motivo seleccionado no está disponible.")
     texto = None
     if str(motivo.get("nombre", "")).strip().casefold() == "otro":
+        if (request.form.get("destinatario_tipo") or "").strip() == "Estudiante":
+            raise ValueError("Selecciona uno de los motivos disponibles para estudiantes.")
         texto = (request.form.get("motivo_otro") or "").strip()
         if not texto or len(texto) > 255:
             raise ValueError("Describe el motivo en un máximo de 255 caracteres.")

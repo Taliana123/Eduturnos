@@ -356,6 +356,7 @@
     <nav class="menu" aria-label="Navegaci&oacute;n principal">
         <div class="menu-desktop-links">
             <a href="{{ url_for('como_funciona') }}" class="{% if request.endpoint == 'como_funciona' %}activo{% endif %}">C&oacute;mo funciona</a>
+            <a href="{{ url_for('creadores') }}" class="{% if request.endpoint == 'creadores' %}activo{% endif %}">Creadores</a>
             <a href="{{ url_for('beneficios') }}" class="{% if request.endpoint == 'beneficios' %}activo{% endif %}">Beneficios</a>
             <a href="{{ url_for('institucion') }}" class="{% if request.endpoint == 'institucion' %}activo{% endif %}">Instituci&oacute;n</a>
             <a href="{{ url_for('privacidad') }}" class="{% if request.endpoint == 'privacidad' %}activo{% endif %}">Privacidad</a>
@@ -368,6 +369,7 @@
             </summary>
             <div class="menu-dropdown-links">
                 <a href="{{ url_for('como_funciona') }}" class="{% if request.endpoint == 'como_funciona' %}activo{% endif %}">C&oacute;mo funciona</a>
+                <a href="{{ url_for('creadores') }}" class="{% if request.endpoint == 'creadores' %}activo{% endif %}">Creadores</a>
                 <a href="{{ url_for('beneficios') }}" class="{% if request.endpoint == 'beneficios' %}activo{% endif %}">Beneficios</a>
                 <a href="{{ url_for('institucion') }}" class="{% if request.endpoint == 'institucion' %}activo{% endif %}">Instituci&oacute;n</a>
                 <a href="{{ url_for('privacidad') }}" class="{% if request.endpoint == 'privacidad' %}activo{% endif %}">Privacidad</a>
@@ -386,7 +388,7 @@
 
 <footer>
     <span>Sistema de gestión de citaciones escolares</span>
-    <span><a href="{{ url_for('privacidad') }}">Privacidad</a> · <a href="{{ url_for('terminos') }}">Condiciones</a></span>
+    <span><a href="{{ url_for('creadores') }}">Creadores</a> · <a href="{{ url_for('privacidad') }}">Privacidad</a> · <a href="{{ url_for('terminos') }}">Condiciones</a></span>
 </footer>
 
 <script src="{{ url_for('static', filename='js/pwa.js') }}?v=2" defer></script>
