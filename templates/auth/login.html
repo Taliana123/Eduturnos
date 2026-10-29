@@ -1426,7 +1426,7 @@ html body.login-page .personal-login .personal-field-jornada select {
                     <label class="login-institution-select">
                         <span>Elige tu instituci&oacute;n</span>
                         <select name="tipo_acceso" data-institution-choice>
-                            <option value="jjfh" {% if tipo_acceso != 'otra' %}selected{% endif %}>Instituci&oacute;n Educativa Jos&eacute; Joaqu&iacute;n Fl&oacute;rez Hern&aacute;ndez</option>
+                            <option value="jjfh" {% if tipo_acceso != 'otra' %}selected{% endif %}>I.E. Jos&eacute; Joaqu&iacute;n Fl&oacute;rez Hern&aacute;ndez</option>
                             <option value="otra" {% if tipo_acceso == 'otra' %}selected{% endif %}>Otra instituci&oacute;n</option>
                         </select>
                     </label>
@@ -1676,7 +1676,7 @@ html body.login-page .personal-login .personal-field-jornada select {
 
 
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20261012_password_controls_v19" defer></script>
-<script src="{{ url_for('static', filename='js/institution-login.js') }}?v=20261029_v1" defer></script>
+<script src="{{ url_for('static', filename='js/institution-login.js') }}?v=20261029_v2" defer></script>
 <script src="{{ url_for('static', filename='js/pwa.js') }}?v=2" defer></script>
 </body>
 
