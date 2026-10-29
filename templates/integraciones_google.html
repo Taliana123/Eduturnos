@@ -42,7 +42,8 @@
 
     <section class="integracion-row">
         <div>
-            <h2>Agenda en Google Calendar</h2>
+            <h2>Agenda de {{ institucion_nombre }} en Google Calendar</h2>
+            {% if institucional and institucional.correo_google %}<small>Cuenta conectada: {{ institucional.correo_google }}</small>{% endif %}
             {% if institucional_sync %}
             <small>{% if apps_script_activo %}Puente institucional configurado{% else %}Agenda institucional conectada{% endif %} · Pendientes: {{ institucional_sync.pendientes or 0 }} · Fallidas: {{ institucional_sync.fallidas or 0 }} · Última sincronización correcta: {% if institucional_sync.ultima_correcta %}{{ institucional_sync.ultima_correcta.strftime('%d/%m/%Y %H:%M') }}{% else %}Sin sincronizaciones{% endif %}</small>
             {% if institucional_sync.fallidas %}

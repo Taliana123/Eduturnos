@@ -3,6 +3,7 @@ from mysql.connector import Error as MySQLError
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.exceptions import BadRequest
 from urllib.parse import quote
+import unicodedata
 
 from config import Config
 from database.bootstrap import ensure_database
@@ -247,6 +248,50 @@ def create_app():
 
     @app.route("/institucion")
     def institucion():
+        from routes.helpers import usuario_actual
+
+        usuario = usuario_actual()
+        institucion_actual = None
+        sedes = []
+        if usuario and usuario.get("id_institucion"):
+            institucion_actual = consultar(
+                "SELECT * FROM instituciones WHERE id=%s AND estado=1",
+                (usuario["id_institucion"],), uno=True,
+            )
+            if institucion_actual:
+                nombre_normalizado = unicodedata.normalize("NFKD", institucion_actual["nombre"])
+                nombre_normalizado = "".join(c for c in nombre_normalizado if not unicodedata.combining(c)).lower()
+                if "jose joaquin" in nombre_normalizado:
+                    # Conserva la ficha pública completa que ya existe para JJFH.
+                    institucion_actual = None
+        if institucion_actual:
+            filas_sedes = consultar(
+                "SELECT nombre,direccion FROM sedes WHERE id_institucion=%s AND estado=1 ORDER BY nombre",
+                (institucion_actual["id"],),
+            )
+            sedes = [
+                {"nombre": fila["nombre"], "direccion": fila.get("direccion") or ""}
+                for fila in filas_sedes
+            ]
+            ubicacion = ", ".join(
+                parte for parte in (
+                    institucion_actual.get("ciudad"),
+                    institucion_actual.get("departamento"),
+                ) if parte
+            )
+            for sede in sedes:
+                sede["ubicacion"] = sede["direccion"] or ubicacion or "Ubicación no registrada"
+                query = ", ".join(parte for parte in (sede["direccion"], sede["nombre"], ubicacion) if parte)
+                sede["mapa"] = "https://maps.google.com/maps?q=" + quote(query) + "&output=embed"
+            informacion = {
+                "nombre": institucion_actual["nombre"],
+                "direccion": institucion_actual.get("direccion") or (sedes[0]["direccion"] if sedes else "") or ubicacion,
+                "telefono": institucion_actual.get("telefono") or "",
+                "municipio": institucion_actual.get("ciudad") or "",
+                "departamento": institucion_actual.get("departamento") or "",
+            }
+            return render_template("institucion.html", informacion=informacion, sedes=sedes)
+
         sedes = [
             {"nombre": nombre, "direccion": direccion}
             for _, nombre, direccion, _ in SEDES_INSTITUCIONALES

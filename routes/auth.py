@@ -296,6 +296,7 @@ def crear_institucion():
     ciudad = (request.form.get("ciudad") or "").strip()
     departamento = (request.form.get("departamento") or "").strip()
     sede = (request.form.get("sede") or "").strip() or "Sede Principal"
+    sede_direccion = (request.form.get("sede_direccion") or "").strip()
     nombres = (request.form.get("nombres") or "").strip()
     apellidos = (request.form.get("apellidos") or "").strip()
     documento = (request.form.get("documento") or "").strip()
@@ -305,7 +306,7 @@ def crear_institucion():
     if not all((nombre, ciudad, departamento, nombres, apellidos, documento, correo)):
         flash("Completa los datos de la institución y del Rector.", "error")
         return render_template("auth/crear_institucion.html"), 400
-    if len(nombre) > 180 or len(ciudad) > 100 or len(departamento) > 100 or len(sede) > 140:
+    if len(nombre) > 180 or len(ciudad) > 100 or len(departamento) > 100 or len(sede) > 140 or len(sede_direccion) > 255:
         flash("Revisa la longitud de los datos ingresados.", "error")
         return render_template("auth/crear_institucion.html"), 400
     if len(password) < 10:
@@ -332,8 +333,8 @@ def crear_institucion():
                 )
                 institucion_id = cur.lastrowid
                 cur.execute(
-                    "INSERT INTO sedes(id_institucion,nombre,estado) VALUES(%s,%s,1)",
-                    (institucion_id, sede),
+                    "INSERT INTO sedes(id_institucion,nombre,direccion,estado) VALUES(%s,%s,%s,1)",
+                    (institucion_id, sede, sede_direccion or None),
                 )
                 sede_id = cur.lastrowid
                 cur.execute(

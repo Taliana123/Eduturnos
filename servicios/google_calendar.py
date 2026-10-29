@@ -226,6 +226,23 @@ def calendar_id_objetivo(scope_key: str) -> str:
     return calendar_id
 
 
+def _id_institucion_scope(scope_key: str) -> int | None:
+    if not scope_key.startswith("institucion:"):
+        return None
+    try:
+        return int(scope_key.split(":", 1)[1])
+    except (TypeError, ValueError):
+        return None
+
+
+def _id_institucion_principal() -> int | None:
+    fila = consultar(
+        "SELECT id FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1",
+        uno=True,
+    )
+    return int(fila["id"]) if fila else None
+
+
 def probar_conexion_calendario(access_token: str, calendar_id: str) -> None:
     url = (
         f"{API_BASE}/calendars/{quote(calendar_id, safe='')}/events"
@@ -306,6 +323,7 @@ def _renovar_token(connection: dict, token: dict) -> dict:
 
 
 def _conexiones_para_cita(cita_id: int, creador_id: int) -> list[dict]:
+    institucion_principal_id = _id_institucion_principal()
     conexiones = consultar(
         "SELECT DISTINCT i.* FROM integraciones_google i "
         "LEFT JOIN citas c ON c.id=%s "
@@ -314,12 +332,20 @@ def _conexiones_para_cita(cita_id: int, creador_id: int) -> list[dict]:
         "LEFT JOIN docentes d ON d.id_docente=c.id_docente "
         "LEFT JOIN usuarios u ON u.id_usuario=i.id_usuario "
         "LEFT JOIN roles r ON r.id=u.id_rol "
-        "WHERE i.scope_key='institucional' OR (u.estado=1 AND (i.id_usuario=%s "
+        "WHERE (i.scope_key='institucional' AND c.id_institucion=%s) "
+        "OR i.scope_key=CONCAT('institucion:',c.id_institucion) "
+        "OR (i.scope_key LIKE 'usuario:%%' AND u.estado=1 AND (i.id_usuario=%s "
         "OR i.id_usuario IN (c.creado_por,e.id_usuario,a.id_usuario,d.id_usuario) "
-        "OR r.nombre IN ('Super Admin','Rector','Administrador / Coordinador'))) ",
-        (cita_id, creador_id),
+        "OR (r.nombre IN ('Super Admin','Rector','Administrador / Coordinador') "
+        "AND u.id_institucion=c.id_institucion))) ",
+        (cita_id, institucion_principal_id or -1, creador_id),
     )
-    if apps_script_configurada():
+    cita = consultar("SELECT id_institucion FROM citas WHERE id=%s", (cita_id,), uno=True)
+    es_principal = bool(
+        cita and institucion_principal_id
+        and int(cita.get("id_institucion") or 0) == institucion_principal_id
+    )
+    if apps_script_configurada() and es_principal:
         # El puente representa una única agenda institucional, sin guardar tokens OAuth.
         if not configuracion_oauth_lista():
             conexiones = []
@@ -405,29 +431,32 @@ def encolar_cita_cursor(cursor, cita_id: int, creador_id: int, operacion: str = 
         "LEFT JOIN docentes d ON d.id_docente=c.id_docente "
         "LEFT JOIN usuarios u ON u.id_usuario=i.id_usuario "
         "LEFT JOIN roles r ON r.id=u.id_rol "
-        "WHERE (i.scope_key='institucional' AND c.id_institucion=(SELECT id FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1)) "
-        "OR (i.scope_key<>'institucional' AND u.estado=1 AND (i.id_usuario=%s "
+        "WHERE (i.scope_key='institucional' AND c.id_institucion=(SELECT id FROM instituciones WHERE nombre LIKE '%%Jos%%Joaqu%%n%%Fl%%rez%%' ORDER BY id LIMIT 1)) "
+        "OR i.scope_key=CONCAT('institucion:',c.id_institucion) "
+        "OR (i.scope_key LIKE 'usuario:%%' AND u.estado=1 AND (i.id_usuario=%s "
         "OR i.id_usuario IN (c.creado_por,e.id_usuario,a.id_usuario,d.id_usuario) "
-        "OR r.nombre IN ('Super Admin','Rector','Administrador / Coordinador')))",
+        "OR (r.nombre IN ('Super Admin','Rector','Administrador / Coordinador') AND u.id_institucion=c.id_institucion)))",
         (cita_id, creador_id),
     )
     scopes = cursor.fetchall()
-    if apps_script_configurada():
-        if configuracion_oauth_lista():
-            scopes = [row for row in scopes if row["scope_key"] != "institucional"]
-        else:
-            scopes = []
     cursor.execute("SELECT id_institucion FROM citas WHERE id=%s", (cita_id,))
     cita_tenant = cursor.fetchone()
     tenant_id = cita_tenant.get("id_institucion") if isinstance(cita_tenant, dict) else (cita_tenant[0] if cita_tenant else None)
-    cursor.execute("SELECT id FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1")
+    cursor.execute(
+        "SELECT id FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1"
+    )
     main_row = cursor.fetchone()
     main_id = main_row.get("id") if isinstance(main_row, dict) else (main_row[0] if main_row else None)
     # Conserva el puente institucional antiguo si un cursor externo de una
     # instalación previa no devuelve todavía la columna tenant.
     is_jjfh_cita = not cita_tenant or bool(tenant_id and main_id and tenant_id == main_id)
-    if apps_script_configurada() and is_jjfh_cita and not any(row["scope_key"] == "institucional" for row in scopes):
-        scopes.append({"scope_key": "institucional"})
+    if apps_script_configurada() and is_jjfh_cita:
+        if configuracion_oauth_lista():
+            scopes = [row for row in scopes if row["scope_key"] != "institucional"]
+        else:
+            scopes = []
+        if not any(row["scope_key"] == "institucional" for row in scopes):
+            scopes.append({"scope_key": "institucional"})
     for row in scopes:
         _encolar_scope_cursor(cursor, cita_id, row["scope_key"], operacion)
     if scopes:
@@ -477,7 +506,17 @@ def encolar_citas_futuras(scope_key: str, user_id: int | None = None) -> dict:
         "ec.nombre IN ('Pendiente','Confirmada','Reprogramada')",
     ]
     parametros = []
-    if scope_key != "institucional":
+    institution_id = _id_institucion_scope(scope_key)
+    if scope_key == "institucional":
+        institution_id = _id_institucion_principal()
+        if not institution_id:
+            return {"citas": 0, "encoladas": 0}
+        filtros.append("c.id_institucion=%s")
+        parametros.append(institution_id)
+    elif institution_id is not None:
+        filtros.append("c.id_institucion=%s")
+        parametros.append(institution_id)
+    else:
         if user_id is None:
             return {"citas": 0, "encoladas": 0}
         filtros.append(

@@ -8,24 +8,24 @@
             <a class="link-back institucion-back account-settings-back history-back-button" href="{{ url_for('inicio') }}" aria-label="Volver al inicio" title="Volver al inicio"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg></a>
             <h1>{{ informacion.nombre }}</h1>
         </div>
-        <p>Información institucional y ubicaciones de sus sedes en Ibagué, Tolima.</p>
+        <p>Información institucional y ubicaciones de sus sedes en {{ informacion.municipio }}{% if informacion.departamento %}, {{ informacion.departamento }}{% endif %}.</p>
     </header>
 
     <section class="institucion-info" aria-labelledby="institucion-info-title">
         <h2 id="institucion-info-title">Información general</h2>
         <dl>
-            <div><dt>Código del establecimiento</dt><dd>{{ informacion.codigo }}</dd></div>
-            <div><dt>Secretaría</dt><dd>{{ informacion.secretaria }}</dd></div>
-            <div><dt>Dirección principal</dt><dd>{{ informacion.direccion }}</dd></div>
-            <div><dt>Teléfono</dt><dd><a href="tel:+576082697083">{{ informacion.telefono }}</a></dd></div>
-            <div><dt>Correo electrónico</dt><dd>{% for correo in informacion.correos %}<a href="mailto:{{ correo }}">{{ correo }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}</dd></div>
-            <div><dt>Municipio / departamento</dt><dd>{{ informacion.municipio }} ({{ informacion.codigo_municipio }}), {{ informacion.departamento }} ({{ informacion.codigo_departamento }})</dd></div>
-            <div><dt>Tipo y género</dt><dd>{{ informacion.tipo }} · {{ informacion.genero }}</dd></div>
-            <div><dt>Zona</dt><dd>{{ informacion.zona }}</dd></div>
-            <div><dt>Niveles</dt><dd>{{ informacion.niveles }}</dd></div>
-            <div><dt>Jornadas</dt><dd>{{ informacion.jornadas }}</dd></div>
-            <div><dt>Grados</dt><dd>{{ informacion.grados }}</dd></div>
-            <div><dt>Modelos educativos</dt><dd>{{ informacion.modelos }}</dd></div>
+            {% if informacion.codigo %}<div><dt>Código del establecimiento</dt><dd>{{ informacion.codigo }}</dd></div>{% endif %}
+            {% if informacion.secretaria %}<div><dt>Secretaría</dt><dd>{{ informacion.secretaria }}</dd></div>{% endif %}
+            {% if informacion.direccion %}<div><dt>Dirección principal</dt><dd>{{ informacion.direccion }}</dd></div>{% endif %}
+            {% if informacion.telefono %}<div><dt>Teléfono</dt><dd><a href="tel:{{ informacion.telefono|replace(' ', '') }}">{{ informacion.telefono }}</a></dd></div>{% endif %}
+            {% if informacion.correos %}<div><dt>Correo electrónico</dt><dd>{% for correo in informacion.correos %}<a href="mailto:{{ correo }}">{{ correo }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}</dd></div>{% endif %}
+            {% if informacion.municipio or informacion.departamento %}<div><dt>Municipio / departamento</dt><dd>{{ informacion.municipio }}{% if informacion.codigo_municipio %} ({{ informacion.codigo_municipio }}){% endif %}{% if informacion.municipio and informacion.departamento %}, {% endif %}{{ informacion.departamento }}{% if informacion.codigo_departamento %} ({{ informacion.codigo_departamento }}){% endif %}</dd></div>{% endif %}
+            {% if informacion.tipo or informacion.genero %}<div><dt>Tipo y género</dt><dd>{{ informacion.tipo }}{% if informacion.tipo and informacion.genero %} · {% endif %}{{ informacion.genero }}</dd></div>{% endif %}
+            {% if informacion.zona %}<div><dt>Zona</dt><dd>{{ informacion.zona }}</dd></div>{% endif %}
+            {% if informacion.niveles %}<div><dt>Niveles</dt><dd>{{ informacion.niveles }}</dd></div>{% endif %}
+            {% if informacion.jornadas %}<div><dt>Jornadas</dt><dd>{{ informacion.jornadas }}</dd></div>{% endif %}
+            {% if informacion.grados %}<div><dt>Grados</dt><dd>{{ informacion.grados }}</dd></div>{% endif %}
+            {% if informacion.modelos %}<div><dt>Modelos educativos</dt><dd>{{ informacion.modelos }}</dd></div>{% endif %}
         </dl>
     </section>
 
@@ -41,10 +41,10 @@
             {% for sede in sedes %}
             <details class="institucion-sede" {% if loop.first %}open{% endif %}>
                 <summary>
-                    <span><strong>{{ sede.nombre }}</strong><small>{{ sede.direccion }}</small></span>
+                    <span><strong>{{ sede.nombre }}</strong><small>{{ sede.ubicacion or sede.direccion or 'Ubicación no registrada' }}</small></span>
                 </summary>
                 <div class="institucion-sede-content">
-                    <a href="https://www.google.com/maps/search/?api=1&amp;query={{ sede.direccion|urlencode }}" target="_blank" rel="noopener noreferrer">Abrir indicaciones en Google Maps</a>
+                    <a href="https://www.google.com/maps/search/?api=1&amp;query={{ (sede.direccion or sede.nombre)|urlencode }}{% if informacion.municipio %}%2C%20{{ informacion.municipio|urlencode }}{% endif %}{% if informacion.departamento %}%2C%20{{ informacion.departamento|urlencode }}{% endif %}" target="_blank" rel="noopener noreferrer">Abrir indicaciones en Google Maps</a>
                     <iframe
                         title="Mapa de {{ sede.nombre }}"
                         src="{{ sede.mapa }}"

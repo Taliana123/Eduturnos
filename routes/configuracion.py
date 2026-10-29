@@ -53,8 +53,18 @@ def _fijar_estado(tabla: str, columna_id: str, registro_id: int) -> None:
 
 def _institucion_actual():
     usuario = usuario_actual()
-    if usuario and usuario.get("rol_nombre") != "Super Admin" and usuario.get("id_institucion"):
-        return consultar("SELECT * FROM instituciones WHERE id=%s", (usuario["id_institucion"],), uno=True)
+    if usuario and usuario.get("rol_nombre") != "Super Admin":
+        institucion_id = usuario.get("id_institucion")
+        if not institucion_id:
+            perfil = consultar(
+                "SELECT s.id_institucion FROM directorio_institucional d "
+                "JOIN sedes s ON s.id=d.id_sede WHERE d.id_usuario=%s LIMIT 1",
+                (usuario["id_usuario"],), uno=True,
+            )
+            institucion_id = (perfil or {}).get("id_institucion")
+        if not institucion_id:
+            return None
+        return consultar("SELECT * FROM instituciones WHERE id=%s", (institucion_id,), uno=True)
     return consultar("SELECT * FROM instituciones ORDER BY id LIMIT 1", uno=True)
 
 
@@ -112,15 +122,17 @@ def guardar_institucion():
         nombre = _texto("nombre", 180)
         ciudad = _texto("ciudad", 100)
         departamento = _texto("departamento", 100)
+        direccion = _texto("direccion", 255, required=False)
+        telefono = _texto("telefono", 40, required=False)
         if institucion_id:
             ejecutar(
-                "UPDATE instituciones SET nombre=%s,ciudad=%s,departamento=%s WHERE id=%s",
-                (nombre, ciudad, departamento, institucion_id),
+                "UPDATE instituciones SET nombre=%s,ciudad=%s,departamento=%s,direccion=%s,telefono=%s WHERE id=%s",
+                (nombre, ciudad, departamento, direccion or None, telefono or None, institucion_id),
             )
         else:
             institucion_id = ejecutar(
-                "INSERT INTO instituciones(nombre,ciudad,departamento) VALUES(%s,%s,%s)",
-                (nombre, ciudad, departamento),
+                "INSERT INTO instituciones(nombre,ciudad,departamento,direccion,telefono) VALUES(%s,%s,%s,%s,%s)",
+                (nombre, ciudad, departamento, direccion or None, telefono or None),
             )
         auditoria("ACTUALIZAR", "Configuración", institucion_id, "Institución actualizada")
         flash("Datos de la institución guardados en MySQL.", "success")

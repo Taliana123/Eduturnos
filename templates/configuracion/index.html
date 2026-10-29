@@ -24,6 +24,8 @@
     <label class="institution-name">Nombre<input name="nombre" maxlength="180" required value="{{ institucion.nombre if institucion else '' }}"></label>
     <label class="institution-city">Ciudad<input name="ciudad" maxlength="100" required value="{{ institucion.ciudad if institucion else '' }}"></label>
     <label class="institution-department">Departamento<input name="departamento" maxlength="100" required value="{{ institucion.departamento if institucion else '' }}"></label>
+    <label class="full-field">Dirección principal<input name="direccion" maxlength="255" value="{{ institucion.direccion if institucion else '' }}"></label>
+    <label>Teléfono<input name="telefono" maxlength="40" value="{{ institucion.telefono if institucion else '' }}"></label>
     <div class="form-actions institution-actions"><button class="boton" type="submit">Guardar institución</button></div>
   </form>
 </section>
