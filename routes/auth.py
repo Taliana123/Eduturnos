@@ -282,6 +282,11 @@ def _mostrar_login():
             login_sedes=_sedes_jjfh(),
             jornadas=_jornadas(),
             tipo_acceso=(request.form.get("tipo_acceso") or "jjfh"),
+            instituciones_login=consultar(
+                "SELECT id,nombre FROM instituciones WHERE estado=1 AND requiere_codigo_institucional=0 "
+                "AND nombre NOT LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY nombre"
+            ),
+            institucion_login_id=(request.form.get("institucion_id") or ""),
         )
     )
     respuesta.headers["Cache-Control"] = "no-store"
@@ -727,21 +732,27 @@ def _limpiar_intentos(clave_hash):
 # BUSCAR USUARIO
 # ============================================================
 
-def _buscar_usuario(identificador, tipo_acceso="jjfh"):
+def _buscar_usuario(identificador, tipo_acceso="jjfh", institucion_id=None):
     valor = (identificador or "").strip()
     correo = _correo(valor)
     if tipo_acceso == "otra":
+        try:
+            institucion_id = int(institucion_id)
+        except (TypeError, ValueError):
+            return None
         institucion_filtro = (
-            "i.id IS NOT NULL AND i.requiere_codigo_institucional=0 "
+            "i.id=%s AND i.estado=1 AND i.requiere_codigo_institucional=0 "
             "AND i.nombre NOT LIKE '%Jos%Joaqu%n%Fl%rez%' AND ("
-            "u.id_institucion IS NOT NULL OR EXISTS ("
+            "u.id_institucion=i.id OR EXISTS ("
             "SELECT 1 FROM directorio_institucional di JOIN sedes s ON s.id=di.id_sede "
             "WHERE di.id_usuario=u.id_usuario AND s.id_institucion=i.id))"
         )
+        parametros = (valor, correo, institucion_id)
     else:
         institucion_filtro = (
             "(i.nombre LIKE '%Jos%Joaqu%n%Fl%rez%' OR u.id_institucion IS NULL)"
         )
+        parametros = (valor, correo)
 
     return consultar(
         """
@@ -759,10 +770,7 @@ def _buscar_usuario(identificador, tipo_acceso="jjfh"):
             )
         LIMIT 1
         """,
-        (
-            valor,
-            correo,
-        ),
+        parametros,
         uno=True,
     )
 
@@ -1298,6 +1306,7 @@ def login():
     tipo_acceso = (request.form.get("tipo_acceso") or "jjfh").strip().lower()
     if tipo_acceso not in {"jjfh", "otra"}:
         tipo_acceso = "jjfh"
+    institucion_login_id = request.form.get("institucion_id")
 
     sede_id = _form_value(
         "id_sede",
@@ -1356,7 +1365,7 @@ def login():
 
         return _mostrar_login()
 
-    usuario = _buscar_usuario(identificador, tipo_acceso)
+    usuario = _buscar_usuario(identificador, tipo_acceso, institucion_login_id)
 
     if not usuario:
 

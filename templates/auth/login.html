@@ -1327,6 +1327,10 @@ html body.login-page .personal-login .personal-field-jornada select {
 </style>
 
 <style>
+    .login-institution-select{display:grid;gap:8px;margin:0 0 8px;color:#24364b;font-size:15px;font-weight:750}
+    .login-institution-select select{width:100%;min-width:0;padding:12px 14px;border:1px solid #d5dfeb;border-radius:12px;background:#fff;color:#1b3048;font:inherit;font-size:14px;font-weight:600}
+    .login-institution-select select:focus{outline:2px solid rgba(47,118,210,.25);border-color:#2f76d2}
+    .login-institution-select[hidden]{display:none!important}
     .login-page .form-links{display:grid;grid-template-columns:1fr;gap:12px;text-align:center}
     .login-page .form-links-primary{display:grid;grid-template-columns:1fr;align-items:center;gap:12px}
     .login-page .form-links-primary a{min-width:0}
@@ -1419,18 +1423,25 @@ html body.login-page .personal-login .personal-field-jornada select {
 
                     {{ csrf_field()|safe }}
 
-                    <fieldset class="login-institution-options">
-                        <legend>Elige tu institución</legend>
-                        <label class="login-institution-option">
-                            <input type="radio" name="tipo_acceso" value="jjfh" {% if tipo_acceso != 'otra' %}checked{% endif %}>
-                            <span><strong>Institución Educativa José Joaquín Flórez Hernández</strong><small>Acceso institucional actual</small></span>
-                        </label>
-                        <label class="login-institution-option">
-                            <input type="radio" name="tipo_acceso" value="otra" {% if tipo_acceso == 'otra' %}checked{% endif %}>
-                            <span><strong>Otra institución</strong><small>Ingresa con tu documento o correo y contraseña, sin código institucional</small></span>
-                        </label>
-                    </fieldset>
-                    <p class="other-institution-hint" data-other-institution-hint hidden>Ingresa con el documento o correo y la contrase&ntilde;a de tu cuenta. EDUTURNOS identificar&aacute; tu instituci&oacute;n autom&aacute;ticamente.</p>
+                    <label class="login-institution-select">
+                        <span>Elige tu instituci&oacute;n</span>
+                        <select name="tipo_acceso" data-institution-choice>
+                            <option value="jjfh" {% if tipo_acceso != 'otra' %}selected{% endif %}>Instituci&oacute;n Educativa Jos&eacute; Joaqu&iacute;n Fl&oacute;rez Hern&aacute;ndez</option>
+                            <option value="otra" {% if tipo_acceso == 'otra' %}selected{% endif %}>Otra instituci&oacute;n</option>
+                        </select>
+                    </label>
+                    <label class="login-institution-select" data-other-institutions {% if tipo_acceso != 'otra' %}hidden{% endif %}>
+                        <span>Selecciona la instituci&oacute;n</span>
+                        <select name="institucion_id" data-institution-list {% if tipo_acceso != 'otra' %}disabled{% else %}required{% endif %}>
+                            <option value="">Elige una instituci&oacute;n</option>
+                            {% for institucion in instituciones_login %}
+                            <option value="{{ institucion.id }}" {% if institucion_login_id|string == institucion.id|string %}selected{% endif %}>{{ institucion.nombre }}</option>
+                            {% else %}
+                            <option value="" disabled>No hay otras instituciones registradas</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <p class="other-institution-hint" data-other-institution-hint {% if tipo_acceso != 'otra' %}hidden{% endif %}>Ingresa con el documento o correo y la contrase&ntilde;a de tu cuenta. El sistema validar&aacute; el acceso en la instituci&oacute;n seleccionada.</p>
 
 
                     <!-- Documento -->
