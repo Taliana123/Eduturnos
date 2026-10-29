@@ -31,10 +31,14 @@ ROLES_INSTITUCIONALES = ("Super Admin", "Rector", "Administrador / Coordinador")
 ROLES_PERSONAL = ROLES_INSTITUCIONALES + ("Docente", "Acudiente", "Estudiante")
 
 
-def _permite(scope: str, rol: str) -> bool:
+def _permite(scope: str, rol: str, usuario=None) -> bool:
     if scope == "personal":
         return rol in ROLES_PERSONAL
-    return scope == "institucional" and rol in ("Super Admin", "Rector")
+    return (
+        scope == "institucional"
+        and rol in ("Super Admin", "Rector")
+        and (rol == "Super Admin" or bool((usuario or {}).get("requiere_codigo_institucional", 1)))
+    )
 
 
 def _inicio_proxima_cita_ms(usuario):
@@ -92,10 +96,8 @@ def index():
         personal_sync = estado_cola_google(f"usuario:{usuario['id_usuario']}")
     institucional = None
     institucional_sync = None
-    institucional_conectado = puente_activo or bool(
-        consultar("SELECT 1 FROM integraciones_google WHERE scope_key='institucional'", uno=True)
-    )
-    if usuario["rol_nombre"] in ("Super Admin", "Rector"):
+    institucional_conectado = False
+    if _permite("institucional", usuario["rol_nombre"], usuario):
         if puente_activo:
             institucional = {"correo_google": "Puente institucional (Apps Script)", "fecha_prueba": None}
         else:
@@ -130,7 +132,7 @@ def conectar(scope):
     if scope not in ("personal", "institucional"):
         abort(404)
     usuario = usuario_actual()
-    if not _permite(scope, usuario["rol_nombre"]):
+    if not _permite(scope, usuario["rol_nombre"], usuario):
         abort(403)
     if scope == "institucional" and apps_script_configurada():
         try:
@@ -192,7 +194,7 @@ def callback():
     if not code:
         abort(400)
     usuario = usuario_actual()
-    if scope not in ("personal", "institucional") or not _permite(scope, usuario["rol_nombre"]):
+    if scope not in ("personal", "institucional") or not _permite(scope, usuario["rol_nombre"], usuario):
         abort(403)
     try:
         token = intercambiar_codigo(code)
@@ -229,7 +231,7 @@ def desconectar(scope):
     if scope not in ("personal", "institucional"):
         abort(404)
     usuario = usuario_actual()
-    if not _permite(scope, usuario["rol_nombre"]):
+    if not _permite(scope, usuario["rol_nombre"], usuario):
         abort(403)
     if scope == "institucional" and apps_script_configurada():
         flash("El puente institucional se administra en la configuración protegida del servidor.", "info")

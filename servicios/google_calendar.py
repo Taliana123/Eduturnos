@@ -405,7 +405,8 @@ def encolar_cita_cursor(cursor, cita_id: int, creador_id: int, operacion: str = 
         "LEFT JOIN docentes d ON d.id_docente=c.id_docente "
         "LEFT JOIN usuarios u ON u.id_usuario=i.id_usuario "
         "LEFT JOIN roles r ON r.id=u.id_rol "
-        "WHERE i.scope_key='institucional' OR (u.estado=1 AND (i.id_usuario=%s "
+        "WHERE (i.scope_key='institucional' AND c.id_institucion=(SELECT id FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1)) "
+        "OR (i.scope_key<>'institucional' AND u.estado=1 AND (i.id_usuario=%s "
         "OR i.id_usuario IN (c.creado_por,e.id_usuario,a.id_usuario,d.id_usuario) "
         "OR r.nombre IN ('Super Admin','Rector','Administrador / Coordinador')))",
         (cita_id, creador_id),
@@ -416,7 +417,16 @@ def encolar_cita_cursor(cursor, cita_id: int, creador_id: int, operacion: str = 
             scopes = [row for row in scopes if row["scope_key"] != "institucional"]
         else:
             scopes = []
-    if apps_script_configurada() and not any(row["scope_key"] == "institucional" for row in scopes):
+    cursor.execute("SELECT id_institucion FROM citas WHERE id=%s", (cita_id,))
+    cita_tenant = cursor.fetchone()
+    tenant_id = cita_tenant.get("id_institucion") if isinstance(cita_tenant, dict) else (cita_tenant[0] if cita_tenant else None)
+    cursor.execute("SELECT id FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1")
+    main_row = cursor.fetchone()
+    main_id = main_row.get("id") if isinstance(main_row, dict) else (main_row[0] if main_row else None)
+    # Conserva el puente institucional antiguo si un cursor externo de una
+    # instalación previa no devuelve todavía la columna tenant.
+    is_jjfh_cita = not cita_tenant or bool(tenant_id and main_id and tenant_id == main_id)
+    if apps_script_configurada() and is_jjfh_cita and not any(row["scope_key"] == "institucional" for row in scopes):
         scopes.append({"scope_key": "institucional"})
     for row in scopes:
         _encolar_scope_cursor(cursor, cita_id, row["scope_key"], operacion)

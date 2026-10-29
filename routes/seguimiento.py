@@ -12,8 +12,11 @@ def lista():
     usuario = usuario_actual()
     params = []
     extra = ""
+    if usuario["rol_nombre"] != "Super Admin" and usuario.get("id_institucion"):
+        extra = " AND c.id_institucion=%s"
+        params.append(usuario["id_institucion"])
     if usuario["rol_nombre"] == "Docente":
-        extra = " AND (c.id_docente=(SELECT d.id_docente FROM docentes d WHERE d.id_usuario=%s) OR c.creado_por=%s)"
+        extra += " AND (c.id_docente=(SELECT d.id_docente FROM docentes d WHERE d.id_usuario=%s) OR c.creado_por=%s)"
         params.extend((usuario["id_usuario"], usuario["id_usuario"]))
 
     rows = consultar(

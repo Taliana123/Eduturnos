@@ -11,6 +11,10 @@ reportes_bp=Blueprint("reportes",__name__,url_prefix="/reportes")
 
 def _filtros():
     desde=request.args.get("desde","").strip(); hasta=request.args.get("hasta","").strip(); estado=request.args.get("estado","").strip(); fs=[]; p=[]
+    from routes.helpers import usuario_actual
+    usuario=usuario_actual()
+    if usuario and usuario.get("rol_nombre") != "Super Admin" and usuario.get("id_institucion"):
+        fs.append("c.id_institucion=%s"); p.append(usuario["id_institucion"])
     if desde: fs.append("c.fecha>=%s"); p.append(desde)
     if hasta: fs.append("c.fecha<=%s"); p.append(hasta)
     if estado: fs.append("ec.nombre=%s"); p.append(estado)

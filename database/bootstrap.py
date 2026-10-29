@@ -31,6 +31,31 @@ def ensure_database(config=None):
         cursor.execute("SELECT 1")
         cursor.fetchone()
 
+        # Aislamiento institucional incremental: asigna lo ya existente a
+        # JJFH y habilita instituciones independientes sin tocar sus datos.
+        cursor.execute("SHOW COLUMNS FROM instituciones LIKE 'requiere_codigo_institucional'")
+        if cursor.fetchone() is None:
+            cursor.execute("ALTER TABLE instituciones ADD COLUMN requiere_codigo_institucional TINYINT(1) NOT NULL DEFAULT 1")
+        for tabla in ("usuarios", "citas", "solicitudes_cita", "periodos_academicos", "acudientes"):
+            cursor.execute(f"SHOW COLUMNS FROM {tabla} LIKE 'id_institucion'")
+            if cursor.fetchone() is None:
+                cursor.execute(f"ALTER TABLE {tabla} ADD COLUMN id_institucion INT NULL")
+        cursor.execute("SELECT id FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1")
+        jjfh = cursor.fetchone()
+        if jjfh:
+            jjfh_id = jjfh[0]
+            cursor.execute("UPDATE usuarios SET id_institucion=%s WHERE id_institucion IS NULL", (jjfh_id,))
+            cursor.execute("UPDATE citas c JOIN usuarios u ON u.id_usuario=c.creado_por SET c.id_institucion=u.id_institucion WHERE c.id_institucion IS NULL")
+            cursor.execute("UPDATE solicitudes_cita s JOIN usuarios u ON u.id_usuario=s.solicitante_usuario_id SET s.id_institucion=u.id_institucion WHERE s.id_institucion IS NULL")
+            cursor.execute("UPDATE periodos_academicos SET id_institucion=%s WHERE id_institucion IS NULL", (jjfh_id,))
+            cursor.execute("UPDATE acudientes a JOIN estudiante_acudiente ea ON ea.id_acudiente=a.id_acudiente JOIN estudiantes e ON e.id_estudiante=ea.id_estudiante JOIN sedes s ON s.id=e.id_sede SET a.id_institucion=s.id_institucion WHERE a.id_institucion IS NULL")
+            cursor.execute("UPDATE acudientes SET id_institucion=%s WHERE id_institucion IS NULL", (jjfh_id,))
+            for tabla in ("usuarios", "citas", "solicitudes_cita", "periodos_academicos", "acudientes"):
+                indice = f"idx_{tabla}_institucion"
+                cursor.execute(f"SHOW INDEX FROM {tabla} WHERE Key_name=%s", (indice,))
+                if cursor.fetchone() is None:
+                    cursor.execute(f"CREATE INDEX {indice} ON {tabla}(id_institucion)")
+
         # Migraciones pequeñas y seguras para instalaciones existentes.
         # Guarda la descripcion del motivo personalizado.
         cursor.execute("SHOW COLUMNS FROM citas LIKE 'motivo_otro'")

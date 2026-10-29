@@ -189,7 +189,12 @@ def _visible(usuario):
     params = []
     filtros = []
 
-    # Estos roles pueden consultar todas las citas.
+    # El permiso de consulta amplia se limita a la institución de la cuenta.
+    if rol != "Super Admin" and usuario.get("id_institucion"):
+        filtros.append("c.id_institucion=%s")
+        params.append(usuario["id_institucion"])
+
+    # Estos roles pueden consultar todas las citas de su institución.
     if rol not in (
         "Super Admin",
         "Rector",
@@ -302,6 +307,7 @@ def consultar_citas(usuario):
 def catalogos(usuario=None):
     # The GET route passes the logged-in user; callers that only need the
     # public catalogs can omit it without requiring a Flask request context.
+    institucion_id = usuario.get("id_institucion") if usuario else None
     return {
         "estudiantes": consultar(
             """
@@ -317,18 +323,19 @@ def catalogos(usuario=None):
                 jornada.nombre AS jornada
 
             FROM estudiantes e
+            JOIN sedes sede_est ON sede_est.id=e.id_sede
 
             LEFT JOIN grados g
                 ON g.id = e.id_grado
             LEFT JOIN jornadas jornada
                 ON jornada.id = e.id_jornada
 
-            WHERE e.estado = 'Activo'
+            WHERE e.estado = 'Activo' AND (%s IS NULL OR sede_est.id_institucion=%s)
 
             ORDER BY
                 e.apellidos,
                 e.nombres
-            """
+            """, (institucion_id, institucion_id),
         ),
 
         "docentes": consultar(
@@ -340,6 +347,7 @@ def catalogos(usuario=None):
                 jornada.nombre AS jornada
 
             FROM docentes d
+            JOIN sedes sede_doc ON sede_doc.id=d.id_sede
             LEFT JOIN jornadas jornada
                 ON jornada.id = d.id_jornada
             LEFT JOIN (
@@ -364,12 +372,12 @@ def catalogos(usuario=None):
             ) asignaciones
                 ON asignaciones.id_docente = d.id_docente
 
-            WHERE d.estado = 1
+            WHERE d.estado = 1 AND (%s IS NULL OR sede_doc.id_institucion=%s)
 
             ORDER BY
                 d.apellidos,
                 d.nombres
-            """
+            """, (institucion_id, institucion_id),
         ),
 
         "acudientes": consultar(
@@ -397,22 +405,23 @@ def catalogos(usuario=None):
                 FROM estudiante_acudiente relacion
                 JOIN estudiantes estudiante
                     ON estudiante.id_estudiante = relacion.id_estudiante
+                JOIN sedes sede_estudiante ON sede_estudiante.id=estudiante.id_sede
                 LEFT JOIN grados grado
                     ON grado.id = estudiante.id_grado
                 LEFT JOIN jornadas jornada
                     ON jornada.id = estudiante.id_jornada
-                WHERE relacion.estado = 1
+                WHERE relacion.estado = 1 AND (%s IS NULL OR sede_estudiante.id_institucion=%s)
                   AND estudiante.estado = 'Activo'
                 GROUP BY relacion.id_acudiente
             ) contexto
                 ON contexto.id_acudiente = acudiente.id_acudiente
 
-            WHERE acudiente.estado = 1
+            WHERE acudiente.estado = 1 AND (%s IS NULL OR contexto.id_acudiente IS NOT NULL)
 
             ORDER BY
                 acudiente.apellidos,
                 acudiente.nombres
-            """
+            """, (institucion_id, institucion_id, institucion_id),
         ),
 
         "motivos": consultar(
@@ -432,8 +441,8 @@ def catalogos(usuario=None):
         "periodos": consultar(
             """
             SELECT id,nombre FROM periodos_academicos
-            WHERE activo=1 AND cerrado=0 ORDER BY id DESC
-            """
+            WHERE activo=1 AND cerrado=0 AND (%s=1 OR id_institucion=%s) ORDER BY id DESC
+            """, (int(not usuario or usuario.get("rol_nombre") == "Super Admin"), institucion_id),
         ),
         "personal_destinatarios": consultar(
             "SELECT u.id_usuario,u.nombres,u.apellidos,u.correo,r.nombre AS rol_nombre, "
@@ -442,7 +451,8 @@ def catalogos(usuario=None):
             "d.id_docente FROM usuarios u JOIN roles r ON r.id=u.id_rol "
             "LEFT JOIN docentes d ON d.id_usuario=u.id_usuario AND d.estado=1 "
             "WHERE u.estado=1 AND r.nombre IN ('Rector','Administrador / Coordinador','Docente') "
-            "ORDER BY r.nombre,u.apellidos,u.nombres"
+            "AND (%s IS NULL OR u.id_institucion=%s) ORDER BY r.nombre,u.apellidos,u.nombres",
+            (institucion_id, institucion_id),
         ),
         "mi_docente_id": (consultar("SELECT id_docente FROM docentes WHERE id_usuario=%s AND estado=1", (usuario["id_usuario"],), uno=True) or {}).get("id_docente") if usuario else None,
     }
@@ -456,22 +466,24 @@ def buscar_estudiante_documento():
     if not documento or len(documento) > 30:
         return jsonify({"ok": False, "error": "Ingresa un número de documento válido."}), 400
 
+    usuario = usuario_actual()
     estudiante = consultar(
         """SELECT e.id_estudiante, e.documento,
                   CONCAT(e.nombres, ' ', e.apellidos) AS nombre,
                   COALESCE(g.nombre, '') AS grado,
                   COALESCE(j.nombre, '') AS jornada
            FROM estudiantes e
+           JOIN sedes s ON s.id=e.id_sede
            LEFT JOIN grados g ON g.id = e.id_grado
            LEFT JOIN jornadas j ON j.id = e.id_jornada
            WHERE e.documento = %s AND e.estado = 'Activo'
+             AND (%s='Super Admin' OR s.id_institucion=%s)
            LIMIT 1""",
-        (documento,), uno=True,
+        (documento, usuario["rol_nombre"], usuario.get("id_institucion")), uno=True,
     )
     if not estudiante:
         return jsonify({"ok": False, "error": "No hay un estudiante activo con ese documento."}), 404
 
-    usuario = usuario_actual()
     if usuario.get("rol_nombre") == "Docente":
         asignado = consultar(
             """SELECT 1 FROM docentes d
@@ -528,8 +540,9 @@ def buscar_destinatario_documento():
         "LEFT JOIN docentes d ON d.id_usuario=u.id_usuario AND d.estado=1 "
         "LEFT JOIN acudientes a ON a.id_usuario=u.id_usuario AND a.estado=1 "
         "WHERE u.estado=1 AND r.nombre=%s "
-        "AND COALESCE(NULLIF(d.documento,''),NULLIF(a.documento,''),u.documento,'')=%s LIMIT 1",
-        (tipo, documento),
+        "AND COALESCE(NULLIF(d.documento,''),NULLIF(a.documento,''),u.documento,'')=%s "
+        "AND (%s='Super Admin' OR u.id_institucion=%s) LIMIT 1",
+        (tipo, documento, usuario["rol_nombre"], usuario.get("id_institucion")),
         uno=True,
     )
     if not destinatario:
@@ -846,10 +859,10 @@ def _crear_solicitud_desde_nueva(usuario, tipo, destinatario_usuario_id, estudia
         """INSERT INTO solicitudes_cita(
                solicitante_usuario_id,tipo_solicitante,id_estudiante,id_acudiente,id_docente,
                destinatario_tipo,destinatario_usuario_id,id_motivo,motivo_otro,id_periodo,
-               fecha_solicitada,hora_solicitada,lugar,observaciones,estado
-           ) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Pendiente')""",
+               fecha_solicitada,hora_solicitada,lugar,observaciones,estado,id_institucion
+           ) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'Pendiente',%s)""",
         (usuario["id_usuario"], usuario["rol_nombre"], estudiante_id, acudiente_id, docente_id,
-         tipo, destinatario_usuario_id, motivo_id, motivo_otro, periodo_id, fecha, hora, lugar, observaciones),
+         tipo, destinatario_usuario_id, motivo_id, motivo_otro, periodo_id, fecha, hora, lugar, observaciones, usuario.get("id_institucion")),
     )
     revisores = consultar(
         "SELECT u.id_usuario FROM usuarios u JOIN roles r ON r.id=u.id_rol "
@@ -883,7 +896,8 @@ def _crear_cita_para_personal(usuario):
         "SELECT u.id_usuario,r.nombre AS rol_nombre,d.id_docente,a.id_acudiente FROM usuarios u "
         "JOIN roles r ON r.id=u.id_rol LEFT JOIN docentes d ON d.id_usuario=u.id_usuario AND d.estado=1 "
         "LEFT JOIN acudientes a ON a.id_usuario=u.id_usuario AND a.estado=1 "
-        "WHERE u.id_usuario=%s AND u.estado=1", (destinatario_id,), uno=True,
+        "WHERE u.id_usuario=%s AND u.estado=1 AND (%s='Super Admin' OR u.id_institucion=%s)",
+        (destinatario_id, usuario["rol_nombre"], usuario.get("id_institucion")), uno=True,
     )
     if not persona or persona["rol_nombre"] != tipo:
         raise ValueError("El destinatario no corresponde al rol seleccionado o est? inactivo.")
@@ -900,7 +914,7 @@ def _crear_cita_para_personal(usuario):
         raise ValueError("La hora de la citaci?n no es v?lida.")
     validar_disponibilidad(persona.get("id_docente"), fecha_obj, hora)
     motivo, motivo_otro = _motivo_cita(motivo_id, usuario)
-    periodo = consultar("SELECT id FROM periodos_academicos WHERE id=%s AND activo=1 AND cerrado=0", (periodo_id,), uno=True)
+    periodo = consultar("SELECT id FROM periodos_academicos WHERE id=%s AND activo=1 AND cerrado=0 AND (%s=1 OR id_institucion=%s)", (periodo_id, int(usuario["rol_nombre"] == "Super Admin"), usuario.get("id_institucion")), uno=True)
     estado = consultar("SELECT id FROM estados_cita WHERE nombre='Pendiente' AND estado=1", uno=True)
     if not motivo or not periodo or not estado:
         raise ValueError("El motivo, el periodo o el estado inicial no est?n disponibles.")
@@ -996,14 +1010,16 @@ def nueva():
                     nombres,
                     apellidos
 
-                FROM estudiantes
+                FROM estudiantes e
+                JOIN sedes s ON s.id=e.id_sede
 
-                WHERE id_estudiante = %s
-                  AND estado = 'Activo'
+                WHERE e.id_estudiante = %s
+                  AND e.estado = 'Activo'
+                  AND (%s='Super Admin' OR s.id_institucion=%s)
 
                 LIMIT 1
                 """,
-                (estudiante_id,),
+                (estudiante_id, usuario["rol_nombre"], usuario.get("id_institucion")),
                 uno=True,
             )
 
@@ -1157,10 +1173,11 @@ def nueva():
                 WHERE id = %s
                   AND activo = 1
                   AND cerrado = 0
+                  AND (%s=1 OR id_institucion=%s)
 
                 LIMIT 1
                 """,
-                (periodo_id,),
+                (periodo_id, int(usuario["rol_nombre"] == "Super Admin"), usuario.get("id_institucion")),
                 uno=True,
             )
 
@@ -1267,16 +1284,7 @@ def cambiar_estado(cita_id):
     # BUSCAR CITA
     # ---------------------------------------------
 
-    cita = consultar(
-        """
-        SELECT *
-        FROM citas
-        WHERE id = %s
-        LIMIT 1
-        """,
-        (cita_id,),
-        uno=True,
-    )
+    cita = _cita_autorizada(usuario, cita_id)
 
     # ---------------------------------------------
     # BUSCAR NUEVO ESTADO
@@ -1569,8 +1577,8 @@ def reprogramar_cita(cita_id):
                 if not estado:
                     abort(409)
                 cursor.execute(
-                    "INSERT INTO citas(id_estudiante,id_acudiente,id_docente,id_motivo,id_estado,id_periodo,fecha,hora,lugar,observaciones,creado_por) "
-                    "SELECT id_estudiante,id_acudiente,id_docente,id_motivo,%s,id_periodo,%s,%s,%s,'',%s FROM citas WHERE id=%s",
+                    "INSERT INTO citas(id_estudiante,id_acudiente,id_docente,id_motivo,id_estado,id_periodo,fecha,hora,lugar,observaciones,creado_por,id_institucion) "
+                    "SELECT id_estudiante,id_acudiente,id_docente,id_motivo,%s,id_periodo,%s,%s,%s,'',%s,id_institucion FROM citas WHERE id=%s",
                     (estado["id"], fecha, hora, "Coordinación", usuario["id_usuario"], cita_id),
                 )
                 nueva_cita_id = cursor.lastrowid

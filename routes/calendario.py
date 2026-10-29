@@ -33,6 +33,9 @@ def _filtros_usuario(usuario):
         "Rector",
         "Administrador / Coordinador",
     ):
+        if rol != "Super Admin" and usuario.get("id_institucion"):
+            filtros.append("c.id_institucion=%s")
+            params.append(usuario["id_institucion"])
         return filtros, params
 
     if rol == "Docente":

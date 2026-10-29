@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#172942">
+  <title>Registrar institución · EDUTURNOS</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f1f6fc;color:#172942;font:16px "Segoe UI",Arial,sans-serif}
+    header{background:#172942;color:#fff;padding:20px max(22px,calc((100% - 980px)/2));font-weight:800;font-size:24px}
+    main{width:min(760px,calc(100% - 28px));margin:34px auto 60px}.card{background:white;border:1px solid #d4e1f2;border-radius:18px;padding:30px;box-shadow:0 12px 34px #17294212}
+    h1{font:700 30px Georgia,serif;margin:0 0 8px}p{color:#61748d;line-height:1.55;margin:0 0 22px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}fieldset{border:1px solid #d8e4f3;border-radius:13px;padding:20px;margin:18px 0}legend{font-weight:700;padding:0 8px}
+    label{display:block;font-size:14px;font-weight:650;margin:0 0 12px}input{display:block;width:100%;margin-top:7px;padding:12px 13px;border:1px solid #cddbeb;border-radius:9px;font:inherit;color:#172942;background:#fff}input:focus{outline:2px solid #397bda;outline-offset:1px}
+    button{width:100%;border:0;border-radius:10px;background:#2269b5;color:#fff;padding:14px;font-weight:750;font-size:16px;cursor:pointer}.back{display:block;text-align:center;margin-top:18px;color:#2367ad;text-decoration:none}.messages{padding:11px 14px;background:#fff3e7;border-radius:8px;color:#814600;margin-bottom:14px}
+    @media(max-width:600px){header{padding:18px 20px}main{margin:18px auto}.card{padding:22px 17px}.grid{grid-template-columns:1fr}fieldset{padding:16px 13px}h1{font-size:26px}}
+  </style>
+</head>
+<body>
+  <header>EDUTURNOS</header>
+  <main><section class="card">
+    <h1>Registrar una institución</h1>
+    <p>El Rector crea la institución y queda como su primer administrador. Después podrá configurar sedes, personal, estudiantes y citaciones.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="messages">{{ message }}</div>{% endfor %}{% endwith %}
+    <form method="post" autocomplete="on">
+      {{ csrf_field()|safe }}
+      <fieldset><legend>Datos de la institución</legend>
+        <label>Nombre de la institución<input name="institucion" maxlength="180" required></label>
+        <div class="grid"><label>Ciudad<input name="ciudad" maxlength="100" required></label><label>Departamento<input name="departamento" maxlength="100" required></label></div>
+        <label>Sede principal<input name="sede" maxlength="140" placeholder="Sede Principal"></label>
+      </fieldset>
+      <fieldset><legend>Cuenta del Rector</legend>
+        <div class="grid"><label>Nombres<input name="nombres" maxlength="100" autocomplete="given-name" required></label><label>Apellidos<input name="apellidos" maxlength="100" autocomplete="family-name" required></label></div>
+        <div class="grid"><label>Documento<input name="documento" maxlength="30" required></label><label>Correo<input name="correo" type="email" maxlength="150" autocomplete="email" required></label></div>
+        <label>Contraseña (mínimo 10 caracteres)<input name="password" type="password" minlength="10" autocomplete="new-password" required></label>
+      </fieldset>
+      <button type="submit">Crear institución e ingresar</button>
+    </form>
+    <a class="back" href="{{ url_for('auth.login') }}">Volver al inicio de sesión</a>
+  </section></main>
+</body>
+</html>

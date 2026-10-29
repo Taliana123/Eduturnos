@@ -6,6 +6,7 @@ from calendar import monthcalendar
 from datetime import date, datetime, timedelta, timezone
 import time
 import hashlib
+import secrets
 
 from flask import (
     Blueprint,
@@ -283,6 +284,89 @@ def _mostrar_login():
     )
     respuesta.headers["Cache-Control"] = "no-store"
     return respuesta
+
+
+@auth_bp.route("/crear-institucion", methods=["GET", "POST"])
+def crear_institucion():
+    """Alta automática de una institución y su Rector inicial."""
+    if request.method == "GET":
+        return render_template("auth/crear_institucion.html")
+
+    nombre = (request.form.get("institucion") or "").strip()
+    ciudad = (request.form.get("ciudad") or "").strip()
+    departamento = (request.form.get("departamento") or "").strip()
+    sede = (request.form.get("sede") or "").strip() or "Sede Principal"
+    nombres = (request.form.get("nombres") or "").strip()
+    apellidos = (request.form.get("apellidos") or "").strip()
+    documento = (request.form.get("documento") or "").strip()
+    correo = _correo(request.form.get("correo"))
+    password = request.form.get("password") or ""
+
+    if not all((nombre, ciudad, departamento, nombres, apellidos, documento, correo)):
+        flash("Completa los datos de la institución y del Rector.", "error")
+        return render_template("auth/crear_institucion.html"), 400
+    if len(nombre) > 180 or len(ciudad) > 100 or len(departamento) > 100 or len(sede) > 140:
+        flash("Revisa la longitud de los datos ingresados.", "error")
+        return render_template("auth/crear_institucion.html"), 400
+    if len(password) < 10:
+        flash("La contraseña debe tener al menos 10 caracteres.", "error")
+        return render_template("auth/crear_institucion.html"), 400
+    if "@" not in correo or len(correo) > 150:
+        flash("Escribe un correo válido para el Rector.", "error")
+        return render_template("auth/crear_institucion.html"), 400
+
+    try:
+        if consultar("SELECT id FROM instituciones WHERE LOWER(TRIM(nombre))=LOWER(TRIM(%s)) LIMIT 1", (nombre,), uno=True):
+            raise ValueError("Ya existe una institución con ese nombre. Contacta al soporte para recuperar el acceso.")
+        if consultar("SELECT id_usuario FROM usuarios WHERE documento=%s OR LOWER(correo)=%s LIMIT 1", (documento, correo), uno=True):
+            raise ValueError("El documento o correo ya tiene una cuenta registrada.")
+        rol_id = _rol_id("Rector")
+        if not rol_id:
+            raise ValueError("El rol Rector no está configurado.")
+        with transaccion() as cnx:
+            cur = cnx.cursor()
+            try:
+                cur.execute(
+                    "INSERT INTO instituciones(nombre,ciudad,departamento,estado,requiere_codigo_institucional) VALUES(%s,%s,%s,1,0)",
+                    (nombre, ciudad, departamento),
+                )
+                institucion_id = cur.lastrowid
+                cur.execute(
+                    "INSERT INTO sedes(id_institucion,nombre,estado) VALUES(%s,%s,1)",
+                    (institucion_id, sede),
+                )
+                sede_id = cur.lastrowid
+                cur.execute(
+                    "INSERT INTO usuarios(id_rol,tipo_documento,documento,nombres,apellidos,correo,password_hash,verificado,estado,id_institucion) "
+                    "VALUES(%s,'CC',%s,%s,%s,%s,%s,1,1,%s)",
+                    (rol_id, documento, nombres, apellidos, correo, generate_password_hash(password), institucion_id),
+                )
+                usuario_id = cur.lastrowid
+                cur.execute(
+                    "INSERT INTO directorio_institucional(id_usuario,id_rol,tipo_documento,documento,nombres,apellidos,correo_institucional,id_sede,id_jornada,codigo_institucional_hash,estado,fecha_vinculacion) "
+                    "VALUES(%s,%s,'CC',%s,%s,%s,%s,%s,NULL,%s,1,NOW())",
+                    (usuario_id, rol_id, documento, nombres, apellidos, correo, sede_id, generate_password_hash(secrets.token_hex(24))),
+                )
+                periodo_nombre = f"Periodo inicial · {nombre[:55]} · {date.today().year}"
+                cur.execute(
+                    "INSERT INTO periodos_academicos(nombre,fecha_inicio,fecha_fin,activo,cerrado,id_institucion) VALUES(%s,%s,%s,1,0,%s)",
+                    (periodo_nombre, date(date.today().year, 1, 1), date(date.today().year, 12, 31), institucion_id),
+                )
+            finally:
+                cur.close()
+        session.clear()
+        session.permanent = True
+        session["usuario_id"] = usuario_id
+        session["rol_nombre"] = "Rector"
+        session["creado_en"] = time.time()
+        flash("La institución quedó creada y tu cuenta de Rector está activa.", "success")
+        return redirect(url_for("auth.dashboard"))
+    except ValueError as exc:
+        flash(str(exc), "error")
+    except Exception as exc:
+        current_app.logger.exception("No se pudo completar el alta de institución")
+        flash("No se pudo crear la institución. Verifica los datos o inténtalo más tarde.", "error")
+    return render_template("auth/crear_institucion.html"), 400
 
 
 def _correo(valor):
@@ -650,6 +734,27 @@ def _buscar_usuario(identificador):
         ),
         uno=True,
     )
+
+
+def _asignar_institucion_cuenta(usuario):
+    """Completa la institución de cuentas antiguas según su perfil escolar."""
+    if usuario.get("id_institucion"):
+        return usuario["id_institucion"]
+    perfil = consultar(
+        "SELECT s.id_institucion FROM directorio_institucional di JOIN sedes s ON s.id=di.id_sede WHERE di.id_usuario=%s "
+        "UNION ALL SELECT s.id_institucion FROM estudiantes e JOIN sedes s ON s.id=e.id_sede WHERE e.id_usuario=%s "
+        "UNION ALL SELECT s.id_institucion FROM acudientes a JOIN estudiante_acudiente ea ON ea.id_acudiente=a.id_acudiente "
+        "JOIN estudiantes e ON e.id_estudiante=ea.id_estudiante JOIN sedes s ON s.id=e.id_sede WHERE a.id_usuario=%s LIMIT 1",
+        (usuario["id_usuario"], usuario["id_usuario"], usuario["id_usuario"]), uno=True,
+    )
+    institucion_id = (perfil or {}).get("id_institucion")
+    if not institucion_id:
+        principal = consultar("SELECT id FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1", uno=True)
+        institucion_id = (principal or {}).get("id")
+    if institucion_id:
+        ejecutar("UPDATE usuarios SET id_institucion=%s WHERE id_usuario=%s AND id_institucion IS NULL", (institucion_id, usuario["id_usuario"]))
+        usuario["id_institucion"] = institucion_id
+    return institucion_id
 
 
 # ============================================================
@@ -1217,17 +1322,6 @@ def login():
 
         return _mostrar_login()
 
-    if "@" in identificador and not (
-        es_correo_gmail(identificador)
-        or es_correo_institucional(identificador)
-    ):
-        flash(
-            "Usa un correo @gmail.com para estudiantes y acudientes, "
-            "o @jjfh.edu.co para personal.",
-            "error",
-        )
-        return _mostrar_login()
-
     usuario = _buscar_usuario(
         identificador
     )
@@ -1343,7 +1437,14 @@ def login():
 
         return _mostrar_login()
 
-    if "@" in identificador and not es_correo_valido_para_rol(
+    _asignar_institucion_cuenta(usuario)
+    institucion = consultar(
+        "SELECT requiere_codigo_institucional FROM instituciones WHERE id=%s",
+        (usuario.get("id_institucion"),), uno=True,
+    ) if usuario.get("id_institucion") else None
+    requiere_codigo = bool(institucion.get("requiere_codigo_institucional", 1)) if institucion else True
+
+    if requiere_codigo and "@" in identificador and not es_correo_valido_para_rol(
         usuario.get("rol_nombre", ""),
         identificador,
     ):
@@ -1371,7 +1472,7 @@ def login():
     # VALIDACIÓN EXTRA DEL PERSONAL
     # ========================================================
 
-    if rol in (
+    if requiere_codigo and rol in (
         "Docente",
         "Administrador / Coordinador",
         "Rector",
@@ -2932,7 +3033,8 @@ def registro_portal(portal):
                                 apellidos = %s,
                                 telefono = %s,
                                 correo = %s,
-                                estado = 1
+                                estado = 1,
+                                id_institucion = (SELECT id_institucion FROM sedes WHERE id = %s)
                             WHERE id_acudiente = %s
                             """,
                             (
@@ -2942,6 +3044,7 @@ def registro_portal(portal):
                                 apellidos,
                                 telefono or None,
                                 correo,
+                                int(estudiante_sede_id),
                                 acudiente_id,
                             ),
                         )
@@ -2962,7 +3065,8 @@ def registro_portal(portal):
                                 direccion,
                                 barrio,
                                 municipio,
-                                estado
+                                estado,
+                                id_institucion
                             )
                             VALUES
                             (
@@ -2976,7 +3080,8 @@ def registro_portal(portal):
                                 NULL,
                                 NULL,
                                 'Ibagué',
-                                1
+                                1,
+                                (SELECT id_institucion FROM sedes WHERE id = %s)
                             )
                             """,
                             (
@@ -2987,6 +3092,7 @@ def registro_portal(portal):
                                 apellidos,
                                 telefono or None,
                                 correo,
+                                int(estudiante_sede_id),
                             ),
                         )
 
@@ -3324,9 +3430,12 @@ def dashboard():
             "Rector",
             "Super Admin",
         ):
-
-            condicion = "1 = 1"
-            parametros = ()
+            if rol != "Super Admin" and usuario.get("id_institucion"):
+                condicion = "c.id_institucion = %s"
+                parametros = (usuario["id_institucion"],)
+            else:
+                condicion = "1 = 1"
+                parametros = ()
 
         else:
 
@@ -3498,10 +3607,10 @@ def dashboard():
 
         solicitudes_pendientes = 0
         if rol in ("Super Admin", "Rector", "Administrador / Coordinador"):
-            fila_solicitudes = consultar(
-                "SELECT COUNT(*) AS total FROM solicitudes_cita WHERE estado='Pendiente'",
-                uno=True,
-            )
+            if rol == "Super Admin":
+                fila_solicitudes = consultar("SELECT COUNT(*) AS total FROM solicitudes_cita WHERE estado='Pendiente'", uno=True)
+            else:
+                fila_solicitudes = consultar("SELECT COUNT(*) AS total FROM solicitudes_cita WHERE estado='Pendiente' AND id_institucion=%s", (usuario.get("id_institucion"),), uno=True)
             solicitudes_pendientes = int(
                 fila_solicitudes["total"] if fila_solicitudes else 0
             )

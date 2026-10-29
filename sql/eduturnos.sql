@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS instituciones (
     direccion VARCHAR(255) NULL,
     telefono VARCHAR(40) NULL,
     estado TINYINT(1) NOT NULL DEFAULT 1,
+    requiere_codigo_institucional TINYINT(1) NOT NULL DEFAULT 1,
     UNIQUE KEY uq_institucion_nombre (nombre)
 ) ENGINE=InnoDB;
 
@@ -72,6 +73,7 @@ CREATE TABLE IF NOT EXISTS periodos_academicos (
     fecha_fin DATE NOT NULL,
     activo TINYINT(1) NOT NULL DEFAULT 0,
     cerrado TINYINT(1) NOT NULL DEFAULT 0,
+    id_institucion INT NULL,
     UNIQUE KEY uq_periodo_nombre (nombre),
     CHECK (fecha_fin >= fecha_inicio)
 ) ENGINE=InnoDB;
@@ -79,6 +81,7 @@ CREATE TABLE IF NOT EXISTS periodos_academicos (
 CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     id_rol INT NOT NULL,
+    id_institucion INT NULL,
     tipo_documento VARCHAR(20) NOT NULL DEFAULT 'CC',
     documento VARCHAR(30) NOT NULL UNIQUE,
     nombres VARCHAR(100) NOT NULL,
@@ -124,6 +127,7 @@ CREATE TABLE IF NOT EXISTS estudiantes (
 
 CREATE TABLE IF NOT EXISTS acudientes (
     id_acudiente INT AUTO_INCREMENT PRIMARY KEY,
+    id_institucion INT NULL,
     id_usuario INT NULL UNIQUE,
     tipo_documento VARCHAR(20) NOT NULL DEFAULT 'CC',
     documento VARCHAR(30) NOT NULL UNIQUE,
@@ -222,6 +226,7 @@ CREATE TABLE IF NOT EXISTS directorio_institucional (
 
 CREATE TABLE IF NOT EXISTS citas (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    id_institucion INT NULL,
     id_estudiante INT NOT NULL,
     id_acudiente INT NOT NULL,
     id_docente INT NOT NULL,
@@ -254,6 +259,7 @@ CREATE TABLE IF NOT EXISTS citas (
 
 CREATE TABLE IF NOT EXISTS solicitudes_cita (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    id_institucion INT NULL,
     solicitante_usuario_id INT NOT NULL,
     tipo_solicitante ENUM('Acudiente','Docente') NOT NULL,
     id_estudiante INT NOT NULL,
