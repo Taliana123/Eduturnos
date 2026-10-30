@@ -13,7 +13,7 @@
     </header>
 
     <div class="alerta info calendar-description" role="note">
-        EDUTURNOS es el registro principal; si el calendario institucional está conectado, recibe una copia genérica de cada cita con fecha, hora y lugar, sin nombres de estudiantes o acudientes ni observaciones. La cuenta propietaria recibe avisos 24 y 2 horas antes; otras cuentas necesitan acceso compartido. Desconectar detiene futuras copias; las ya enviadas se administran en Google Calendar. En Android, el botón intenta abrir la app en el día de la próxima cita y usa la web como alternativa; en PC abre ese día en el navegador. Los recordatorios internos dependen de la tarea de notificaciones. <a href="{{ url_for('privacidad') }}">Política de Privacidad</a>.
+        EDUTURNOS es el registro principal; si el calendario institucional está conectado, recibe una copia genérica de cada cita con fecha, hora y lugar, sin nombres de estudiantes o acudientes ni observaciones. La cuenta propietaria recibe avisos 24 y 2 horas antes; otras cuentas necesitan acceso compartido. Desconectar detiene futuras copias; las ya enviadas se administran en Google Calendar. En Android, el botón abre la app Google Calendar en el día de la próxima cita; en PC abre ese día en el navegador. Los recordatorios internos dependen de la tarea de notificaciones. <a href="{{ url_for('privacidad') }}">Política de Privacidad</a>.
     </div>
 
     {% if not oauth_activo and not apps_script_activo %}

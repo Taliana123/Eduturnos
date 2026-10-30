@@ -88,6 +88,7 @@ def _url_abrir_calendario(inicio_ms=None):
     return (
         f"intent://com.android.calendar/time/{inicio_ms}"
         "#Intent;scheme=content;action=android.intent.action.VIEW;"
+        "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
         "package=com.google.android.calendar;end"
     )
 
