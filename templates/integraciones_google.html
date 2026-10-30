@@ -52,7 +52,7 @@
             {% endif %}
         </div>
         <div class="google-calendar-actions">
-            <a class="boton google-calendar-open" href="{{ calendar_open_url }}">{% if 'Android' in request.headers.get('User-Agent', '') %}Abrir app de Google Calendar{% else %}Abrir Google Calendar{% endif %}</a>
+            <a class="boton google-calendar-open" href="{{ calendar_open_url }}"{% if 'Android' in request.headers.get('User-Agent', '') %} target="_blank" rel="noopener"{% endif %}>{% if 'Android' in request.headers.get('User-Agent', '') %}Abrir app de Google Calendar{% else %}Abrir Google Calendar{% endif %}</a>
             {% if puede_institucional and not apps_script_activo and oauth_activo %}
             {% if institucional %}
             <form method="post" action="{{ url_for('integraciones_google.desconectar', scope='institucional') }}">{{ csrf_field()|safe }}<button class="boton secundario" type="submit">Desconectar agenda</button></form>
