@@ -371,7 +371,7 @@ if ("serviceWorker" in navigator) {
 			if (day) startMs = new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3]), 12).getTime();
 		}
 		if (!startMs) startMs = Date.now();
-		link.href = `intent://com.android.calendar/time/${startMs}#Intent;scheme=content;action=android.intent.action.VIEW;type=time/epoch;package=com.google.android.calendar;end`;
+		link.href = `intent://com.android.calendar/time/${startMs}#Intent;scheme=content;action=android.intent.action.VIEW;type=time/epoch;component=com.google.android.calendar/com.android.calendar.AllInOneActivity;package=com.google.android.calendar;end`;
 		link.target = "_blank";
 		link.rel = "noopener";
 	}, true);
