@@ -357,3 +357,22 @@ if ("serviceWorker" in navigator) {
 		navigator.serviceWorker.register("/service-worker.js");
 	});
 }
+(() => {
+	if (!/Android/i.test(navigator.userAgent)) return;
+	document.addEventListener("click", (event) => {
+		if (!(event.target instanceof Element)) return;
+		const link = event.target.closest("a.google-calendar-open");
+		if (!(link instanceof HTMLAnchorElement)) return;
+		const href = link.getAttribute("href") || "";
+		const timestamp = href.match(/\/time\/(\d{10,})/);
+		let startMs = timestamp ? Number(timestamp[1]) : 0;
+		if (!startMs) {
+			const day = href.match(/calendar\/u\/\d+\/r\/day\/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+			if (day) startMs = new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3]), 12).getTime();
+		}
+		if (!startMs) startMs = Date.now();
+		link.href = `intent://com.android.calendar/time/${startMs}#Intent;scheme=content;action=android.intent.action.VIEW;type=time/epoch;package=com.google.android.calendar;end`;
+		link.target = "_blank";
+		link.rel = "noopener";
+	}, true);
+})();
