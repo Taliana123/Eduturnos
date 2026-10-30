@@ -1,6 +1,8 @@
 from datetime import date
 from io import StringIO, BytesIO
 import csv
+from zipfile import ZipFile, ZIP_DEFLATED
+from xml.sax.saxutils import escape
 from flask import Blueprint, Response, render_template, request
 from database.db import consultar
 from routes.helpers import roles_permitidos
@@ -56,6 +58,68 @@ def exportar_csv():
     rows=_filas_reporte(); out=StringIO(); writer=csv.writer(out); writer.writerow(["Cita","Fecha","Hora","Lugar","Estado","Motivo","Estudiante","Docente","Acudiente","Observaciones"])
     for r in rows: writer.writerow([_valor_hoja_calculo(r["id"]),_valor_hoja_calculo(r["fecha"]),_valor_hoja_calculo(formatear_hora(r["hora"])),_valor_hoja_calculo(r["lugar"]),_valor_hoja_calculo(r["estado"]),_valor_hoja_calculo(r["motivo"]),_valor_hoja_calculo(r["estudiante"]),_valor_hoja_calculo(r["docente"]),_valor_hoja_calculo(r["acudiente"]),_valor_hoja_calculo(r["observaciones"] or "")])
     return Response("\ufeff"+out.getvalue(),mimetype="text/csv; charset=utf-8",headers={"Content-Disposition":f'attachment; filename="eduturnos_reporte_{date.today().isoformat()}.csv"'})
+
+
+def _celda_word(valor, encabezado=False):
+    texto = escape(str(valor if valor is not None else ""))
+    negrita = "<w:rPr><w:b/></w:rPr>" if encabezado else ""
+    sombreado = '<w:shd w:fill="EAF3FF"/>' if encabezado else ""
+    return (
+        f"<w:tc><w:tcPr>{sombreado}<w:tcW w:w=\"1400\" w:type=\"dxa\"/></w:tcPr>"
+        f"<w:p><w:r>{negrita}<w:t xml:space=\"preserve\">{texto}</w:t></w:r></w:p></w:tc>"
+    )
+
+
+def _crear_docx_reporte(rows):
+    encabezados = ("Cita", "Fecha", "Hora", "Lugar", "Estado", "Motivo", "Estudiante", "Docente", "Acudiente", "Observaciones")
+    claves = ("id", "fecha", "hora", "lugar", "estado", "motivo", "estudiante", "docente", "acudiente", "observaciones")
+    filas = ["<w:tr>" + "".join(_celda_word(valor, True) for valor in encabezados) + "</w:tr>"]
+    for registro in rows:
+        valores = [registro.get(clave) for clave in claves]
+        valores[2] = formatear_hora(valores[2])
+        filas.append("<w:tr>" + "".join(_celda_word(valor or "") for valor in valores) + "</w:tr>")
+    documento = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+        '<w:body><w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="30"/></w:rPr>'
+        '<w:t>EDUTURNOS - Reporte de citaciones</w:t></w:r></w:p>'
+        '<w:tbl><w:tblPr><w:tblW w:w="14000" w:type="dxa"/><w:tblBorders>'
+        '<w:top w:val="single" w:sz="4" w:color="B8CDE5"/><w:left w:val="single" w:sz="4" w:color="B8CDE5"/>'
+        '<w:bottom w:val="single" w:sz="4" w:color="B8CDE5"/><w:right w:val="single" w:sz="4" w:color="B8CDE5"/>'
+        '<w:insideH w:val="single" w:sz="4" w:color="B8CDE5"/><w:insideV w:val="single" w:sz="4" w:color="B8CDE5"/>'
+        '</w:tblBorders></w:tblPr><w:tblGrid>' + '<w:gridCol w:w="1400"/>' * 10 + '</w:tblGrid>'
+        + "".join(filas)
+        + '</w:tbl><w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/>'
+        '<w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="360" w:footer="360" w:gutter="0"/>'
+        '</w:sectPr></w:body></w:document>'
+    )
+    tipos = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+        '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+        '<Default Extension="xml" ContentType="application/xml"/>'
+        '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+        '</Types>')
+    relaciones = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>'
+        '</Relationships>')
+    salida = BytesIO()
+    with ZipFile(salida, "w", ZIP_DEFLATED) as archivo:
+        archivo.writestr("[Content_Types].xml", tipos)
+        archivo.writestr("_rels/.rels", relaciones)
+        archivo.writestr("word/document.xml", documento)
+    return salida.getvalue()
+
+
+@reportes_bp.route("/exportar.docx")
+@roles_permitidos("Super Admin", "Rector", "Administrador / Coordinador")
+def exportar_word():
+    contenido = _crear_docx_reporte(_filas_reporte())
+    return Response(
+        contenido,
+        mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f'attachment; filename="eduturnos_reporte_{date.today().isoformat()}.docx"'},
+    )
 
 
 @reportes_bp.route("/exportar.xlsx")

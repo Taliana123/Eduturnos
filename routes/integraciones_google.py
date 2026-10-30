@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import secrets
 from datetime import date, datetime, time, timedelta, timezone
+from urllib.parse import quote
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
 
 from database.db import consultar, ejecutar
@@ -88,7 +89,8 @@ def _url_abrir_calendario(inicio_ms=None):
     return (
         f"intent://com.android.calendar/time/{inicio_ms}"
         "#Intent;scheme=content;action=android.intent.action.VIEW;"
-        "package=com.google.android.calendar;end"
+        "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
+        f"S.browser_fallback_url={quote(web_url, safe='')};end"
     )
 
 
