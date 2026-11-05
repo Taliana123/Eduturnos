@@ -157,7 +157,7 @@ def _url_app_cita(cita, android: bool) -> str | None:
 def index():
     usuario = usuario_actual()
     android = "Android" in request.user_agent.string
-    proxima_cita, calendar_open_start_ms = _proxima_cita(usuario)
+    proxima_cita, calendar_open_start_ms = _proxima_cita(usuario, solo_sincronizadas=android)
     event_url = _url_app_cita(proxima_cita, android)
     calendar_open_event_available = bool(proxima_cita and event_url)
     # Android recibe el enlace HTTPS de la cita reconocido por Google Calendar.
