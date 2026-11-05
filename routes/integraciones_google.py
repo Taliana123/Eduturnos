@@ -3,7 +3,7 @@ from __future__ import annotations
 import secrets
 from datetime import date, datetime, time, timedelta, timezone
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
-from urllib.parse import parse_qs, quote, urlsplit
+from urllib.parse import parse_qs, urlencode, urlsplit
 
 from database.db import consultar, ejecutar
 from routes.helpers import login_requerido, roles_permitidos, usuario_actual
@@ -80,28 +80,13 @@ def _inicio_proxima_cita_ms(usuario):
 
 
 def _url_abrir_calendario(inicio_ms=None):
+    """Enlace web de Google Calendar para escritorio."""
+    inicio_ms = int(inicio_ms or datetime.now(timezone(timedelta(hours=-5))).timestamp() * 1000)
     bogota = timezone(timedelta(hours=-5))
-    inicio_ms = int(
-        inicio_ms or datetime.now(bogota).timestamp() * 1000
-    )
-    fecha = datetime.fromtimestamp(
-        inicio_ms / 1000,
-        tz=bogota
-    ).date()
-    if "Android" not in request.user_agent.string:
-        return (
-            "https://calendar.google.com/calendar/u/0/r/day/"
-            f"{fecha.year}/{fecha.month}/{fecha.day}"
-        )
+    fecha = datetime.fromtimestamp(inicio_ms / 1000, tz=bogota).date()
     return (
-        f"intent://com.android.calendar/time/{inicio_ms}"
-        "#Intent;"
-        "scheme=content;"
-        "action=android.intent.action.VIEW;"
-        "type=time/epoch;"
-        "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
-        "package=com.google.android.calendar;"
-        "end"
+        "https://calendar.google.com/calendar/u/0/r/day/"
+        f"{fecha.year}/{fecha.month}/{fecha.day}"
     )
 
 def _proxima_cita(usuario, solo_sincronizadas=False):
@@ -157,12 +142,15 @@ def _url_app_cita(cita, android: bool) -> str | None:
         return web_url
     parsed = urlsplit(web_url)
     eid = parse_qs(parsed.query).get("eid", [""])[0]
-    if not eid or any(ch not in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-" for ch in eid):
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname != "www.google.com"
+        or parsed.path != "/calendar/event"
+        or not eid
+        or any(ch not in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-" for ch in eid)
+    ):
         return None
-    # En Android la apertura usa el proveedor del dispositivo por fecha;
-    # aquí se conserva el enlace del evento para escritorio.
-    return web_url
-
+    return "https://www.google.com/calendar/event?" + urlencode({"eid": eid})
 
 @integraciones_google_bp.get("/")
 @login_requerido
@@ -172,11 +160,9 @@ def index():
     proxima_cita, calendar_open_start_ms = _proxima_cita(usuario)
     event_url = _url_app_cita(proxima_cita, android)
     calendar_open_event_available = bool(proxima_cita and event_url)
-    # En Android abre directamente la app en la fecha de la próxima cita.
-    # El enlace web de evento de Apps Script se conserva solo para escritorio.
-    # Android must always receive a native Calendar intent. If there is no
-    # upcoming appointment, _proxima_cita returns the current timestamp.
-    calendar_open_url = (event_url or _url_abrir_calendario(calendar_open_start_ms))
+    # Android recibe el enlace HTTPS de la cita reconocido por Google Calendar.
+    # Si no hay un evento sincronizado, se muestra el aviso sin lanzar un intent.
+    calendar_open_url = event_url if android else (event_url or _url_abrir_calendario(calendar_open_start_ms))
     oauth_activo = configuracion_oauth_lista()
     scope_institucional = _scope_institucional(usuario)
     puente_activo = apps_script_configurada() and scope_institucional == "institucional"

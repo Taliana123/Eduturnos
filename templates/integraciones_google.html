@@ -53,7 +53,7 @@
         </div>
         <div class="google-calendar-actions">
             {% if calendar_open_url %}
-            <a class="boton google-calendar-open" href="{{ calendar_open_url }}" target="_blank" rel="noopener" data-calendar-start="{{ calendar_open_start_ms }}" data-google-calendar-open>{% if android_device %}Abrir app de Google Calendar{% elif calendar_open_event_available %}Abrir cita en Google Calendar{% else %}Abrir Google Calendar{% endif %}</a>
+            <a class="boton google-calendar-open" href="{{ calendar_open_url }}" target="_self" data-calendar-start="{{ calendar_open_start_ms }}" data-google-calendar-open>{% if android_device %}Abrir app de Google Calendar{% elif calendar_open_event_available %}Abrir cita en Google Calendar{% else %}Abrir Google Calendar{% endif %}</a>
             {% elif android_device %}
             <p class="google-calendar-open-hint" role="status">No hay una cita futura sincronizada para abrir en la app todavía.</p>
             {% endif %}
