@@ -513,6 +513,17 @@ def test_soporte_abre_directamente_el_correo_institucional():
     )
 
 
+def test_soporte_en_android_abre_gmail_con_el_mensaje_preparado():
+    respuesta = app.test_client().get(
+        "/soporte/",
+        headers={"User-Agent": "Mozilla/5.0 (Linux; Android 14) Chrome/130.0"},
+    )
+
+    assert respuesta.status_code == 302
+    assert respuesta.headers["Location"].startswith("intent://compose?to=coliejjfh%40hotmail.com")
+    assert "package=com.google.android.gm;end" in respuesta.headers["Location"]
+
+
 @pytest.mark.parametrize("scope,rol,permitido", [
     ("personal", "Docente", True),
     ("personal", "Rector", True),

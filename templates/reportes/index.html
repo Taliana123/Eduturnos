@@ -14,7 +14,7 @@
   <section class="reportes-panorama" aria-label="Resumen de citaciones">
     <div class="reportes-panorama-intro">
       <div class="acciones report-export reportes-panorama-exportar" aria-label="Exportar reportes">
-        <a class="boton pequeno" href="{{ url_for('reportes.exportar_csv',desde=desde,hasta=hasta,estado=estado) }}" download>CSV</a>
+        <a class="boton pequeno" href="{{ url_for('reportes.exportar_word',desde=desde,hasta=hasta,estado=estado) }}" download>Word</a>
         <a class="boton pequeno" href="{{ url_for('reportes.exportar_xlsx',desde=desde,hasta=hasta,estado=estado) }}" download>Excel</a>
         <a class="boton pequeno" href="{{ url_for('reportes.exportar_pdf',desde=desde,hasta=hasta,estado=estado) }}" download>PDF</a>
       </div>
@@ -83,7 +83,7 @@
     <div class="reportes-results-heading">
       <h2>Detalle de citaciones</h2>
       <div class="acciones report-export">
-        <a class="boton pequeno" href="{{ url_for('reportes.exportar_csv',desde=desde,hasta=hasta,estado=estado) }}">CSV</a>
+        <a class="boton pequeno" href="{{ url_for('reportes.exportar_word',desde=desde,hasta=hasta,estado=estado) }}">Word</a>
         <a class="boton pequeno" href="{{ url_for('reportes.exportar_xlsx',desde=desde,hasta=hasta,estado=estado) }}">Excel</a>
         <a class="boton pequeno" href="{{ url_for('reportes.exportar_pdf',desde=desde,hasta=hasta,estado=estado) }}">PDF</a>
       </div>

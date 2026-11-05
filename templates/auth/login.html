@@ -1312,6 +1312,31 @@ html body.login-page .personal-login .personal-field-jornada select {
         }
 
 </style>
+<style>
+    .login-institution-options{display:grid;gap:9px;margin:0 0 8px;padding:0;border:0}
+    .login-institution-options legend{margin:0 0 8px;color:#24364b;font-weight:750;font-size:15px}
+    .login-institution-option{display:flex;align-items:flex-start;gap:11px;padding:13px 14px;border:1px solid #d5dfeb;border-radius:13px;background:#fff;cursor:pointer}
+    .login-institution-option:has(input:checked){border-color:#2f76d2;background:#f2f7ff;box-shadow:0 0 0 2px rgba(47,118,210,.10)}
+    .login-institution-option input{width:18px;height:18px;flex:0 0 18px;margin:2px 0 0;accent-color:#2f76d2}
+    .login-institution-option span{display:grid;gap:4px}
+    .login-institution-option strong{color:#1b3048;font-size:14px}
+    .login-institution-option small,.other-institution-hint{color:#63758a;font-size:12px;line-height:1.45}
+    .other-institution-hint{margin:0;padding:10px 12px;border-radius:10px;background:#eef5fc}
+    .personal-login[hidden],.other-institution-hint[hidden]{display:none!important}
+    @media(max-width:600px){.login-institution-option{padding:12px}.login-institution-option strong{font-size:13px}.login-institution-options legend{font-size:14px}}
+</style>
+
+<style>
+    .login-institution-select{display:grid;gap:8px;margin:0 0 8px;color:#24364b;font-size:15px;font-weight:750}
+    .login-institution-select select{width:100%;min-width:0;padding:12px 14px;border:1px solid #d5dfeb;border-radius:12px;background:#fff;color:#1b3048;font:inherit;font-size:14px;font-weight:600}
+    .login-institution-select select:focus{outline:2px solid rgba(47,118,210,.25);border-color:#2f76d2}
+    .login-institution-select[hidden]{display:none!important}
+    .login-page .form-links{display:grid;grid-template-columns:1fr;gap:12px;text-align:center}
+    .login-page .form-links-primary{display:grid;grid-template-columns:1fr;align-items:center;gap:12px}
+    .login-page .form-links-primary a{min-width:0}
+    .login-page .form-links-institution{display:block;text-align:center}
+    @media(max-width:600px){.login-page .form-links-primary{grid-template-columns:1fr;gap:12px}.login-page .form-links-primary a{font-size:12px}.login-page .form-links-institution{font-size:12px}}
+</style>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261023_login_center_v2" media="(max-width: 900px)">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/password-controls.css') }}?v=20261012_password_desktop_v1">
 </head>
@@ -1393,10 +1418,30 @@ html body.login-page .personal-login .personal-field-jornada select {
                 <form
                     method="post"
                     autocomplete="off"
-                    class="stack-form"
+                    class="stack-form login-form"
                 >
 
                     {{ csrf_field()|safe }}
+
+                    <label class="login-institution-select">
+                        <span>Elige tu instituci&oacute;n</span>
+                        <select name="tipo_acceso" data-institution-choice>
+                            <option value="jjfh" {% if tipo_acceso != 'otra' %}selected{% endif %}>I.E. Jos&eacute; Joaqu&iacute;n Fl&oacute;rez Hern&aacute;ndez</option>
+                            <option value="otra" {% if tipo_acceso == 'otra' %}selected{% endif %}>Otra instituci&oacute;n</option>
+                        </select>
+                    </label>
+                    <label class="login-institution-select" data-other-institutions {% if tipo_acceso != 'otra' %}hidden{% endif %}>
+                        <span>Selecciona la instituci&oacute;n</span>
+                        <select name="institucion_id" data-institution-list {% if tipo_acceso != 'otra' %}disabled{% else %}required{% endif %}>
+                            <option value="" selected>Elige una instituci&oacute;n</option>
+                            {% for institucion in instituciones_login %}
+                            <option value="{{ institucion.id }}">{{ institucion.nombre }}</option>
+                            {% else %}
+                            <option value="" disabled>No hay otras instituciones registradas</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <p class="other-institution-hint" data-other-institution-hint {% if tipo_acceso != 'otra' %}hidden{% endif %}>Ingresa con el documento o correo y la contrase&ntilde;a de tu cuenta. El sistema validar&aacute; el acceso en la instituci&oacute;n seleccionada.</p>
 
 
                     <!-- Documento -->
@@ -1433,14 +1478,14 @@ html body.login-page .personal-login .personal-field-jornada select {
 
                     <!-- Personal institucional -->
 
-                    <div class="personal-login">
+                    <div class="personal-login" data-jjfh-fields>
 
                         <h3>
-                            Personal institucional
+                            Acceso del personal de José Joaquín
                         </h3>
 
                         <p>
-                            Docentes, Coordinadores y Rectoría deben usar su correo
+                            Docentes, Coordinadores y Rectoría usan su correo
                             <strong>@jjfh.edu.co</strong>, código de 6 dígitos,
                             sede y jornada.
                         </p>
@@ -1485,7 +1530,7 @@ html body.login-page .personal-login .personal-field-jornada select {
 
                                     <option value="" selected disabled></option>
 
-                                    {% for sede in sedes %}
+                                    {% for sede in login_sedes %}
 
                                         {% if sede is mapping %}
 
@@ -1498,9 +1543,9 @@ html body.login-page .personal-login .personal-field-jornada select {
                                         {% else %}
 
                                             <option
-                                                value="{{ sede[0] }}"
+                                                value="{{ sede.id }}"
                                             >
-                                                {{ sede[1] }}
+                                                {{ sede.nombre }}
                                             </option>
 
                                         {% endif %}
@@ -1571,19 +1616,11 @@ html body.login-page .personal-login .personal-field-jornada select {
 
 
                 <div class="form-links">
-
-                    <a
-                        href="{{ url_for('passwords.recuperar') }}"
-                    >
-                        ¿Olvidaste tu contraseña?
-                    </a>
-
-                    <a
-                        href="{{ url_for('auth.registro') }}"
-                    >
-                        Crear una cuenta
-                    </a>
-
+                    <div class="form-links-primary">
+                        <a href="{{ url_for('passwords.recuperar') }}">&iquest;Olvidaste tu contrase&ntilde;a?</a>
+                        <a href="{{ url_for('auth.registro') }}">Crear una cuenta</a>
+                    </div>
+                    <a class="form-links-institution" href="{{ url_for('auth.crear_institucion') }}">&iquest;Eres Rector de otra instituci&oacute;n? Reg&iacute;strala aqu&iacute;</a>
                 </div>
 
 
@@ -1639,6 +1676,7 @@ html body.login-page .personal-login .personal-field-jornada select {
 
 
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20261012_password_controls_v19" defer></script>
+<script src="{{ url_for('static', filename='js/institution-login.js') }}?v=20261029_v2" defer></script>
 <script src="{{ url_for('static', filename='js/pwa.js') }}?v=2" defer></script>
 </body>
 

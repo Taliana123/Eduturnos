@@ -3,6 +3,7 @@ from __future__ import annotations
 import secrets
 from datetime import date, datetime, time, timedelta, timezone
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
+from urllib.parse import parse_qs, quote, urlsplit
 
 from database.db import consultar, ejecutar
 from routes.helpers import login_requerido, roles_permitidos, usuario_actual
@@ -21,6 +22,7 @@ from servicios.google_calendar import (
     procesar_cola_google,
     probar_conexion_calendario,
     probar_apps_script,
+    enlace_evento_apps_script,
     reintentar_fallidas_google,
     uri_callback,
     url_autorizacion,
@@ -30,11 +32,27 @@ integraciones_google_bp = Blueprint("integraciones_google", __name__, url_prefix
 ROLES_INSTITUCIONALES = ("Super Admin", "Rector", "Administrador / Coordinador")
 ROLES_PERSONAL = ROLES_INSTITUCIONALES + ("Docente", "Acudiente", "Estudiante")
 
-
-def _permite(scope: str, rol: str) -> bool:
+def _permite(scope: str, rol: str, usuario=None) -> bool:
     if scope == "personal":
         return rol in ROLES_PERSONAL
-    return scope == "institucional" and rol in ("Super Admin", "Rector")
+    return scope == "institucional" and rol in ("Super Admin", "Rector") and (
+        rol == "Super Admin" or bool((usuario or {}).get("id_institucion"))
+    )
+
+
+def _scope_institucional(usuario):
+    if usuario.get("rol_nombre") == "Super Admin":
+        return "institucional"
+    institucion_id = usuario.get("id_institucion")
+    if not institucion_id:
+        return None
+    principal = consultar(
+        "SELECT id FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1",
+        uno=True,
+    )
+    if principal and int(principal["id"]) == int(institucion_id):
+        return "institucional"
+    return f"institucion:{int(institucion_id)}"
 
 
 def _inicio_proxima_cita_ms(usuario):
@@ -62,24 +80,113 @@ def _inicio_proxima_cita_ms(usuario):
 
 
 def _url_abrir_calendario(inicio_ms=None):
-    web_url = "https://calendar.google.com/calendar/u/0/r/month"
+    bogota = timezone(timedelta(hours=-5))
+    inicio_ms = int(
+        inicio_ms or datetime.now(bogota).timestamp() * 1000
+    )
+    fecha = datetime.fromtimestamp(
+        inicio_ms / 1000,
+        tz=bogota
+    ).date()
     if "Android" not in request.user_agent.string:
-        return web_url
-    inicio_ms = int(inicio_ms or datetime.now(timezone(timedelta(hours=-5))).timestamp() * 1000)
+        return (
+            "https://calendar.google.com/calendar/u/0/r/day/"
+            f"{fecha.year}/{fecha.month}/{fecha.day}"
+        )
     return (
         f"intent://com.android.calendar/time/{inicio_ms}"
-        "#Intent;scheme=content;action=android.intent.action.VIEW;"
-        "package=com.google.android.calendar;end"
+        "#Intent;"
+        "scheme=content;"
+        "action=android.intent.action.VIEW;"
+        "type=time/epoch;"
+        "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
+        "package=com.google.android.calendar;"
+        "end"
     )
+
+def _proxima_cita(usuario, solo_sincronizadas=False):
+    from routes.calendario import citas_visibles
+
+    bogota = timezone(timedelta(hours=-5))
+    ahora = datetime.now(bogota)
+    candidatas = []
+    for cita in citas_visibles(usuario):
+        if (cita.get("estado_nombre") or "").strip().lower() == "cancelada":
+            continue
+        try:
+            fecha = cita.get("fecha")
+            hora = cita.get("hora")
+            fecha = fecha if isinstance(fecha, date) else date.fromisoformat(str(fecha)[:10])
+            hora = hora if isinstance(hora, time) else time.fromisoformat(str(hora))
+            inicio = datetime.combine(fecha, hora, tzinfo=bogota)
+        except (TypeError, ValueError):
+            continue
+        if inicio >= ahora:
+            if solo_sincronizadas:
+                evento = consultar(
+                    "SELECT google_event_id FROM eventos_google "
+                    "WHERE id_cita=%s AND scope_key='institucional' "
+                    "AND estado='Sincronizado' AND google_event_id IS NOT NULL LIMIT 1",
+                    (cita["id"],), uno=True,
+                )
+                if not evento:
+                    continue
+            candidatas.append((inicio, cita))
+    if candidatas:
+        inicio, cita = min(candidatas, key=lambda elemento: elemento[0])
+        return cita, int(inicio.timestamp() * 1000)
+    return None, int(ahora.timestamp() * 1000)
+
+
+def _url_app_cita(cita, android: bool) -> str | None:
+    if not cita or not apps_script_configurada():
+        return None
+    evento = consultar(
+        "SELECT google_event_id FROM eventos_google "
+        "WHERE id_cita=%s AND scope_key='institucional' AND estado='Sincronizado' LIMIT 1",
+        (cita["id"],), uno=True,
+    )
+    if not evento or not evento.get("google_event_id"):
+        return None
+    try:
+        web_url = enlace_evento_apps_script(evento["google_event_id"])
+    except Exception:
+        current_app.logger.exception("No se pudo resolver el enlace de la cita sincronizada en Google Calendar")
+        return None
+    if not android:
+        return web_url
+    parsed = urlsplit(web_url)
+    eid = parse_qs(parsed.query).get("eid", [""])[0]
+    if not eid or any(ch not in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-" for ch in eid):
+        return None
+    # En Android la apertura usa el proveedor del dispositivo por fecha;
+    # aquí se conserva el enlace del evento para escritorio.
+    return web_url
 
 
 @integraciones_google_bp.get("/")
 @login_requerido
 def index():
     usuario = usuario_actual()
-    calendar_open_start_ms = _inicio_proxima_cita_ms(usuario)
+    android = "Android" in request.user_agent.string
+    proxima_cita, calendar_open_start_ms = _proxima_cita(usuario)
+    event_url = _url_app_cita(proxima_cita, android) if not android else None
+    calendar_open_event_available = bool(proxima_cita and event_url)
+    # En Android abre directamente la app en la fecha de la próxima cita.
+    # El enlace web de evento de Apps Script se conserva solo para escritorio.
+    # Android must always receive a native Calendar intent. If there is no
+    # upcoming appointment, _proxima_cita returns the current timestamp.
+    calendar_open_url = (event_url or _url_abrir_calendario(calendar_open_start_ms))
     oauth_activo = configuracion_oauth_lista()
-    puente_activo = apps_script_configurada()
+    scope_institucional = _scope_institucional(usuario)
+    puente_activo = apps_script_configurada() and scope_institucional == "institucional"
+    institucion_nombre = usuario.get("institucion_nombre")
+    if scope_institucional == "institucional":
+        principal = consultar(
+            "SELECT nombre FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1",
+            uno=True,
+        )
+        institucion_nombre = (principal or {}).get("nombre") or institucion_nombre
     personal = None
     personal_sync = None
     if usuario["rol_nombre"] in ROLES_PERSONAL and oauth_activo:
@@ -90,19 +197,17 @@ def index():
         personal_sync = estado_cola_google(f"usuario:{usuario['id_usuario']}")
     institucional = None
     institucional_sync = None
-    institucional_conectado = puente_activo or bool(
-        consultar("SELECT 1 FROM integraciones_google WHERE scope_key='institucional'", uno=True)
-    )
-    if usuario["rol_nombre"] in ("Super Admin", "Rector"):
+    institucional_conectado = False
+    if _permite("institucional", usuario["rol_nombre"], usuario):
         if puente_activo:
             institucional = {"correo_google": "Puente institucional (Apps Script)", "fecha_prueba": None}
         else:
             institucional = consultar(
-                "SELECT correo_google,calendar_id,fecha_actualizacion,fecha_prueba FROM integraciones_google WHERE scope_key='institucional'",
-                uno=True,
+                "SELECT correo_google,calendar_id,fecha_actualizacion,fecha_prueba FROM integraciones_google WHERE scope_key=%s",
+                (scope_institucional,), uno=True,
             )
         institucional_conectado = bool(institucional)
-        institucional_sync = estado_cola_google("institucional")
+        institucional_sync = estado_cola_google(scope_institucional)
     return render_template(
         "integraciones_google.html",
         usuario=usuario,
@@ -114,12 +219,55 @@ def index():
         puede_institucional=usuario["rol_nombre"] in ("Super Admin", "Rector"),
         apps_script_activo=puente_activo,
         institucional_conectado=institucional_conectado,
+        scope_institucional=scope_institucional,
+        institucion_nombre=institucion_nombre or "la institución",
         oauth_activo=oauth_activo,
-        calendar_open_url=_url_abrir_calendario(calendar_open_start_ms),
+        calendar_open_url=calendar_open_url,
+        android_device=android,
+        calendar_open_event_available=calendar_open_event_available,
         calendar_open_start_ms=calendar_open_start_ms,
         configuracion_lista=configuracion_lista(),
         callback_url=(uri_callback() if oauth_activo else "/integraciones-google/callback"),
     )
+
+
+@integraciones_google_bp.post("/sincronizar-institucional")
+@roles_permitidos("Super Admin", "Rector")
+def sincronizar_institucional():
+    usuario = usuario_actual()
+    scope_key = _scope_institucional(usuario)
+    if not scope_key:
+        abort(403)
+    if scope_key == "institucional" and apps_script_configurada():
+        try:
+            probar_apps_script()
+        except Exception as exc:
+            current_app.logger.exception("Falló la prueba del puente de Google Calendar")
+            flash(f"No se pudo conectar con Google Calendar: {error_google_seguro(exc)}", "error")
+            return redirect(url_for("integraciones_google.index"))
+    elif not configuracion_oauth_lista():
+        flash("Conecta primero la agenda institucional de Google Calendar.", "error")
+        return redirect(url_for("integraciones_google.index"))
+
+    try:
+        resumen = encolar_citas_futuras(scope_key)
+        resultado = procesar_cola_google(limite=100)
+        if resultado["fallidas"]:
+            flash(
+                f"Se procesaron {resultado['procesadas']} citas: "
+                f"{resultado['sincronizadas']} sincronizadas y {resultado['fallidas']} con error. Revisa el estado de sincronización.",
+                "warning",
+            )
+        elif resultado["sincronizadas"]:
+            flash(f"Se sincronizaron {resultado['sincronizadas']} citas futuras con Google Calendar.", "success")
+        elif resumen["citas"] == 0:
+            flash("No hay citas futuras confirmadas o pendientes para sincronizar.", "info")
+        else:
+            flash("La cola no entregó citas; revisa la conexión de Google Calendar.", "warning")
+    except Exception as exc:
+        current_app.logger.exception("Falló la sincronización manual de citas futuras")
+        flash(f"No se pudieron sincronizar las citas: {error_google_seguro(exc)}", "error")
+    return redirect(url_for("integraciones_google.index"))
 
 
 @integraciones_google_bp.get("/conectar/<scope>")
@@ -128,9 +276,11 @@ def conectar(scope):
     if scope not in ("personal", "institucional"):
         abort(404)
     usuario = usuario_actual()
-    if not _permite(scope, usuario["rol_nombre"]):
+    if not _permite(scope, usuario["rol_nombre"], usuario):
         abort(403)
-    if scope == "institucional" and apps_script_configurada():
+    scope_key = _scope_institucional(usuario) if scope == "institucional" else None
+    puente_institucional = scope_key == "institucional" and apps_script_configurada()
+    if puente_institucional:
         try:
             probar_apps_script()
             flash("El puente de Google Calendar está conectado y puede acceder a la agenda institucional.", "success")
@@ -154,12 +304,21 @@ def conectar(scope):
 @integraciones_google_bp.post("/reintentar-institucional")
 @roles_permitidos("Super Admin", "Rector")
 def reintentar_institucional():
-    if not apps_script_configurada():
+    usuario = usuario_actual()
+    scope_key = _scope_institucional(usuario)
+    puente_institucional = scope_key == "institucional" and apps_script_configurada()
+    if puente_institucional:
+        try:
+            probar_apps_script()
+        except Exception as exc:
+            current_app.logger.exception("Falló la prueba del puente de Google Calendar")
+            flash(f"No se pudo probar el puente: {error_google_seguro(exc)}", "error")
+            return redirect(url_for("integraciones_google.index"))
+    elif not scope_key or not configuracion_oauth_lista():
         flash("El puente de Google Calendar no está configurado en el servidor.", "error")
         return redirect(url_for("integraciones_google.index"))
     try:
-        probar_apps_script()
-        cantidad = reintentar_fallidas_google("institucional")
+        cantidad = reintentar_fallidas_google(scope_key)
         if cantidad:
             resultado = procesar_cola_google(limite=20)
             if not resultado["fallidas"]:
@@ -190,11 +349,13 @@ def callback():
     if not code:
         abort(400)
     usuario = usuario_actual()
-    if scope not in ("personal", "institucional") or not _permite(scope, usuario["rol_nombre"]):
+    if scope not in ("personal", "institucional") or not _permite(scope, usuario["rol_nombre"], usuario):
         abort(403)
     try:
         token = intercambiar_codigo(code)
-        scope_key = "institucional" if scope == "institucional" else f"usuario:{usuario['id_usuario']}"
+        scope_key = _scope_institucional(usuario) if scope == "institucional" else f"usuario:{usuario['id_usuario']}"
+        if not scope_key:
+            abort(403)
         probar_conexion_calendario(
             token["access_token"],
             calendar_id_objetivo(scope_key),
@@ -227,12 +388,13 @@ def desconectar(scope):
     if scope not in ("personal", "institucional"):
         abort(404)
     usuario = usuario_actual()
-    if not _permite(scope, usuario["rol_nombre"]):
+    if not _permite(scope, usuario["rol_nombre"], usuario):
         abort(403)
-    if scope == "institucional" and apps_script_configurada():
+    scope_key = _scope_institucional(usuario) if scope == "institucional" else None
+    if scope_key == "institucional" and apps_script_configurada():
         flash("El puente institucional se administra en la configuración protegida del servidor.", "info")
         return redirect(url_for("integraciones_google.index"))
-    scope_key = "institucional" if scope == "institucional" else f"usuario:{usuario['id_usuario']}"
+    scope_key = scope_key or f"usuario:{usuario['id_usuario']}"
     ejecutar("DELETE FROM integraciones_google WHERE scope_key=%s", (scope_key,))
     flash("Calendario de Google desconectado.", "success")
     return redirect(url_for("integraciones_google.index"))

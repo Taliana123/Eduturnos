@@ -573,3 +573,29 @@
         margin-top: 12px !important;
     }
 }
+/* Keep institutional administration aligned and compact on desktop. */
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page > .panel {
+        margin-bottom: 12px !important;
+        padding: 16px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page > .configuracion-catalogos {
+        gap: 12px !important;
+        margin-bottom: 12px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.institucion-form,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.catalogo-form,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-form,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.state-form,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.stack-form {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-entry-sede,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede {
+        max-width: 100% !important;
+    }
+}

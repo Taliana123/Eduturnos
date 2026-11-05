@@ -51,16 +51,27 @@ document.addEventListener("DOMContentLoaded", () => {
 	if (citationsView) {
 		const search = citationsView.querySelector('[data-citas-search]');
 		const status = citationsView.querySelector('[data-citas-status]');
+		const recipient = citationsView.querySelector('[data-citas-recipient]');
 		const filterCitations = () => {
 			let visible = 0;
+			const normalize = (value) => (value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase().trim();
+			const query = normalize(search?.value);
 			citationsView.querySelectorAll('[data-citas-row]').forEach((row) => {
-				row.hidden = !row.dataset.student.toLocaleLowerCase().includes(search.value.trim().toLocaleLowerCase()) || (status.value && row.dataset.state !== status.value);
+				const matchesSearch = normalize(row.dataset.student).includes(query)
+					|| normalize(row.dataset.teacher).includes(query)
+					|| normalize(row.dataset.state).includes(query);
+				const matchesStatus = !status?.value || row.dataset.state === status.value;
+				const matchesRecipient = !recipient?.value || row.dataset.recipient === recipient.value;
+				row.hidden = !(matchesSearch && matchesStatus && matchesRecipient);
 				if (!row.hidden) visible++;
 			});
-			citationsView.querySelector('[data-citas-empty]').hidden = visible > 0;
+			const empty = citationsView.querySelector('[data-citas-empty]');
+			if (empty) empty.hidden = visible > 0;
 		};
-		search.addEventListener('input', filterCitations);
-		status.addEventListener('change', filterCitations);
+		search?.addEventListener('input', filterCitations);
+		status?.addEventListener('change', filterCitations);
+		recipient?.addEventListener('change', filterCitations);
+		filterCitations();
 	}
 	const administration = document.querySelector(".administracion-page .configuracion-page");
 	if (administration) {
@@ -263,15 +274,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	};
 	document.addEventListener("click", (event) => {
 		if (!(event.target instanceof Element)) return;
-		const calendarLink = event.target.closest("[data-google-calendar-open]");
-		if (calendarLink && /Android/i.test(navigator.userAgent)) {
-			event.preventDefault();
-			const providedStart = Number(calendarLink.dataset.calendarStart);
-			const startMillis = Number.isFinite(providedStart) && providedStart > 0 ? providedStart : Date.now();
-			const appIntent = `intent://com.android.calendar/time/${startMillis}#Intent;scheme=content;action=android.intent.action.VIEW;package=com.google.android.calendar;end`;
-			window.location.href = appIntent;
-			return;
-		}
 		const tab = event.target.closest("[data-cita-tab]");
 		if (tab && (mobileDialogMedia.matches || tab.closest('.desktop-cita-open'))) {
 			const tabDialog = tab.closest("dialog");

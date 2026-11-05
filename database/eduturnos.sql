@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS instituciones (
     direccion VARCHAR(255) NULL,
     telefono VARCHAR(40) NULL,
     estado TINYINT(1) NOT NULL DEFAULT 1,
+    requiere_codigo_institucional TINYINT(1) NOT NULL DEFAULT 1,
     UNIQUE KEY uq_institucion_nombre (nombre)
 ) ENGINE=InnoDB;
 
@@ -72,6 +73,7 @@ CREATE TABLE IF NOT EXISTS periodos_academicos (
     fecha_fin DATE NOT NULL,
     activo TINYINT(1) NOT NULL DEFAULT 0,
     cerrado TINYINT(1) NOT NULL DEFAULT 0,
+    id_institucion INT NULL,
     UNIQUE KEY uq_periodo_nombre (nombre),
     CHECK (fecha_fin >= fecha_inicio)
 ) ENGINE=InnoDB;
@@ -79,6 +81,7 @@ CREATE TABLE IF NOT EXISTS periodos_academicos (
 CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     id_rol INT NOT NULL,
+    id_institucion INT NULL,
     tipo_documento VARCHAR(20) NOT NULL DEFAULT 'CC',
     documento VARCHAR(30) NOT NULL UNIQUE,
     nombres VARCHAR(100) NOT NULL,
@@ -124,6 +127,7 @@ CREATE TABLE IF NOT EXISTS estudiantes (
 
 CREATE TABLE IF NOT EXISTS acudientes (
     id_acudiente INT AUTO_INCREMENT PRIMARY KEY,
+    id_institucion INT NULL,
     id_usuario INT NULL UNIQUE,
     tipo_documento VARCHAR(20) NOT NULL DEFAULT 'CC',
     documento VARCHAR(30) NOT NULL UNIQUE,
@@ -222,10 +226,14 @@ CREATE TABLE IF NOT EXISTS directorio_institucional (
 
 CREATE TABLE IF NOT EXISTS citas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    id_estudiante INT NOT NULL,
-    id_acudiente INT NOT NULL,
-    id_docente INT NOT NULL,
+    id_institucion INT NULL,
+    id_estudiante INT NULL,
+    id_acudiente INT NULL,
+    id_docente INT NULL,
+    destinatario_tipo VARCHAR(40) NULL,
+    destinatario_usuario_id INT NULL,
     id_motivo INT NOT NULL,
+    motivo_otro VARCHAR(255) NULL,
     id_estado INT NOT NULL,
     id_periodo INT NOT NULL,
     fecha DATE NOT NULL,
@@ -239,6 +247,7 @@ CREATE TABLE IF NOT EXISTS citas (
     FOREIGN KEY (id_estudiante) REFERENCES estudiantes(id_estudiante) ON DELETE RESTRICT,
     FOREIGN KEY (id_acudiente) REFERENCES acudientes(id_acudiente) ON DELETE RESTRICT,
     FOREIGN KEY (id_docente) REFERENCES docentes(id_docente) ON DELETE RESTRICT,
+    FOREIGN KEY (destinatario_usuario_id) REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
     FOREIGN KEY (id_motivo) REFERENCES motivos(id) ON DELETE RESTRICT,
     FOREIGN KEY (id_estado) REFERENCES estados_cita(id) ON DELETE RESTRICT,
     FOREIGN KEY (id_periodo) REFERENCES periodos_academicos(id) ON DELETE RESTRICT,
@@ -254,12 +263,17 @@ CREATE TABLE IF NOT EXISTS citas (
 
 CREATE TABLE IF NOT EXISTS solicitudes_cita (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    id_institucion INT NULL,
     solicitante_usuario_id INT NOT NULL,
-    tipo_solicitante ENUM('Acudiente','Docente') NOT NULL,
-    id_estudiante INT NOT NULL,
+    tipo_solicitante VARCHAR(40) NOT NULL,
+    id_estudiante INT NULL,
     id_acudiente INT NULL,
-    id_docente INT NOT NULL,
+    id_docente INT NULL,
+    destinatario_tipo VARCHAR(40) NULL,
+    destinatario_usuario_id INT NULL,
     id_motivo INT NOT NULL,
+    motivo_otro VARCHAR(255) NULL,
+    id_periodo INT NULL,
     fecha_solicitada DATE NOT NULL,
     hora_solicitada TIME NOT NULL,
     fecha_propuesta DATE NULL,
@@ -277,7 +291,9 @@ CREATE TABLE IF NOT EXISTS solicitudes_cita (
     FOREIGN KEY (id_estudiante) REFERENCES estudiantes(id_estudiante) ON DELETE RESTRICT,
     FOREIGN KEY (id_acudiente) REFERENCES acudientes(id_acudiente) ON DELETE SET NULL,
     FOREIGN KEY (id_docente) REFERENCES docentes(id_docente) ON DELETE RESTRICT,
+    FOREIGN KEY (destinatario_usuario_id) REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
     FOREIGN KEY (id_motivo) REFERENCES motivos(id) ON DELETE RESTRICT,
+    FOREIGN KEY (id_periodo) REFERENCES periodos_academicos(id) ON DELETE SET NULL,
     FOREIGN KEY (revisado_por) REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
     FOREIGN KEY (cita_id) REFERENCES citas(id) ON DELETE SET NULL,
     INDEX idx_solicitud_estado (estado, fecha_creacion),

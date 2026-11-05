@@ -27,6 +27,7 @@ function doPost(e) {
     if (payload.action === 'test') {
       return json_({ ok: true, protocol: EDUTURNOS_PROTOCOL, calendar: calendar.getName(), calendarId: calendar.getId() });
     }
+    if (payload.action === 'event_link') return json_(eventLink_(calendar, payload));
     if (payload.action === 'upsert') return json_(upsert_(calendar, payload));
     if (payload.action === 'delete') return json_(delete_(calendar, payload));
     return json_({ ok: false, status: 400, error: 'Operación desconocida.' });
@@ -122,7 +123,26 @@ function upsert_(calendar, payload) {
   event.removeAllReminders();
   event.addPopupReminder(1440);
   event.addPopupReminder(120);
-  return { ok: true, eventId: event.getId() };
+
+  // Events created by the institutional account appear in other people's
+  // Google Calendars only after Google sends them an invitation. The Flask
+  // service supplies only verified, real participant email addresses.
+  const attendees = Array.from(new Set((Array.isArray(payload.attendees) ? payload.attendees : [])
+    .map(function (email) { return String(email || '').trim().toLowerCase(); })
+    .filter(function (email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !email.endsWith('.local'); })));
+  const apiEvent = findCalendarApiEvent_(calendar, event.getId());
+  if (!apiEvent) throw new Error('No se pudo localizar el evento creado en Google Calendar.');
+  Calendar.Events.patch({
+    attendees: attendees.map(function (email) { return { email: email }; }),
+    guestsCanModify: false,
+    guestsCanInviteOthers: false,
+    guestsCanSeeOtherGuests: false,
+    reminders: { useDefault: false, overrides: [
+      { method: 'popup', minutes: 1440 },
+      { method: 'popup', minutes: 120 },
+    ] },
+  }, calendar.getId(), apiEvent.id, { sendUpdates: 'all' });
+  return { ok: true, eventId: event.getId(), invited: attendees.length };
 }
 
 function delete_(calendar, payload) {
@@ -139,6 +159,37 @@ function delete_(calendar, payload) {
   }
   if (event) event.deleteEvent();
   return { ok: true };
+}
+
+function eventLink_(calendar, payload) {
+  const iCalUid = String(payload.google_event_id || '').trim();
+  if (!iCalUid) return { ok: false, status: 400, error: 'Falta el identificador de la cita.' };
+  const managed = calendar.getEventById(iCalUid);
+  if (!managed || !/^eduturnos[a-f0-9]{64}$/.test(managed.getTag(EDUTURNOS_TAG) || '')) {
+    return { ok: false, status: 404, error: 'No se encontró la cita sincronizada.' };
+  }
+  const response = Calendar.Events.list(calendar.getId(), {
+    iCalUID: iCalUid,
+    maxResults: 10,
+    showDeleted: false,
+  });
+  const apiEvent = (response.items || []).find(function (item) {
+    return item.status === 'confirmed' && item.iCalUID === iCalUid && item.id;
+  });
+  if (!apiEvent) return { ok: false, status: 404, error: 'Google Calendar no encontró la cita sincronizada.' };
+  const eid = Utilities.base64EncodeWebSafe(apiEvent.id + ' ' + calendar.getId()).replace(/=+$/, '');
+  return { ok: true, url: 'https://www.google.com/calendar/event?eid=' + eid };
+}
+
+function findCalendarApiEvent_(calendar, iCalUid) {
+  const response = Calendar.Events.list(calendar.getId(), {
+    iCalUID: iCalUid,
+    maxResults: 10,
+    showDeleted: false,
+  });
+  return (response.items || []).find(function (item) {
+    return item.status === 'confirmed' && item.iCalUID === iCalUid && item.id;
+  }) || null;
 }
 
 function json_(value) {

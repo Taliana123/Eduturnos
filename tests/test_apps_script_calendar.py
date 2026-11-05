@@ -160,16 +160,25 @@ def test_apps_script_source_sets_two_popup_reminders():
 
 def test_integrations_page_offers_eduturnos_calendar_to_every_role():
     from pathlib import Path
+    from routes.integraciones_google import _url_abrir_calendario
 
     source = Path("templates/integraciones_google.html").read_text(encoding="utf-8")
-    assert "https://calendar.google.com/calendar/u/0/r/month" in source
-    assert "intent://calendar.google.com" not in source
-    assert "S.browser_fallback_url" not in source
+    route_source = Path("routes/integraciones_google.py").read_text(encoding="utf-8")
+    assert '"#Intent;scheme=content;action=android.intent.action.VIEW;type=time/epoch;"' in route_source
     assert "Abrir app de Google Calendar" in source
-    assert "Al crear, cambiar o cancelar una cita en EDUTURNOS" in source
+    assert "EDUTURNOS es el registro principal" in source
     assert source.count("<h2>Agenda") == 1
     assert "google-calendar-actions" in source
     assert "{% if institucional_sync and institucional_sync.fallidas" in source
     assert "<script>" not in source
     assert "Reintentar citas fallidas" in source
     assert "{% if usuario.rol_nombre in ['Estudiante','Acudiente'] %}" not in source
+    with app.test_request_context(headers={"User-Agent": "Mozilla/5.0 (Linux; Android 14)"}):
+        assert _url_abrir_calendario(1793328513689) == (
+            "intent://com.android.calendar/time/1793328513689"
+            "#Intent;scheme=content;action=android.intent.action.VIEW;type=time/epoch;"
+            "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
+            "package=com.google.android.calendar;end"
+        )
+    with app.test_request_context(headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0)"}):
+        assert _url_abrir_calendario(1793328513689).startswith("https://calendar.google.com/calendar/u/0/r/day/")

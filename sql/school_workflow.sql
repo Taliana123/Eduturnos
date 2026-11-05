@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS cierres_cita (
     id_cita INT PRIMARY KEY,
     asistencia ENUM('Asistió','No asistió') NOT NULL,
     resultado TEXT NOT NULL,
+    requiere_otra_cita TINYINT(1) NOT NULL DEFAULT 0,
+    requiere_acompanamiento TINYINT(1) NOT NULL DEFAULT 0,
     cerrado_por INT NOT NULL,
     fecha_cierre DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_cita) REFERENCES citas(id) ON DELETE RESTRICT,

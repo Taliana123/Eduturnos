@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Configuración · EDUTURNOS{% endblock %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/configuracion.css') }}?v=20261027_sedes_desktop_alignment_v1">{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/configuracion.css') }}?v=20261102_cuentas_inscritas_v1">{% endblock %}
 {% block content %}
 <div class="administracion-page">
 <div class="configuracion-page">
@@ -12,7 +12,6 @@
     <h1>Configuración institucional</h1>
   </div>
 </div>
-
 {% if puede_editar_institucion %}
 <section class="panel">
   <div class="section-heading">
@@ -24,6 +23,8 @@
     <label class="institution-name">Nombre<input name="nombre" maxlength="180" required value="{{ institucion.nombre if institucion else '' }}"></label>
     <label class="institution-city">Ciudad<input name="ciudad" maxlength="100" required value="{{ institucion.ciudad if institucion else '' }}"></label>
     <label class="institution-department">Departamento<input name="departamento" maxlength="100" required value="{{ institucion.departamento if institucion else '' }}"></label>
+    <label class="full-field">Dirección principal<input name="direccion" maxlength="255" value="{{ institucion.direccion if institucion else '' }}"></label>
+    <label>Teléfono<input name="telefono" maxlength="40" value="{{ institucion.telefono if institucion else '' }}"></label>
     <div class="form-actions institution-actions"><button class="boton" type="submit">Guardar institución</button></div>
   </form>
 </section>
@@ -191,6 +192,59 @@
     </div>
   </div>
 </section>
+
+<section class="panel cuentas-inscritas-panel" id="cuentas-inscritas">
+  <header class="page-head config-section-heading">
+    <div>
+      <h2>Cuentas inscritas</h2>
+      <p>Total de usuarios registrados: <strong>{{ total_cuentas_inscritas }}</strong>. Bloquear impide iniciar sesión durante 30 días; retirar acceso desactiva la cuenta y conserva su historial.</p>
+    </div>
+  </header>
+  <label class="cuentas-inscritas-search">Buscar usuario
+    <input type="search" data-cuentas-filter placeholder="Nombre, documento, correo o rol">
+  </label>
+  <div class="table-wrap">
+    <table class="cuentas-inscritas-table">
+      <thead><tr><th>Usuario</th><th>Documento</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody data-cuentas-lista>
+      {% for cuenta in cuentas_inscritas %}
+        <tr data-cuenta-row>
+          <td>{{ cuenta.nombres }} {{ cuenta.apellidos }}</td>
+          <td>{{ cuenta.documento }}</td>
+          <td>{{ cuenta.correo }}</td>
+          <td>{{ cuenta.rol_nombre }}</td>
+          <td>
+            {% if not cuenta.estado %}<span class="badge">Acceso retirado</span>
+            {% elif cuenta.bloqueada %}<span class="badge">Bloqueada hasta {{ cuenta.bloqueado_hasta.strftime('%d/%m/%Y') }}</span>
+            {% elif cuenta.verificado %}<span class="badge">Activa</span>
+            {% else %}<span class="badge">Pendiente de verificación</span>{% endif %}
+          </td>
+          <td class="acciones cuentas-inscritas-actions">
+            {% if cuenta.estado %}
+              {% if cuenta.bloqueada %}
+              <form method="post" action="{{ url_for('configuracion.desbloquear_cuenta', usuario_id=cuenta.id_usuario) }}">{{ csrf_field()|safe }}<button class="boton pequeno secundario" type="submit">Desbloquear</button></form>
+              {% else %}
+              <form method="post" action="{{ url_for('configuracion.bloquear_cuenta', usuario_id=cuenta.id_usuario) }}">{{ csrf_field()|safe }}<button class="boton pequeno secundario" type="submit">Bloquear 30 días</button></form>
+              {% endif %}
+              <form method="post" action="{{ url_for('configuracion.retirar_acceso_cuenta', usuario_id=cuenta.id_usuario) }}" onsubmit="return confirm('¿Retirar el acceso de esta cuenta? Se conservarán sus citas e historial.');">{{ csrf_field()|safe }}<button class="boton pequeno secundario" type="submit">Retirar acceso</button></form>
+            {% else %}
+              <form method="post" action="{{ url_for('configuracion.reactivar_cuenta', usuario_id=cuenta.id_usuario) }}">{{ csrf_field()|safe }}<button class="boton pequeno" type="submit">Reactivar</button></form>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}<tr><td colspan="6">Todavía no hay cuentas registradas para esta institución.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+<script>
+document.querySelector('[data-cuentas-filter]')?.addEventListener('input', function () {
+  const termino = this.value.trim().toLocaleLowerCase();
+  document.querySelectorAll('[data-cuenta-row]').forEach(function (fila) {
+    fila.hidden = !fila.textContent.toLocaleLowerCase().includes(termino);
+  });
+});
+</script>
 
 </div>
 </div>

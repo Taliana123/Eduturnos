@@ -6,7 +6,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from mysql.connector import Error as MySQLError
 
 from database.db import consultar, ejecutar
-from routes.helpers import auditoria, roles_permitidos
+from routes.helpers import auditoria, roles_permitidos, usuario_actual
 
 configuracion_bp = Blueprint("configuracion", __name__, url_prefix="/configuracion")
 
@@ -52,19 +52,73 @@ def _fijar_estado(tabla: str, columna_id: str, registro_id: int) -> None:
 
 
 def _institucion_actual():
+    usuario = usuario_actual()
+    if usuario and usuario.get("rol_nombre") != "Super Admin":
+        institucion_id = usuario.get("id_institucion")
+        if not institucion_id:
+            perfil = consultar(
+                "SELECT s.id_institucion FROM directorio_institucional d "
+                "JOIN sedes s ON s.id=d.id_sede WHERE d.id_usuario=%s LIMIT 1",
+                (usuario["id_usuario"],), uno=True,
+            )
+            institucion_id = (perfil or {}).get("id_institucion")
+        if not institucion_id:
+            return None
+        return consultar("SELECT * FROM instituciones WHERE id=%s", (institucion_id,), uno=True)
     return consultar("SELECT * FROM instituciones ORDER BY id LIMIT 1", uno=True)
+
+
+def _filtro_cuenta_institucional():
+    """Incluye cuentas asignadas directamente o vinculadas por su perfil escolar."""
+    return (
+        "(%s=1 OR u.id_institucion=%s "
+        "OR EXISTS (SELECT 1 FROM estudiantes e JOIN sedes s ON s.id=e.id_sede "
+        "WHERE e.id_usuario=u.id_usuario AND s.id_institucion=%s) "
+        "OR EXISTS (SELECT 1 FROM docentes d JOIN sedes s ON s.id=d.id_sede "
+        "WHERE d.id_usuario=u.id_usuario AND s.id_institucion=%s) "
+        "OR EXISTS (SELECT 1 FROM directorio_institucional di JOIN sedes s ON s.id=di.id_sede "
+        "WHERE di.id_usuario=u.id_usuario AND s.id_institucion=%s) "
+        "OR EXISTS (SELECT 1 FROM acudientes a WHERE a.id_usuario=u.id_usuario AND a.id_institucion=%s))"
+    )
+
+
+def _parametros_alcance_cuentas(institucion_id, todos):
+    return (int(todos), institucion_id, institucion_id, institucion_id, institucion_id, institucion_id)
+
+
+def _cuenta_en_alcance(usuario_id, institucion_id, todos):
+    return consultar(
+        "SELECT u.id_usuario,u.estado,r.nombre AS rol_nombre FROM usuarios u "
+        "JOIN roles r ON r.id=u.id_rol WHERE u.id_usuario=%s AND " + _filtro_cuenta_institucional(),
+        (usuario_id, *_parametros_alcance_cuentas(institucion_id, todos)),
+        uno=True,
+    )
 
 
 @configuracion_bp.get("/")
 @roles_permitidos(*CONFIG_ROLES)
 def index():
+    usuario = usuario_actual()
+    institucion_id = usuario.get("id_institucion") if usuario else None
+    todos = bool(usuario and usuario.get("rol_nombre") == "Super Admin")
+    institucion = _institucion_actual()
+    cuentas_inscritas = consultar(
+        "SELECT u.id_usuario,u.documento,u.nombres,u.apellidos,u.correo,u.estado,u.verificado, "
+        "u.bloqueado_hasta,(u.bloqueado_hasta>NOW()) AS bloqueada,u.fecha_creacion,r.nombre AS rol_nombre "
+        "FROM usuarios u JOIN roles r ON r.id=u.id_rol WHERE " + _filtro_cuenta_institucional() +
+        " ORDER BY u.estado DESC,u.apellidos,u.nombres,u.id_usuario",
+        _parametros_alcance_cuentas((institucion or {}).get("id"), todos),
+    )
     return render_template(
         "configuracion/index.html",
-        institucion=_institucion_actual(),
-        periodos=consultar("SELECT * FROM periodos_academicos ORDER BY fecha_inicio DESC, id DESC"),
+        institucion=institucion,
+        cuentas_inscritas=cuentas_inscritas,
+        total_cuentas_inscritas=len(cuentas_inscritas),
+        periodos=consultar("SELECT * FROM periodos_academicos WHERE (%s=1 OR id_institucion=%s) ORDER BY fecha_inicio DESC, id DESC", (int(todos), institucion_id)),
         sedes=consultar(
             "SELECT s.*, i.nombre AS institucion_nombre FROM sedes s "
-            "JOIN instituciones i ON i.id=s.id_institucion ORDER BY s.estado DESC, s.nombre"
+            "JOIN instituciones i ON i.id=s.id_institucion WHERE (%s=1 OR s.id_institucion=%s) ORDER BY s.estado DESC, s.nombre",
+            (int(todos), institucion_id),
         ),
         jornadas=consultar(
             "SELECT * FROM jornadas ORDER BY estado DESC, "
@@ -82,6 +136,93 @@ def index():
     )
 
 
+def _autorizar_accion_cuenta(cuenta):
+    actor = usuario_actual()
+    if not cuenta:
+        return "La cuenta no existe o no pertenece a tu institución."
+    if int(cuenta["id_usuario"]) == int(actor["id_usuario"]):
+        return "No puedes cambiar el acceso de tu propia cuenta."
+    rol_actor = actor.get("rol_nombre")
+    rol_objetivo = cuenta.get("rol_nombre")
+    if rol_actor != "Super Admin" and rol_objetivo == "Super Admin":
+        return "No tienes permisos para cambiar una cuenta Super Admin."
+    if rol_actor == "Administrador / Coordinador" and rol_objetivo in {"Rector", "Administrador / Coordinador"}:
+        return "El coordinador no puede cambiar el acceso de Rector o de otro coordinador."
+    if rol_actor == "Rector" and rol_objetivo == "Rector":
+        return "No puedes cambiar el acceso de otra cuenta Rector."
+    return None
+
+
+@configuracion_bp.post("/cuentas/<int:usuario_id>/bloquear")
+@roles_permitidos(*CONFIG_ROLES)
+def bloquear_cuenta(usuario_id):
+    actor = usuario_actual()
+    institucion = _institucion_actual()
+    todos = actor.get("rol_nombre") == "Super Admin"
+    cuenta = _cuenta_en_alcance(usuario_id, (institucion or {}).get("id"), todos)
+    error = _autorizar_accion_cuenta(cuenta)
+    if error:
+        flash(error, "error")
+    elif cuenta.get("estado"):
+        ejecutar("UPDATE usuarios SET bloqueado_hasta=DATE_ADD(NOW(),INTERVAL 30 DAY),intentos_fallidos=0 WHERE id_usuario=%s", (usuario_id,))
+        auditoria("BLOQUEAR", "Cuentas inscritas", usuario_id, "Cuenta bloqueada temporalmente por 30 días")
+        flash("Cuenta bloqueada durante 30 días.", "success")
+    else:
+        flash("La cuenta ya tiene el acceso retirado. Reactívala antes de bloquearla.", "error")
+    return redirect(url_for("configuracion.index", _anchor="cuentas-inscritas"))
+
+
+@configuracion_bp.post("/cuentas/<int:usuario_id>/desbloquear")
+@roles_permitidos(*CONFIG_ROLES)
+def desbloquear_cuenta(usuario_id):
+    actor = usuario_actual()
+    institucion = _institucion_actual()
+    todos = actor.get("rol_nombre") == "Super Admin"
+    cuenta = _cuenta_en_alcance(usuario_id, (institucion or {}).get("id"), todos)
+    error = _autorizar_accion_cuenta(cuenta)
+    if error:
+        flash(error, "error")
+    elif cuenta.get("estado"):
+        ejecutar("UPDATE usuarios SET bloqueado_hasta=NULL WHERE id_usuario=%s", (usuario_id,))
+        auditoria("DESBLOQUEAR", "Cuentas inscritas", usuario_id, "Bloqueo temporal retirado")
+        flash("Bloqueo retirado.", "success")
+    return redirect(url_for("configuracion.index", _anchor="cuentas-inscritas"))
+
+
+@configuracion_bp.post("/cuentas/<int:usuario_id>/retirar-acceso")
+@roles_permitidos(*CONFIG_ROLES)
+def retirar_acceso_cuenta(usuario_id):
+    actor = usuario_actual()
+    institucion = _institucion_actual()
+    todos = actor.get("rol_nombre") == "Super Admin"
+    cuenta = _cuenta_en_alcance(usuario_id, (institucion or {}).get("id"), todos)
+    error = _autorizar_accion_cuenta(cuenta)
+    if error:
+        flash(error, "error")
+    elif cuenta.get("estado"):
+        ejecutar("UPDATE usuarios SET estado=0,bloqueado_hasta=NULL WHERE id_usuario=%s", (usuario_id,))
+        auditoria("RETIRAR_ACCESO", "Cuentas inscritas", usuario_id, "Acceso retirado; se conserva el historial")
+        flash("Acceso retirado. Se conservan las citas y el historial.", "success")
+    return redirect(url_for("configuracion.index", _anchor="cuentas-inscritas"))
+
+
+@configuracion_bp.post("/cuentas/<int:usuario_id>/reactivar")
+@roles_permitidos(*CONFIG_ROLES)
+def reactivar_cuenta(usuario_id):
+    actor = usuario_actual()
+    institucion = _institucion_actual()
+    todos = actor.get("rol_nombre") == "Super Admin"
+    cuenta = _cuenta_en_alcance(usuario_id, (institucion or {}).get("id"), todos)
+    error = _autorizar_accion_cuenta(cuenta)
+    if error:
+        flash(error, "error")
+    elif not cuenta.get("estado"):
+        ejecutar("UPDATE usuarios SET estado=1,bloqueado_hasta=NULL,intentos_fallidos=0 WHERE id_usuario=%s", (usuario_id,))
+        auditoria("REACTIVAR", "Cuentas inscritas", usuario_id, "Cuenta reactivada")
+        flash("Cuenta reactivada.", "success")
+    return redirect(url_for("configuracion.index", _anchor="cuentas-inscritas"))
+
+
 def usuario_rol() -> str:
     from routes.helpers import usuario_actual
     usuario = usuario_actual()
@@ -96,19 +237,26 @@ def usuario_rol() -> str:
 @roles_permitidos(*OWNER)
 def guardar_institucion():
     try:
+        usuario = usuario_actual()
         institucion_id = _entero("id_institucion", required=False)
+        if usuario and usuario["rol_nombre"] != "Super Admin":
+            institucion_id = usuario.get("id_institucion")
+            if not institucion_id:
+                raise ValueError("La cuenta no tiene una institución asignada.")
         nombre = _texto("nombre", 180)
         ciudad = _texto("ciudad", 100)
         departamento = _texto("departamento", 100)
+        direccion = _texto("direccion", 255, required=False)
+        telefono = _texto("telefono", 40, required=False)
         if institucion_id:
             ejecutar(
-                "UPDATE instituciones SET nombre=%s,ciudad=%s,departamento=%s WHERE id=%s",
-                (nombre, ciudad, departamento, institucion_id),
+                "UPDATE instituciones SET nombre=%s,ciudad=%s,departamento=%s,direccion=%s,telefono=%s WHERE id=%s",
+                (nombre, ciudad, departamento, direccion or None, telefono or None, institucion_id),
             )
         else:
             institucion_id = ejecutar(
-                "INSERT INTO instituciones(nombre,ciudad,departamento) VALUES(%s,%s,%s)",
-                (nombre, ciudad, departamento),
+                "INSERT INTO instituciones(nombre,ciudad,departamento,direccion,telefono) VALUES(%s,%s,%s,%s,%s)",
+                (nombre, ciudad, departamento, direccion or None, telefono or None),
             )
         auditoria("ACTUALIZAR", "Configuración", institucion_id, "Institución actualizada")
         flash("Datos de la institución guardados en MySQL.", "success")
@@ -121,10 +269,12 @@ def guardar_institucion():
 @roles_permitidos(*OWNER)
 def toggle_institucion(institucion_id):
     try:
+        if usuario_rol() != "Super Admin":
+            raise ValueError("Solo Super Admin puede activar o desactivar instituciones.")
         _fijar_estado("instituciones", "id", institucion_id)
         auditoria("CAMBIAR_ESTADO", "Configuración", institucion_id, "Estado de institución cambiado")
         flash("Estado de la institución actualizado.", "success")
-    except MySQLError as exc:
+    except (ValueError, MySQLError) as exc:
         flash(f"No se pudo cambiar el estado: {exc}", "error")
     return redirect(url_for("configuracion.index"))
 
@@ -140,9 +290,10 @@ def nuevo_periodo():
         fin_d = date.fromisoformat(fin)
         if fin_d < inicio_d:
             raise ValueError("La fecha final no puede ser anterior a la fecha inicial.")
+        usuario = usuario_actual()
         ejecutar(
-            "INSERT INTO periodos_academicos(nombre,fecha_inicio,fecha_fin,activo,cerrado) VALUES(%s,%s,%s,0,0)",
-            (nombre, inicio, fin),
+            "INSERT INTO periodos_academicos(nombre,fecha_inicio,fecha_fin,activo,cerrado,id_institucion) VALUES(%s,%s,%s,0,0,%s)",
+            (nombre, inicio, fin, usuario.get("id_institucion") if usuario else None),
         )
         auditoria("CREAR", "Configuración", None, f"Periodo {nombre}")
         flash("Periodo creado correctamente.", "success")
@@ -154,12 +305,19 @@ def nuevo_periodo():
 @configuracion_bp.post("/periodo/<int:periodo_id>/activar")
 @roles_permitidos(*OWNER)
 def activar_periodo(periodo_id):
-    periodo = consultar("SELECT * FROM periodos_academicos WHERE id=%s", (periodo_id,), uno=True)
+    usuario = usuario_actual()
+    scope = "" if usuario["rol_nombre"] == "Super Admin" else " AND id_institucion=%s"
+    params = (periodo_id,) if not scope else (periodo_id, usuario.get("id_institucion"))
+    periodo = consultar("SELECT * FROM periodos_academicos WHERE id=%s" + scope, params, uno=True)
     if not periodo or periodo["cerrado"]:
         flash("El periodo no existe o ya está cerrado.", "error")
         return redirect(url_for("configuracion.index"))
-    ejecutar("UPDATE periodos_academicos SET activo=0")
-    ejecutar("UPDATE periodos_academicos SET activo=1 WHERE id=%s AND cerrado=0", (periodo_id,))
+    if usuario["rol_nombre"] == "Super Admin":
+        ejecutar("UPDATE periodos_academicos SET activo=0")
+        ejecutar("UPDATE periodos_academicos SET activo=1 WHERE id=%s AND cerrado=0", (periodo_id,))
+    else:
+        ejecutar("UPDATE periodos_academicos SET activo=0 WHERE id_institucion=%s", (usuario.get("id_institucion"),))
+        ejecutar("UPDATE periodos_academicos SET activo=1 WHERE id=%s AND cerrado=0 AND id_institucion=%s", (periodo_id, usuario.get("id_institucion")))
     auditoria("ACTIVAR", "Configuración", periodo_id, "Periodo académico activado")
     flash("Periodo activo actualizado.", "success")
     return redirect(url_for("configuracion.index"))
@@ -168,7 +326,11 @@ def activar_periodo(periodo_id):
 @configuracion_bp.post("/periodo/<int:periodo_id>/cerrar")
 @roles_permitidos(*OWNER)
 def cerrar_periodo(periodo_id):
-    ejecutar("UPDATE periodos_academicos SET activo=0,cerrado=1 WHERE id=%s", (periodo_id,))
+    usuario = usuario_actual()
+    if usuario["rol_nombre"] == "Super Admin":
+        ejecutar("UPDATE periodos_academicos SET activo=0,cerrado=1 WHERE id=%s", (periodo_id,))
+    else:
+        ejecutar("UPDATE periodos_academicos SET activo=0,cerrado=1 WHERE id=%s AND id_institucion=%s", (periodo_id, usuario.get("id_institucion")))
     auditoria("CERRAR", "Configuración", periodo_id, "Periodo académico cerrado")
     flash("Periodo cerrado.", "success")
     return redirect(url_for("configuracion.index"))
@@ -182,8 +344,13 @@ def cerrar_periodo(periodo_id):
 @roles_permitidos(*CONFIG_ROLES)
 def guardar_sede():
     try:
+        usuario = usuario_actual()
         sede_id = _entero("id_sede", required=False)
         institucion_id = _entero("id_institucion")
+        if usuario and usuario["rol_nombre"] != "Super Admin":
+            institucion_id = usuario.get("id_institucion")
+            if not institucion_id:
+                raise ValueError("La cuenta no tiene una institución asignada.")
         nombre = _texto("nombre", 140)
         direccion = _texto("direccion", 255, required=False)
         codigo = _texto("codigo_sede", 6, required=False)
@@ -193,6 +360,9 @@ def guardar_sede():
         if not consultar("SELECT id FROM instituciones WHERE id=%s", (institucion_id,), uno=True):
             raise ValueError("La institución seleccionada no existe.")
         if sede_id:
+            permitida = consultar("SELECT id FROM sedes WHERE id=%s AND id_institucion=%s", (sede_id, institucion_id), uno=True)
+            if not permitida:
+                raise ValueError("La sede no pertenece a tu institución.")
             ejecutar(
                 "UPDATE sedes SET id_institucion=%s,nombre=%s,direccion=%s,codigo_sede=%s,estado=%s WHERE id=%s",
                 (institucion_id, nombre, direccion or None, codigo or None, estado, sede_id),
@@ -213,10 +383,15 @@ def guardar_sede():
 @roles_permitidos(*CONFIG_ROLES)
 def toggle_sede(sede_id):
     try:
+        usuario = usuario_actual()
+        if usuario and usuario["rol_nombre"] != "Super Admin":
+            existe = consultar("SELECT id FROM sedes WHERE id=%s AND id_institucion=%s", (sede_id, usuario.get("id_institucion")), uno=True)
+            if not existe:
+                raise ValueError("La sede no pertenece a tu institución.")
         _fijar_estado("sedes", "id", sede_id)
         auditoria("CAMBIAR_ESTADO", "Configuración", sede_id, "Estado de sede cambiado")
         flash("Estado de sede actualizado.", "success")
-    except MySQLError as exc:
+    except (ValueError, MySQLError) as exc:
         flash(f"No se pudo cambiar el estado de la sede: {exc}", "error")
     return redirect(url_for("configuracion.index"))
 

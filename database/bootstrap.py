@@ -31,8 +31,66 @@ def ensure_database(config=None):
         cursor.execute("SELECT 1")
         cursor.fetchone()
 
+        # Aislamiento institucional incremental: asigna lo ya existente a
+        # JJFH y habilita instituciones independientes sin tocar sus datos.
+        cursor.execute("SHOW COLUMNS FROM instituciones LIKE 'requiere_codigo_institucional'")
+        if cursor.fetchone() is None:
+            cursor.execute("ALTER TABLE instituciones ADD COLUMN requiere_codigo_institucional TINYINT(1) NOT NULL DEFAULT 1")
+        for tabla in ("usuarios", "citas", "solicitudes_cita", "periodos_academicos", "acudientes"):
+            cursor.execute(f"SHOW COLUMNS FROM {tabla} LIKE 'id_institucion'")
+            if cursor.fetchone() is None:
+                cursor.execute(f"ALTER TABLE {tabla} ADD COLUMN id_institucion INT NULL")
+        cursor.execute("SELECT id FROM instituciones WHERE nombre LIKE '%Jos%Joaqu%n%Fl%rez%' ORDER BY id LIMIT 1")
+        jjfh = cursor.fetchone()
+        if jjfh:
+            jjfh_id = jjfh[0]
+            cursor.execute("UPDATE usuarios SET id_institucion=%s WHERE id_institucion IS NULL", (jjfh_id,))
+            cursor.execute("UPDATE citas c JOIN usuarios u ON u.id_usuario=c.creado_por SET c.id_institucion=u.id_institucion WHERE c.id_institucion IS NULL")
+            cursor.execute("UPDATE solicitudes_cita s JOIN usuarios u ON u.id_usuario=s.solicitante_usuario_id SET s.id_institucion=u.id_institucion WHERE s.id_institucion IS NULL")
+            cursor.execute("UPDATE periodos_academicos SET id_institucion=%s WHERE id_institucion IS NULL", (jjfh_id,))
+            cursor.execute("UPDATE acudientes a JOIN estudiante_acudiente ea ON ea.id_acudiente=a.id_acudiente JOIN estudiantes e ON e.id_estudiante=ea.id_estudiante JOIN sedes s ON s.id=e.id_sede SET a.id_institucion=s.id_institucion WHERE a.id_institucion IS NULL")
+            cursor.execute("UPDATE acudientes SET id_institucion=%s WHERE id_institucion IS NULL", (jjfh_id,))
+            for tabla in ("usuarios", "citas", "solicitudes_cita", "periodos_academicos", "acudientes"):
+                indice = f"idx_{tabla}_institucion"
+                cursor.execute(f"SHOW INDEX FROM {tabla} WHERE Key_name=%s", (indice,))
+                if cursor.fetchone() is None:
+                    cursor.execute(f"CREATE INDEX {indice} ON {tabla}(id_institucion)")
+
         # Migraciones pequeñas y seguras para instalaciones existentes.
+        # Guarda la descripcion del motivo personalizado.
+        cursor.execute("SHOW COLUMNS FROM citas LIKE 'motivo_otro'")
+        if cursor.fetchone() is None:
+            cursor.execute(
+                "ALTER TABLE citas ADD COLUMN motivo_otro VARCHAR(255) NULL"
+            )
+
         # La creación inicial completa sigue estando en database/eduturnos.sql.
+
+        # Las citas dirigidas a personal o acudientes no necesariamente están
+        # asociadas a un estudiante ni a un docente organizador.
+        for columna in ("id_estudiante", "id_acudiente", "id_docente"):
+            cursor.execute(f"SHOW COLUMNS FROM citas LIKE '{columna}'")
+            campo = cursor.fetchone()
+            if campo is not None and str(campo[2]).upper() != "YES":
+                cursor.execute(f"ALTER TABLE citas MODIFY COLUMN {columna} INT NULL")
+        for columna, tipo in (("destinatario_tipo", "VARCHAR(40) NULL"), ("destinatario_usuario_id", "INT NULL")):
+            cursor.execute(f"SHOW COLUMNS FROM citas LIKE '{columna}'")
+            if cursor.fetchone() is None:
+                cursor.execute(f"ALTER TABLE citas ADD COLUMN {columna} {tipo}")
+
+        cursor.execute("SHOW COLUMNS FROM solicitudes_cita LIKE 'tipo_solicitante'")
+        tipo_solicitante = cursor.fetchone()
+        if tipo_solicitante is not None and str(tipo_solicitante[1]).upper().startswith("ENUM("):
+            cursor.execute("ALTER TABLE solicitudes_cita MODIFY COLUMN tipo_solicitante VARCHAR(40) NOT NULL")
+        for columna in ("id_estudiante", "id_docente"):
+            cursor.execute(f"SHOW COLUMNS FROM solicitudes_cita LIKE '{columna}'")
+            campo = cursor.fetchone()
+            if campo is not None and str(campo[2]).upper() != "YES":
+                cursor.execute(f"ALTER TABLE solicitudes_cita MODIFY COLUMN {columna} INT NULL")
+        for columna, tipo in (("destinatario_tipo", "VARCHAR(40) NULL"), ("destinatario_usuario_id", "INT NULL"), ("motivo_otro", "VARCHAR(255) NULL"), ("id_periodo", "INT NULL")):
+            cursor.execute(f"SHOW COLUMNS FROM solicitudes_cita LIKE '{columna}'")
+            if cursor.fetchone() is None:
+                cursor.execute(f"ALTER TABLE solicitudes_cita ADD COLUMN {columna} {tipo}")
 
         cursor.execute(
             "SHOW COLUMNS FROM citas LIKE 'recordatorio_24h_enviado'"
@@ -68,6 +126,13 @@ def ensure_database(config=None):
         cursor.execute(migracion_escolar.read_text(encoding="utf-8"))
         while cursor.nextset():
             pass
+        for columna in ("requiere_otra_cita", "requiere_acompanamiento"):
+            cursor.execute(f"SHOW COLUMNS FROM cierres_cita LIKE '{columna}'")
+            if cursor.fetchone() is None:
+                cursor.execute(
+                    f"ALTER TABLE cierres_cita ADD COLUMN {columna} "
+                    "TINYINT(1) NOT NULL DEFAULT 0"
+                )
         migracion_google = Path(__file__).resolve().parents[1] / "sql" / "google_calendar_sync.sql"
         for sentencia in migracion_google.read_text(encoding="utf-8").split(";"):
             sentencia = sentencia.strip()
