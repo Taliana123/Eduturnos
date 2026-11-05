@@ -170,7 +170,7 @@ def index():
     usuario = usuario_actual()
     android = "Android" in request.user_agent.string
     proxima_cita, calendar_open_start_ms = _proxima_cita(usuario)
-    event_url = _url_app_cita(proxima_cita, android) if not android else None
+    event_url = _url_app_cita(proxima_cita, android)
     calendar_open_event_available = bool(proxima_cita and event_url)
     # En Android abre directamente la app en la fecha de la próxima cita.
     # El enlace web de evento de Apps Script se conserva solo para escritorio.
