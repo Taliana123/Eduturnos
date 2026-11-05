@@ -68,15 +68,52 @@ def _institucion_actual():
     return consultar("SELECT * FROM instituciones ORDER BY id LIMIT 1", uno=True)
 
 
+def _filtro_cuenta_institucional():
+    """Incluye cuentas asignadas directamente o vinculadas por su perfil escolar."""
+    return (
+        "(%s=1 OR u.id_institucion=%s "
+        "OR EXISTS (SELECT 1 FROM estudiantes e JOIN sedes s ON s.id=e.id_sede "
+        "WHERE e.id_usuario=u.id_usuario AND s.id_institucion=%s) "
+        "OR EXISTS (SELECT 1 FROM docentes d JOIN sedes s ON s.id=d.id_sede "
+        "WHERE d.id_usuario=u.id_usuario AND s.id_institucion=%s) "
+        "OR EXISTS (SELECT 1 FROM directorio_institucional di JOIN sedes s ON s.id=di.id_sede "
+        "WHERE di.id_usuario=u.id_usuario AND s.id_institucion=%s) "
+        "OR EXISTS (SELECT 1 FROM acudientes a WHERE a.id_usuario=u.id_usuario AND a.id_institucion=%s))"
+    )
+
+
+def _parametros_alcance_cuentas(institucion_id, todos):
+    return (int(todos), institucion_id, institucion_id, institucion_id, institucion_id, institucion_id)
+
+
+def _cuenta_en_alcance(usuario_id, institucion_id, todos):
+    return consultar(
+        "SELECT u.id_usuario,u.estado,r.nombre AS rol_nombre FROM usuarios u "
+        "JOIN roles r ON r.id=u.id_rol WHERE u.id_usuario=%s AND " + _filtro_cuenta_institucional(),
+        (usuario_id, *_parametros_alcance_cuentas(institucion_id, todos)),
+        uno=True,
+    )
+
+
 @configuracion_bp.get("/")
 @roles_permitidos(*CONFIG_ROLES)
 def index():
     usuario = usuario_actual()
     institucion_id = usuario.get("id_institucion") if usuario else None
     todos = bool(usuario and usuario.get("rol_nombre") == "Super Admin")
+    institucion = _institucion_actual()
+    cuentas_inscritas = consultar(
+        "SELECT u.id_usuario,u.documento,u.nombres,u.apellidos,u.correo,u.estado,u.verificado, "
+        "u.bloqueado_hasta,(u.bloqueado_hasta>NOW()) AS bloqueada,u.fecha_creacion,r.nombre AS rol_nombre "
+        "FROM usuarios u JOIN roles r ON r.id=u.id_rol WHERE " + _filtro_cuenta_institucional() +
+        " ORDER BY u.estado DESC,u.apellidos,u.nombres,u.id_usuario",
+        _parametros_alcance_cuentas((institucion or {}).get("id"), todos),
+    )
     return render_template(
         "configuracion/index.html",
-        institucion=_institucion_actual(),
+        institucion=institucion,
+        cuentas_inscritas=cuentas_inscritas,
+        total_cuentas_inscritas=len(cuentas_inscritas),
         periodos=consultar("SELECT * FROM periodos_academicos WHERE (%s=1 OR id_institucion=%s) ORDER BY fecha_inicio DESC, id DESC", (int(todos), institucion_id)),
         sedes=consultar(
             "SELECT s.*, i.nombre AS institucion_nombre FROM sedes s "
@@ -97,6 +134,93 @@ def index():
         estados=consultar("SELECT * FROM estados_cita ORDER BY estado DESC, id"),
         puede_editar_institucion=usuario_rol() in OWNER,
     )
+
+
+def _autorizar_accion_cuenta(cuenta):
+    actor = usuario_actual()
+    if not cuenta:
+        return "La cuenta no existe o no pertenece a tu institución."
+    if int(cuenta["id_usuario"]) == int(actor["id_usuario"]):
+        return "No puedes cambiar el acceso de tu propia cuenta."
+    rol_actor = actor.get("rol_nombre")
+    rol_objetivo = cuenta.get("rol_nombre")
+    if rol_actor != "Super Admin" and rol_objetivo == "Super Admin":
+        return "No tienes permisos para cambiar una cuenta Super Admin."
+    if rol_actor == "Administrador / Coordinador" and rol_objetivo in {"Rector", "Administrador / Coordinador"}:
+        return "El coordinador no puede cambiar el acceso de Rector o de otro coordinador."
+    if rol_actor == "Rector" and rol_objetivo == "Rector":
+        return "No puedes cambiar el acceso de otra cuenta Rector."
+    return None
+
+
+@configuracion_bp.post("/cuentas/<int:usuario_id>/bloquear")
+@roles_permitidos(*CONFIG_ROLES)
+def bloquear_cuenta(usuario_id):
+    actor = usuario_actual()
+    institucion = _institucion_actual()
+    todos = actor.get("rol_nombre") == "Super Admin"
+    cuenta = _cuenta_en_alcance(usuario_id, (institucion or {}).get("id"), todos)
+    error = _autorizar_accion_cuenta(cuenta)
+    if error:
+        flash(error, "error")
+    elif cuenta.get("estado"):
+        ejecutar("UPDATE usuarios SET bloqueado_hasta=DATE_ADD(NOW(),INTERVAL 30 DAY),intentos_fallidos=0 WHERE id_usuario=%s", (usuario_id,))
+        auditoria("BLOQUEAR", "Cuentas inscritas", usuario_id, "Cuenta bloqueada temporalmente por 30 días")
+        flash("Cuenta bloqueada durante 30 días.", "success")
+    else:
+        flash("La cuenta ya tiene el acceso retirado. Reactívala antes de bloquearla.", "error")
+    return redirect(url_for("configuracion.index", _anchor="cuentas-inscritas"))
+
+
+@configuracion_bp.post("/cuentas/<int:usuario_id>/desbloquear")
+@roles_permitidos(*CONFIG_ROLES)
+def desbloquear_cuenta(usuario_id):
+    actor = usuario_actual()
+    institucion = _institucion_actual()
+    todos = actor.get("rol_nombre") == "Super Admin"
+    cuenta = _cuenta_en_alcance(usuario_id, (institucion or {}).get("id"), todos)
+    error = _autorizar_accion_cuenta(cuenta)
+    if error:
+        flash(error, "error")
+    elif cuenta.get("estado"):
+        ejecutar("UPDATE usuarios SET bloqueado_hasta=NULL WHERE id_usuario=%s", (usuario_id,))
+        auditoria("DESBLOQUEAR", "Cuentas inscritas", usuario_id, "Bloqueo temporal retirado")
+        flash("Bloqueo retirado.", "success")
+    return redirect(url_for("configuracion.index", _anchor="cuentas-inscritas"))
+
+
+@configuracion_bp.post("/cuentas/<int:usuario_id>/retirar-acceso")
+@roles_permitidos(*CONFIG_ROLES)
+def retirar_acceso_cuenta(usuario_id):
+    actor = usuario_actual()
+    institucion = _institucion_actual()
+    todos = actor.get("rol_nombre") == "Super Admin"
+    cuenta = _cuenta_en_alcance(usuario_id, (institucion or {}).get("id"), todos)
+    error = _autorizar_accion_cuenta(cuenta)
+    if error:
+        flash(error, "error")
+    elif cuenta.get("estado"):
+        ejecutar("UPDATE usuarios SET estado=0,bloqueado_hasta=NULL WHERE id_usuario=%s", (usuario_id,))
+        auditoria("RETIRAR_ACCESO", "Cuentas inscritas", usuario_id, "Acceso retirado; se conserva el historial")
+        flash("Acceso retirado. Se conservan las citas y el historial.", "success")
+    return redirect(url_for("configuracion.index", _anchor="cuentas-inscritas"))
+
+
+@configuracion_bp.post("/cuentas/<int:usuario_id>/reactivar")
+@roles_permitidos(*CONFIG_ROLES)
+def reactivar_cuenta(usuario_id):
+    actor = usuario_actual()
+    institucion = _institucion_actual()
+    todos = actor.get("rol_nombre") == "Super Admin"
+    cuenta = _cuenta_en_alcance(usuario_id, (institucion or {}).get("id"), todos)
+    error = _autorizar_accion_cuenta(cuenta)
+    if error:
+        flash(error, "error")
+    elif not cuenta.get("estado"):
+        ejecutar("UPDATE usuarios SET estado=1,bloqueado_hasta=NULL,intentos_fallidos=0 WHERE id_usuario=%s", (usuario_id,))
+        auditoria("REACTIVAR", "Cuentas inscritas", usuario_id, "Cuenta reactivada")
+        flash("Cuenta reactivada.", "success")
+    return redirect(url_for("configuracion.index", _anchor="cuentas-inscritas"))
 
 
 def usuario_rol() -> str:

@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, time, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from database.db import consultar, ejecutar
 from routes.helpers import roles_permitidos, usuario_actual, login_requerido, auditoria, notificar
@@ -16,6 +16,15 @@ ROLES_REVISAN_REPROGRAMACION = (
 
 
 def _validar_fecha_cita(valor):
+    if isinstance(valor, datetime):
+        fecha = valor.date()
+        if fecha < date.today():
+            raise ValueError("La fecha de la cita no puede ser anterior a hoy.")
+        return fecha.isoformat()
+    if isinstance(valor, date):
+        if valor < date.today():
+            raise ValueError("La fecha de la cita no puede ser anterior a hoy.")
+        return valor.isoformat()
     try:
         fecha = date.fromisoformat(str(valor or "").strip())
     except ValueError as exc:
@@ -25,12 +34,32 @@ def _validar_fecha_cita(valor):
     return fecha.isoformat()
 
 
+def _normalizar_hora_cita(valor):
+    """Acepta TIME de MySQL, timedelta y formatos de formulario HTML."""
+    if isinstance(valor, datetime):
+        valor = valor.time()
+    if isinstance(valor, time):
+        return valor.strftime("%H:%M")
+    if isinstance(valor, timedelta):
+        segundos = int(valor.total_seconds()) % 86400
+        return f"{segundos // 3600:02d}:{(segundos % 3600) // 60:02d}"
+
+    texto = str(valor or "").strip()
+    for formato in ("%H:%M", "%H:%M:%S", "%I:%M %p", "%I:%M:%S %p"):
+        try:
+            return datetime.strptime(texto, formato).strftime("%H:%M")
+        except ValueError:
+            continue
+    raise ValueError("La hora debe tener un formato válido, por ejemplo 08:00 o 08:00 AM.")
+
+
 def _estados():
     return [r["nombre"] for r in consultar("SELECT nombre FROM estados_cita ORDER BY id")]
 
 
 def _cita_desde_solicitud(s, fecha, hora, estado_nombre, creador_id):
     fecha = _validar_fecha_cita(fecha)
+    hora = _normalizar_hora_cita(hora)
     estado = consultar("SELECT id FROM estados_cita WHERE nombre=%s", (estado_nombre,), uno=True)
     periodo = consultar(
         "SELECT id FROM periodos_academicos WHERE activo=1 AND id=COALESCE(%s,(SELECT id FROM periodos_academicos WHERE activo=1 ORDER BY id DESC LIMIT 1)) LIMIT 1",
@@ -316,7 +345,7 @@ def resolver(solicitud_id):
             flash("Solicitud rechazada.", "success")
         elif accion in ("aceptar", "proponer"):
             fecha_final = _validar_fecha_cita(fecha or s["fecha_solicitada"])
-            hora_final = hora or s["hora_solicitada"]
+            hora_final = _normalizar_hora_cita(hora or s["hora_solicitada"])
             try:
                 datetime.strptime(str(fecha_final), "%Y-%m-%d")
                 datetime.strptime(str(hora_final), "%H:%M")

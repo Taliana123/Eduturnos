@@ -40,16 +40,18 @@ TRANSICIONES_ESTADO = {
     "Justificada": set(),
 }
 def _motivo_cita(motivo_id, usuario):
+    es_personal = (request.form.get("destinatario_tipo") or "Estudiante").strip() != "Estudiante"
     motivo = consultar(
-        "SELECT id,nombre FROM motivos WHERE id=%s AND estado=1",
+        "SELECT id,nombre FROM motivos WHERE id=%s" + ("" if es_personal else " AND estado=1"),
         (motivo_id,),
         uno=True,
     )
     if not motivo:
         raise ValueError("El motivo seleccionado no está disponible.")
     texto = None
-    if str(motivo.get("nombre", "")).strip().casefold() == "otro":
-        if (request.form.get("destinatario_tipo") or "").strip() == "Estudiante":
+    es_otro = str(motivo.get("nombre", "")).strip().casefold() == "otro"
+    if es_otro or es_personal:
+        if not es_personal:
             raise ValueError("Selecciona uno de los motivos disponibles para estudiantes.")
         texto = (request.form.get("motivo_otro") or "").strip()
         if not texto or len(texto) > 255:
@@ -195,16 +197,11 @@ def _visible(usuario):
         params.append(usuario["id_institucion"])
 
     # Estos roles pueden consultar todas las citas de su institución.
-    if rol not in (
-        "Super Admin",
-        "Rector",
-        "Administrador / Coordinador",
-    ):
-
-        if rol == "Docente":
-            relacion = "c.id_docente=(SELECT d.id_docente FROM docentes d WHERE d.id_usuario=%s)"
-            relacion_params = [usuario["id_usuario"]]
-        elif rol == "Estudiante":
+    if rol in ("Docente", "Administrador / Coordinador"):
+        filtros.append("c.creado_por=%s")
+        params.append(usuario["id_usuario"])
+    elif rol not in ("Super Admin", "Rector"):
+        if rol == "Estudiante":
             relacion = "c.id_estudiante=(SELECT e.id_estudiante FROM estudiantes e WHERE e.documento=%s)"
             relacion_params = [usuario["documento"]]
         elif rol == "Acudiente":
@@ -759,6 +756,27 @@ def index():
 
     usuario = usuario_actual()
     citas = consultar_citas(usuario)
+    # No mostrar registros antiguos en los que el Rector figura como su propio destinatario.
+    # Las solicitudes de otras personas dirigidas al Rector se conservan.
+    if usuario["rol_nombre"] == "Rector":
+        citas = [
+            cita for cita in citas
+            if not (
+                cita.get("destinatario_usuario_id") == usuario["id_usuario"]
+                and cita.get("creado_por") == usuario["id_usuario"]
+            )
+        ]
+    tipo_destinatario = (request.args.get("destinatario_tipo") or "").strip()
+    tipos_destinatario = {
+        "Estudiante", "Docente", "Administrador / Coordinador", "Acudiente", "Rector"
+    }
+    if usuario["rol_nombre"] == "Rector":
+        tipos_destinatario.discard("Rector")
+    if tipo_destinatario in tipos_destinatario:
+        citas = [
+            cita for cita in citas
+            if (cita.get("destinatario_tipo") or "Estudiante") == tipo_destinatario
+        ]
     puede_anotar = usuario["rol_nombre"] in (
         "Super Admin",
         "Rector",
@@ -802,6 +820,7 @@ def index():
     return render_template(
         "citas/index.html",
         citas=citas,
+        tipo_destinatario=tipo_destinatario if tipo_destinatario in tipos_destinatario else "",
         notas_por_cita=notas_por_cita,
         puede_anotar=puede_anotar,
         usuario_id=usuario["id_usuario"],
@@ -886,10 +905,21 @@ def _crear_cita_para_personal(usuario):
         raise ValueError("Tu rol no puede crear una citaci?n para ese tipo de destinatario.")
     try:
         destinatario_id = int(request.form.get("destinatario_usuario_id", ""))
-        motivo_id = int(request.form.get("id_motivo", ""))
+    except (TypeError, ValueError):
+        raise ValueError("Busca por documento y selecciona el destinatario antes de crear la cita.")
+    motivo_personal = consultar(
+        "SELECT id FROM motivos "
+        "ORDER BY CASE WHEN estado=1 THEN 0 ELSE 1 END, "
+        "CASE WHEN LOWER(TRIM(nombre))='otro' THEN 0 ELSE 1 END, id LIMIT 1",
+        uno=True,
+    )
+    if not motivo_personal:
+        raise ValueError("No hay motivos registrados en la institución. Crea al menos uno en Configuración institucional.")
+    motivo_id = motivo_personal["id"]
+    try:
         periodo_id = int(request.form.get("id_periodo", ""))
     except (TypeError, ValueError):
-        raise ValueError("Selecciona el destinatario, motivo y periodo.")
+        raise ValueError("Selecciona un periodo académico activo. Si no aparece ninguno, Rectoría debe activarlo en Configuración institucional.")
     if destinatario_id == int(usuario["id_usuario"]):
         raise ValueError("No puedes crear una citaci?n para tu propia cuenta.")
     persona = consultar(

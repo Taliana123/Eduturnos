@@ -322,11 +322,12 @@ def test_backfill_google_encola_citas_futuras_del_usuario(monkeypatch):
         resumen = google_calendar.encolar_citas_futuras(f"usuario:{user_id}", user_id)
 
     sql, parametros = consultas[0]
-    assert "TIMESTAMP(c.fecha,c.hora)>=NOW()" in sql
+    assert "TIMESTAMP(c.fecha,c.hora)>=%s" in sql
     assert "e.id_usuario=%s" in sql
     assert "a.id_usuario=%s" in sql
     assert "d.id_usuario=%s" in sql
-    assert parametros == (user_id, user_id, user_id, user_id, user_id)
+    assert isinstance(parametros[0], datetime)
+    assert parametros[1:] == (user_id, user_id, user_id, user_id, user_id)
     assert resumen == {"citas": 1, "encoladas": 2}
     assert encoladas == [(5, 77)]
 

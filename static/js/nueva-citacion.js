@@ -7,7 +7,6 @@
   const type = form.querySelector('#destinatario-tipo');
   const studentPanel = form.querySelector('[data-student-panel]');
   const personalPanel = form.querySelector('[data-personal-panel]');
-  const personal = form.querySelector('#destinatario-personal');
   const search = form.querySelector('#buscar-documento-estudiante');
   const searchButton = form.querySelector('#buscar-estudiante-boton');
   const studentId = form.querySelector('#id-estudiante');
@@ -22,7 +21,7 @@
   const personalReasonField = form.querySelector('[data-personal-reason-field]');
   const studentReason = form.querySelector('#motivo-estudiante');
   const reasonId = form.querySelector('#id-motivo');
-  const personalReason = form.querySelector('#motivo-otro');
+  const personalReason = form.querySelector('#motivo-personal');
   let requestSerial = 0;
   let personalRequestSerial = 0;
   let personalTimer = 0;
@@ -158,8 +157,7 @@
     personalReasonField.hidden = isStudent;
     personalReason.disabled = isStudent;
     personalReason.required = !isStudent;
-    reasonId.value = isStudent ? studentReason.value : form.dataset.otherReasonId;
-
+    reasonId.value = isStudent ? studentReason.value : (form.dataset.otherReasonId || '');
     search.disabled = !isStudent;
     searchButton.disabled = !isStudent;
     studentId.disabled = !isStudent;
@@ -207,10 +205,15 @@
   });
   search.addEventListener('input', () => {
     requestSerial += 1;
+    search.setCustomValidity('');
     clearStudent('Documento modificado. Pulsa Buscar para cargar los datos.');
   });
   type.addEventListener('change', applyType);
-  studentReason.addEventListener('change', () => { reasonId.value = studentReason.value; });
+  type.addEventListener('input', applyType);
+  studentReason.addEventListener('change', () => {
+    reasonId.value = studentReason.value;
+    studentReason.setCustomValidity('');
+  });
   personalSearch.addEventListener('input', () => {
     personalRequestSerial += 1;
     personalSearch.setCustomValidity('');
@@ -220,6 +223,9 @@
       personalTimer = window.setTimeout(resolvePersonalRecipient, 350);
     }
   });
+  personalReason.addEventListener('input', () => {
+    personalReason.setCustomValidity('');
+  });
   personalSearch.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -228,10 +234,28 @@
     }
   });
   form.addEventListener('submit', (event) => {
+    if (type.value === 'Estudiante' && !studentId.value) {
+      event.preventDefault();
+      search.setCustomValidity('Busca y selecciona al estudiante por número de documento.');
+      search.reportValidity();
+      return;
+    }
     if (type.value !== 'Estudiante' && !personalId.value) {
       event.preventDefault();
       personalSearch.setCustomValidity('Ingresa un documento válido y espera a que se seleccione el destinatario.');
       personalSearch.reportValidity();
+      return;
+    }
+    if (type.value === 'Estudiante' && !studentReason.value) {
+      event.preventDefault();
+      studentReason.setCustomValidity('Selecciona el motivo de la citación.');
+      studentReason.reportValidity();
+      return;
+    }
+    if (type.value !== 'Estudiante' && !personalReason.value.trim()) {
+      event.preventDefault();
+      personalReason.setCustomValidity('Escribe el motivo de la citación.');
+      personalReason.reportValidity();
     }
   });
   form.addEventListener('reset', () => {
@@ -241,8 +265,14 @@
       personalSearch.value = '';
       clearPersonal('Escribe el documento para seleccionar automáticamente el destinatario.');
       applyType();
+      studentReason.value = '';
+      reasonId.value = '';
+      personalReason.value = '';
     }, 0);
   });
 
   applyType();
+  // Reapply the correct recipient panel when mobile browsers restore this
+  // form from the back/forward cache after a validation redirect.
+  window.addEventListener('pageshow', applyType);
 })();

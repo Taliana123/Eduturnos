@@ -21,7 +21,8 @@ def usuario_actual():
             "SELECT u.*, r.nombre AS rol_nombre, i.nombre AS institucion_nombre, "
             "i.requiere_codigo_institucional FROM usuarios u JOIN roles r ON r.id=u.id_rol "
             "LEFT JOIN instituciones i ON i.id=u.id_institucion "
-            "WHERE u.id_usuario=%s AND u.estado=1",
+            "WHERE u.id_usuario=%s AND u.estado=1 "
+            "AND (u.bloqueado_hasta IS NULL OR u.bloqueado_hasta<=NOW())",
             (uid,), uno=True,
         )
     except Exception:

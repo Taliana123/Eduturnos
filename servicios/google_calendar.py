@@ -4,6 +4,7 @@ import base64
 import hashlib
 import hmac
 import json
+import re
 import time
 import uuid
 from datetime import datetime, time as datetime_time, timedelta, timezone
@@ -74,6 +75,24 @@ def probar_apps_script() -> None:
         raise GoogleCalendarError(
             "Actualiza y vuelve a implementar EDUTURNOSCalendar.gs en Apps Script para corregir la verificación de firma."
         )
+
+
+def enlace_evento_apps_script(google_event_id: str) -> str:
+    """Resuelve el iCalUID guardado por CalendarApp a un enlace de evento real."""
+    event_id = str(google_event_id or "").strip()
+    if not event_id:
+        raise GoogleCalendarError("La cita todavía no tiene un evento sincronizado.", 404)
+    respuesta = _solicitud_apps_script({"action": "event_link", "google_event_id": event_id})
+    url = str(respuesta.get("url") or "").strip()
+    parsed = urlsplit(url)
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname != "www.google.com"
+        or parsed.path != "/calendar/event"
+        or not parsed.query.startswith("eid=")
+    ):
+        raise GoogleCalendarError("Google Calendar no devolvió el enlace de la cita.", 502)
+    return url
 
 
 def _canonical_json(value: dict) -> str:
@@ -332,13 +351,15 @@ def _conexiones_para_cita(cita_id: int, creador_id: int) -> list[dict]:
         "LEFT JOIN docentes d ON d.id_docente=c.id_docente "
         "LEFT JOIN usuarios u ON u.id_usuario=i.id_usuario "
         "LEFT JOIN roles r ON r.id=u.id_rol "
-        "WHERE (i.scope_key='institucional' AND c.id_institucion=%s) "
+        "WHERE (i.scope_key='institucional' AND (c.id_institucion=%s OR "
+        "(c.id_institucion IS NULL AND EXISTS (SELECT 1 FROM usuarios creador "
+        "WHERE creador.id_usuario=c.creado_por AND creador.id_institucion=%s)))) "
         "OR i.scope_key=CONCAT('institucion:',c.id_institucion) "
         "OR (i.scope_key LIKE 'usuario:%%' AND u.estado=1 AND (i.id_usuario=%s "
         "OR i.id_usuario IN (c.creado_por,e.id_usuario,a.id_usuario,d.id_usuario) "
         "OR (r.nombre IN ('Super Admin','Rector','Administrador / Coordinador') "
         "AND u.id_institucion=c.id_institucion))) ",
-        (cita_id, institucion_principal_id or -1, creador_id),
+        (cita_id, institucion_principal_id or -1, institucion_principal_id or -1, creador_id),
     )
     cita = consultar("SELECT id_institucion FROM citas WHERE id=%s", (cita_id,), uno=True)
     es_principal = bool(
@@ -502,20 +523,31 @@ def encolar_cita(cita_id: int, creador_id: int, operacion: str = "upsert") -> in
 
 def encolar_citas_futuras(scope_key: str, user_id: int | None = None) -> dict:
     filtros = [
-        "TIMESTAMP(c.fecha,c.hora)>=NOW()",
+        # Las fechas/horas de EDUTURNOS se guardan en hora local de Colombia.
+        # No compararlas con NOW() del servidor (AlwaysData puede estar en UTC).
+        "TIMESTAMP(c.fecha,c.hora)>=%s",
         "ec.nombre IN ('Pendiente','Confirmada','Reprogramada')",
     ]
-    parametros = []
+    hora_bogota = datetime.now(timezone(timedelta(hours=-5))).replace(tzinfo=None)
+    parametros = [hora_bogota]
     institution_id = _id_institucion_scope(scope_key)
     if scope_key == "institucional":
         institution_id = _id_institucion_principal()
         if not institution_id:
             return {"citas": 0, "encoladas": 0}
-        filtros.append("c.id_institucion=%s")
-        parametros.append(institution_id)
+        filtros.append(
+            "(c.id_institucion=%s OR (c.id_institucion IS NULL AND EXISTS ("
+            "SELECT 1 FROM usuarios creador WHERE creador.id_usuario=c.creado_por "
+            "AND creador.id_institucion=%s)))"
+        )
+        parametros.extend([institution_id, institution_id])
     elif institution_id is not None:
-        filtros.append("c.id_institucion=%s")
-        parametros.append(institution_id)
+        filtros.append(
+            "(c.id_institucion=%s OR (c.id_institucion IS NULL AND EXISTS ("
+            "SELECT 1 FROM usuarios creador WHERE creador.id_usuario=c.creado_por "
+            "AND creador.id_institucion=%s)))"
+        )
+        parametros.extend([institution_id, institution_id])
     else:
         if user_id is None:
             return {"citas": 0, "encoladas": 0}
@@ -528,7 +560,7 @@ def encolar_citas_futuras(scope_key: str, user_id: int | None = None) -> dict:
         parametros.extend([user_id] * 5)
     citas = consultar(
         "SELECT DISTINCT c.id,c.creado_por FROM citas c "
-        "JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
+        "LEFT JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
         "LEFT JOIN acudientes a ON a.id_acudiente=c.id_acudiente "
         "LEFT JOIN docentes d ON d.id_docente=c.id_docente "
         "JOIN estados_cita ec ON ec.id=c.id_estado WHERE " + " AND ".join(filtros)
@@ -550,7 +582,7 @@ def sincronizar_cita(
         return []
     cita = consultar(
         "SELECT c.id,c.fecha,c.hora,c.lugar,c.creado_por,s.direccion sede "
-        "FROM citas c JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
+        "FROM citas c LEFT JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
         "LEFT JOIN sedes s ON s.id=e.id_sede WHERE c.id=%s",
         (cita_id,), uno=True,
     )
@@ -682,9 +714,20 @@ def _eliminar_evento_google(calendar_id: str, event_id: str, access_token: str) 
 
 def _procesar_tarea_apps_script(tarea: dict) -> None:
     cita = consultar(
-        "SELECT c.id,c.fecha,c.hora,c.lugar,c.creado_por,ec.nombre estado,s.direccion sede "
+        "SELECT c.id,c.fecha,c.hora,c.lugar,c.creado_por,ec.nombre estado,s.direccion sede, "
+        "COALESCE(eu.correo,ef.correo) estudiante_correo,COALESCE(au.correo,a.correo) acudiente_correo, "
+        "COALESCE(du.correo,d.correo_institucional) docente_correo,td.correo destinatario_correo, "
+        "cu.correo creador_correo "
         "FROM citas c JOIN estados_cita ec ON ec.id=c.id_estado "
         "LEFT JOIN estudiantes e ON e.id_estudiante=c.id_estudiante "
+        "LEFT JOIN usuarios eu ON eu.id_usuario=e.id_usuario AND eu.estado=1 "
+        "LEFT JOIN usuarios ef ON ef.documento=e.documento AND ef.estado=1 "
+        "LEFT JOIN acudientes a ON a.id_acudiente=c.id_acudiente "
+        "LEFT JOIN usuarios au ON au.id_usuario=a.id_usuario AND au.estado=1 "
+        "LEFT JOIN docentes d ON d.id_docente=c.id_docente "
+        "LEFT JOIN usuarios du ON du.id_usuario=d.id_usuario AND du.estado=1 "
+        "LEFT JOIN usuarios td ON td.id_usuario=c.destinatario_usuario_id AND td.estado=1 "
+        "LEFT JOIN usuarios cu ON cu.id_usuario=c.creado_por AND cu.estado=1 "
         "LEFT JOIN sedes s ON s.id=e.id_sede WHERE c.id=%s",
         (tarea["id_cita"],),
         uno=True,
@@ -708,11 +751,18 @@ def _procesar_tarea_apps_script(tarea: dict) -> None:
             "start": inicio.isoformat(),
         })
     if operacion == "upsert":
+        email_pattern = re.compile(r"[^\s@]+@[^\s@]+\.[^\s@]+")
+        emails = set()
+        for key in ("estudiante_correo", "acudiente_correo", "docente_correo", "destinatario_correo", "creador_correo"):
+            correo = str(cita.get(key) or "").strip().lower()
+            if email_pattern.fullmatch(correo) and not correo.rsplit("@", 1)[-1].endswith(".local"):
+                emails.add(correo)
         payload.update({
-            "title": "Citación escolar",
+            "title": "Citaci\u00f3n escolar",
             "description": "Consulta los detalles de la cita en EDUTURNOS.",
-            "location": cita.get("lugar") or cita.get("sede") or "Ibagué, Tolima",
+            "location": cita.get("lugar") or cita.get("sede") or "Ibagu\u00e9, Tolima",
             "end": (inicio + timedelta(minutes=30)).isoformat(),
+            "attendees": sorted(emails),
         })
     respuesta = _solicitud_apps_script(payload)
     if operacion == "delete":

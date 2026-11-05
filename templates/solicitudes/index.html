@@ -52,7 +52,7 @@
 
         <div class="table-responsive">
 
-            <table class="table">
+            <table class="table solicitudes-table">
 
                 <thead>
 
@@ -89,28 +89,31 @@
 
                     <tr>
 
-                        <td>
-                            <strong>#{{ s.id }}</strong>
+                        <td data-label="Solicitud">
+                            <div class="solicitud-mobile-summary">
+                                <strong>Solicitud #{{ s.id }}</strong>
+                                <button type="button" class="solicitud-mobile-toggle" data-request-toggle aria-expanded="false" aria-label="Abrir solicitud {{ s.id }}">Ver <span aria-hidden="true">⌄</span></button>
+                            </div>
                         </td>
 
 
-                        <td>
+                        <td data-label="Destinatario">
                             {{ s.estudiante }}
                             {% if s.destinatario_tipo %}<br><small>{{ 'Padre / acudiente' if s.destinatario_tipo == 'Acudiente' else 'Estudiante' if s.destinatario_tipo == 'Estudiante' else s.destinatario_tipo }}</small>{% endif %}
                         </td>
 
 
-                        <td>
+                        <td data-label="Motivo">
                             {{ s.motivo or "—" }}
                         </td>
 
 
-                        <td>
+                        <td data-label="Docente">
                             {{ s.docente or "Por asignar" }}
                         </td>
 
 
-                        <td>
+                        <td data-label="Solicitante">
 
                             {{ s.rol_solicitante }}
 
@@ -122,17 +125,17 @@
                         </td>
 
 
-                        <td>
+                        <td data-label="Fecha">
                             {{ s.fecha_solicitada }}
                         </td>
 
 
-                        <td>
+                        <td data-label="Hora">
                             {{ s.hora_solicitada|hora_ampm }}
                         </td>
 
 
-                        <td>
+                        <td data-label="Estado">
 
                             {% if s.estado == "Pendiente" %}
 
@@ -193,7 +196,7 @@
 
                         {% if rol in ["Super Admin", "Rector", "Administrador / Coordinador"] %}
 
-                        <td>
+                        <td data-label="Acciones" class="solicitudes-actions-cell">
 
                             {% if s.estado in ["Pendiente", "Propuesta"] %}
 
@@ -507,6 +510,7 @@ a.solicitudes-final-seguimiento:hover {
     background: #145b91 !important;
     color: #ffffff !important;
 }
+.solicitud-mobile-toggle { display:none; }
 @media(max-width:760px) {
     .solicitudes-encabezado {
         flex-direction: column !important;
@@ -519,6 +523,75 @@ a.solicitudes-final-seguimiento:hover {
     .solicitudes-header-actions { margin-top:-8px !important; }
     a.solicitudes-seguimiento { justify-content:center !important; }
 }
+
+@media(max-width:760px) {
+    #contenido .solicitudes-page { min-width:0 !important; padding-left:0 !important; padding-right:0 !important; }
+    #contenido .solicitudes-final-card { min-width:0 !important; padding:16px !important; overflow:hidden !important; }
+    #contenido .solicitudes-final-card > .card-header { margin-bottom:14px !important; }
+    #contenido .solicitudes-final-card > .card-header h2 { margin:0 0 6px !important; font-size:22px !important; line-height:1.25 !important; }
+    #contenido .solicitudes-final-card > .card-header p { margin:0 !important; line-height:1.45 !important; }
+    #contenido .solicitudes-table,
+    #contenido .solicitudes-table thead,
+    #contenido .solicitudes-table tbody { display:block !important; width:100% !important; min-width:0 !important; }
+    #contenido .solicitudes-page .table-responsive { width:100% !important; min-width:0 !important; overflow:visible !important; }
+    #contenido .solicitudes-table thead { display:none !important; }
+    #contenido .solicitudes-table tbody { display:grid !important; gap:12px !important; }
+    #contenido .solicitudes-table tbody tr {
+        display:grid !important;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:0 12px !important;
+        width:100% !important;
+        min-width:0 !important;
+        padding:8px 12px !important;
+        border:1px solid #dce5ef !important;
+        border-radius:13px !important;
+        background:#ffffff !important;
+        box-shadow:0 3px 10px rgba(18,59,104,.05) !important;
+        box-sizing:border-box !important;
+    }
+    #contenido .solicitudes-table tbody tr:not(.is-expanded) td:not([data-label="Solicitud"]) { display:none !important; }
+    #contenido .solicitudes-table tbody td[data-label="Solicitud"] { display:block !important; width:100% !important; min-width:0 !important; grid-column:1/-1 !important; }
+    #contenido .solicitudes-table tbody td[data-label="Solicitud"]::before { display:none !important; }
+    #contenido .solicitud-mobile-summary { display:flex !important; flex-flow:row nowrap !important; align-items:center !important; justify-content:space-between !important; gap:10px !important; width:100% !important; min-width:0 !important; }
+    #contenido .solicitud-mobile-summary strong { display:block !important; flex:1 1 auto !important; min-width:0 !important; margin:0 !important; color:#17365d; font-size:15px !important; line-height:1.3 !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important; }
+    #contenido .solicitud-mobile-toggle { display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; flex:0 0 auto !important; width:auto !important; min-width:58px !important; min-height:32px !important; margin-left:auto !important; padding:5px 9px !important; border:1px solid #dce5ef !important; border-radius:999px !important; background:#f4f8fc !important; color:#1769aa !important; font-size:12px !important; font-weight:700 !important; line-height:1 !important; box-shadow:none !important; }
+    #contenido .solicitud-mobile-toggle span { display:inline-block; transition:transform .15s ease; }
+    #contenido .solicitudes-table tbody tr.is-expanded .solicitud-mobile-toggle span { transform:rotate(180deg); }
+    #contenido .solicitudes-table tbody tr.is-expanded td[data-label="Solicitud"] { grid-column:1/-1 !important; border-bottom:1px solid #e8eef5 !important; }
+    #contenido .solicitudes-table tbody tr.is-expanded td[data-label="Solicitud"]::before { display:none !important; }
+    #contenido .solicitudes-table tbody td {
+        display:grid !important;
+        align-content:start !important;
+        gap:4px !important;
+        min-width:0 !important;
+        padding:9px 2px !important;
+        border:0 !important;
+        background:transparent !important;
+        color:#36506e !important;
+        line-height:1.4 !important;
+        white-space:normal !important;
+        overflow-wrap:anywhere !important;
+        word-break:normal !important;
+        box-sizing:border-box !important;
+    }
+    #contenido .solicitudes-table tbody td::before {
+        content:attr(data-label);
+        color:#71849a;
+        font-size:11px;
+        font-weight:700;
+        line-height:1.25;
+        text-transform:uppercase;
+        letter-spacing:.03em;
+    }
+    #contenido .solicitudes-table tbody td[data-label="Solicitud"],
+    #contenido .solicitudes-table tbody td[data-label="Acciones"] { grid-column:1/-1 !important; }
+    #contenido .solicitudes-table .badge { display:inline-flex !important; width:max-content; max-width:100%; white-space:normal !important; overflow-wrap:anywhere; }
+    #contenido .solicitudes-table .acciones-tabla { display:flex !important; flex-flow:row wrap !important; gap:8px !important; width:100% !important; }
+    #contenido .solicitudes-table .acciones-tabla form { flex:1 1 115px !important; min-width:0 !important; margin:0 !important; }
+    #contenido .solicitudes-table .acciones-tabla button { width:100% !important; min-width:0 !important; min-height:42px !important; padding:9px 10px !important; white-space:normal !important; line-height:1.2 !important; }
+}
 </style>
+
+<script src="{{ url_for('static', filename='js/solicitudes-collapsible.js') }}?v=20261103_collapse_v4" defer></script>
 
 {% endblock %}

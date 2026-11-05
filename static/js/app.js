@@ -51,16 +51,27 @@ document.addEventListener("DOMContentLoaded", () => {
 	if (citationsView) {
 		const search = citationsView.querySelector('[data-citas-search]');
 		const status = citationsView.querySelector('[data-citas-status]');
+		const recipient = citationsView.querySelector('[data-citas-recipient]');
 		const filterCitations = () => {
 			let visible = 0;
+			const normalize = (value) => (value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase().trim();
+			const query = normalize(search?.value);
 			citationsView.querySelectorAll('[data-citas-row]').forEach((row) => {
-				row.hidden = !row.dataset.student.toLocaleLowerCase().includes(search.value.trim().toLocaleLowerCase()) || (status.value && row.dataset.state !== status.value);
+				const matchesSearch = normalize(row.dataset.student).includes(query)
+					|| normalize(row.dataset.teacher).includes(query)
+					|| normalize(row.dataset.state).includes(query);
+				const matchesStatus = !status?.value || row.dataset.state === status.value;
+				const matchesRecipient = !recipient?.value || row.dataset.recipient === recipient.value;
+				row.hidden = !(matchesSearch && matchesStatus && matchesRecipient);
 				if (!row.hidden) visible++;
 			});
-			citationsView.querySelector('[data-citas-empty]').hidden = visible > 0;
+			const empty = citationsView.querySelector('[data-citas-empty]');
+			if (empty) empty.hidden = visible > 0;
 		};
-		search.addEventListener('input', filterCitations);
-		status.addEventListener('change', filterCitations);
+		search?.addEventListener('input', filterCitations);
+		status?.addEventListener('change', filterCitations);
+		recipient?.addEventListener('change', filterCitations);
+		filterCitations();
 	}
 	const administration = document.querySelector(".administracion-page .configuracion-page");
 	if (administration) {
@@ -357,22 +368,3 @@ if ("serviceWorker" in navigator) {
 		navigator.serviceWorker.register("/service-worker.js");
 	});
 }
-(() => {
-	if (!/Android/i.test(navigator.userAgent)) return;
-	document.addEventListener("click", (event) => {
-		if (!(event.target instanceof Element)) return;
-		const link = event.target.closest("a.google-calendar-open");
-		if (!(link instanceof HTMLAnchorElement)) return;
-		const href = link.getAttribute("href") || "";
-		const timestamp = href.match(/\/time\/(\d{10,})/);
-		let startMs = timestamp ? Number(timestamp[1]) : 0;
-		if (!startMs) {
-			const day = href.match(/calendar\/u\/\d+\/r\/day\/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
-			if (day) startMs = new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3]), 12).getTime();
-		}
-		if (!startMs) startMs = Date.now();
-		link.href = `intent://com.android.calendar/time/${startMs}#Intent;scheme=content;action=android.intent.action.VIEW;type=time/epoch;component=com.google.android.calendar/com.android.calendar.AllInOneActivity;package=com.google.android.calendar;end`;
-		link.target = "_blank";
-		link.rel = "noopener";
-	}, true);
-})();

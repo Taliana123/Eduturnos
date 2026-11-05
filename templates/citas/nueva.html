@@ -1,6 +1,6 @@
 ﻿{% extends 'base.html' %}
 {% from '_hora_cita.html' import selector_hora %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva-cita.css') }}?v=20261028_recipient_text_motive_v1"><link rel="stylesheet" href="{{ url_for('static', filename='css/citas-form-visibility.css') }}?v=20261028_recipient_text_motive_v1">{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva-cita.css') }}?v=20261102_recipient_panels_v5"><link rel="stylesheet" href="{{ url_for('static', filename='css/citas-form-visibility.css') }}?v=20261102_recipient_panels_v5">{% endblock %}
 {% block content %}
 <div class="page-head nueva-cita-heading"><div class="menu-page-heading"><div class="menu-page-heading-copy"><h1>Nueva citación</h1><p>Completa los datos del destinatario y agenda la fecha, hora y motivo del encuentro.</p></div></div></div>
 {% set motivo_otro_id = namespace(value='') %}{% for motivo in motivos %}{% if motivo.nombre|lower == 'otro' %}{% set motivo_otro_id.value = motivo.id %}{% endif %}{% endfor %}
@@ -33,7 +33,7 @@
       <option value="">Primero busca al estudiante por documento</option>
     </select>
   </section>
-  <section class="citation-mode-panel" data-personal-panel aria-labelledby="personal-mode-title" hidden style="display:none!important">
+  <section class="citation-mode-panel" data-personal-panel aria-labelledby="personal-mode-title" hidden>
     <h2 id="personal-mode-title">Citación para personal institucional</h2>
     <label class="full-field" data-personal-search-label for="buscar-documento-personal">Buscar por n&uacute;mero de documento</label>
     <div class="citation-document-control full-field personal-document-control">
@@ -53,14 +53,17 @@
         {% for motivo in motivos %}{% if motivo.nombre|lower != 'otro' %}<option value="{{ motivo.id }}">{{ motivo.nombre }}</option>{% endif %}{% endfor %}
       </select>
     </label>
-    <label class="full-field" data-personal-reason-field hidden>Motivo<textarea name="motivo_otro" id="motivo-otro" maxlength="255" rows="3" placeholder="Explica el motivo de la citación" disabled></textarea></label>
+    <label class="full-field" data-personal-reason-field hidden>Motivo de la citación
+      <textarea id="motivo-personal" name="motivo_otro" maxlength="255" rows="3" placeholder="Escribe el motivo de la citación" disabled></textarea>
+    </label>
     <input type="hidden" name="id_motivo" id="id-motivo" value="{{ motivo_otro_id.value }}">
     <label>Fecha<input type="date" name="fecha" min="{{ fecha_minima }}" required></label>
     <label>Hora{{ selector_hora('hora') }}</label>
+    {% if not periodos %}<p class="full-field citation-period-warning" role="alert">No hay un periodo académico activo. Rectoría debe activar uno en Configuración institucional para poder registrar la cita.</p>{% endif %}
   </section>
   <div class="full-field mobile-command-group citation-form-actions"><button class="boton" type="submit">Crear citación</button><button class="boton secundario" type="reset">Cancelar</button></div>
 </form>
-<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261028_reason_by_recipient_v2" defer></script>
+<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261102_personal_reason_text_v4" defer></script>
 <style>
 .nueva-cita-form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;width:min(100%,820px);margin:0 auto;padding:18px}
 .citation-mode-field,.citation-mode-panel{grid-column:1/-1;min-width:0}
@@ -70,6 +73,7 @@
 .citation-mode-panel[hidden]{display:none!important}
 .citation-mode-panel label[hidden]{display:none!important}
 .citation-details-panel textarea{width:100%;min-width:0;min-height:88px;box-sizing:border-box;resize:vertical}
+.citation-period-warning{margin:0;padding:12px;border-left:4px solid #d34747;border-radius:8px;background:#fff2f2;color:#7b2525}
 .nueva-cita-form > section[data-personal-panel][hidden]{display:none!important;visibility:hidden!important}
 .citation-mode-panel h2{margin:0 0 4px;color:#17365d;font-size:18px}
 .citation-mode-panel label{display:grid;gap:6px;min-width:0;color:#36506e;font-size:13px;font-weight:700}

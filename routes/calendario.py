@@ -28,27 +28,26 @@ def _filtros_usuario(usuario):
     filtros = []
     params = []
 
-    if rol in (
-        "Super Admin",
-        "Rector",
-        "Administrador / Coordinador",
-    ):
+    if rol in ("Super Admin", "Rector"):
         if rol != "Super Admin" and usuario.get("id_institucion"):
             filtros.append("c.id_institucion=%s")
             params.append(usuario["id_institucion"])
         return filtros, params
 
-    if rol == "Docente":
-        filtros.append(
-            """
-            c.id_docente = (
-                SELECT d.id_docente
-                FROM docentes d
-                WHERE d.id_usuario = %s
-            )
-            """
-        )
+    if rol == "Administrador / Coordinador":
+        filtros.append("c.creado_por=%s")
         params.append(usuario["id_usuario"])
+        if usuario.get("id_institucion"):
+            filtros.append("c.id_institucion=%s")
+            params.append(usuario["id_institucion"])
+        return filtros, params
+
+    if rol == "Docente":
+        filtros.append("c.creado_por=%s")
+        params.append(usuario["id_usuario"])
+        if usuario.get("id_institucion"):
+            filtros.append("c.id_institucion=%s")
+            params.append(usuario["id_institucion"])
 
     elif rol == "Estudiante":
         filtros.append(

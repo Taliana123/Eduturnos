@@ -18,10 +18,16 @@
                 <span class="citas-all-label">Todas las citaciones <span>{{ citas|length }}</span></span>
             </div>
             <div class="citas-desktop-search">
-                <input type="search" data-citas-search placeholder="Buscar estudiante..." aria-label="Buscar estudiante">
+                <input type="search" data-citas-search placeholder="Buscar por destinatario..." aria-label="Buscar por destinatario">
                 <select class="citas-desktop-state-filter" data-citas-status aria-label="Filtrar por estado">
                     <option value="">Todos los estados</option><option value="Pendiente">Pendiente</option><option value="Confirmada">Confirmada</option><option value="Realizada">Realizada</option><option value="No asistió">No asistió</option>
                     {% for estado in citas|map(attribute='estado')|unique|sort if estado not in ['Pendiente','Confirmada','Realizada','No asistió'] %}<option>{{ estado }}</option>{% endfor %}
+                </select>
+                <select class="citas-desktop-state-filter" data-citas-recipient aria-label="Filtrar por tipo de destinatario">
+                    <option value="">Todos los destinatarios</option>
+                    {% for tipo in ['Estudiante', 'Docente', 'Administrador / Coordinador', 'Acudiente', 'Rector'] %}
+                    {% if rol != 'Rector' or tipo != 'Rector' %}<option value="{{ tipo }}" {% if tipo_destinatario == tipo %}selected{% endif %}>{{ tipo }}</option>{% endif %}
+                    {% endfor %}
                 </select>
             </div>
         </div>
@@ -30,7 +36,7 @@
             <tbody id="citas-desktop-list">
             {% set meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'] %}
             {% for cita in citas %}
-            <tr data-citas-row data-student="{{ cita.estudiante }}" data-state="{{ cita.estado }}" data-teacher="{{ cita.docente }}" data-date="{{ cita.fecha }}">
+            <tr data-citas-row data-student="{{ cita.estudiante }}" data-state="{{ cita.estado }}" data-recipient="{{ cita.destinatario_tipo or 'Estudiante' }}" data-teacher="{{ cita.docente }}" data-date="{{ cita.fecha }}">
                 <td><div class="citas-desktop-student"><span class="citas-desktop-avatar" aria-hidden="true">{{ cita.estudiante[:1] }}</span><div><strong>{{ cita.estudiante }}</strong><small>{% if cita.grado %}Grado {{ cita.grado }}{% endif %}{% if cita.grupo %} · {{ cita.grupo }}{% endif %}{% if cita.jornada %} · {{ cita.jornada }}{% endif %}</small></div></div></td>
                 <td>{{ cita.fecha.day }} de {{ meses[cita.fecha.month - 1] }}, {{ cita.fecha.year }}<small>{{ cita.hora|hora_ampm }}</small></td>
                 <td>{{ cita.motivo }}</td><td>{{ cita.docente }}</td>
@@ -39,7 +45,7 @@
             </tr>
             {% endfor %}
             {% for cita in citas %}
-            <tr class="citas-mobile-row" data-citas-row data-student="{{ cita.estudiante }}" data-state="{{ cita.estado }}">
+            <tr class="citas-mobile-row" data-citas-row data-student="{{ cita.estudiante }}" data-state="{{ cita.estado }}" data-recipient="{{ cita.destinatario_tipo or 'Estudiante' }}">
                 <td colspan="6">
                     <article class="citas-mobile-card">
                         <header class="citas-mobile-card-heading">
@@ -299,7 +305,8 @@
   html body #contenido .citas-desktop-toolbar{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:10px;}
   html body #contenido .citas-desktop-tabs{min-width:0;}
   html body #contenido .citas-all-label{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:7px 4px;border-bottom:2px solid #2458d6;color:#2458d6;font-size:12px;font-weight:600;}
-  html body #contenido .citas-desktop-search{display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,.72fr);gap:8px;}
+  html body #contenido .citas-desktop-search{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;}
+  html body #contenido .citas-desktop-search input{grid-column:1/-1;}
   html body #contenido .citas-desktop-search input,html body #contenido select.citas-desktop-state-filter{width:100%!important;min-width:0!important;min-height:40px!important;margin:0!important;font-size:12px!important;}
   html body #contenido .citas-desktop-table-scroll{overflow:visible;}
   html body #contenido .citas-desktop-table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}

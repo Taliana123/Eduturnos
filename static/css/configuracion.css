@@ -1394,3 +1394,43 @@ html body.has-desktop-sidebar #contenido .administracion-page .configuracion-pag
         justify-content: flex-start !important;
     }
 }
+/* Cuenta institucional: directorio de usuarios para Rector y Coordinación. */
+.configuracion-page #cuentas-inscritas {
+    scroll-margin-top: 24px;
+}
+
+.configuracion-page .cuentas-inscritas-search {
+    display: block;
+    width: min(100%, 460px);
+    margin: 0 0 14px;
+}
+
+.configuracion-page .cuentas-inscritas-search input {
+    width: 100%;
+    margin-top: 6px;
+}
+
+.configuracion-page .cuentas-inscritas-table {
+    min-width: 820px;
+}
+
+.configuracion-page .cuentas-inscritas-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.configuracion-page .cuentas-inscritas-actions form {
+    margin: 0;
+}
+
+@media (max-width: 720px) {
+    .configuracion-page .cuentas-inscritas-panel {
+        padding: 16px 12px;
+    }
+
+    .configuracion-page .cuentas-inscritas-actions {
+        min-width: 170px;
+    }
+}
