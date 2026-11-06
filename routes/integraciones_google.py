@@ -80,19 +80,10 @@ def _inicio_proxima_cita_ms(usuario):
 
 
 def _url_abrir_calendario(inicio_ms=None):
-    """Abre la app Calendar en Android y el calendario web en computadores."""
+    """Enlace web de Google Calendar para escritorio."""
+    inicio_ms = int(inicio_ms or datetime.now(timezone(timedelta(hours=-5))).timestamp() * 1000)
     bogota = timezone(timedelta(hours=-5))
-    inicio_ms = int(inicio_ms or datetime.now(bogota).timestamp() * 1000)
     fecha = datetime.fromtimestamp(inicio_ms / 1000, tz=bogota).date()
-    if "Android" in request.user_agent.string:
-        # Lanza la actividad principal de Google Calendar instalada en Android.
-        # No incluye respaldo web para evitar terminar en Chrome/Google.com.
-        return (
-            "intent://launch/#Intent;scheme=eduturnos;"
-            "action=android.intent.action.MAIN;"
-            "category=android.intent.category.LAUNCHER;"
-            "package=com.google.android.calendar;end"
-        )
     return (
         "https://calendar.google.com/calendar/u/0/r/day/"
         f"{fecha.year}/{fecha.month}/{fecha.day}"
@@ -171,7 +162,7 @@ def index():
     calendar_open_event_available = bool(proxima_cita and event_url)
     # Android recibe el enlace HTTPS de la cita reconocido por Google Calendar.
     # Si no hay un evento sincronizado, se muestra el aviso sin lanzar un intent.
-    calendar_open_url = event_url or _url_abrir_calendario(calendar_open_start_ms)
+    calendar_open_url = event_url if android else (event_url or _url_abrir_calendario(calendar_open_start_ms))
     oauth_activo = configuracion_oauth_lista()
     scope_institucional = _scope_institucional(usuario)
     puente_activo = apps_script_configurada() and scope_institucional == "institucional"
