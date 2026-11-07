@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import base64
 import secrets
 from datetime import date, datetime, time, timedelta, timezone
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
-from urllib.parse import parse_qs, quote, urlencode, urlsplit
+from urllib.parse import parse_qs, urlencode, urlsplit
 
 from database.db import consultar, ejecutar
 from routes.helpers import login_requerido, roles_permitidos, usuario_actual
@@ -79,7 +80,35 @@ def _inicio_proxima_cita_ms(usuario):
     return int(ahora.timestamp() * 1000)
 
 
-def _url_intent_android(uri: str, scheme: str, fallback_url: str, content_type: str | None = None) -> str:
+def _scopes_calendario_usuario(usuario):
+    scopes = []
+    user_id = usuario.get("id_usuario")
+    if user_id:
+        scopes.append(f"usuario:{int(user_id)}")
+    institutional_scope = _scope_institucional(usuario)
+    if institutional_scope:
+        scopes.append(institutional_scope)
+    return list(dict.fromkeys(scopes))
+
+
+def _evento_sincronizado_cita(cita, usuario=None):
+    if not cita:
+        return None
+    scopes = _scopes_calendario_usuario(usuario) if usuario else ["institucional"]
+    placeholders = ",".join(["%s"] * len(scopes))
+    return consultar(
+        "SELECT eg.google_event_id,eg.scope_key,ig.calendar_id,ig.correo_google "
+        "FROM eventos_google eg LEFT JOIN integraciones_google ig "
+        "ON ig.scope_key=eg.scope_key "
+        "WHERE eg.id_cita=%s AND eg.scope_key IN (" + placeholders + ") "
+        "AND eg.estado='Sincronizado' AND eg.google_event_id IS NOT NULL "
+        "ORDER BY CASE WHEN eg.scope_key=%s THEN 0 ELSE 1 END LIMIT 1",
+        tuple([cita["id"], *scopes, scopes[0]]),
+        uno=True,
+    )
+
+
+def _url_intent_android(uri: str, scheme: str, content_type: str | None = None) -> str:
     intent_url = (
         f"intent://{uri}#Intent;scheme={scheme};action=android.intent.action.VIEW;"
     )
@@ -87,13 +116,13 @@ def _url_intent_android(uri: str, scheme: str, fallback_url: str, content_type: 
         intent_url += f"type={content_type};"
     return (
         intent_url
-        + "package=com.google.android.calendar;"
-        + f"S.browser_fallback_url={quote(fallback_url, safe='')};end"
+        + "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
+        + "package=com.google.android.calendar;end"
     )
 
 
 def _url_abrir_calendario(inicio_ms=None):
-    """Abre Google Calendar en Android o el día correspondiente en la web."""
+    """Genera un enlace nativo para móviles y web para equipos de escritorio."""
     inicio_ms = int(inicio_ms or datetime.now(timezone(timedelta(hours=-5))).timestamp() * 1000)
     bogota = timezone(timedelta(hours=-5))
     fecha = datetime.fromtimestamp(inicio_ms / 1000, tz=bogota).date()
@@ -101,13 +130,15 @@ def _url_abrir_calendario(inicio_ms=None):
         "https://calendar.google.com/calendar/u/0/r/day/"
         f"{fecha.year}/{fecha.month}/{fecha.day}"
     )
-    if "Android" in request.user_agent.string:
+    user_agent = request.user_agent.string.lower()
+    if "android" in user_agent:
         return _url_intent_android(
             f"com.android.calendar/time/{inicio_ms}",
             "content",
-            web_url,
             "time/epoch",
         )
+    if any(device in user_agent for device in ("iphone", "ipad", "ipod")):
+        return "googlecalendar://"
     return web_url
 
 def _proxima_cita(usuario, solo_sincronizadas=False):
@@ -128,15 +159,8 @@ def _proxima_cita(usuario, solo_sincronizadas=False):
         except (TypeError, ValueError):
             continue
         if inicio >= ahora:
-            if solo_sincronizadas:
-                evento = consultar(
-                    "SELECT google_event_id FROM eventos_google "
-                    "WHERE id_cita=%s AND scope_key='institucional' "
-                    "AND estado='Sincronizado' AND google_event_id IS NOT NULL LIMIT 1",
-                    (cita["id"],), uno=True,
-                )
-                if not evento:
-                    continue
+            if solo_sincronizadas and not _evento_sincronizado_cita(cita, usuario):
+                continue
             candidatas.append((inicio, cita))
     if candidatas:
         inicio, cita = min(candidatas, key=lambda elemento: elemento[0])
@@ -144,47 +168,68 @@ def _proxima_cita(usuario, solo_sincronizadas=False):
     return None, int(ahora.timestamp() * 1000)
 
 
-def _url_app_cita(cita, android: bool) -> str | None:
-    if not cita or not apps_script_configurada():
+def _url_evento_app_cita(cita, usuario=None) -> str | None:
+    if not cita:
         return None
-    evento = consultar(
-        "SELECT google_event_id FROM eventos_google "
-        "WHERE id_cita=%s AND scope_key='institucional' AND estado='Sincronizado' LIMIT 1",
-        (cita["id"],), uno=True,
-    )
+    evento = _evento_sincronizado_cita(cita, usuario)
     if not evento or not evento.get("google_event_id"):
         return None
-    try:
-        web_url = enlace_evento_apps_script(evento["google_event_id"])
-    except Exception:
-        current_app.logger.exception("No se pudo resolver el enlace de la cita sincronizada en Google Calendar")
+    if evento["scope_key"] == "institucional" and apps_script_configurada():
+        try:
+            web_url = enlace_evento_apps_script(evento["google_event_id"])
+        except Exception:
+            current_app.logger.exception("No se pudo resolver el enlace de la cita sincronizada en Google Calendar")
+            return None
+        parsed = urlsplit(web_url)
+        eid = parse_qs(parsed.query).get("eid", [""])[0]
+        if (
+            parsed.scheme != "https"
+            or parsed.hostname != "www.google.com"
+            or parsed.path != "/calendar/event"
+            or not eid
+            or any(ch not in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-" for ch in eid)
+        ):
+            return None
+    else:
+        calendar_id = evento.get("calendar_id")
+        if calendar_id == "primary":
+            calendar_id = evento.get("correo_google")
+        if not calendar_id:
+            return None
+        raw_eid = f"{evento['google_event_id']} {calendar_id}".encode("utf-8")
+        eid = base64.urlsafe_b64encode(raw_eid).decode("ascii").rstrip("=")
+    return "https://www.google.com/calendar/event?" + urlencode({"eid": eid})
+
+
+def _url_app_cita(
+    cita,
+    android: bool,
+    ios: bool = False,
+    evento_url: str | None = None,
+    usuario=None,
+) -> str | None:
+    web_url = evento_url if evento_url is not None else _url_evento_app_cita(cita, usuario)
+    if not web_url:
         return None
-    if not android:
-        return web_url
     parsed = urlsplit(web_url)
     eid = parse_qs(parsed.query).get("eid", [""])[0]
-    if (
-        parsed.scheme != "https"
-        or parsed.hostname != "www.google.com"
-        or parsed.path != "/calendar/event"
-        or not eid
-        or any(ch not in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-" for ch in eid)
-    ):
-        return None
-    web_url = "https://www.google.com/calendar/event?" + urlencode({"eid": eid})
-    return _url_intent_android(
-        f"www.google.com/calendar/event?eid={eid}",
-        "https",
-        web_url,
-    )
+    if ios:
+        return "googlecalendar://"
+    if android:
+        return _url_intent_android(f"www.google.com/calendar/event?eid={eid}", "https")
+    return web_url
 
 @integraciones_google_bp.get("/")
 @login_requerido
 def index():
     usuario = usuario_actual()
-    android = "Android" in request.user_agent.string
-    proxima_cita, calendar_open_start_ms = _proxima_cita(usuario, solo_sincronizadas=android)
-    event_url = _url_app_cita(proxima_cita, android)
+    user_agent = request.user_agent.string.lower()
+    android = "android" in user_agent
+    ios = any(device in user_agent for device in ("iphone", "ipad", "ipod"))
+    mobile = android or ios
+    proxima_cita, calendar_open_start_ms = _proxima_cita(usuario, solo_sincronizadas=mobile)
+    calendar_open_event_url = _url_evento_app_cita(proxima_cita, usuario) if mobile else None
+    event_url = _url_app_cita(proxima_cita, android, ios, calendar_open_event_url, usuario)
     calendar_open_url = event_url or _url_abrir_calendario(calendar_open_start_ms)
     oauth_activo = configuracion_oauth_lista()
     scope_institucional = _scope_institucional(usuario)
@@ -232,7 +277,9 @@ def index():
         institucion_nombre=institucion_nombre or "la institución",
         oauth_activo=oauth_activo,
         calendar_open_url=calendar_open_url,
+        calendar_open_event_url=calendar_open_event_url,
         calendar_open_start_ms=calendar_open_start_ms,
+        calendar_open_mobile=mobile,
         configuracion_lista=configuracion_lista(),
         callback_url=(uri_callback() if oauth_activo else "/integraciones-google/callback"),
     )

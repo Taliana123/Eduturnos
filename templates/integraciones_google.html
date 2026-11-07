@@ -13,7 +13,7 @@
     </header>
 
     <div class="alerta info calendar-description" role="note">
-        EDUTURNOS es el registro principal; si el calendario institucional está conectado, recibe una copia genérica de cada cita con fecha, hora y lugar, sin nombres de estudiantes o acudientes ni observaciones. La cuenta propietaria recibe avisos 24 y 2 horas antes; otras cuentas necesitan acceso compartido. Desconectar detiene futuras copias; las ya enviadas se administran en Google Calendar. En Android, el botón intenta abrir la cita sincronizada más próxima o la vista general de la app; Chrome ofrece la alternativa web si no puede iniciar la app. En PC abre Google Calendar en el navegador. Los recordatorios internos dependen de la tarea de notificaciones. <a href="{{ url_for('privacidad') }}">Política de Privacidad</a>.
+        EDUTURNOS es el registro principal; si el calendario institucional está conectado, recibe una copia genérica de cada cita con fecha, hora y lugar, sin nombres de estudiantes o acudientes ni observaciones. La cuenta propietaria recibe avisos 24 y 2 horas antes; otras cuentas necesitan acceso compartido. Desconectar detiene futuras copias; las ya enviadas se administran en Google Calendar. En celulares, el botón intenta abrir directamente la aplicación Google Calendar y no redirige a la web si no está instalada o no puede abrirse. En computadores abre Google Calendar en el navegador. Los recordatorios internos dependen de la tarea de notificaciones. <a href="{{ url_for('privacidad') }}">Política de Privacidad</a>.
     </div>
 
     {% if not oauth_activo and not apps_script_activo %}
@@ -52,7 +52,8 @@
             {% endif %}
         </div>
         <div class="google-calendar-actions">
-            <a class="boton google-calendar-open" href="{{ calendar_open_url }}" target="_self" data-calendar-start="{{ calendar_open_start_ms }}" data-google-calendar-open>Abrir Google Calendar</a>
+            <a class="boton google-calendar-open" href="{{ calendar_open_url }}" target="_self" data-calendar-start="{{ calendar_open_start_ms }}" data-calendar-event-url="{{ calendar_open_event_url or '' }}" data-google-calendar-open>Abrir Google Calendar</a>
+            {% if calendar_open_mobile %}<small class="calendar-mobile-note">En este celular se intenta abrir la app. Si no está instalada o el sistema no permite iniciarla, no se abrirá la versión web.</small>{% endif %}
             {% if puede_institucional and institucional_conectado %}
             <form method="post" action="{{ url_for('integraciones_google.sincronizar_institucional') }}">
                 {{ csrf_field()|safe }}

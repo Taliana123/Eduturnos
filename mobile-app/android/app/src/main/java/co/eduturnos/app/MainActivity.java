@@ -38,5 +38,31 @@ public class MainActivity extends BridgeActivity {
                 }
             });
         }
+
+        @JavascriptInterface
+        public void openEvent(String eventUrl) {
+            runOnUiThread(() -> {
+                Uri uri = Uri.parse(eventUrl == null ? "" : eventUrl);
+                String eventId = uri.getQueryParameter("eid");
+                if (!"https".equals(uri.getScheme())
+                        || !"www.google.com".equals(uri.getHost())
+                        || !"/calendar/event".equals(uri.getPath())
+                        || eventId == null
+                        || !eventId.matches("[A-Za-z0-9_-]+")) {
+                    Toast.makeText(MainActivity.this,
+                            "No se pudo validar la cita de Google Calendar.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri)
+                        .setPackage("com.google.android.calendar");
+                try {
+                    startActivity(intent);
+                } catch (ActivityNotFoundException error) {
+                    Toast.makeText(MainActivity.this,
+                            "Google Calendar no está disponible en este dispositivo.", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 }

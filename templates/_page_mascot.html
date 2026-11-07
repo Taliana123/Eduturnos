@@ -1,0 +1,21 @@
+<button
+    class="page-mascot page-mascot--floating{% if request.endpoint == 'auth.dashboard' %} page-mascot--dashboard{% endif %}"
+    type="button"
+    aria-label="{% if usuario_navegacion %}Agente de EDUTURNOS. Pulsa para hablar con EDUBOT y arrastra para moverlo.{% else %}Agente animado de EDUTURNOS. Arrastra para moverlo y pulsa para saludar.{% endif %}"
+    data-page-mascot
+    {% if usuario_navegacion %}data-assistant-voice-launch aria-controls="assistant-chat-panel" aria-expanded="false"{% endif %}
+>
+    <span class="page-mascot__frame" data-mascot-frame aria-hidden="true">
+        <span
+            class="page-mascot__sheet page-mascot__directions is-visible"
+            data-mascot-directions
+            style="background-image: url('{{ url_for('static', filename='mascots/drone-directions.webp') }}')"
+        ></span>
+        <span
+            class="page-mascot__sheet page-mascot__reactions"
+            data-mascot-reactions
+            style="background-image: url('{{ url_for('static', filename='mascots/drone-reactions.webp') }}')"
+        ></span>
+    </span>
+</button>
+<script src="{{ url_for('static', filename='js/page-mascot.js') }}?v=20261107_voice_panel_v2" defer></script>

@@ -632,7 +632,8 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'url_for(\'soporte.index\')' not in widget
     assert 'assistant-suggestions' not in widget
     assert 'Las preguntas abiertas se envían a Groq' not in widget
-    assert 'Por tu seguridad, no compartas información personal ni documentos.' in widget
+    assert 'No compartas información personal ni documentos.' in widget
+    assert 'tu voz se transcribe con el servicio del navegador' in widget
     assert 'datos de estudiantes' not in widget
     assert "{% include '_asistente_widget.html' %}" in lateral
     assert "{% include '_asistente_widget.html' %}" not in dashboard
@@ -642,8 +643,8 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
     assert "request.endpoint != 'soporte.index'" not in base
-    assert "css/edubot.css') }}?v=20261025_assistant_resize_v3" in base
-    assert "js/asistente.js') }}?v=20261025_assistant_resize_v3" in base
+    assert "css/edubot.css') }}?v=20261107_voice_chat_v3" in base
+    assert "js/asistente.js') }}?v=20261107_voice_chat_v3" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
     assert 'if (isOpen) {\n            clearChatPosition();\n            const defaultBounds = root.getBoundingClientRect();' in assistant_script
     assert 'assistantWidget' not in app_js
@@ -707,7 +708,15 @@ def test_edubot_local_se_integra_en_ayuda_sin_iframe_externo():
     script = Path('static/js/asistente.js').read_text(encoding='utf-8')
     environment = Path('.env.example').read_text(encoding='utf-8')
     assert '<iframe' not in plantilla
-    assert 'icons/edubot.png' in plantilla
+    assert 'icons/edubot.png' not in plantilla
+    assert 'assistant-sidebar-avatar assistant-drone-avatar' in plantilla
+    assert 'data-assistant-voice-view hidden' not in plantilla
+    assert 'data-assistant-voice-toggle aria-pressed="false"' in plantilla
+    assert 'data-create-citation-url=' in plantilla
+    assert 'data-assistant-dictate' not in plantilla
+    assert 'data-assistant-speak' not in plantilla
+    assert 'SpeechRecognition' in script
+    assert 'speechSynthesis' in script
     assert 'data-assistant-suggestion=' not in plantilla
     assert 'assistant-suggestions' not in styles
     base = Path('templates/base.html').read_text(encoding='utf-8')
@@ -716,10 +725,10 @@ def test_edubot_local_se_integra_en_ayuda_sin_iframe_externo():
     assert 'BOTPRESS_SHARE_URL' not in environment
     assert 'animation' not in plantilla
     assert 'css/edubot.css' in base
-    assert 'assistant-mark-float' in styles
+    assert 'animation: assistant-mark-float' not in styles
     assert 'background: #2458e8' in styles
+    assert 'assistant-action-link' in styles
     assert 'assistant-chat-body[hidden]' in styles
-    assert 'prefers-reduced-motion: reduce' in styles
     assert 'data-eduturnos-assistant' in script
     assert 'fetch(root.dataset.endpoint' in script
     assert 'data-assistant-clear' not in script

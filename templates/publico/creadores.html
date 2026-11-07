@@ -30,9 +30,23 @@
             {% endif %}
         </div>
         <h2>{{ nombre }}</h2>
-        {% if cargo %}<span class="creador-rol">{{ cargo }}</span>{% endif %}
+        {% if cargo %}<span class="creador-rol">{{ cargo }}</span>{% else %}<span class="creador-rol creador-rol-vacio" aria-hidden="true"></span>{% endif %}
     </article>
     {% endfor %}
+</section>
+
+<section class="creadores-edubot" aria-labelledby="creadores-edubot-title">
+    <div class="creadores-edubot-copy">
+        <span class="creadores-edubot-kicker">El compañero digital de EDUTURNOS</span>
+        <h2 id="creadores-edubot-title">EDUBOT</h2>
+        <p>Es el agente de orientación de la plataforma. Ayuda a la comunidad educativa a resolver dudas y a encontrar los pasos adecuados para usar EDUTURNOS.</p>
+        <ul aria-label="Funciones de EDUBOT">
+            <li>Orientación sobre la plataforma</li>
+            <li>Ayuda por texto y voz, según el navegador</li>
+            <li>Respuestas habladas cuando la voz está disponible</li>
+        </ul>
+    </div>
+    <span class="creadores-edubot-avatar" role="img" aria-label="Agente animado EDUBOT" style="background-image:url('{{ url_for('static', filename='mascots/drone-directions.webp') }}')"></span>
 </section>
 
 <section class="creadores-historia" aria-label="Historia y desarrollo de EDUTURNOS">
@@ -42,20 +56,29 @@
     <article><h2>Estructura y programación</h2><p>La aplicación usa Python y Flask en el servidor, rutas modulares por función, plantillas Jinja, HTML, CSS y JavaScript en la interfaz, y MySQL para los datos. La autenticación y los roles controlan el acceso; servicios separados atienden notificaciones y la sincronización con Google Calendar.</p></article>
 </section>
 <style>
-.creadores-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:24px 0 30px}
-.creador-card{display:grid;justify-items:center;align-content:start;min-width:0;padding:20px 12px;border:1px solid #e0eaf2;border-radius:16px;background:#fff;text-align:center;box-shadow:0 8px 20px rgba(24,67,103,.06)}
-.creador-foto{display:grid;place-items:center;width:104px;height:116px;margin-bottom:12px;overflow:hidden;border:1px solid #d6e3ef;border-radius:14px;background:#edf5fb;color:#6488a8}
+.creadores-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;gap:14px;margin:24px 0 30px}
+.creador-card{box-sizing:border-box;display:grid;grid-template-rows:116px minmax(2.8em,1fr) 25px;gap:10px;justify-items:center;align-content:stretch;min-width:0;min-height:248px;padding:20px 12px;border:1px solid #e0eaf2;border-radius:18px;background:#fff;text-align:center;box-shadow:0 8px 20px rgba(24,67,103,.06)}
+.creador-foto{display:grid;place-items:center;width:104px;height:116px;overflow:hidden;border:1px solid #d6e3ef;border-radius:14px;background:#edf5fb;color:#6488a8}
 .creador-foto img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 38%}
 .creador-foto img.creador-foto-jared{object-fit:cover;object-position:center 40%;transform:scale(1.3);transform-origin:center 40%}
 .creador-foto-placeholder{display:grid;width:100%;height:100%;place-items:center;background:linear-gradient(145deg,#eef7fc,#dcecf7)}
 .creador-foto-placeholder svg{width:46px;height:46px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.creador-card h2{margin:0;color:#17365d;font-size:16px;line-height:1.4}
-.creador-rol{margin-top:6px;padding:4px 9px;border-radius:20px;background:#eaf3ff;color:#2458a6;font-size:11px;font-weight:700}
+.creador-card h2{display:flex;align-items:center;justify-content:center;min-width:0;margin:0;color:#17365d;font-size:16px;line-height:1.4;overflow-wrap:anywhere}
+.creador-rol{display:inline-flex;align-items:center;justify-content:center;min-height:25px;box-sizing:border-box;margin:0;padding:4px 10px;border-radius:20px;background:#eaf3ff;color:#2458a6;font-size:11px;font-weight:700}.creador-rol-vacio{visibility:hidden}
+.creadores-edubot{display:grid;grid-template-columns:minmax(0,1fr) 220px;align-items:center;gap:24px;margin:0 0 24px;padding:26px;border:1px solid #d5e4f2;border-radius:20px;background:linear-gradient(135deg,#fff,#edf6ff);box-shadow:0 10px 24px rgba(24,67,103,.08)}
+.creadores-edubot-copy{min-width:0}
+.creadores-edubot-kicker{display:inline-flex;padding:7px 12px;border:1px solid #d4e2f1;border-radius:999px;background:#f7fbff;color:#315d91;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.creadores-edubot h2{margin:12px 0;color:#17365d;font-size:clamp(28px,5vw,42px);line-height:1}
+.creadores-edubot p{max-width:680px;margin:0;color:#526d86;font-size:16px;line-height:1.65}
+.creadores-edubot ul{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0;padding:0;list-style:none}
+.creadores-edubot li{padding:7px 11px;border:1px solid #dce8f4;border-radius:999px;background:#fff;color:#31516f;font-size:13px;font-weight:700}
+.creadores-edubot-avatar{display:block;width:200px;height:220px;justify-self:center;background-repeat:no-repeat;background-size:300% 300%;background-position:50% 50%}
 .creadores-historia{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .creadores-historia article{padding:19px;border-left:3px solid #2a72b8;border-radius:8px;background:#f2f7fc}
 .creadores-historia h2{margin:0 0 7px;color:#17365d;font-size:19px}
 .creadores-historia p{margin:0;color:#526d86;font-size:14px;line-height:1.65}
-@media(max-width:650px){.creadores-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0 22px}.creador-card{padding:14px 8px}.creador-foto{width:78px;height:88px;border-radius:14px}.creador-card h2{font-size:14px}.creadores-historia{grid-template-columns:1fr;gap:10px}.creadores-historia article{padding:15px}}
+@media(max-width:760px){.creadores-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:20px 0 24px}.creador-card{grid-template-rows:88px minmax(2.8em,1fr) 25px;gap:9px;min-height:202px;padding:14px 9px;border-radius:18px}.creador-foto{width:78px;height:88px;border-radius:14px}.creador-card h2{font-size:14px;line-height:1.35}.creadores-edubot{grid-template-columns:1fr;gap:8px;padding:18px}.creadores-edubot-avatar{grid-row:1;width:150px;height:160px}.creadores-edubot p{font-size:14px}.creadores-edubot ul{gap:6px}.creadores-edubot li{font-size:12px}.creadores-historia{grid-template-columns:1fr;gap:10px}.creadores-historia article{padding:15px}}
+@media(max-width:380px){.creadores-grid{grid-template-columns:1fr}.creador-card{min-height:210px}.creadores-edubot{padding-inline:18px}}
 </style>
 {% endset %}
 {% include "publico/base_publica.html" %}

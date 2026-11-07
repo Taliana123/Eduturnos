@@ -343,6 +343,7 @@
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout-responsive.css') }}?v=20261023_password_heading_back_v1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-ui-fixes.css') }}?v=20261026_desktop_account_config_v3" media="(min-width: 901px)">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_voice_panel_v1">
 </head>
 
 <body class="public-info-page">
@@ -407,5 +408,6 @@
         .public-info-page h1, .public-info-page h2 { scroll-margin-top: 90px; }
     }
 </style>
+{% include '_page_mascot.html' %}
 </body>
 </html>

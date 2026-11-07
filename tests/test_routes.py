@@ -623,6 +623,44 @@ def test_asistente_responde_localmente_a_todos_los_roles(monkeypatch, rol):
     assert "citaciones" in response.json["respuesta"].lower()
 
 
+@pytest.mark.parametrize(
+    ("rol", "accion", "fragmento"),
+    [
+        ("Super Admin", "crear_cita", "Crear citación"),
+        ("Rector", "crear_cita", "Crear citación"),
+        ("Administrador / Coordinador", "crear_cita", "Crear citación"),
+        ("Docente", "crear_cita", "Crear citación"),
+        ("Acudiente", "crear_cita", "solicitar una cita"),
+        ("Estudiante", None, "no tiene habilitada"),
+    ],
+)
+def test_asistente_guia_creacion_de_citas_sin_saltar_permisos(
+    monkeypatch, rol, accion, fragmento
+):
+    from routes import asistente as asistente_routes
+
+    usuario = {"id_usuario": 12, "rol_nombre": rol}
+    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(asistente_routes, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(
+        asistente_routes,
+        "generar_respuesta",
+        lambda *_args, **_kwargs: pytest.fail("La solicitud de cita debe usar el flujo guiado."),
+    )
+    client = app.test_client()
+    with client.session_transaction() as sesion:
+        sesion["_csrf_token"] = "chat-csrf"
+    response = client.post(
+        "/asistente/preguntar",
+        json={"mensaje": "Quiero que me ayudes a crear una cita"},
+        headers={"X-CSRFToken": "chat-csrf"},
+    )
+
+    assert response.status_code == 200
+    assert fragmento.lower() in response.json["respuesta"].lower()
+    assert response.json.get("accion") == accion
+
+
 def test_asistente_responde_pregunta_abierta_con_el_perfil_actual(monkeypatch):
     from routes import asistente as asistente_routes
 
