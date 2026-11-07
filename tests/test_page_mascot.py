@@ -122,6 +122,9 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     assert "SpeechRecognizer" in native_activity
     assert "startSystemVoiceInput()" in native_activity
     assert "RecognizerIntent.ACTION_RECOGNIZE_SPEECH" in native_activity
+    assert "spanishFemaleVoicePattern" in assistant_script
+    assert "selectSpanishVoice()" in assistant_script
+    assert assistant_script.count("utterance.voice = selectSpanishVoice();") == 2
     assert "Manifest.permission.RECORD_AUDIO" in native_activity
     assert "callPanel.hidden = false" in assistant_script
     assert "positionCallNearLauncher(launcher)" in assistant_script
@@ -152,8 +155,8 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     assert 'android:name="android.permission.RECORD_AUDIO"' in manifest
     assert 'android.speech.RecognitionService' in manifest
     assert 'android.speech.action.RECOGNIZE_SPEECH' in manifest
-    assert 'versionName "1.9"' in android_build
-    assert 'versionCode 10' in android_build
+    assert 'versionName "2.0"' in android_build
+    assert 'versionCode 11' in android_build
     assert "data-calendar-event-url=\"{{ calendar_open_event_url or '' }}\"" in calendar_template
     assert "calendar_open_event_url=calendar_open_event_url" in calendar_route
     assert "icons/edubot.png" not in Path("templates/_asistente_widget.html").read_text(encoding="utf-8")

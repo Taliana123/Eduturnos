@@ -120,6 +120,7 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
     share = client.get("/compartir")
     assert share.status_code == 200
     assert b"Compartir EDUTURNOS" in share.data
+    assert b"Comparte el acceso a EDUTURNOS con la comunidad educativa" in share.data
     assert b'data-share-eduturnos' in share.data
     assert b"Descargar c\xc3\xb3digo QR" not in share.data
     assert b"https://eduturnos.example/" not in share.data
@@ -127,6 +128,9 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
     home = client.get("/")
     assert home.status_code == 200
     assert b"Compartir EDUTURNOS con QR" not in home.data
+    assert b'href="/compartir"' in home.data
+    public_base = Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
+    assert public_base.count("url_for('compartir_eduturnos')") == 2
     for template in (
         "templates/index.html",
         "templates/dashboard.html",
@@ -136,7 +140,9 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
         assert '{% include "_qr_compartir.html" %}' not in Path(template).read_text(encoding="utf-8")
 
     sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
-    assert "compartir_eduturnos" in sidebar
+    assert sidebar.index("('soporte.index', 'Ayuda y soporte')") < sidebar.index(
+        "('compartir_eduturnos', 'Compartir EDUTURNOS')"
+    )
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():

@@ -235,7 +235,7 @@ def create_app():
 
     @app.get("/compartir")
     def compartir_eduturnos():
-        return render_template("compartir_eduturnos.html")
+        return render_template("publico/compartir_eduturnos.html")
 
     @app.get("/compartir/eduturnos.svg")
     def compartir_qr_eduturnos():

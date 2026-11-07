@@ -346,6 +346,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout-responsive.css') }}?v=20261023_password_heading_back_v1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-ui-fixes.css') }}?v=20261107_desktop_pc_updates_v1" media="(min-width: 901px)">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_mascot_everywhere_v1">
+    {% if request.endpoint == 'compartir_eduturnos' %}<link rel="stylesheet" href="{{ url_for('static', filename='css/qr-compartir.css') }}?v=3">{% endif %}
 </head>
 
 <body class="public-info-page">
@@ -359,6 +360,7 @@
     <nav class="menu" aria-label="Navegaci&oacute;n principal">
         <div class="menu-desktop-links">
             <a href="{{ url_for('como_funciona') }}" class="{% if request.endpoint == 'como_funciona' %}activo{% endif %}">C&oacute;mo funciona</a>
+            <a href="{{ url_for('compartir_eduturnos') }}" class="{% if request.endpoint == 'compartir_eduturnos' %}activo{% endif %}">Compartir EDUTURNOS</a>
             <a href="{{ url_for('creadores') }}" class="{% if request.endpoint == 'creadores' %}activo{% endif %}">Creadores</a>
             <a href="{{ url_for('beneficios') }}" class="{% if request.endpoint == 'beneficios' %}activo{% endif %}">Beneficios</a>
             <a href="{{ url_for('institucion') }}" class="{% if request.endpoint == 'institucion' %}activo{% endif %}">Instituci&oacute;n</a>
@@ -372,6 +374,7 @@
             </summary>
             <div class="menu-dropdown-links">
                 <a href="{{ url_for('como_funciona') }}" class="{% if request.endpoint == 'como_funciona' %}activo{% endif %}">C&oacute;mo funciona</a>
+                <a href="{{ url_for('compartir_eduturnos') }}" class="{% if request.endpoint == 'compartir_eduturnos' %}activo{% endif %}">Compartir EDUTURNOS</a>
                 <a href="{{ url_for('creadores') }}" class="{% if request.endpoint == 'creadores' %}activo{% endif %}">Creadores</a>
                 <a href="{{ url_for('beneficios') }}" class="{% if request.endpoint == 'beneficios' %}activo{% endif %}">Beneficios</a>
                 <a href="{{ url_for('institucion') }}" class="{% if request.endpoint == 'institucion' %}activo{% endif %}">Instituci&oacute;n</a>

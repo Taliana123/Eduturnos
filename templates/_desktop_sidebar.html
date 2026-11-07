@@ -32,12 +32,12 @@
     {% set enlaces = [('auth.dashboard', 'Resumen')] %}
     {% if personal %}{% set enlaces = enlaces + [('citas.nueva', 'Nueva citación')] %}{% endif %}
     {% set enlaces = enlaces + [('citas.index', 'Citaciones'), ('calendario.index', 'Ver agenda'), ('notificaciones.index', 'Recordatorios')] %}
-    {% set enlaces = enlaces + [('compartir_eduturnos', 'Compartir EDUTURNOS')] %}
     {% if personal %}{% set enlaces = enlaces + [('estudiantes.lista', 'Estudiantes'), ('seguimiento.lista', 'Seguimiento'), ('solicitudes.index', 'Solicitudes')] %}{% endif %}
     {% if gestion %}{% set enlaces = enlaces + [('reportes.index', 'Reportes'), ('acudientes.lista', 'Acudientes'), ('docentes.lista', 'Docentes')] %}{% endif %}
     {% if gestion %}{% set enlaces = enlaces + [('configuracion.index', 'Administración')] %}{% endif %}
     {% if visitante %}{% set enlaces = enlaces + [('justificaciones.index', 'Justificaciones')] %}{% endif %}
     {% set enlaces = enlaces + [('soporte.index', 'Ayuda y soporte')] %}
+    {% set enlaces = enlaces + [('compartir_eduturnos', 'Compartir EDUTURNOS')] %}
     {% for destino, nombre in enlaces %}
     {% if destino == 'citas.nueva' %}
     {% set activo = endpoint == destino %}

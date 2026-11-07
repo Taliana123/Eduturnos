@@ -1,4 +1,15 @@
 const initializeEduturnosAssistant = () => {
+    const spanishFemaleVoicePattern = /female|femenina|mujer|sabina|helena|laura|elena|m[oó]nica|paulina|luc[ií]a|isabella|zira|samantha|[#_]f\d/i;
+    const selectSpanishVoice = () => {
+        const voices = window.speechSynthesis?.getVoices() || [];
+        const spanishVoices = voices.filter((voice) => /^es(?:-|_)/i.test(voice.lang));
+        if (!spanishVoices.length) return null;
+        return spanishVoices.find((voice) => /^es[-_]CO$/i.test(voice.lang) && spanishFemaleVoicePattern.test(voice.name))
+            || spanishVoices.find((voice) => spanishFemaleVoicePattern.test(voice.name))
+            || spanishVoices.find((voice) => /^es[-_]CO$/i.test(voice.lang))
+            || spanishVoices[0];
+    };
+
     const appendInlineMarkdown = (container, text) => {
         const tokenPattern = /(\*\*.+?\*\*|__.+?__|`[^`]+`|\*[^*\n]+\*)/g;
         let lastIndex = 0;
@@ -163,6 +174,7 @@ const initializeEduturnosAssistant = () => {
             }
             const utterance = new SpeechSynthesisUtterance(answer);
             utterance.lang = "es-CO";
+            utterance.voice = selectSpanishVoice();
             utterance.onend = utterance.onerror = () => {
                 busy = false;
                 speaker.textContent = "Tú";
@@ -451,6 +463,7 @@ const initializeEduturnosAssistant = () => {
         }
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = "es-CO";
+        utterance.voice = selectSpanishVoice();
         utterance.onstart = () => {
             voiceCallBusy = true;
             callSpeaker.textContent = "EDUBOT";

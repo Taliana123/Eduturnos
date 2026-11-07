@@ -20,6 +20,14 @@
     color: #526b88;
 }
 
+.eduturnos-share-steps {
+    margin-top: 2rem;
+}
+
+.public-info-page .eduturnos-share-card {
+    align-self: flex-start;
+}
+
 .eduturnos-share-card {
     display: flex;
     width: min(100%, 34rem);
