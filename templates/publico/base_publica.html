@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,7 @@
     <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261108_native_voice_v1">
     <title>EDUTURNOS · {{ titulo }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_public_menu_title_v65" media="(max-width: 900px)">
 
@@ -343,7 +344,7 @@
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout-responsive.css') }}?v=20261023_password_heading_back_v1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-ui-fixes.css') }}?v=20261026_desktop_account_config_v3" media="(min-width: 901px)">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_voice_panel_v1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_mascot_everywhere_v1">
 </head>
 
 <body class="public-info-page">
@@ -408,6 +409,7 @@
         .public-info-page h1, .public-info-page h2 { scroll-margin-top: 90px; }
     }
 </style>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261108_native_voice_v1" defer></script>
 {% include '_page_mascot.html' %}
 </body>
 </html>

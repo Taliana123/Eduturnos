@@ -28,7 +28,7 @@ GOOGLE_APPS_SCRIPT_SECRET=la_misma_clave_aleatoria_de_32_caracteres_o_mas
 
 Pega exactamente el mismo secreto en Apps Script y AlwaysData. No hace falta llenar `GOOGLE_OAUTH_CLIENT_ID` ni `GOOGLE_OAUTH_CLIENT_SECRET` para este modo. Reinicia la aplicación después de actualizar las variables.
 
-Luego, en EDUTURNOS, entra como Rector o Super Admin a **Mi cuenta → Calendarios conectados** y pulsa **Probar conexión**. La prueba debe confirmar que el script accede a la agenda. Al crear una cita, EDUTURNOS la pone en la cola transaccional y dispara un intento en segundo plano. Si Google o la red no responden, la tarea se reintenta con el proceso programado:
+Luego, en EDUTURNOS, entra como Rector o Super Admin a **Mi cuenta → Calendarios conectados** y pulsa **Probar conexión**. La prueba debe confirmar que el script accede a la agenda. Al crear o actualizar una cita, EDUTURNOS la pone en la cola transaccional; el proceso programado la envía a Google sin retrasar la respuesta de la página:
 
 ```text
 <ruta-del-entorno-python>/python <ruta-de-la-aplicacion>/tools/sincronizar_google_calendar.py

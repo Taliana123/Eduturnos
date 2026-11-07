@@ -13,7 +13,7 @@ from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import Request, urlopen
 
 from cryptography.fernet import Fernet, InvalidToken
-from flask import after_this_request, current_app, has_request_context, request, url_for
+from flask import current_app, url_for
 
 from database.db import consultar, ejecutar, transaccion
 
@@ -394,30 +394,6 @@ def _event_id(cita_id: int, scope_key: str) -> str:
     return "eduturnos" + digest
 
 
-def _programar_sincronizacion_inmediata() -> None:
-    if not apps_script_configurada() or not has_request_context():
-        return
-    if request.environ.get("eduturnos_google_sync_scheduled"):
-        return
-    request.environ["eduturnos_google_sync_scheduled"] = True
-    app = current_app._get_current_object()
-
-    @after_this_request
-    def iniciar_worker(response):
-        try:
-            with app.app_context():
-                resultado = procesar_cola_google(limite=20)
-            app.logger.info(
-                "Sincronización inmediata de Google Calendar: %s procesadas, %s correctas, %s fallidas.",
-                resultado["procesadas"],
-                resultado["sincronizadas"],
-                resultado["fallidas"],
-            )
-        except Exception:
-            app.logger.exception("No se pudo completar la sincronización inmediata con Google Calendar")
-        return response
-
-
 def _encolar_scope_cursor(cursor, cita_id: int, scope_key: str, operacion: str) -> None:
     cursor.execute(
         "SELECT google_event_id FROM eventos_google WHERE id_cita=%s AND scope_key=%s",
@@ -480,8 +456,6 @@ def encolar_cita_cursor(cursor, cita_id: int, creador_id: int, operacion: str = 
             scopes.append({"scope_key": "institucional"})
     for row in scopes:
         _encolar_scope_cursor(cursor, cita_id, row["scope_key"], operacion)
-    if scopes:
-        _programar_sincronizacion_inmediata()
     return len(scopes)
 
 
@@ -516,8 +490,6 @@ def encolar_cita(cita_id: int, creador_id: int, operacion: str = "upsert") -> in
             ),
         )
         cantidad += 1
-    if cantidad:
-        _programar_sincronizacion_inmediata()
     return cantidad
 
 

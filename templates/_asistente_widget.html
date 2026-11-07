@@ -36,12 +36,34 @@
                 </button>
             </form>
             <p class="assistant-status" data-assistant-status aria-live="polite"></p>
-            <small class="assistant-privacy">Al usar el micrófono, tu voz se transcribe con el servicio del navegador y el texto se envía a EDUBOT. No compartas información personal ni documentos.</small>
+            <small class="assistant-privacy">Al usar el micrófono, tu voz se transcribe con el servicio del dispositivo o navegador y el texto se envía a EDUBOT. No compartas información personal ni documentos.</small>
         </div>
         <button class="assistant-resize-handle assistant-resize-nw" type="button" data-assistant-resize="nw" aria-label="Cambiar tamaño desde la esquina superior izquierda"></button>
         <button class="assistant-resize-handle assistant-resize-ne" type="button" data-assistant-resize="ne" aria-label="Cambiar tamaño desde la esquina superior derecha"></button>
         <button class="assistant-resize-handle assistant-resize-sw" type="button" data-assistant-resize="sw" aria-label="Cambiar tamaño desde la esquina inferior izquierda"></button>
         <button class="assistant-resize-handle assistant-resize-se" type="button" data-assistant-resize="se" aria-label="Cambiar tamaño desde la esquina inferior derecha"></button>
     </div>
+    <section class="assistant-voice-call" data-assistant-call role="dialog" aria-modal="false" aria-labelledby="assistant-call-title" aria-hidden="true" hidden>
+        <header class="assistant-voice-call__header">
+            <div>
+                <small>EDUTURNOS · ASISTENTE DE VOZ</small>
+                <h2 id="assistant-call-title">EDUBOT</h2>
+            </div>
+            <button type="button" class="assistant-voice-call__close" data-assistant-call-close aria-label="Cerrar llamada">×</button>
+        </header>
+        <div class="assistant-voice-call__stage">
+            <span class="assistant-voice-call__avatar assistant-drone-avatar" role="img" aria-label="Agente EDUBOT" style="background-image:url('{{ url_for('static', filename='mascots/drone-directions.webp') }}')"></span>
+            <p class="assistant-voice-call__state" data-assistant-call-state aria-live="polite">Listo para escucharte</p>
+            <div class="assistant-voice-call__wave" data-assistant-call-wave aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <span class="assistant-voice-call__speaker" data-assistant-call-speaker>Tú</span>
+            <button type="button" class="assistant-voice-call__hangup" data-assistant-call-toggle aria-pressed="false" aria-label="Iniciar conversación por voz">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 14.2a12 12 0 0 1 14.8 0l-2.1 3.2a1.5 1.5 0 0 1-1.8.5l-2.1-.9a1.5 1.5 0 0 1-.9-1.4v-1a9 9 0 0 0-1 0v1a1.5 1.5 0 0 1-.9 1.4l-2.1.9a1.5 1.5 0 0 1-1.8-.5L4.6 14.2Z"/></svg>
+            </button>
+            <span class="assistant-voice-call__action" data-assistant-call-action>Iniciar llamada</span>
+        </div>
+        <p class="assistant-voice-call__privacy">Tu voz se transcribe para que EDUBOT pueda responderte.</p>
+    </section>
 </section>
 {% endif %}

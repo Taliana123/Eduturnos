@@ -13,9 +13,9 @@ def test_drone_mascot_is_shared_by_login_and_dashboard():
     assert "{% include '_page_mascot.html' %}" in Path("templates/base.html").read_text(encoding="utf-8")
     assert "{% include '_page_mascot.html' %}" in Path("templates/index.html").read_text(encoding="utf-8")
     assert "{% include '_page_mascot.html' %}" in Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
-    assert "20261107_voice_panel_v1" in login
-    assert "20261107_voice_panel_v1" in Path("templates/base.html").read_text(encoding="utf-8")
-    assert "20261107_voice_panel_v2" in mascot
+    assert "20261107_mascot_everywhere_v1" in login
+    assert "20261107_mascot_everywhere_v1" in Path("templates/base.html").read_text(encoding="utf-8")
+    assert "20261108_native_voice_v1" in mascot
     assert "mascots/drone-directions.webp" in mascot
     assert "mascots/drone-reactions.webp" in mascot
     assert "page-mascot--login" not in mascot
@@ -47,6 +47,8 @@ def test_drone_sprite_sheets_are_served_by_flask():
     assert b'data-page-mascot' in login.data
     assert b"/static/mascots/drone-directions.webp" in login.data
     assert b"/static/mascots/drone-reactions.webp" in login.data
+    assert b"data-assistant-public-call" in login.data
+    assert b"/static/js/asistente.js?v=20261108_native_voice_v1" in login.data
     assert b"page-mascot--login" not in login.data
     assert login.data.index(b"page-mascot--floating") > login.data.index(b"</main>")
 
@@ -56,6 +58,11 @@ def test_drone_sprite_sheets_are_served_by_flask():
         assert response.mimetype == "image/webp"
         assert response.data[:4] == b"RIFF"
         assert response.data[8:12] == b"WEBP"
+
+    home = client.get("/")
+    assert home.status_code == 200
+    assert b"data-assistant-public-call" in home.data
+    assert b"/static/js/asistente.js?v=20261108_native_voice_v1" in home.data
 
 
 def test_legacy_floating_robot_widget_is_removed_without_removing_chat_avatar():
@@ -75,7 +82,7 @@ def test_legacy_floating_robot_widget_is_removed_without_removing_chat_avatar():
     assert "mascots/drone-directions.webp" in sources[0]
 
 
-def test_floating_agent_opens_nearby_voice_chat_and_help_opens_text_chat():
+def test_floating_agent_opens_voice_call_separate_from_help_chat():
     mascot = Path("templates/_page_mascot.html").read_text(encoding="utf-8")
     help_widget = Path("templates/_asistente_widget.html").read_text(encoding="utf-8")
     assistant_script = Path("static/js/asistente.js").read_text(encoding="utf-8")
@@ -94,12 +101,29 @@ def test_floating_agent_opens_nearby_voice_chat_and_help_opens_text_chat():
     assert "data-assistant-voice-launch" in assistant_script
     assert "data-assistant-toggle data-assistant-open" in help_widget
     assert 'data-assistant-voice-toggle aria-pressed="false"' in help_widget
+    assert 'data-assistant-call role="dialog"' in help_widget
+    assert 'data-assistant-public-call role="dialog"' in mascot
+    assert "assistant-voice-call__avatar assistant-drone-avatar" in help_widget
+    assert "assistant-voice-call__wave" in help_widget
+    assert "assistant-voice-call__hangup" in help_widget
     assert "navigator.mediaDevices.getUserMedia({ audio: true })" in assistant_script
-    assert "placeChatNearLauncher(sourceButton)" in assistant_script
+    assert "EDUTURNOSNativeVoice" in assistant_script
+    assert "eduturnos-native-voice-result" in assistant_script
+    assert "eduturnos-native-voice-result" in native_activity
+    assert "SpeechRecognizer" in native_activity
+    assert "Manifest.permission.RECORD_AUDIO" in native_activity
+    assert "callPanel.hidden = false" in assistant_script
+    assert "positionCallNearLauncher(launcher)" in assistant_script
+    assert "placeChatNearLauncher" not in assistant_script
+    assert "setChatOpen(true, launcher" not in assistant_script
+    assert "No se concedió permiso al micrófono" not in assistant_script
+    assert "permiso de EDUTURNOS" in assistant_script
     assert "data-assistant-voice-view" not in help_widget
     assert help_widget.index("assistant-avatar assistant-drone-avatar") < help_widget.index("id=\"dashboard-help-title\"")
-    assert "is-voice-mode" in assistant_script
-    assert ".dashboard-help-chat.is-voice-mode" in assistant_styles
+    assert "is-voice-mode" not in assistant_script
+    assert ".dashboard-help-chat.is-voice-mode" not in assistant_styles
+    assert ".assistant-voice-call" in assistant_styles
+    assert ".page-mascot:active" in assistant_styles
     assert "background-color: transparent !important" in assistant_styles
     assert "animation: assistant-mark-float" not in assistant_styles
     assert "assistant-voice-controls" not in help_widget
@@ -110,6 +134,12 @@ def test_floating_agent_opens_nearby_voice_chat_and_help_opens_text_chat():
     assert "launcher.openEvent(eventUrl)" in app_script
     assert "openEvent(String eventUrl)" in native_activity
     assert "setPackage(\"com.google.android.calendar\")" in native_activity
+    manifest = Path(
+        "mobile-app/android/app/src/main/AndroidManifest.xml"
+    ).read_text(encoding="utf-8")
+    android_build = Path("mobile-app/android/app/build.gradle").read_text(encoding="utf-8")
+    assert 'android:name="android.permission.RECORD_AUDIO"' in manifest
+    assert 'versionName "1.5"' in android_build
     assert "data-calendar-event-url=\"{{ calendar_open_event_url or '' }}\"" in calendar_template
     assert "calendar_open_event_url=calendar_open_event_url" in calendar_route
     assert "icons/edubot.png" not in Path("templates/_asistente_widget.html").read_text(encoding="utf-8")

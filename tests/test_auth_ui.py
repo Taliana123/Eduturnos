@@ -186,14 +186,13 @@ def test_support_link_opens_prefilled_email_to_institution():
     route = Path("routes/soporte.py").read_text(encoding="utf-8")
     assert "('soporte.index', 'Ayuda y soporte')" in sidebar
     assert "'soporte.index': 'mail'" in sidebar
-    assert "mailto:coliejjfh@hotmail.com" in sidebar
-    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
     assert "desktop-support-link" not in sidebar
     assert "outlook.live.com" not in sidebar
     assert "url_for('soporte.index')" not in assistant_widget
     assert "redirect(" in route
-    assert "mailto:coliejjfh@hotmail.com" in route
-    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in route
+    assert "https://mail.google.com/mail/" in route
+    assert "S.browser_fallback_url" in route
+    assert "Hola, necesito ayuda con EDUTURNOS" in route
     assert not Path("templates/soporte/index.html").exists()
 
 
@@ -633,7 +632,7 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'assistant-suggestions' not in widget
     assert 'Las preguntas abiertas se envían a Groq' not in widget
     assert 'No compartas información personal ni documentos.' in widget
-    assert 'tu voz se transcribe con el servicio del navegador' in widget
+    assert 'tu voz se transcribe con el servicio del dispositivo o navegador' in widget
     assert 'datos de estudiantes' not in widget
     assert "{% include '_asistente_widget.html' %}" in lateral
     assert "{% include '_asistente_widget.html' %}" not in dashboard
@@ -643,8 +642,8 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
     assert "request.endpoint != 'soporte.index'" not in base
-    assert "css/edubot.css') }}?v=20261107_voice_chat_v3" in base
-    assert "js/asistente.js') }}?v=20261107_voice_chat_v3" in base
+    assert "css/edubot.css') }}?v=20261108_native_voice_v1" in base
+    assert "js/asistente.js') }}?v=20261108_native_voice_v1" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
     assert 'if (isOpen) {\n            clearChatPosition();\n            const defaultBounds = root.getBoundingClientRect();' in assistant_script
     assert 'assistantWidget' not in app_js

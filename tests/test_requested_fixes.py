@@ -789,15 +789,14 @@ def test_support_opens_prefilled_email_without_extra_form_or_chat():
 
     assert "('soporte.index', 'Ayuda y soporte')" in sidebar
     assert "'soporte.index': 'mail'" in sidebar
-    assert "mailto:coliejjfh@hotmail.com" in sidebar
-    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
     assert "desktop-support-link" not in sidebar
     assert "outlook.live.com" not in sidebar
     assert 'class="support-nav-link" href="{{ url_for(\'soporte.index\') }}"' not in assistant_widget
     assert "mail.google.com/mail/" not in sidebar
     assert "redirect(" in route
-    assert "mailto:coliejjfh@hotmail.com" in route
-    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in route
+    assert "https://mail.google.com/mail/" in route
+    assert "S.browser_fallback_url" in route
+    assert "Hola, necesito ayuda con EDUTURNOS" in route
     assert not Path("templates/soporte/index.html").exists()
     assert "Respuesta automática de EDUBOT" in email
 
@@ -859,8 +858,9 @@ def test_support_is_available_in_sidebar_and_legacy_gmail_composer_is_removed():
     assert "mail.google.com/mail/" not in sidebar
     assert "soporte_bp" in app_source
     assert "supportEmailLink" not in app_js
-    assert "mailto:coliejjfh@hotmail.com" in Path("routes/soporte.py").read_text(encoding="utf-8")
-    assert "mailto:coliejjfh@hotmail.com" in sidebar
+    route = Path("routes/soporte.py").read_text(encoding="utf-8")
+    assert "https://mail.google.com/mail/" in route
+    assert "S.browser_fallback_url" in route
 
 
 def test_requested_visual_fixes_are_scoped_to_desktop():

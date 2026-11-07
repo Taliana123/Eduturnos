@@ -13,7 +13,7 @@
     </header>
 
     <div class="alerta info calendar-description" role="note">
-        EDUTURNOS es el registro principal; si el calendario institucional está conectado, recibe una copia genérica de cada cita con fecha, hora y lugar, sin nombres de estudiantes o acudientes ni observaciones. La cuenta propietaria recibe avisos 24 y 2 horas antes; otras cuentas necesitan acceso compartido. Desconectar detiene futuras copias; las ya enviadas se administran en Google Calendar. En celulares, el botón intenta abrir directamente la aplicación Google Calendar y no redirige a la web si no está instalada o no puede abrirse. En computadores abre Google Calendar en el navegador. Los recordatorios internos dependen de la tarea de notificaciones. <a href="{{ url_for('privacidad') }}">Política de Privacidad</a>.
+        EDUTURNOS conserva la información oficial. La sincronización comparte en Google Calendar solo fecha, hora y lugar, sin nombres ni observaciones. En celulares se intenta abrir la aplicación; en computadores, Google Calendar en el navegador. <a href="{{ url_for('privacidad') }}">Política de Privacidad</a>.
     </div>
 
     {% if not oauth_activo and not apps_script_activo %}
@@ -52,14 +52,14 @@
             {% endif %}
         </div>
         <div class="google-calendar-actions">
-            <a class="boton google-calendar-open" href="{{ calendar_open_url }}" target="_self" data-calendar-start="{{ calendar_open_start_ms }}" data-calendar-event-url="{{ calendar_open_event_url or '' }}" data-google-calendar-open>Abrir Google Calendar</a>
-            {% if calendar_open_mobile %}<small class="calendar-mobile-note">En este celular se intenta abrir la app. Si no está instalada o el sistema no permite iniciarla, no se abrirá la versión web.</small>{% endif %}
             {% if puede_institucional and institucional_conectado %}
-            <form method="post" action="{{ url_for('integraciones_google.sincronizar_institucional') }}">
+            <form class="google-calendar-sync-form" method="post" action="{{ url_for('integraciones_google.sincronizar_institucional') }}">
                 {{ csrf_field()|safe }}
                 <button class="boton secundario google-calendar-sync" type="submit">Sincronizar citas futuras</button>
             </form>
             {% endif %}
+            <a class="boton google-calendar-open" href="{{ calendar_open_url }}" target="_self" data-calendar-start="{{ calendar_open_start_ms }}" data-calendar-event-url="{{ calendar_open_event_url or '' }}" data-google-calendar-open>Abrir Google Calendar</a>
+            {% if calendar_open_mobile %}<small class="calendar-mobile-note">Se intentará abrir la aplicación; el sistema puede impedirlo.</small>{% endif %}
             {% if puede_institucional and not apps_script_activo and oauth_activo %}
             {% if institucional %}
             <form method="post" action="{{ url_for('integraciones_google.desconectar', scope='institucional') }}">{{ csrf_field()|safe }}<button class="boton secundario" type="submit">Desconectar agenda</button></form>
@@ -87,8 +87,9 @@
 .google-calendar-actions{display:flex;flex:0 0 auto;align-items:center;justify-content:flex-end;gap:8px;}
 .google-calendar-actions form{margin:0;}
 .google-calendar-actions .google-calendar-open,.google-calendar-actions .google-calendar-retry{display:inline-flex;width:auto;min-width:0;white-space:nowrap;}
+.google-calendar-actions .calendar-mobile-note{flex-basis:100%;}
 .google-calendar-actions .google-calendar-retry{padding:7px 10px!important;font-size:12px!important;line-height:1.15;}
-@media(max-width:600px){.integraciones-page{padding-top:8px}.integracion-row{align-items:flex-start;flex-direction:column;gap:12px}.integracion-actions{width:100%}.google-calendar-actions{width:100%;justify-content:flex-start;flex-wrap:wrap;gap:7px}.google-calendar-actions .google-calendar-open{padding:10px 13px;font-size:14px}.google-calendar-actions .google-calendar-retry,.google-calendar-actions .google-calendar-sync{padding:8px 10px;font-size:12px}}
+@media(max-width:600px){.integraciones-page{padding-top:8px}.integracion-row{align-items:flex-start;flex-direction:column;gap:12px}.integracion-actions{width:100%}.google-calendar-actions{width:100%;justify-content:flex-start;flex-wrap:wrap;gap:7px}.google-calendar-actions .google-calendar-sync-form,.google-calendar-actions .google-calendar-open{flex:1 1 0;min-width:0}.google-calendar-actions .google-calendar-open{padding:10px 8px;font-size:13px;white-space:normal;text-align:center}.google-calendar-actions .google-calendar-sync{width:100%;padding:8px 7px;font-size:12px;white-space:normal}.google-calendar-actions .google-calendar-retry{padding:8px 10px;font-size:12px}}
 @media(max-width:720px){
     html body #contenido .integraciones-page > .page-head{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;}
     html body #contenido .integraciones-page > .page-head .account-back-button{display:inline-flex!important;flex:0 0 36px!important;width:36px!important;min-width:36px!important;max-width:36px!important;height:36px!important;min-height:36px!important;max-height:36px!important;align-self:center!important;box-sizing:border-box!important;}

@@ -167,10 +167,11 @@ def test_integrations_page_offers_eduturnos_calendar_to_every_role():
     assert "package=com.google.android.calendar;end" in route_source
     assert "S.browser_fallback_url" not in route_source
     assert "Abrir Google Calendar" in source
-    assert "no redirige a la web" in source
+    assert "Se intentará abrir la aplicación" in source
     assert "No hay una cita futura sincronizada" not in source
     assert "{% if calendar_open_url %}" not in source
-    assert "EDUTURNOS es el registro principal" in source
+    assert "EDUTURNOS conserva la información oficial" in source
+    assert source.index("Sincronizar citas futuras") < source.index("Abrir Google Calendar")
     assert source.count("<h2>Agenda") == 1
     assert "google-calendar-actions" in source
     assert "{% if institucional_sync and institucional_sync.fallidas" in source
@@ -298,7 +299,26 @@ def test_next_synced_appointment_prefers_personal_google_calendar_event(monkeypa
         "_evento_sincronizado_cita",
         lambda cita, _usuario: {"scope_key": "usuario:12"} if cita["id"] == 92 else None,
     )
+    monkeypatch.setattr(
+        integraciones_google,
+        "_scope_institucional",
+        lambda _usuario: "institucion:7",
+    )
 
-    cita, _inicio_ms = integraciones_google._proxima_cita(usuario, solo_sincronizadas=True)
+    monkeypatch.setattr(
+        integraciones_google,
+        "consultar",
+        lambda *_args, **_kwargs: [{
+            "id_cita": 92,
+            "google_event_id": "personal-event",
+            "scope_key": "usuario:12",
+            "calendar_id": "primary",
+            "correo_google": "docente@example.com",
+        }],
+    )
+    cita, _inicio_ms, evento = integraciones_google._proxima_cita(
+        usuario, solo_sincronizadas=True
+    )
 
     assert cita == cita_sincronizada
+    assert evento["google_event_id"] == "personal-event"

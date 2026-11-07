@@ -91,6 +91,35 @@ def _scopes_calendario_usuario(usuario):
     return list(dict.fromkeys(scopes))
 
 
+def _eventos_sincronizados_citas(citas, usuario=None):
+    if not citas:
+        return {}
+    scopes = _scopes_calendario_usuario(usuario) if usuario else ["institucional"]
+    ids = list(dict.fromkeys(int(cita["id"]) for cita in citas))
+    id_placeholders = ",".join(["%s"] * len(ids))
+    scope_placeholders = ",".join(["%s"] * len(scopes))
+    eventos = consultar(
+        "SELECT eg.id_cita,eg.google_event_id,eg.scope_key,ig.calendar_id,ig.correo_google "
+        "FROM eventos_google eg LEFT JOIN integraciones_google ig "
+        "ON ig.scope_key=eg.scope_key "
+        "WHERE eg.id_cita IN (" + id_placeholders + ") "
+        "AND eg.scope_key IN (" + scope_placeholders + ") "
+        "AND eg.estado='Sincronizado' AND eg.google_event_id IS NOT NULL "
+        "ORDER BY eg.id_cita,CASE WHEN eg.scope_key=%s THEN 0 ELSE 1 END",
+        tuple([*ids, *scopes, scopes[0]]),
+    )
+    if isinstance(eventos, dict):
+        eventos = [eventos]
+    seleccionados = {}
+    for evento in eventos or []:
+        cita_id = evento.get("id_cita")
+        if cita_id is None and len(ids) == 1:
+            cita_id = ids[0]
+        if cita_id is not None:
+            seleccionados.setdefault(int(cita_id), evento)
+    return seleccionados
+
+
 def _evento_sincronizado_cita(cita, usuario=None):
     if not cita:
         return None
@@ -159,19 +188,29 @@ def _proxima_cita(usuario, solo_sincronizadas=False):
         except (TypeError, ValueError):
             continue
         if inicio >= ahora:
-            if solo_sincronizadas and not _evento_sincronizado_cita(cita, usuario):
-                continue
             candidatas.append((inicio, cita))
+    eventos = (
+        _eventos_sincronizados_citas([cita for _inicio, cita in candidatas], usuario)
+        if solo_sincronizadas
+        else {}
+    )
+    if solo_sincronizadas:
+        candidatas = [
+            (inicio, cita)
+            for inicio, cita in candidatas
+            if int(cita["id"]) in eventos
+        ]
     if candidatas:
         inicio, cita = min(candidatas, key=lambda elemento: elemento[0])
-        return cita, int(inicio.timestamp() * 1000)
-    return None, int(ahora.timestamp() * 1000)
+        evento = eventos.get(int(cita["id"]))
+        return cita, int(inicio.timestamp() * 1000), evento
+    return None, int(ahora.timestamp() * 1000), None
 
 
-def _url_evento_app_cita(cita, usuario=None) -> str | None:
+def _url_evento_app_cita(cita, usuario=None, evento=None) -> str | None:
     if not cita:
         return None
-    evento = _evento_sincronizado_cita(cita, usuario)
+    evento = evento or _evento_sincronizado_cita(cita, usuario)
     if not evento or not evento.get("google_event_id"):
         return None
     if evento["scope_key"] == "institucional" and apps_script_configurada():
@@ -227,8 +266,14 @@ def index():
     android = "android" in user_agent
     ios = any(device in user_agent for device in ("iphone", "ipad", "ipod"))
     mobile = android or ios
-    proxima_cita, calendar_open_start_ms = _proxima_cita(usuario, solo_sincronizadas=mobile)
-    calendar_open_event_url = _url_evento_app_cita(proxima_cita, usuario) if mobile else None
+    proxima_cita, calendar_open_start_ms, evento_sincronizado = _proxima_cita(
+        usuario, solo_sincronizadas=mobile
+    )
+    calendar_open_event_url = (
+        _url_evento_app_cita(proxima_cita, usuario, evento_sincronizado)
+        if mobile
+        else None
+    )
     event_url = _url_app_cita(proxima_cita, android, ios, calendar_open_event_url, usuario)
     calendar_open_url = event_url or _url_abrir_calendario(calendar_open_start_ms)
     oauth_activo = configuracion_oauth_lista()

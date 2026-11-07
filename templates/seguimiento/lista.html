@@ -73,7 +73,8 @@
 {% endfor %}
 <div class="table-wrap seguimiento-historial"><table><tr><th>Fecha</th><th>Estudiante</th><th>Estado</th><th>Asistencia</th><th>Observaciones</th><th>Usuario</th></tr>{% for s in seguimientos %}<tr><td>{{ s.fecha_seguimiento.strftime('%d/%m/%Y') }} {{ s.fecha_seguimiento|hora_ampm }}</td><td>{{ s.nombres }} {{ s.apellidos }}</td><td>{{ s.estado_actual }}</td><td>{{ s.asistencia }}</td><td>{{ s.observaciones or '-' }}</td><td>{{ s.usuario_n }} {{ s.usuario_a }}</td></tr>{% else %}<tr><td colspan="6">Sin seguimientos.</td></tr>{% endfor %}</table></div>
 <style>
-.seguimiento-procesos{display:none;}
+.seguimiento-procesos{display:block;background:#fff;border:1px solid #d5e1fa;border-radius:6px;overflow:hidden;margin-top:0;}
+.seguimiento-historial{display:none!important;}
 html body dialog.seguimiento-detail-dialog{width:620px;max-width:calc(100vw - 40px);max-height:calc(100dvh - 40px);padding:30px;margin:auto;border:1px solid #d5e1fa;border-radius:6px;background:#fff;color:#142d50;overflow-y:auto;font-family:inherit;}
 .seguimiento-detail-dialog::backdrop{background:rgba(20,45,80,.45);}
 html body .seguimiento-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:24px;border-bottom:1px solid #d5e1fa;}
@@ -117,7 +118,16 @@ html body .seguimiento-detail-history article p{margin:6px 0 0;}
 	html body #contenido .seguimiento-estado-no-asistió,html body #contenido .seguimiento-estado-cancelada{background:#faeaf0;color:#c52e54;}
 	html body #contenido .seguimiento-procesos-vacio{padding:24px;margin:0;border-top:1px solid #d5e1fa;}
 }
-@media(max-width:900px){.seguimiento-descripcion-desktop{display:none!important;}}
+@media(max-width:900px){
+	.seguimiento-descripcion-desktop{display:none!important;}
+	html body #contenido .seguimiento-procesos-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;}
+	html body #contenido .seguimiento-procesos-header h2{margin:0;font-size:16px;font-weight:700;}
+	html body #contenido a.seguimiento-proceso{display:grid;grid-template-columns:84px minmax(0,1fr) 18px;align-items:center;gap:10px;padding:16px;border-top:1px solid #d5e1fa;color:inherit;text-decoration:none;background:#fff;}
+	html body #contenido .seguimiento-proceso-info strong{font-size:14px;}
+	html body #contenido .seguimiento-proceso-info p{margin:5px 0 0;font-size:13px;line-height:1.45;overflow-wrap:anywhere;}
+	html body #contenido .seguimiento-proceso-abrir{text-align:right;}
+	html body #contenido .seguimiento-detail-dialog{width:620px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);padding:22px;}
+}
 </style>
 
 

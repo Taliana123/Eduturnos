@@ -83,6 +83,21 @@
                 rgba(15, 32, 55, .16);
         }
 
+        .eduturnos-header .mobile-back-link {
+            display: inline-grid;
+            place-items: center;
+            flex: 0 0 38px;
+            width: 38px;
+            height: 38px;
+            margin-right: 12px;
+            border: 1px solid rgba(255, 255, 255, .4);
+            border-radius: 50%;
+            color: #ffffff;
+            font-size: 22px;
+            line-height: 1;
+            text-decoration: none;
+        }
+
         .eduturnos-logo {
 
             margin: 0;
@@ -1339,7 +1354,8 @@ html body.login-page .personal-login .personal-field-jornada select {
 </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261023_login_center_v2" media="(max-width: 900px)">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/password-controls.css') }}?v=20261012_password_desktop_v1">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_voice_panel_v1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_mascot_everywhere_v1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261108_native_voice_v1">
 </head>
 
 
@@ -1347,7 +1363,7 @@ html body.login-page .personal-login .personal-field-jornada select {
 
     <header class="eduturnos-header">
 
-        <a class="mobile-back-link" style="display:none" href="{{ url_for('inicio') }}" aria-label="Volver al inicio" title="Volver al inicio"><span aria-hidden="true">←</span></a>
+        <a class="mobile-back-link" href="{{ url_for('inicio') }}" aria-label="Volver al inicio" title="Volver al inicio"><span aria-hidden="true">←</span></a>
 
         <div class="eduturnos-logo">
             <img class="eduturnos-header-logo" src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional">
@@ -1633,6 +1649,7 @@ html body.login-page .personal-login .personal-field-jornada select {
     </main>
 
 {% include '_page_mascot.html' %}
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261108_native_voice_v1" defer></script>
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20261012_password_controls_v19" defer></script>
 <script src="{{ url_for('static', filename='js/institution-login.js') }}?v=20261029_v2" defer></script>
 <script src="{{ url_for('static', filename='js/pwa.js') }}?v=2" defer></script>

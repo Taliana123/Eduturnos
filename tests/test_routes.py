@@ -501,14 +501,15 @@ def test_formulario_login_no_se_guarda_en_cache():
     assert respuesta.headers["Cache-Control"] == "no-store"
 
 
-def test_soporte_abre_directamente_el_correo_institucional():
+def test_soporte_abre_gmail_con_el_mensaje_preparado():
     client = app.test_client()
     respuesta = client.get("/soporte/")
 
     assert respuesta.status_code == 302
     assert respuesta.headers["Location"] == (
-        "mailto:coliejjfh@hotmail.com"
-        "?subject=Ayuda%20con%20EDUTURNOS"
+        "https://mail.google.com/mail/?view=cm&fs=1"
+        "&to=coliejjfh%40hotmail.com"
+        "&su=Ayuda%20con%20EDUTURNOS"
         "&body=Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS"
     )
 
@@ -521,7 +522,9 @@ def test_soporte_en_android_abre_gmail_con_el_mensaje_preparado():
 
     assert respuesta.status_code == 302
     assert respuesta.headers["Location"].startswith("intent://compose?to=coliejjfh%40hotmail.com")
-    assert "package=com.google.android.gm;end" in respuesta.headers["Location"]
+    assert "package=com.google.android.gm;" in respuesta.headers["Location"]
+    assert "S.browser_fallback_url=https%3A%2F%2Fmail.google.com%2Fmail%2F" in respuesta.headers["Location"]
+    assert respuesta.headers["Location"].endswith(";end")
 
 
 @pytest.mark.parametrize("scope,rol,permitido", [
