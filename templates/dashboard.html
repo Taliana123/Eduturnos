@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}Panel · EDUTURNOS{% endblock %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-overview.css') }}?v=20261028_dashboard_alignment_v5">{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-overview.css') }}?v=20261028_dashboard_alignment_v5"><link rel="stylesheet" href="{{ url_for('static', filename='css/edubot-mascot.css') }}?v=20261106_edubot_mascot_v1">{% endblock %}
 
 
 {% block content %}
@@ -278,6 +278,7 @@
          ===================================================== -->
 
 </section>
+{% include '_edubot_mascot.html' %}
 <!-- EDUTURNOS - ESPACIADO TITULOS DASHBOARD -->
 <!-- FIN EDUTURNOS - ESPACIADO TITULOS DASHBOARD -->
 
