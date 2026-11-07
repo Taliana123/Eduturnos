@@ -1,0 +1,117 @@
+.eduturnos-share-page-head {
+    margin-bottom: 1.5rem;
+}
+
+.eduturnos-share-eyebrow {
+    margin: 0 0 0.4rem;
+    color: #1762c4;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.eduturnos-share-page-head h1 {
+    margin: 0;
+    color: #15345c;
+}
+
+.eduturnos-share-page-head p:last-child {
+    margin: 0.5rem 0 0;
+    color: #526b88;
+}
+
+.eduturnos-share-card {
+    display: flex;
+    width: min(100%, 34rem);
+    align-items: center;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin: 0 auto 2rem;
+    padding: clamp(1.25rem, 5vw, 2.5rem);
+    overflow: hidden;
+    border: 1px solid #d5e5fb;
+    border-radius: 1.75rem;
+    background:
+        radial-gradient(ellipse at 10% 0%, rgb(91 167 255 / 28%), transparent 48%),
+        linear-gradient(145deg, #f8fbff 12%, #e8f2ff 100%);
+    box-shadow: 0 1.25rem 3.5rem rgb(24 79 146 / 14%);
+    text-align: center;
+}
+
+.eduturnos-share-card h2 {
+    margin: 0;
+    color: #173c70;
+    font-size: clamp(1.25rem, 3vw, 1.6rem);
+}
+
+.eduturnos-share-qr-frame {
+    display: grid;
+    width: min(100%, 19rem);
+    aspect-ratio: 1;
+    place-items: center;
+    padding: 1rem;
+    border: 1px solid #cfe0f8;
+    border-radius: 1.5rem;
+    background: linear-gradient(145deg, #fff, #f4f8ff);
+    box-shadow: 0 0.8rem 2rem rgb(23 76 139 / 13%);
+}
+
+.eduturnos-share-qr-frame img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+}
+
+.eduturnos-share-description {
+    max-width: 25rem;
+    margin: 0;
+    color: #405c7c;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.eduturnos-share-button {
+    display: inline-flex;
+    min-height: 3.25rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    padding: 0.8rem 1.4rem;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(115deg, #145cc5, #287fea);
+    box-shadow: 0 0.6rem 1.25rem rgb(25 99 201 / 25%);
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 750;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.eduturnos-share-button:hover {
+    box-shadow: 0 0.8rem 1.5rem rgb(25 99 201 / 34%);
+    transform: translateY(-1px);
+}
+
+.eduturnos-share-button:focus-visible {
+    outline: 3px solid #80b7ff;
+    outline-offset: 3px;
+}
+
+.eduturnos-share-button svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.eduturnos-share-status {
+    min-height: 1.4em;
+    margin: -0.75rem 0 0;
+    color: #174e97;
+    font-size: 0.9rem;
+}

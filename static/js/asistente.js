@@ -305,6 +305,10 @@ const initializeEduturnosAssistant = () => {
                 setState("No te escuché. Inténtalo otra vez.");
             } else if (event.detail?.error === "not-allowed") {
                 stop("Android bloqueó el micrófono. Concede el permiso a EDUTURNOS y vuelve a iniciar.");
+            } else if (event.detail?.error === "unavailable") {
+                stop("Android no encontró un servicio ni una aplicación para reconocer voz. Activa o instala la app de Google y vuelve a intentar.");
+            } else if (event.detail?.error === "cancelled") {
+                stop("Se canceló el reconocimiento de voz.");
             } else {
                 stop("No hay un servicio de reconocimiento de voz disponible en este dispositivo.");
             }
@@ -579,7 +583,9 @@ const initializeEduturnosAssistant = () => {
         const message = error === "not-allowed"
             ? "Android bloqueó el micrófono. Concede a EDUTURNOS el permiso de micrófono y vuelve a iniciar."
             : error === "unavailable"
-                ? "No hay un servicio de reconocimiento de voz disponible en este dispositivo."
+                ? "Android no encontró un servicio ni una aplicación para reconocer voz. Activa o instala la app de Google y vuelve a intentar."
+                : error === "cancelled"
+                    ? "Se canceló el reconocimiento de voz."
                 : "No se pudo reconocer la voz. Inténtalo otra vez.";
         stopVoiceConversation(message);
     });

@@ -48,7 +48,7 @@ def test_drone_sprite_sheets_are_served_by_flask():
     assert b"/static/mascots/drone-directions.webp" in login.data
     assert b"/static/mascots/drone-reactions.webp" in login.data
     assert b"data-assistant-public-call" in login.data
-    assert b"/static/js/asistente.js?v=20261107_voice_input_feedback_v2" in login.data
+    assert b"/static/js/asistente.js?v=20261107_voice_input_fallback_v1" in login.data
     assert b"page-mascot--login" not in login.data
     assert login.data.index(b"page-mascot--floating") > login.data.index(b"</main>")
 
@@ -62,7 +62,7 @@ def test_drone_sprite_sheets_are_served_by_flask():
     home = client.get("/")
     assert home.status_code == 200
     assert b"data-assistant-public-call" in home.data
-    assert b"/static/js/asistente.js?v=20261107_voice_input_feedback_v2" in home.data
+    assert b"/static/js/asistente.js?v=20261107_voice_input_fallback_v1" in home.data
 
 
 def test_legacy_floating_robot_widget_is_removed_without_removing_chat_avatar():
@@ -120,6 +120,8 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     assert "EXTRA_PARTIAL_RESULTS, true" in native_activity
     assert "eduturnos-native-voice-result" in native_activity
     assert "SpeechRecognizer" in native_activity
+    assert "startSystemVoiceInput()" in native_activity
+    assert "RecognizerIntent.ACTION_RECOGNIZE_SPEECH" in native_activity
     assert "Manifest.permission.RECORD_AUDIO" in native_activity
     assert "callPanel.hidden = false" in assistant_script
     assert "positionCallNearLauncher(launcher)" in assistant_script
@@ -148,8 +150,10 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     ).read_text(encoding="utf-8")
     android_build = Path("mobile-app/android/app/build.gradle").read_text(encoding="utf-8")
     assert 'android:name="android.permission.RECORD_AUDIO"' in manifest
-    assert 'versionName "1.7"' in android_build
-    assert 'versionCode 8' in android_build
+    assert 'android.speech.RecognitionService' in manifest
+    assert 'android.speech.action.RECOGNIZE_SPEECH' in manifest
+    assert 'versionName "1.9"' in android_build
+    assert 'versionCode 10' in android_build
     assert "data-calendar-event-url=\"{{ calendar_open_event_url or '' }}\"" in calendar_template
     assert "calendar_open_event_url=calendar_open_event_url" in calendar_route
     assert "icons/edubot.png" not in Path("templates/_asistente_widget.html").read_text(encoding="utf-8")

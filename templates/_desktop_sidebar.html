@@ -14,6 +14,7 @@
   <nav aria-label="Funciones de {{ rol }}">
     {% set iconos_nav = {
       'auth.dashboard': 'home',
+      'compartir_eduturnos': 'share',
       'citas.nueva': 'calendar-plus',
       'citas.index': 'list',
       'calendario.index': 'calendar-days',
@@ -31,6 +32,7 @@
     {% set enlaces = [('auth.dashboard', 'Resumen')] %}
     {% if personal %}{% set enlaces = enlaces + [('citas.nueva', 'Nueva citación')] %}{% endif %}
     {% set enlaces = enlaces + [('citas.index', 'Citaciones'), ('calendario.index', 'Ver agenda'), ('notificaciones.index', 'Recordatorios')] %}
+    {% set enlaces = enlaces + [('compartir_eduturnos', 'Compartir EDUTURNOS')] %}
     {% if personal %}{% set enlaces = enlaces + [('estudiantes.lista', 'Estudiantes'), ('seguimiento.lista', 'Seguimiento'), ('solicitudes.index', 'Solicitudes')] %}{% endif %}
     {% if gestion %}{% set enlaces = enlaces + [('reportes.index', 'Reportes'), ('acudientes.lista', 'Acudientes'), ('docentes.lista', 'Docentes')] %}{% endif %}
     {% if gestion %}{% set enlaces = enlaces + [('configuracion.index', 'Administración')] %}{% endif %}

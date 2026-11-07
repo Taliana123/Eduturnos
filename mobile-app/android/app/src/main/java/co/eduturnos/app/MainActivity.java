@@ -25,8 +25,10 @@ import java.util.ArrayList;
 
 public class MainActivity extends BridgeActivity {
     private static final int REQUEST_RECORD_AUDIO = 4002;
+    private static final int REQUEST_SYSTEM_VOICE_INPUT = 4003;
     private SpeechRecognizer voiceRecognizer;
     private boolean voiceStartPending;
+    private boolean voiceFallbackPending;
     private boolean voiceCancellationRequested;
 
     @Override
@@ -42,10 +44,36 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onDestroy() {
         voiceStartPending = false;
+        voiceFallbackPending = false;
         voiceCancellationRequested = true;
         if (voiceRecognizer != null) voiceRecognizer.cancel();
         releaseVoiceRecognizer();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQUEST_SYSTEM_VOICE_INPUT) return;
+        voiceFallbackPending = false;
+        if (voiceCancellationRequested) {
+            dispatchVoiceEvent("eduturnos-native-voice-end", null, null);
+            return;
+        }
+
+        if (resultCode == RESULT_OK && data != null) {
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches != null && !matches.isEmpty() && !matches.get(0).trim().isEmpty()) {
+                dispatchVoiceEvent("eduturnos-native-voice-speech-start", null, null);
+                dispatchVoiceEvent("eduturnos-native-voice-speech-end", null, null);
+                dispatchVoiceEvent("eduturnos-native-voice-result", "text", matches.get(0).trim());
+            } else {
+                dispatchVoiceEvent("eduturnos-native-voice-error", "error", "no-speech");
+            }
+        } else {
+            dispatchVoiceEvent("eduturnos-native-voice-error", "error", "cancelled");
+        }
+        dispatchVoiceEvent("eduturnos-native-voice-end", null, null);
     }
 
     @Override
@@ -76,12 +104,12 @@ public class MainActivity extends BridgeActivity {
     }
 
     private void startVoiceRecognition() {
+        voiceCancellationRequested = false;
         if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-            dispatchVoiceEvent("eduturnos-native-voice-error", "error", "unavailable");
+            startSystemVoiceInput();
             return;
         }
         releaseVoiceRecognizer();
-        voiceCancellationRequested = false;
         voiceRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         voiceRecognizer.setRecognitionListener(new RecognitionListener() {
             @Override
@@ -110,6 +138,11 @@ public class MainActivity extends BridgeActivity {
             @Override
             public void onError(int error) {
                 if (!voiceCancellationRequested) {
+                    if (error == SpeechRecognizer.ERROR_CLIENT || error == SpeechRecognizer.ERROR_SERVER) {
+                        releaseVoiceRecognizer();
+                        startSystemVoiceInput();
+                        return;
+                    }
                     String message = error == SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS
                             ? "not-allowed"
                             : error == SpeechRecognizer.ERROR_NO_MATCH
@@ -159,6 +192,24 @@ public class MainActivity extends BridgeActivity {
         } catch (IllegalStateException | SecurityException error) {
             releaseVoiceRecognizer();
             dispatchVoiceEvent("eduturnos-native-voice-error", "error", "recognition");
+        }
+    }
+
+    private void startSystemVoiceInput() {
+        if (voiceFallbackPending || voiceCancellationRequested) return;
+        releaseVoiceRecognizer();
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                .putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es-CO")
+                .putExtra(RecognizerIntent.EXTRA_PROMPT, "Habla con EDUBOT")
+                .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+        try {
+            voiceFallbackPending = true;
+            startActivityForResult(intent, REQUEST_SYSTEM_VOICE_INPUT);
+        } catch (ActivityNotFoundException | SecurityException error) {
+            voiceFallbackPending = false;
+            dispatchVoiceEvent("eduturnos-native-voice-error", "error", "unavailable");
+            dispatchVoiceEvent("eduturnos-native-voice-end", null, null);
         }
     }
 

@@ -1,0 +1,17 @@
+<section class="eduturnos-share-card" aria-labelledby="share-card-title">
+    <h2 id="share-card-title">Escanea y comparte</h2>
+    <div class="eduturnos-share-qr-frame">
+        <img
+            src="{{ url_for('compartir_qr_eduturnos') }}?v=2"
+            alt="Código QR azul para abrir EDUTURNOS"
+            width="260"
+            height="260"
+        >
+    </div>
+    <p class="eduturnos-share-description">Escanea el código para abrir EDUTURNOS e iniciar sesión.</p>
+    <button class="eduturnos-share-button" type="button" data-share-eduturnos>
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5 5 5M5 13v6h14v-6"/></svg>
+        <span>Compartir EDUTURNOS</span>
+    </button>
+    <p class="eduturnos-share-status" data-share-status role="status" aria-live="polite"></p>
+</section>

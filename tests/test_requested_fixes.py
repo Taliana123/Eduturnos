@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from pathlib import Path
 
 import pytest
+import qrcode
 from flask import render_template
 
 from app import app
@@ -94,6 +95,48 @@ def test_registro_conserva_campos_y_aplica_reglas_de_password_y_documento():
     assert "field.reportValidity()" in script
     assert "option.dataset.idGrado === gradeId" in script
     assert 'groupSelect.disabled = !gradeId' in script
+
+
+def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch):
+    monkeypatch.setitem(app.config, "APP_ORIGIN", "https://eduturnos.example")
+    client = app.test_client()
+    destinations = []
+    add_data = qrcode.QRCode.add_data
+
+    def capture_destination(qr, data, *args, **kwargs):
+        destinations.append(data)
+        return add_data(qr, data, *args, **kwargs)
+
+    monkeypatch.setattr(qrcode.QRCode, "add_data", capture_destination)
+
+    qr = client.get("/compartir/eduturnos.svg")
+    assert qr.status_code == 200
+    assert qr.mimetype == "image/svg+xml"
+    assert b"<svg" in qr.data
+    assert b"#1468E8" in qr.data
+    assert qr.headers["Cache-Control"] == "public, max-age=3600"
+    assert destinations == ["https://eduturnos.example/"]
+
+    share = client.get("/compartir")
+    assert share.status_code == 200
+    assert b"Compartir EDUTURNOS" in share.data
+    assert b'data-share-eduturnos' in share.data
+    assert b"Descargar c\xc3\xb3digo QR" not in share.data
+    assert b"https://eduturnos.example/" not in share.data
+
+    home = client.get("/")
+    assert home.status_code == 200
+    assert b"Compartir EDUTURNOS con QR" not in home.data
+    for template in (
+        "templates/index.html",
+        "templates/dashboard.html",
+        "templates/integraciones_google.html",
+        "templates/citas/index.html",
+    ):
+        assert '{% include "_qr_compartir.html" %}' not in Path(template).read_text(encoding="utf-8")
+
+    sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
+    assert "compartir_eduturnos" in sidebar
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
@@ -527,7 +570,7 @@ def test_voice_transcripts_are_submitted_and_responses_are_visible():
     assert "button.disabled && !voiceCallActive" in assistant_script
     assert 'showVoiceMessage("EDUBOT", replyText)' in assistant_script
     assert "showVoiceMessage(\"EDUBOT\", errorMessage)" in assistant_script
-    assert all("20261107_voice_input_feedback_v3" in template for template in templates)
+    assert all("20261107_voice_input_fallback_v1" in template for template in templates)
 
 
 def test_student_name_and_mobile_directory_icons_match_shared_directory_style():
