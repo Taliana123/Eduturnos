@@ -678,7 +678,7 @@ def test_configuration_catalog_titles_follow_followup_page_heading_layout():
     assert "min-height: 58px !important;" in css
 
 
-def test_homepage_artwork_is_next_to_slogan_and_login_back_link_is_symbol_only():
+def test_homepage_artwork_is_next_to_slogan_and_login_back_link_is_visible_on_desktop():
     login = Path("templates/auth/login.html").read_text(encoding="utf-8")
     homepage = Path("templates/index.html").read_text(encoding="utf-8")
     illustration = Path("templates/_eduturnos_illustration.html").read_text(encoding="utf-8")
@@ -695,6 +695,7 @@ def test_homepage_artwork_is_next_to_slogan_and_login_back_link_is_symbol_only()
     assert 'class="eduturnos-recuperar-final-back account-settings-back"' in recovery
     assert '<svg aria-hidden="true" viewBox="0 0 24 24">' in recovery
     assert 'aria-label="Volver al inicio"' in login
+    assert 'class="mobile-back-link-label">Volver al inicio</span>' in login
 
 
 def test_homepage_artwork_scales_on_mobile_and_login_remains_plain():

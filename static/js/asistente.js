@@ -109,11 +109,12 @@ const initializeEduturnosAssistant = () => {
 
         const state = panel.querySelector("[data-assistant-public-state]");
         const speaker = panel.querySelector("[data-assistant-public-speaker]");
+        const transcript = panel.querySelector("[data-assistant-public-transcript]");
         const wave = panel.querySelector("[data-assistant-public-wave]");
         const toggle = panel.querySelector("[data-assistant-public-toggle]");
         const close = panel.querySelector("[data-assistant-public-close]");
         const action = panel.querySelector("[data-assistant-public-action]");
-        if (!state || !speaker || !wave || !toggle || !close || !action) return false;
+        if (!state || !speaker || !transcript || !wave || !toggle || !close || !action) return false;
 
         panel.dataset.initialized = "true";
         document.body.append(panel);
@@ -150,14 +151,17 @@ const initializeEduturnosAssistant = () => {
         const answerByVoice = (question) => {
             busy = true;
             speaker.textContent = "EDUBOT";
-            setState(publicAnswer(question));
+            transcript.textContent = `Te escuché: ${question}`;
+            const answer = publicAnswer(question);
+            setState(answer);
             if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
                 busy = false;
                 speaker.textContent = "Tú";
                 setState("Respuesta mostrada. Inicia sesión para recibir ayuda personalizada.");
+                if (active) restartTimer = window.setTimeout(startRecognition, 250);
                 return;
             }
-            const utterance = new SpeechSynthesisUtterance(publicAnswer(question));
+            const utterance = new SpeechSynthesisUtterance(answer);
             utterance.lang = "es-CO";
             utterance.onend = utterance.onerror = () => {
                 busy = false;
@@ -174,30 +178,46 @@ const initializeEduturnosAssistant = () => {
             if (!active || !SpeechRecognition) return;
             recognition = new SpeechRecognition();
             recognition.lang = "es-CO";
-            recognition.interimResults = false;
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.onstart = () => setState("Micrófono activo. Habla ahora…");
+            recognition.onspeechstart = () => setState("Te escucho…");
+            recognition.onspeechend = () => setState("Procesando lo que dijiste…");
             recognition.onresult = (event) => {
-                const question = event.results?.[event.resultIndex]?.[0]?.transcript?.trim();
-                if (question) {
-                    busy = true;
-                    recognition.stop();
-                    answerByVoice(question);
-                }
+                const results = [...event.results].slice(event.resultIndex);
+                const heardText = results.map((result) => result[0]?.transcript || "").join(" ").trim();
+                if (heardText) transcript.textContent = `Te escuché: ${heardText}`;
+                const question = results
+                    .filter((result) => result.isFinal)
+                    .map((result) => result[0]?.transcript || "")
+                    .join(" ")
+                    .trim();
+                if (!question) return;
+                busy = true;
+                recognition.stop();
+                answerByVoice(question);
             };
             recognition.onerror = (event) => {
                 if (!active) return;
                 if (event.error === "not-allowed" || event.error === "service-not-allowed") {
                     stop("El navegador bloqueó el micrófono. Concede el permiso y vuelve a iniciar.");
-                } else if (event.error !== "no-speech" && event.error !== "aborted") {
+                } else if (event.error === "audio-capture") {
+                    stop("No se pudo iniciar el micrófono. Comprueba el dispositivo y sus permisos.");
+                } else if (event.error === "no-speech") {
+                    setState("No detecté voz. Habla ahora para que EDUBOT pueda escucharte.");
+                } else if (event.error === "network") {
+                    stop("El reconocimiento de voz no pudo conectarse. Comprueba tu conexión e inténtalo otra vez.");
+                } else if (event.error !== "aborted") {
                     setState("No se pudo reconocer la voz. Inténtalo otra vez.");
                 }
             };
             recognition.onend = () => {
                 recognition = null;
-                if (active && !busy) restartTimer = window.setTimeout(startRecognition, 250);
+                if (active && !busy) restartTimer = window.setTimeout(startRecognition, 500);
             };
             try {
                 recognition.start();
-                setState("Escuchando…");
+                setState("Solicitando acceso al micrófono…");
             } catch (error) {
                 stop("No se pudo iniciar el micrófono. Vuelve a intentarlo.");
                 console.warn("No se pudo iniciar el micrófono de EDUBOT.", error);
@@ -207,24 +227,21 @@ const initializeEduturnosAssistant = () => {
             if (!active) return;
             if (NativeVoice?.startListening) {
                 setState("Solicitando permiso para usar el micrófono…");
-                NativeVoice.startListening();
+                try {
+                    NativeVoice.startListening();
+                } catch (error) {
+                    stop("No se pudo iniciar el reconocimiento de voz en este dispositivo.");
+                    console.error("No se pudo iniciar el reconocimiento nativo de EDUBOT.", error);
+                }
             } else if (SpeechRecognition) {
-                setState("Solicitando acceso al micrófono…");
-                if (!navigator.mediaDevices?.getUserMedia) {
-                    startWebRecognition();
+                if (!window.isSecureContext) {
+                    stop("El micrófono requiere una conexión segura. Abre EDUTURNOS con su dirección HTTPS.");
                     return;
                 }
-                navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-                    stream.getTracks().forEach((track) => track.stop());
-                    if (active) startWebRecognition();
-                }).catch((error) => {
-                    const message = error.name === "NotAllowedError"
-                        ? "El navegador bloqueó el micrófono. Concede el permiso y vuelve a iniciar."
-                        : "No se pudo acceder al micrófono de este dispositivo.";
-                    stop(message);
-                });
+                setState("Solicitando acceso al micrófono…");
+                startWebRecognition();
             } else {
-                setState("El reconocimiento de voz no está disponible en este dispositivo.");
+                stop("El reconocimiento de voz no está disponible en este navegador. Abre EDUTURNOS en Chrome actualizado.");
             }
         }
         function stop(message = "Conversación por voz finalizada.") {
@@ -263,11 +280,24 @@ const initializeEduturnosAssistant = () => {
         };
 
         window.addEventListener("eduturnos-native-voice-ready", () => {
-            if (active && !busy) setState("Escuchando…");
+            if (active && !busy) setState("Micrófono activo. Habla ahora…");
         });
         window.addEventListener("eduturnos-native-voice-result", (event) => {
             const question = event.detail?.text?.trim();
-            if (active && question) answerByVoice(question);
+            if (active && question) {
+                transcript.textContent = `Te escuché: ${question}`;
+                answerByVoice(question);
+            }
+        });
+        window.addEventListener("eduturnos-native-voice-partial-result", (event) => {
+            const text = event.detail?.text?.trim();
+            if (active && text) transcript.textContent = `Te escuché: ${text}`;
+        });
+        window.addEventListener("eduturnos-native-voice-speech-start", () => {
+            if (active && !busy) setState("Te escucho…");
+        });
+        window.addEventListener("eduturnos-native-voice-speech-end", () => {
+            if (active && !busy) setState("Procesando lo que dijiste…");
         });
         window.addEventListener("eduturnos-native-voice-error", (event) => {
             if (!active) return;
@@ -280,7 +310,7 @@ const initializeEduturnosAssistant = () => {
             }
         });
         window.addEventListener("eduturnos-native-voice-end", () => {
-            if (active && !busy) restartTimer = window.setTimeout(startRecognition, 250);
+            if (active && !busy) restartTimer = window.setTimeout(startRecognition, 500);
         });
         launchers.forEach((launcher) => launcher.addEventListener("click", () => {
             if (isOpen) {
@@ -330,6 +360,7 @@ const initializeEduturnosAssistant = () => {
     const voiceToggle = root.querySelector("[data-assistant-voice-toggle]");
     const callPanel = section?.querySelector("[data-assistant-call]");
     const callState = callPanel?.querySelector("[data-assistant-call-state]");
+    const callTranscript = callPanel?.querySelector("[data-assistant-call-transcript]");
     const callSpeaker = callPanel?.querySelector("[data-assistant-call-speaker]");
     const callToggle = callPanel?.querySelector("[data-assistant-call-toggle]");
     const callWave = callPanel?.querySelector("[data-assistant-call-wave]");
@@ -339,7 +370,7 @@ const initializeEduturnosAssistant = () => {
     const voiceLaunchers = [...document.querySelectorAll("[data-assistant-voice-launch]")];
     const openButton = sidebarToggles.find((toggle) => toggle.hasAttribute("data-assistant-open"));
     if (!form || !input || !output || !button || !status || !body || !voiceToggle || !openButton
-        || !callPanel || !callState || !callSpeaker || !callToggle || !callWave || !callClose || !callAction) return false;
+        || !callPanel || !callState || !callTranscript || !callSpeaker || !callToggle || !callWave || !callClose || !callAction) return false;
 
     root.dataset.eduturnosInitialized = "true";
     document.body.append(callPanel);
@@ -447,10 +478,18 @@ const initializeEduturnosAssistant = () => {
         voiceRecognition = recognition;
         recognition.lang = "es-CO";
         recognition.continuous = conversation;
-        recognition.interimResults = false;
+        recognition.interimResults = true;
+        recognition.onstart = () => setStatus("Micrófono activo. Habla ahora…");
+        recognition.onspeechstart = () => setStatus("Te escucho…");
+        recognition.onspeechend = () => setStatus("Procesando lo que dijiste…");
         recognition.onresult = (event) => {
-            const transcript = [...event.results]
-                .slice(event.resultIndex)
+            const results = [...event.results].slice(event.resultIndex);
+            const heardText = results
+                .map((result) => result[0]?.transcript || "")
+                .join(" ")
+                .trim();
+            if (heardText) callTranscript.textContent = `Te escuché: ${heardText}`;
+            const transcript = results
                 .filter((result) => result.isFinal)
                 .map((result) => result[0]?.transcript || "")
                 .join(" ")
@@ -460,6 +499,7 @@ const initializeEduturnosAssistant = () => {
                 voiceCallBusy = true;
                 input.value = transcript;
                 input.dispatchEvent(new Event("input", { bubbles: true }));
+                setStatus("EDUBOT está preparando una respuesta…");
                 recognition.stop();
                 form.requestSubmit();
                 return;
@@ -467,25 +507,27 @@ const initializeEduturnosAssistant = () => {
         };
         recognition.onerror = (event) => {
             if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-                stopVoiceConversation("El navegador o la aplicación bloqueó el micrófono. Comprueba el permiso de EDUTURNOS, activa el acceso global al micrófono y vuelve a tocar para intentar.");
+                stopVoiceConversation("El navegador bloqueó el micrófono. Revisa el permiso de EDUTURNOS y vuelve a iniciar.");
             } else if (event.error === "audio-capture") {
-                stopVoiceConversation("No se pudo acceder al micrófono. Comprueba que el dispositivo tenga uno disponible y que el acceso global al micrófono esté activado.");
-            } else if (event.error !== "aborted" && event.error !== "no-speech") {
+                stopVoiceConversation("No se pudo iniciar el micrófono. Comprueba el dispositivo y sus permisos.");
+            } else if (event.error === "no-speech") {
+                setStatus("No detecté voz. Habla ahora para que EDUBOT pueda escucharte.");
+            } else if (event.error === "network") {
+                stopVoiceConversation("El reconocimiento de voz no pudo conectarse. Comprueba tu conexión e inténtalo otra vez.");
+            } else if (event.error !== "aborted") {
                 setStatus("No se pudo reconocer la voz. Inténtalo otra vez.");
             }
         };
         recognition.onend = () => {
             if (voiceRecognition === recognition) voiceRecognition = null;
             if (conversation && voiceCallActive && !voiceCallBusy) {
-                voiceCallRestartTimer = window.setTimeout(() => startVoiceRecognition(true), 250);
+                voiceCallRestartTimer = window.setTimeout(() => startVoiceRecognition(true), 500);
             }
             refreshSend();
         };
         try {
             recognition.start();
-            setStatus(conversation
-                ? "Escuchando. Habla con EDUBOT; puedes finalizar la conversación cuando quieras."
-                : "Escuchando…");
+            setStatus("Solicitando acceso al micrófono…");
         } catch (error) {
             voiceRecognition = null;
             stopVoiceConversation("No se pudo iniciar el micrófono. Comprueba el permiso de EDUTURNOS y vuelve a intentar.");
@@ -494,15 +536,27 @@ const initializeEduturnosAssistant = () => {
     };
 
     window.addEventListener("eduturnos-native-voice-ready", () => {
-        if (voiceCallActive && !voiceCallBusy) setStatus("Escuchando…");
+        if (voiceCallActive && !voiceCallBusy) setStatus("Micrófono activo. Habla ahora…");
     });
     window.addEventListener("eduturnos-native-voice-result", (event) => {
         const transcript = event.detail?.text?.trim();
         if (!voiceCallActive || !transcript) return;
         voiceCallBusy = true;
+        callTranscript.textContent = `Te escuché: ${transcript}`;
         input.value = transcript;
         input.dispatchEvent(new Event("input", { bubbles: true }));
+        setStatus("EDUBOT está preparando una respuesta…");
         form.requestSubmit();
+    });
+    window.addEventListener("eduturnos-native-voice-partial-result", (event) => {
+        const text = event.detail?.text?.trim();
+        if (voiceCallActive && text) callTranscript.textContent = `Te escuché: ${text}`;
+    });
+    window.addEventListener("eduturnos-native-voice-speech-start", () => {
+        if (voiceCallActive && !voiceCallBusy) setStatus("Te escucho…");
+    });
+    window.addEventListener("eduturnos-native-voice-speech-end", () => {
+        if (voiceCallActive && !voiceCallBusy) setStatus("Procesando lo que dijiste…");
     });
     window.addEventListener("eduturnos-native-voice-error", (event) => {
         if (!voiceCallActive) return;
@@ -520,7 +574,7 @@ const initializeEduturnosAssistant = () => {
     });
     window.addEventListener("eduturnos-native-voice-end", () => {
         if (voiceCallActive && !voiceCallBusy) {
-            voiceCallRestartTimer = window.setTimeout(() => startVoiceRecognition(true), 250);
+            voiceCallRestartTimer = window.setTimeout(() => startVoiceRecognition(true), 500);
         }
     });
 
@@ -535,31 +589,11 @@ const initializeEduturnosAssistant = () => {
         }
         voiceCallActive = true;
         voiceCallBusy = false;
+        callTranscript.textContent = "";
         refreshSend();
         callSpeaker.textContent = "Tú";
         setStatus("Solicitando acceso al micrófono…");
-        if (nativeVoice?.startListening) {
-            startVoiceRecognition(true);
-            return;
-        }
-        if (!navigator.mediaDevices?.getUserMedia) {
-            startVoiceRecognition(true);
-            return;
-        }
-        navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-            stream.getTracks().forEach((track) => track.stop());
-            if (voiceCallActive) startVoiceRecognition(true);
-        }).catch((error) => {
-            const message = error.name === "NotAllowedError" || error.name === "PermissionDeniedError"
-                ? "Android o el navegador bloqueó la captura del micrófono. Revisa el permiso de EDUTURNOS y activa el acceso global al micrófono; luego vuelve a iniciar la llamada."
-                : error.name === "NotFoundError" || error.name === "DevicesNotFoundError"
-                    ? "No se encontró un micrófono disponible en este dispositivo."
-                    : error.name === "NotReadableError" || error.name === "AbortError"
-                        ? "El micrófono está ocupado o no disponible. Cierra otras apps que lo estén usando e inténtalo de nuevo."
-                        : "No se pudo acceder al micrófono. Comprueba los permisos de EDUTURNOS y vuelve a intentar.";
-            stopVoiceConversation(message);
-            console.warn("No se pudo solicitar acceso al micrófono de EDUBOT.", error);
-        });
+        startVoiceRecognition(true);
     };
     voiceToggle.disabled = !canRecognizeVoice;
     voiceToggle.addEventListener("click", toggleVoiceConversation);

@@ -10,9 +10,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="EDUTURNOS">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}" type="image/png" sizes="192x192">
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261108_native_voice_v1">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261107_voice_input_feedback_v2">
 
     <title>EDUTURNOS | Comunidad educativa</title>
 
@@ -909,8 +910,8 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
 {% if request.args.get('mobile') == '1' or session.get('mobile_mode') or 'Android' in request.user_agent.string or 'iPhone' in request.user_agent.string or 'iPad' in request.user_agent.string %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_mobile_recovery_v64">
 {% endif %}
-<script src="{{ url_for('static', filename='js/pwa.js') }}?v=2" defer></script>
-<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261108_native_voice_v1" defer></script>
+<script src="{{ url_for('static', filename='js/pwa.js') }}?v=5" defer></script>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261107_voice_input_feedback_v2" defer></script>
 {% include '_page_mascot.html' %}
 </body>
 </html>
@@ -1123,7 +1124,7 @@ body {
 
 </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261028_home_reference_match_v1" media="(max-width: 900px)">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-ui-fixes.css') }}?v=20261026_desktop_account_config_v3" media="(min-width: 901px)">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-ui-fixes.css') }}?v=20261107_desktop_pc_updates_v1" media="(min-width: 901px)">
 <style id="eduturnos-home-hero-illustration">
     html body.public-home-page .hero-message-row {
         display: flex !important;

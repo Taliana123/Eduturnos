@@ -91,6 +91,7 @@ public class MainActivity extends BridgeActivity {
 
             @Override
             public void onBeginningOfSpeech() {
+                dispatchVoiceEvent("eduturnos-native-voice-speech-start", null, null);
             }
 
             @Override
@@ -103,6 +104,7 @@ public class MainActivity extends BridgeActivity {
 
             @Override
             public void onEndOfSpeech() {
+                dispatchVoiceEvent("eduturnos-native-voice-speech-end", null, null);
             }
 
             @Override
@@ -136,6 +138,10 @@ public class MainActivity extends BridgeActivity {
 
             @Override
             public void onPartialResults(Bundle partialResults) {
+                ArrayList<String> matches = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                if (matches != null && !matches.isEmpty() && !matches.get(0).trim().isEmpty()) {
+                    dispatchVoiceEvent("eduturnos-native-voice-partial-result", "text", matches.get(0).trim());
+                }
             }
 
             @Override
@@ -146,7 +152,7 @@ public class MainActivity extends BridgeActivity {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es-CO")
-                .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
+                .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
                 .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
         try {
             voiceRecognizer.startListening(intent);

@@ -172,6 +172,15 @@ def test_login_illustration_is_restored_only_on_desktop():
     assert "login-desktop-visual" not in mobile_styles
 
 
+def test_login_back_link_has_desktop_text_and_mobile_icon_only():
+    login = Path("templates/auth/login.html").read_text(encoding="utf-8")
+    mobile_rules = login.split("@media (max-width: 560px)", 1)[1].split("</style>", 1)[0]
+
+    assert 'class="mobile-back-link-label">Volver al inicio</span>' in login
+    assert ".mobile-back-link-label" in mobile_rules
+    assert "display: none;" in mobile_rules
+
+
 def test_account_title_and_description_align_with_personal_info_heading_on_mobile():
     template = Path("templates/cuenta/index.html").read_text(encoding="utf-8")
     mobile_styles = template.split("@media(max-width:720px)", 1)[1]
@@ -642,8 +651,8 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
     assert "request.endpoint != 'soporte.index'" not in base
-    assert "css/edubot.css') }}?v=20261108_native_voice_v1" in base
-    assert "js/asistente.js') }}?v=20261108_native_voice_v1" in base
+    assert "css/edubot.css') }}?v=20261107_voice_input_feedback_v2" in base
+    assert "js/asistente.js') }}?v=20261107_voice_input_feedback_v2" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
     assert 'if (isOpen) {\n            clearChatPosition();\n            const defaultBounds = root.getBoundingClientRect();' in assistant_script
     assert 'assistantWidget' not in app_js

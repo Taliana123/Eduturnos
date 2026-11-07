@@ -29,6 +29,7 @@
     <div class="assistant-voice-call__stage">
         <span class="assistant-voice-call__avatar assistant-drone-avatar" role="img" aria-label="Agente EDUBOT" style="background-image:url('{{ url_for('static', filename='mascots/drone-directions.webp') }}')"></span>
         <p class="assistant-voice-call__state" data-assistant-public-state aria-live="polite">Listo para escucharte</p>
+        <p class="assistant-voice-call__transcript" data-assistant-public-transcript aria-live="polite"></p>
         <div class="assistant-voice-call__wave" data-assistant-public-wave aria-hidden="true">
             <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
         </div>
@@ -40,4 +41,4 @@
     </div>
     <p class="assistant-voice-call__privacy">En esta página puedo orientar sobre el acceso y las citas. Inicia sesión para recibir ayuda personalizada.</p>
 </section>
-<script src="{{ url_for('static', filename='js/page-mascot.js') }}?v=20261108_native_voice_v1" defer></script>
+<script src="{{ url_for('static', filename='js/page-mascot.js') }}?v=20261107_voice_input_feedback_v2" defer></script>

@@ -15,8 +15,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="EDUTURNOS">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}" type="image/png" sizes="192x192">
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}">
 
     <title>Iniciar sesión · EDUTURNOS</title>
 
@@ -84,18 +85,39 @@
         }
 
         .eduturnos-header .mobile-back-link {
-            display: inline-grid;
-            place-items: center;
-            flex: 0 0 38px;
-            width: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            width: auto;
+            min-width: 38px;
             height: 38px;
             margin-right: 12px;
+            padding: 0 12px;
+            gap: 8px;
             border: 1px solid rgba(255, 255, 255, .4);
-            border-radius: 50%;
+            border-radius: 999px;
             color: #ffffff;
             font-size: 22px;
             line-height: 1;
             text-decoration: none;
+        }
+
+        .eduturnos-header .mobile-back-link-label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 560px) {
+            .eduturnos-header .mobile-back-link {
+                width: 38px;
+                padding: 0;
+                border-radius: 50%;
+            }
+
+            .eduturnos-header .mobile-back-link-label {
+                display: none;
+            }
         }
 
         .eduturnos-logo {
@@ -1355,7 +1377,7 @@ html body.login-page .personal-login .personal-field-jornada select {
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261023_login_center_v2" media="(max-width: 900px)">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/password-controls.css') }}?v=20261012_password_desktop_v1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_mascot_everywhere_v1">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261108_native_voice_v1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261107_voice_input_feedback_v2">
 </head>
 
 
@@ -1363,7 +1385,7 @@ html body.login-page .personal-login .personal-field-jornada select {
 
     <header class="eduturnos-header">
 
-        <a class="mobile-back-link" href="{{ url_for('inicio') }}" aria-label="Volver al inicio" title="Volver al inicio"><span aria-hidden="true">←</span></a>
+        <a class="mobile-back-link" href="{{ url_for('inicio') }}" aria-label="Volver al inicio" title="Volver al inicio"><span aria-hidden="true">←</span><span class="mobile-back-link-label">Volver al inicio</span></a>
 
         <div class="eduturnos-logo">
             <img class="eduturnos-header-logo" src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional">
@@ -1649,10 +1671,10 @@ html body.login-page .personal-login .personal-field-jornada select {
     </main>
 
 {% include '_page_mascot.html' %}
-<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261108_native_voice_v1" defer></script>
-<script src="{{ url_for('static', filename='js/app.js') }}?v=20261012_password_controls_v19" defer></script>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261107_voice_input_feedback_v2" defer></script>
+<script src="{{ url_for('static', filename='js/app.js') }}?v=20261107_service_worker_register_v2" defer></script>
 <script src="{{ url_for('static', filename='js/institution-login.js') }}?v=20261029_v2" defer></script>
-<script src="{{ url_for('static', filename='js/pwa.js') }}?v=2" defer></script>
+<script src="{{ url_for('static', filename='js/pwa.js') }}?v=5" defer></script>
 </body>
 
 </html>
