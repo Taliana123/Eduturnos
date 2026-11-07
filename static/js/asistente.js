@@ -102,8 +102,251 @@ const initializeEduturnosAssistant = () => {
         }
     };
 
+    const initializePublicAssistantVoice = () => {
+        const panel = document.querySelector("[data-assistant-public-call]");
+        const launchers = [...document.querySelectorAll("[data-assistant-voice-launch]")];
+        if (!panel || !launchers.length || panel.dataset.initialized === "true") return false;
+
+        const state = panel.querySelector("[data-assistant-public-state]");
+        const speaker = panel.querySelector("[data-assistant-public-speaker]");
+        const transcript = panel.querySelector("[data-assistant-public-transcript]");
+        const wave = panel.querySelector("[data-assistant-public-wave]");
+        const toggle = panel.querySelector("[data-assistant-public-toggle]");
+        const close = panel.querySelector("[data-assistant-public-close]");
+        const action = panel.querySelector("[data-assistant-public-action]");
+        if (!state || !speaker || !transcript || !wave || !toggle || !close || !action) return false;
+
+        panel.dataset.initialized = "true";
+        document.body.append(panel);
+        const NativeVoice = window.EDUTURNOSNativeVoice;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let active = false;
+        let busy = false;
+        let recognition = null;
+        let restartTimer = 0;
+        let isOpen = false;
+
+        const setState = (message) => {
+            state.textContent = message;
+            wave.classList.toggle("is-active", active && !busy);
+            wave.classList.toggle("is-speaking", busy);
+            panel.classList.toggle("is-listening", active && !busy);
+            panel.classList.toggle("is-speaking", busy);
+            toggle.setAttribute("aria-pressed", String(active));
+            action.textContent = active ? "Colgar" : panel.classList.contains("is-ended") ? "Llamada finalizada" : "Iniciar llamada";
+        };
+        const publicAnswer = (question) => {
+            const text = question.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            if (text.includes("contrasena") || text.includes("clave")) {
+                return "En la pantalla de inicio de sesión, selecciona «Olvidé mi contraseña» y sigue las instrucciones que recibirás en tu correo.";
+            }
+            if (text.includes("cita") || text.includes("calendario")) {
+                return "Para consultar o solicitar una cita, inicia sesión en EDUTURNOS. Las opciones disponibles dependen de tu perfil.";
+            }
+            if (text.includes("registro") || text.includes("cuenta") || text.includes("ingresar") || text.includes("iniciar sesion")) {
+                return "Selecciona «Iniciar sesión» o «Crear cuenta» en la parte superior de la página. Si tu institución ya te registró, usa las credenciales que te entregaron.";
+            }
+            return "Puedo orientarte sobre el acceso, las contraseñas y las citas. Para ayuda personalizada, inicia sesión y abre EDUBOT.";
+        };
+        const answerByVoice = (question) => {
+            busy = true;
+            speaker.textContent = "EDUBOT";
+            transcript.textContent = `Te escuché: ${question}`;
+            const answer = publicAnswer(question);
+            setState(answer);
+            if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+                busy = false;
+                speaker.textContent = "Tú";
+                setState("Respuesta mostrada. Inicia sesión para recibir ayuda personalizada.");
+                if (active) restartTimer = window.setTimeout(startRecognition, 250);
+                return;
+            }
+            const utterance = new SpeechSynthesisUtterance(answer);
+            utterance.lang = "es-CO";
+            utterance.onend = utterance.onerror = () => {
+                busy = false;
+                speaker.textContent = "Tú";
+                if (active) {
+                    setState("Escuchando…");
+                    restartTimer = window.setTimeout(startRecognition, 250);
+                }
+            };
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        };
+        const startWebRecognition = () => {
+            if (!active || !SpeechRecognition) return;
+            recognition = new SpeechRecognition();
+            recognition.lang = "es-CO";
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.onstart = () => setState("Micrófono activo. Habla ahora…");
+            recognition.onspeechstart = () => setState("Te escucho…");
+            recognition.onspeechend = () => setState("Procesando lo que dijiste…");
+            recognition.onresult = (event) => {
+                const results = [...event.results].slice(event.resultIndex);
+                const heardText = results.map((result) => result[0]?.transcript || "").join(" ").trim();
+                if (heardText) transcript.textContent = `Te escuché: ${heardText}`;
+                const question = results
+                    .filter((result) => result.isFinal)
+                    .map((result) => result[0]?.transcript || "")
+                    .join(" ")
+                    .trim();
+                if (!question) return;
+                busy = true;
+                recognition.stop();
+                answerByVoice(question);
+            };
+            recognition.onerror = (event) => {
+                if (!active) return;
+                if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+                    stop("El navegador bloqueó el micrófono. Concede el permiso y vuelve a iniciar.");
+                } else if (event.error === "audio-capture") {
+                    stop("No se pudo iniciar el micrófono. Comprueba el dispositivo y sus permisos.");
+                } else if (event.error === "no-speech") {
+                    setState("No detecté voz. Habla ahora para que EDUBOT pueda escucharte.");
+                } else if (event.error === "network") {
+                    stop("El reconocimiento de voz no pudo conectarse. Comprueba tu conexión e inténtalo otra vez.");
+                } else if (event.error !== "aborted") {
+                    setState("No se pudo reconocer la voz. Inténtalo otra vez.");
+                }
+            };
+            recognition.onend = () => {
+                recognition = null;
+                if (active && !busy) restartTimer = window.setTimeout(startRecognition, 500);
+            };
+            try {
+                recognition.start();
+                setState("Solicitando acceso al micrófono…");
+            } catch (error) {
+                stop("No se pudo iniciar el micrófono. Vuelve a intentarlo.");
+                console.warn("No se pudo iniciar el micrófono de EDUBOT.", error);
+            }
+        };
+        function startRecognition() {
+            if (!active) return;
+            if (NativeVoice?.startListening) {
+                setState("Solicitando permiso para usar el micrófono…");
+                try {
+                    NativeVoice.startListening();
+                } catch (error) {
+                    stop("No se pudo iniciar el reconocimiento de voz en este dispositivo.");
+                    console.error("No se pudo iniciar el reconocimiento nativo de EDUBOT.", error);
+                }
+            } else if (SpeechRecognition) {
+                if (!window.isSecureContext) {
+                    stop("El micrófono requiere una conexión segura. Abre EDUTURNOS con su dirección HTTPS.");
+                    return;
+                }
+                setState("Solicitando acceso al micrófono…");
+                startWebRecognition();
+            } else {
+                stop("El reconocimiento de voz no está disponible en este navegador. Abre EDUTURNOS en Chrome actualizado.");
+            }
+        }
+        function stop(message = "Conversación por voz finalizada.") {
+            active = false;
+            busy = false;
+            window.clearTimeout(restartTimer);
+            if (NativeVoice?.stopListening) NativeVoice.stopListening();
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (error) {
+                    console.warn("No se pudo detener el micrófono de EDUBOT.", error);
+                }
+                recognition = null;
+            }
+            window.speechSynthesis?.cancel();
+            speaker.textContent = "Tú";
+            setState(message);
+        }
+        const positionPanel = (launcher) => {
+            const anchor = launcher.getBoundingClientRect();
+            const bounds = panel.getBoundingClientRect();
+            const left = anchor.left - bounds.width - 14 >= 8
+                ? anchor.left - bounds.width - 14
+                : Math.min(anchor.right + 14, window.innerWidth - bounds.width - 8);
+            panel.style.left = `${Math.max(8, left)}px`;
+            panel.style.top = `${Math.max(8, Math.min(anchor.top, window.innerHeight - bounds.height - 8))}px`;
+        };
+        const closePanel = () => {
+            stop("");
+            isOpen = false;
+            panel.hidden = true;
+            panel.setAttribute("aria-hidden", "true");
+            panel.classList.remove("is-open", "is-ended");
+            launchers.forEach((launcher) => launcher.setAttribute("aria-expanded", "false"));
+        };
+
+        window.addEventListener("eduturnos-native-voice-ready", () => {
+            if (active && !busy) setState("Micrófono activo. Habla ahora…");
+        });
+        window.addEventListener("eduturnos-native-voice-result", (event) => {
+            const question = event.detail?.text?.trim();
+            if (active && question) {
+                transcript.textContent = `Te escuché: ${question}`;
+                answerByVoice(question);
+            }
+        });
+        window.addEventListener("eduturnos-native-voice-partial-result", (event) => {
+            const text = event.detail?.text?.trim();
+            if (active && text) transcript.textContent = `Te escuché: ${text}`;
+        });
+        window.addEventListener("eduturnos-native-voice-speech-start", () => {
+            if (active && !busy) setState("Te escucho…");
+        });
+        window.addEventListener("eduturnos-native-voice-speech-end", () => {
+            if (active && !busy) setState("Procesando lo que dijiste…");
+        });
+        window.addEventListener("eduturnos-native-voice-error", (event) => {
+            if (!active) return;
+            if (event.detail?.error === "no-speech") {
+                setState("No te escuché. Inténtalo otra vez.");
+            } else if (event.detail?.error === "not-allowed") {
+                stop("Android bloqueó el micrófono. Concede el permiso a EDUTURNOS y vuelve a iniciar.");
+            } else {
+                stop("No hay un servicio de reconocimiento de voz disponible en este dispositivo.");
+            }
+        });
+        window.addEventListener("eduturnos-native-voice-end", () => {
+            if (active && !busy) restartTimer = window.setTimeout(startRecognition, 500);
+        });
+        launchers.forEach((launcher) => launcher.addEventListener("click", () => {
+            if (isOpen) {
+                closePanel();
+                return;
+            }
+            isOpen = true;
+            panel.hidden = false;
+            panel.setAttribute("aria-hidden", "false");
+            panel.classList.remove("is-ended");
+            panel.classList.add("is-open");
+            positionPanel(launcher);
+            launchers.forEach((item) => item.setAttribute("aria-expanded", "true"));
+            active = true;
+            startRecognition();
+        }));
+        close.addEventListener("click", closePanel);
+        toggle.addEventListener("click", () => {
+            if (active) {
+                stop();
+                panel.classList.add("is-ended");
+            } else if (panel.classList.contains("is-ended")) {
+                closePanel();
+            } else {
+                active = true;
+                startRecognition();
+            }
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && isOpen) closePanel();
+        });
+        return true;
+    };
+
     const root = document.querySelector("[data-eduturnos-assistant]");
-    if (!root) return false;
+    if (!root) return initializePublicAssistantVoice();
 
     const section = root.closest(".dashboard-help");
     if (root.dataset.eduturnosInitialized === "true") return true;
@@ -114,18 +357,300 @@ const initializeEduturnosAssistant = () => {
     const button = form?.querySelector("button[type='submit']");
     const status = root.querySelector("[data-assistant-status]");
     const body = root.querySelector("[data-assistant-body]");
-    const toggleButtons = [...(section?.querySelectorAll("[data-assistant-toggle]") || [])];
-    const openButton = toggleButtons.find((toggle) => toggle.hasAttribute("data-assistant-open"));
-    if (!form || !input || !output || !button || !status || !body || !openButton || !toggleButtons.length) return false;
+    const voiceToggle = root.querySelector("[data-assistant-voice-toggle]");
+    const callPanel = section?.querySelector("[data-assistant-call]");
+    const callState = callPanel?.querySelector("[data-assistant-call-state]");
+    const callTranscript = callPanel?.querySelector("[data-assistant-call-transcript]");
+    const callSpeaker = callPanel?.querySelector("[data-assistant-call-speaker]");
+    const callToggle = callPanel?.querySelector("[data-assistant-call-toggle]");
+    const callWave = callPanel?.querySelector("[data-assistant-call-wave]");
+    const callClose = callPanel?.querySelector("[data-assistant-call-close]");
+    const callAction = callPanel?.querySelector("[data-assistant-call-action]");
+    const sidebarToggles = [...(section?.querySelectorAll("[data-assistant-toggle]") || [])];
+    const voiceLaunchers = [...document.querySelectorAll("[data-assistant-voice-launch]")];
+    const openButton = sidebarToggles.find((toggle) => toggle.hasAttribute("data-assistant-open"));
+    if (!form || !input || !output || !button || !status || !body || !voiceToggle || !openButton
+        || !callPanel || !callState || !callTranscript || !callSpeaker || !callToggle || !callWave || !callClose || !callAction) return false;
 
     root.dataset.eduturnosInitialized = "true";
+    document.body.append(callPanel);
     let activeRequestController = null;
     let requestSequence = 0;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const nativeVoice = window.EDUTURNOSNativeVoice;
+    const canRecognizeVoice = Boolean(SpeechRecognition || nativeVoice?.startListening);
+    let voiceRecognition = null;
+    let voiceCallActive = false;
+    let voiceCallBusy = false;
+    let voiceCallRestartTimer = 0;
+    let voiceCallOverlayOpen = false;
+    const setStatus = (message) => {
+        status.textContent = message;
+        callState.textContent = message || (voiceCallActive ? "Escuchando…" : "Listo para escucharte");
+        callWave.classList.toggle("is-active", voiceCallActive && !voiceCallBusy);
+        callWave.classList.toggle("is-speaking", voiceCallBusy);
+        callPanel.classList.toggle("is-listening", voiceCallActive && !voiceCallBusy);
+        callPanel.classList.toggle("is-speaking", voiceCallBusy);
+        callToggle.setAttribute("aria-pressed", String(voiceCallActive));
+        callToggle.setAttribute("aria-label", voiceCallActive ? "Finalizar conversación por voz" : "Iniciar conversación por voz");
+        callAction.textContent = voiceCallActive
+            ? "Colgar"
+            : voiceCallOverlayOpen && callPanel.classList.contains("is-ended")
+                ? "Llamada finalizada"
+                : "Iniciar llamada";
+    };
+    const showVoiceMessage = (speaker, message) => {
+        callSpeaker.textContent = speaker;
+        callTranscript.textContent = `${speaker}: ${message}`;
+    };
+    const submitVoiceMessage = () => {
+        if (typeof form.requestSubmit === "function") {
+            form.requestSubmit();
+        } else {
+            form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+        }
+    };
     const refreshSend = () => {
         button.disabled = input.disabled || !input.value.trim();
+        voiceToggle.disabled = !canRecognizeVoice;
+        voiceToggle.setAttribute("aria-pressed", String(voiceCallActive));
+        const label = voiceCallActive ? "Finalizar conversación por voz" : "Iniciar conversación por voz";
+        voiceToggle.setAttribute("aria-label", label);
+        voiceToggle.title = label;
     };
 
+    const stopVoiceConversation = (message = "") => {
+        const wasActive = voiceCallActive;
+        voiceCallActive = false;
+        voiceCallBusy = false;
+        window.clearTimeout(voiceCallRestartTimer);
+        if (wasActive && nativeVoice?.stopListening) nativeVoice.stopListening();
+        if (voiceRecognition) {
+            try {
+                voiceRecognition.stop();
+            } catch (error) {
+                console.warn("No se pudo detener el reconocimiento de voz de EDUBOT.", error);
+            }
+            voiceRecognition = null;
+        }
+        window.speechSynthesis?.cancel();
+        callSpeaker.textContent = "Tú";
+        refreshSend();
+        if (message) setStatus(message);
+        else setStatus("");
+    };
+
+    const speakResponse = (text) => new Promise((resolve) => {
+        if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+            resolve();
+            return;
+        }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "es-CO";
+        utterance.onstart = () => {
+            voiceCallBusy = true;
+            callSpeaker.textContent = "EDUBOT";
+            setStatus("EDUBOT está respondiendo…");
+        };
+        utterance.onend = () => {
+            voiceCallBusy = false;
+            callSpeaker.textContent = "Tú";
+            resolve();
+        };
+        utterance.onerror = () => {
+            voiceCallBusy = false;
+            callSpeaker.textContent = "Tú";
+            resolve();
+        };
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
+    });
+
+    const startVoiceRecognition = (conversation = false) => {
+        if (nativeVoice?.startListening) {
+            setStatus("Solicitando acceso al micrófono…");
+            try {
+                nativeVoice.startListening();
+            } catch (error) {
+                stopVoiceConversation("No se pudo iniciar el reconocimiento de voz en este dispositivo.");
+                console.warn("No se pudo iniciar el reconocimiento nativo de EDUBOT.", error);
+            }
+            return;
+        }
+        if (!SpeechRecognition) {
+            setStatus("El reconocimiento de voz no está disponible en este navegador. Abre EDUTURNOS en Chrome actualizado.");
+            return;
+        }
+        if (!window.isSecureContext) {
+            stopVoiceConversation("El micrófono requiere una conexión segura. Abre EDUTURNOS con su dirección HTTPS.");
+            return;
+        }
+        const recognition = new SpeechRecognition();
+        voiceRecognition = recognition;
+        recognition.lang = "es-CO";
+        recognition.continuous = conversation;
+        recognition.interimResults = true;
+        recognition.onstart = () => setStatus("Micrófono activo. Habla ahora…");
+        recognition.onspeechstart = () => setStatus("Te escucho…");
+        recognition.onspeechend = () => setStatus("Procesando lo que dijiste…");
+        recognition.onresult = (event) => {
+            const results = [...event.results].slice(event.resultIndex);
+            const heardText = results
+                .map((result) => result[0]?.transcript || "")
+                .join(" ")
+                .trim();
+            if (heardText) callTranscript.textContent = `Te escuché: ${heardText}`;
+            const transcript = results
+                .filter((result) => result.isFinal)
+                .map((result) => result[0]?.transcript || "")
+                .join(" ")
+                .trim();
+            if (!transcript) return;
+            if (conversation) {
+                voiceCallBusy = true;
+                input.value = transcript;
+                input.dispatchEvent(new Event("input", { bubbles: true }));
+                setStatus("EDUBOT está preparando una respuesta…");
+                recognition.stop();
+                submitVoiceMessage();
+                return;
+            }
+        };
+        recognition.onerror = (event) => {
+            if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+                stopVoiceConversation("El navegador bloqueó el micrófono. Revisa el permiso de EDUTURNOS y vuelve a iniciar.");
+            } else if (event.error === "audio-capture") {
+                stopVoiceConversation("No se pudo iniciar el micrófono. Comprueba el dispositivo y sus permisos.");
+            } else if (event.error === "no-speech") {
+                setStatus("No detecté voz. Habla ahora para que EDUBOT pueda escucharte.");
+            } else if (event.error === "network") {
+                stopVoiceConversation("El reconocimiento de voz no pudo conectarse. Comprueba tu conexión e inténtalo otra vez.");
+            } else if (event.error !== "aborted") {
+                setStatus("No se pudo reconocer la voz. Inténtalo otra vez.");
+            }
+        };
+        recognition.onend = () => {
+            if (voiceRecognition === recognition) voiceRecognition = null;
+            if (conversation && voiceCallActive && !voiceCallBusy) {
+                voiceCallRestartTimer = window.setTimeout(() => startVoiceRecognition(true), 500);
+            }
+            refreshSend();
+        };
+        try {
+            recognition.start();
+            setStatus("Solicitando acceso al micrófono…");
+        } catch (error) {
+            voiceRecognition = null;
+            stopVoiceConversation("No se pudo iniciar el micrófono. Comprueba el permiso de EDUTURNOS y vuelve a intentar.");
+            console.warn("No se pudo iniciar el reconocimiento de voz de EDUBOT.", error);
+        }
+    };
+
+    window.addEventListener("eduturnos-native-voice-ready", () => {
+        if (voiceCallActive && !voiceCallBusy) setStatus("Micrófono activo. Habla ahora…");
+    });
+    window.addEventListener("eduturnos-native-voice-result", (event) => {
+        const transcript = event.detail?.text?.trim();
+        if (!voiceCallActive || voiceCallBusy || !transcript) return;
+        voiceCallBusy = true;
+        showVoiceMessage("Tú", transcript);
+        input.value = transcript;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        setStatus("EDUBOT está preparando una respuesta…");
+        submitVoiceMessage();
+    });
+    window.addEventListener("eduturnos-native-voice-partial-result", (event) => {
+        const text = event.detail?.text?.trim();
+        if (voiceCallActive && text) callTranscript.textContent = `Te escuché: ${text}`;
+    });
+    window.addEventListener("eduturnos-native-voice-speech-start", () => {
+        if (voiceCallActive && !voiceCallBusy) setStatus("Te escucho…");
+    });
+    window.addEventListener("eduturnos-native-voice-speech-end", () => {
+        if (voiceCallActive && !voiceCallBusy) setStatus("Procesando lo que dijiste…");
+    });
+    window.addEventListener("eduturnos-native-voice-error", (event) => {
+        if (!voiceCallActive) return;
+        const error = event.detail?.error;
+        if (error === "no-speech") {
+            setStatus("No te escuché. Inténtalo otra vez.");
+            return;
+        }
+        const message = error === "not-allowed"
+            ? "Android bloqueó el micrófono. Concede a EDUTURNOS el permiso de micrófono y vuelve a iniciar."
+            : error === "unavailable"
+                ? "No hay un servicio de reconocimiento de voz disponible en este dispositivo."
+                : "No se pudo reconocer la voz. Inténtalo otra vez.";
+        stopVoiceConversation(message);
+    });
+    window.addEventListener("eduturnos-native-voice-end", () => {
+        if (voiceCallActive && !voiceCallBusy) {
+            voiceCallRestartTimer = window.setTimeout(() => startVoiceRecognition(true), 500);
+        }
+    });
+
+    const toggleVoiceConversation = () => {
+        if (!canRecognizeVoice) {
+            setStatus("El reconocimiento de voz no está disponible en este navegador. Abre EDUTURNOS en Chrome actualizado.");
+            return;
+        }
+        if (voiceCallActive) {
+            stopVoiceConversation("Conversación por voz finalizada.");
+            return;
+        }
+        voiceCallActive = true;
+        voiceCallBusy = false;
+        callTranscript.textContent = "";
+        refreshSend();
+        callSpeaker.textContent = "Tú";
+        setStatus("Solicitando acceso al micrófono…");
+        startVoiceRecognition(true);
+    };
+    voiceToggle.disabled = !canRecognizeVoice;
+    voiceToggle.addEventListener("click", toggleVoiceConversation);
+    callToggle.addEventListener("click", () => {
+        if (voiceCallActive) {
+            stopVoiceConversation("Llamada finalizada.");
+            callToggle.setAttribute("aria-label", "Cerrar llamada");
+            callToggle.querySelector("svg").innerHTML = "<path d=\"M6 6l12 12M18 6 6 18\"/>";
+            callPanel.classList.add("is-ended");
+            callAction.textContent = "Llamada finalizada";
+        } else if (callPanel.classList.contains("is-ended")) {
+            closeVoiceCall();
+        } else {
+            callPanel.classList.remove("is-ended");
+            toggleVoiceConversation();
+        }
+    });
+
+    const positionCallNearLauncher = (launcher) => {
+        const anchor = launcher.getBoundingClientRect();
+        const panel = callPanel.getBoundingClientRect();
+        const gap = 14;
+        const left = anchor.left - panel.width - gap >= 8
+            ? anchor.left - panel.width - gap
+            : Math.min(anchor.right + gap, window.innerWidth - panel.width - 8);
+        const top = Math.min(
+            Math.max(8, anchor.top + (anchor.height - panel.height) / 2),
+            Math.max(8, window.innerHeight - panel.height - 8),
+        );
+        callPanel.style.left = `${Math.max(8, left)}px`;
+        callPanel.style.top = `${top}px`;
+    };
+
+    const closeVoiceCall = () => {
+        stopVoiceConversation();
+        voiceCallOverlayOpen = false;
+        callPanel.hidden = true;
+        callPanel.setAttribute("aria-hidden", "true");
+        callPanel.classList.remove("is-open", "is-ended");
+        voiceLaunchers.forEach((launcher) => launcher.setAttribute("aria-expanded", "false"));
+    };
+
+    callClose.addEventListener("click", closeVoiceCall);
+
     const resetConversation = () => {
+        stopVoiceConversation();
         requestSequence += 1;
         activeRequestController?.abort();
         activeRequestController = null;
@@ -134,7 +659,7 @@ const initializeEduturnosAssistant = () => {
         input.disabled = false;
         input.value = "";
         input.style.height = "";
-        status.textContent = "";
+        setStatus("");
         refreshSend();
     };
 
@@ -304,10 +829,12 @@ const initializeEduturnosAssistant = () => {
             resetConversation();
             clearChatPosition();
             defaultChatSize = null;
+        } else if (voiceCallOverlayOpen) {
+            closeVoiceCall();
         }
         root.hidden = !isOpen;
         root.classList.toggle("is-open", isOpen);
-        toggleButtons.forEach((toggle) => {
+        sidebarToggles.forEach((toggle) => {
             toggle.setAttribute("aria-expanded", String(isOpen));
         });
         if (isOpen) {
@@ -318,19 +845,41 @@ const initializeEduturnosAssistant = () => {
                 height: defaultBounds.height,
             };
         } else {
-            (sourceButton?.hasAttribute("data-assistant-open") ? sourceButton : openButton).focus();
+            (sourceButton && !root.contains(sourceButton) ? sourceButton : openButton).focus();
         }
     };
 
-    toggleButtons.forEach((toggleButton) => {
+    sidebarToggles.forEach((toggleButton) => {
         toggleButton.addEventListener("click", () => {
             setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton);
         });
     });
 
+    voiceLaunchers.forEach((launcher) => {
+        launcher.addEventListener("click", () => {
+            if (voiceCallOverlayOpen) {
+                closeVoiceCall();
+                return;
+            }
+            if (!root.hidden) setChatOpen(false, launcher);
+            voiceCallOverlayOpen = true;
+            callPanel.hidden = false;
+            callPanel.setAttribute("aria-hidden", "false");
+            callPanel.classList.add("is-open");
+            callPanel.classList.remove("is-ended");
+            callToggle.setAttribute("aria-label", "Finalizar conversación por voz");
+            callToggle.innerHTML = "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4.6 14.2a12 12 0 0 1 14.8 0l-2.1 3.2a1.5 1.5 0 0 1-1.8.5l-2.1-.9a1.5 1.5 0 0 1-.9-1.4v-1a9 9 0 0 0-1 0v1a1.5 1.5 0 0 1-.9 1.4l-2.1.9a1.5 1.5 0 0 1-1.8-.5L4.6 14.2Z\"/></svg>";
+            voiceLaunchers.forEach((item) => item.setAttribute("aria-expanded", "true"));
+            positionCallNearLauncher(launcher);
+            toggleVoiceConversation();
+        });
+    });
+
     document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && !root.hidden) {
-            setChatOpen(false, toggleButtons[0]);
+        if (event.key === "Escape" && voiceCallOverlayOpen) {
+            closeVoiceCall();
+        } else if (event.key === "Escape" && !root.hidden) {
+            setChatOpen(false, null);
         }
     });
 
@@ -338,13 +887,14 @@ const initializeEduturnosAssistant = () => {
 
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        if (button.disabled || input.disabled) return;
+        if (input.disabled || (button.disabled && !voiceCallActive)) return;
         const message = input.value.trim();
         if (!message || message.length > 1200) return;
 
+        const answerByVoice = voiceCallActive;
         button.disabled = true;
         input.disabled = true;
-        status.textContent = "EDUBOT está preparando una respuesta…";
+        setStatus("EDUBOT está preparando una respuesta…");
         const controller = new AbortController();
         activeRequestController = controller;
         const currentRequest = ++requestSequence;
@@ -371,23 +921,52 @@ const initializeEduturnosAssistant = () => {
             if (currentRequest !== requestSequence) return;
             const answer = document.createElement("div");
             answer.className = "assistant-answer";
+            let replyText = "";
             if (!response.ok) {
                 answer.classList.add("assistant-error");
                 answer.textContent = data && typeof data.error === "string"
                     ? data.error
                     : `El asistente respondió con un error (${response.status}).`;
                 input.value = message;
+                if (answerByVoice) {
+                    showVoiceMessage("EDUBOT", answer.textContent);
+                    setStatus("No se pudo completar la solicitud.");
+                    await speakResponse(answer.textContent);
+                }
             } else if (data && typeof data.respuesta === "string" && data.respuesta.trim()) {
                 renderAssistantMarkdown(answer, data.respuesta);
+                replyText = data.respuesta;
+                if (answerByVoice) showVoiceMessage("EDUBOT", replyText);
+                if (data.accion === "crear_cita" && root.dataset.createCitationUrl) {
+                    const actionLink = document.createElement("a");
+                    actionLink.className = "assistant-action-link";
+                    actionLink.href = root.dataset.createCitationUrl;
+                    actionLink.textContent = root.dataset.createCitationLabel || "Abrir formulario de citación";
+                    answer.append(actionLink);
+                }
             } else {
                 answer.textContent = "El asistente no devolvió una respuesta válida.";
                 input.value = message;
+                if (answerByVoice) {
+                    showVoiceMessage("EDUBOT", answer.textContent);
+                    setStatus("No se recibió una respuesta válida.");
+                    await speakResponse(answer.textContent);
+                }
             }
             output.append(answer);
             output.scrollTop = output.scrollHeight;
+            if (answerByVoice && replyText) {
+                await speakResponse(replyText);
+            }
         } catch {
             if (controller.signal.aborted || currentRequest !== requestSequence) return;
             input.value = message;
+            setStatus("No se pudo conectar con EDUTURNOS. Inténtalo nuevamente.");
+            if (answerByVoice) {
+                const errorMessage = "No se pudo conectar con EDUTURNOS. Inténtalo nuevamente.";
+                showVoiceMessage("EDUBOT", errorMessage);
+                await speakResponse(errorMessage);
+            }
             const answer = document.createElement("p");
             answer.className = "assistant-answer assistant-error";
             answer.textContent = "No se pudo conectar con EDUTURNOS. Inténtalo nuevamente.";
@@ -398,8 +977,15 @@ const initializeEduturnosAssistant = () => {
                 activeRequestController = null;
                 input.disabled = false;
                 refreshSend();
-                status.textContent = "";
-                input.focus();
+                if (answerByVoice && voiceCallActive) {
+                    voiceCallBusy = false;
+                    voiceCallRestartTimer = window.setTimeout(() => {
+                        if (voiceCallActive && !voiceRecognition) startVoiceRecognition(true);
+                    }, 250);
+                } else {
+                    setStatus("");
+                }
+                if (!answerByVoice) input.focus();
             }
         }
     });

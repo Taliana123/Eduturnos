@@ -1,15 +1,15 @@
 {% if usuario_navegacion %}
 <section class="dashboard-help" aria-label="Ayuda y soporte">
     <button class="assistant-sidebar-entry assistant-sidebar-card" type="button" data-assistant-toggle data-assistant-open aria-controls="assistant-chat-panel" aria-expanded="false" aria-label="Abrir Ayuda EDUTURNOS" title="Abrir Ayuda EDUTURNOS">
-        <img class="assistant-sidebar-avatar" src="{{ url_for('static', filename='icons/edubot.png') }}" alt="" width="40" height="40">
+        <span class="assistant-sidebar-avatar assistant-drone-avatar" role="img" aria-label="Agente de inteligencia artificial de EDUTURNOS" style="background-image:url('{{ url_for('static', filename='mascots/drone-directions.webp') }}')"></span>
         <span class="assistant-sidebar-copy">
             <strong>Ayuda EDUTURNOS</strong>
             <small>Pregunta a EDUBOT</small>
         </span>
     </button>
-    <div class="dashboard-help-chat" id="assistant-chat-panel" data-eduturnos-assistant data-endpoint="{{ url_for('asistente.preguntar') }}" data-csrf="{{ csrf_token() }}" hidden>
+    <div class="dashboard-help-chat" id="assistant-chat-panel" data-eduturnos-assistant data-endpoint="{{ url_for('asistente.preguntar') }}" data-create-citation-url="{% if usuario_navegacion.rol_nombre in ['Super Admin','Rector','Administrador / Coordinador','Docente'] %}{{ url_for('citas.nueva') }}{% elif usuario_navegacion.rol_nombre == 'Acudiente' %}{{ url_for('solicitudes.nueva_acudiente') }}{% endif %}" data-create-citation-label="{% if usuario_navegacion.rol_nombre == 'Acudiente' %}Abrir solicitud de cita{% else %}Abrir formulario de citación{% endif %}" data-csrf="{{ csrf_token() }}" hidden>
         <header class="assistant-header" title="Arrastra este encabezado para mover el chat">
-            <img class="assistant-avatar" src="{{ url_for('static', filename='icons/edubot.png') }}" alt="Muñeco de EDUBOT" width="48" height="48">
+            <span class="assistant-avatar assistant-drone-avatar" role="img" aria-label="Agente EDUBOT" style="background-image:url('{{ url_for('static', filename='mascots/drone-directions.webp') }}')"></span>
             <span class="assistant-brand">
                 <strong id="dashboard-help-title">EDUBOT</strong>
                 <small>Respuesta inmediata a tus dudas</small>
@@ -28,17 +28,43 @@
 
             <form class="assistant-composer">
                 <textarea id="assistant-question" rows="1" maxlength="1200" aria-label="Mensaje para EDUBOT" placeholder="Mensaje para EDUBOT…" autocomplete="off"></textarea>
+                <button class="assistant-voice-toggle" type="button" data-assistant-voice-toggle aria-pressed="false" aria-label="Iniciar conversación por voz" title="Iniciar conversación por voz">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-4 0h8"></path></svg>
+                </button>
                 <button type="submit" aria-label="Enviar pregunta" disabled>
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-5 16-3-7-8-1Zm8 1 8-9" /></svg>
                 </button>
             </form>
             <p class="assistant-status" data-assistant-status aria-live="polite"></p>
-            <small class="assistant-privacy">Por tu seguridad, no compartas información personal ni documentos.</small>
+            <small class="assistant-privacy">Al usar el micrófono, tu voz se transcribe con el servicio del dispositivo o navegador y el texto se envía a EDUBOT. No compartas información personal ni documentos.</small>
         </div>
         <button class="assistant-resize-handle assistant-resize-nw" type="button" data-assistant-resize="nw" aria-label="Cambiar tamaño desde la esquina superior izquierda"></button>
         <button class="assistant-resize-handle assistant-resize-ne" type="button" data-assistant-resize="ne" aria-label="Cambiar tamaño desde la esquina superior derecha"></button>
         <button class="assistant-resize-handle assistant-resize-sw" type="button" data-assistant-resize="sw" aria-label="Cambiar tamaño desde la esquina inferior izquierda"></button>
         <button class="assistant-resize-handle assistant-resize-se" type="button" data-assistant-resize="se" aria-label="Cambiar tamaño desde la esquina inferior derecha"></button>
     </div>
+    <section class="assistant-voice-call" data-assistant-call role="dialog" aria-modal="false" aria-labelledby="assistant-call-title" aria-hidden="true" hidden>
+        <header class="assistant-voice-call__header">
+            <div>
+                <small>EDUTURNOS · ASISTENTE DE VOZ</small>
+                <h2 id="assistant-call-title">EDUBOT</h2>
+            </div>
+            <button type="button" class="assistant-voice-call__close" data-assistant-call-close aria-label="Cerrar llamada">×</button>
+        </header>
+        <div class="assistant-voice-call__stage">
+            <span class="assistant-voice-call__avatar assistant-drone-avatar" role="img" aria-label="Agente EDUBOT" style="background-image:url('{{ url_for('static', filename='mascots/drone-directions.webp') }}')"></span>
+            <p class="assistant-voice-call__state" data-assistant-call-state aria-live="polite">Listo para escucharte</p>
+            <p class="assistant-voice-call__transcript" data-assistant-call-transcript aria-live="polite"></p>
+            <div class="assistant-voice-call__wave" data-assistant-call-wave aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <span class="assistant-voice-call__speaker" data-assistant-call-speaker>Tú</span>
+            <button type="button" class="assistant-voice-call__hangup" data-assistant-call-toggle aria-pressed="false" aria-label="Iniciar conversación por voz">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 14.2a12 12 0 0 1 14.8 0l-2.1 3.2a1.5 1.5 0 0 1-1.8.5l-2.1-.9a1.5 1.5 0 0 1-.9-1.4v-1a9 9 0 0 0-1 0v1a1.5 1.5 0 0 1-.9 1.4l-2.1.9a1.5 1.5 0 0 1-1.8-.5L4.6 14.2Z"/></svg>
+            </button>
+            <span class="assistant-voice-call__action" data-assistant-call-action>Iniciar llamada</span>
+        </div>
+        <p class="assistant-voice-call__privacy">Tu voz se transcribe para que EDUBOT pueda responderte.</p>
+    </section>
 </section>
 {% endif %}

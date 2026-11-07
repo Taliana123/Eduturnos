@@ -1,7 +1,7 @@
 import hashlib
 import hmac
 import json
-from datetime import date, time
+from datetime import date, time, timedelta
 from urllib.error import HTTPError
 
 import pytest
@@ -164,9 +164,14 @@ def test_integrations_page_offers_eduturnos_calendar_to_every_role():
 
     source = Path("templates/integraciones_google.html").read_text(encoding="utf-8")
     route_source = Path("routes/integraciones_google.py").read_text(encoding="utf-8")
-    assert '"#Intent;scheme=content;action=android.intent.action.VIEW;type=time/epoch;"' in route_source
-    assert "Abrir app de Google Calendar" in source
-    assert "EDUTURNOS es el registro principal" in source
+    assert "package=com.google.android.calendar;end" in route_source
+    assert "S.browser_fallback_url" not in route_source
+    assert "Abrir Google Calendar" in source
+    assert "Se intentará abrir la aplicación" in source
+    assert "No hay una cita futura sincronizada" not in source
+    assert "{% if calendar_open_url %}" not in source
+    assert "EDUTURNOS conserva la información oficial" in source
+    assert source.index("Sincronizar citas futuras") < source.index("Abrir Google Calendar")
     assert source.count("<h2>Agenda") == 1
     assert "google-calendar-actions" in source
     assert "{% if institucional_sync and institucional_sync.fallidas" in source
@@ -174,11 +179,146 @@ def test_integrations_page_offers_eduturnos_calendar_to_every_role():
     assert "Reintentar citas fallidas" in source
     assert "{% if usuario.rol_nombre in ['Estudiante','Acudiente'] %}" not in source
     with app.test_request_context(headers={"User-Agent": "Mozilla/5.0 (Linux; Android 14)"}):
-        assert _url_abrir_calendario(1793328513689) == (
+        intent_url = _url_abrir_calendario(1793328513689)
+        assert intent_url.startswith(
             "intent://com.android.calendar/time/1793328513689"
-            "#Intent;scheme=content;action=android.intent.action.VIEW;type=time/epoch;"
+            "#Intent;scheme=content;action=android.intent.action.VIEW;"
+            "type=time/epoch;"
             "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
-            "package=com.google.android.calendar;end"
         )
+        assert (
+            "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
+            in intent_url
+        )
+        assert intent_url.endswith("package=com.google.android.calendar;end")
+        assert "S.browser_fallback_url" not in intent_url
     with app.test_request_context(headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0)"}):
         assert _url_abrir_calendario(1793328513689).startswith("https://calendar.google.com/calendar/u/0/r/day/")
+    with app.test_request_context(headers={"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)"}):
+        assert _url_abrir_calendario(1793328513689) == "googlecalendar://"
+
+
+def test_android_synced_event_intent_targets_google_calendar_without_web_fallback(monkeypatch):
+    from routes import integraciones_google
+
+    monkeypatch.setattr(integraciones_google, "apps_script_configurada", lambda: True)
+    monkeypatch.setattr(
+        integraciones_google,
+        "consultar",
+        lambda *args, **kwargs: {
+            "google_event_id": "stored-event-id",
+            "scope_key": "institucional",
+        },
+    )
+    monkeypatch.setattr(
+        integraciones_google,
+        "enlace_evento_apps_script",
+        lambda event_id: "https://www.google.com/calendar/event?eid=abc_DEF-123",
+    )
+
+    with app.test_request_context(headers={"User-Agent": "Mozilla/5.0 (Linux; Android 14)"}):
+        intent_url = integraciones_google._url_app_cita({"id": 91}, android=True)
+
+    assert intent_url.startswith(
+        "intent://www.google.com/calendar/event?eid=abc_DEF-123"
+        "#Intent;scheme=https;action=android.intent.action.VIEW;"
+        "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
+    )
+    assert (
+        "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
+        in intent_url
+    )
+    assert intent_url.endswith("package=com.google.android.calendar;end")
+    assert "S.browser_fallback_url" not in intent_url
+
+    ios_url = integraciones_google._url_app_cita({"id": 91}, android=False, ios=True)
+    assert ios_url == "googlecalendar://"
+
+
+def test_android_synced_personal_event_opens_that_specific_google_event(monkeypatch):
+    import base64
+    from urllib.parse import parse_qs, urlsplit
+    from routes import integraciones_google
+
+    monkeypatch.setattr(integraciones_google, "_scope_institucional", lambda _usuario: "institucion:7")
+    monkeypatch.setattr(integraciones_google, "apps_script_configurada", lambda: False)
+
+    queries = []
+
+    def find_event(sql, params=(), uno=False):
+        queries.append((sql, params, uno))
+        return {
+            "google_event_id": "eduturnos-personal-event",
+            "scope_key": "usuario:12",
+            "calendar_id": "primary",
+            "correo_google": "docente@example.com",
+        }
+
+    monkeypatch.setattr(
+        integraciones_google,
+        "consultar",
+        find_event,
+    )
+    usuario = {"id_usuario": 12, "rol_nombre": "Docente", "id_institucion": 7}
+    cita = {"id": 91}
+
+    with app.test_request_context(headers={"User-Agent": "Mozilla/5.0 (Linux; Android 14)"}):
+        event_url = integraciones_google._url_evento_app_cita(cita, usuario)
+        intent_url = integraciones_google._url_app_cita(
+            cita, android=True, evento_url=event_url, usuario=usuario
+        )
+
+    encoded_intent_eid = parse_qs(urlsplit(intent_url).query)["eid"][0]
+    encoded_eid = parse_qs(urlsplit(event_url).query)["eid"][0]
+    decoded_eid = base64.urlsafe_b64decode(encoded_eid + "=" * (-len(encoded_eid) % 4)).decode()
+    assert queries[0][1] == (91, "usuario:12", "institucion:7", "usuario:12")
+    assert queries[0][2]
+    assert decoded_eid == "eduturnos-personal-event docente@example.com"
+    assert encoded_intent_eid == encoded_eid
+    assert intent_url.startswith(
+        f"intent://www.google.com/calendar/event?eid={encoded_eid}"
+        "#Intent;scheme=https;action=android.intent.action.VIEW;"
+        "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
+    )
+
+
+def test_next_synced_appointment_prefers_personal_google_calendar_event(monkeypatch):
+    from routes import calendario, integraciones_google
+
+    tomorrow = date.today() + timedelta(days=1)
+    cita_sincronizada = {"id": 92, "fecha": tomorrow, "hora": time(9, 0)}
+    cita_sin_sincronizar = {"id": 91, "fecha": tomorrow, "hora": time(8, 0)}
+    usuario = {"id_usuario": 12, "rol_nombre": "Docente", "id_institucion": 7}
+    monkeypatch.setattr(
+        calendario,
+        "citas_visibles",
+        lambda _usuario: [cita_sin_sincronizar, cita_sincronizada],
+    )
+    monkeypatch.setattr(
+        integraciones_google,
+        "_evento_sincronizado_cita",
+        lambda cita, _usuario: {"scope_key": "usuario:12"} if cita["id"] == 92 else None,
+    )
+    monkeypatch.setattr(
+        integraciones_google,
+        "_scope_institucional",
+        lambda _usuario: "institucion:7",
+    )
+
+    monkeypatch.setattr(
+        integraciones_google,
+        "consultar",
+        lambda *_args, **_kwargs: [{
+            "id_cita": 92,
+            "google_event_id": "personal-event",
+            "scope_key": "usuario:12",
+            "calendar_id": "primary",
+            "correo_google": "docente@example.com",
+        }],
+    )
+    cita, _inicio_ms, evento = integraciones_google._proxima_cita(
+        usuario, solo_sincronizadas=True
+    )
+
+    assert cita == cita_sincronizada
+    assert evento["google_event_id"] == "personal-event"

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -8,8 +8,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="EDUTURNOS">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}" type="image/png" sizes="192x192">
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261107_voice_input_feedback_v2">
     <title>EDUTURNOS · {{ titulo }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_public_menu_title_v65" media="(max-width: 900px)">
 
@@ -342,7 +344,8 @@
         }
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout-responsive.css') }}?v=20261023_password_heading_back_v1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-ui-fixes.css') }}?v=20261026_desktop_account_config_v3" media="(min-width: 901px)">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-ui-fixes.css') }}?v=20261107_desktop_pc_updates_v1" media="(min-width: 901px)">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_mascot_everywhere_v1">
 </head>
 
 <body class="public-info-page">
@@ -391,7 +394,7 @@
     <span><a href="{{ url_for('privacidad') }}">Privacidad</a> · <a href="{{ url_for('terminos') }}">Condiciones</a></span>
 </footer>
 
-<script src="{{ url_for('static', filename='js/pwa.js') }}?v=2" defer></script>
+<script src="{{ url_for('static', filename='js/pwa.js') }}?v=5" defer></script>
 <script src="{{ url_for('static', filename='js/public-back.js') }}?v=20261021_public_back_v3" defer></script>
 <style>
     .public-title-row { display: flex; min-width: 0; align-items: center; gap: 12px; margin: 22px 0 20px; }
@@ -407,5 +410,7 @@
         .public-info-page h1, .public-info-page h2 { scroll-margin-top: 90px; }
     }
 </style>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261107_voice_input_feedback_v3" defer></script>
+{% include '_page_mascot.html' %}
 </body>
 </html>

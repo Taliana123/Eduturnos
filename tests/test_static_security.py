@@ -1,5 +1,6 @@
 import base64
 import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -29,9 +30,42 @@ def test_plaintext_directory_codes_are_not_distributed():
 
 def test_service_worker_version_invalidates_stale_app_assets():
     service_worker = (ROOT / "static" / "service-worker.js").read_text(encoding="utf-8")
+    manifest = json.loads((ROOT / "static" / "manifest.webmanifest").read_text(encoding="utf-8"))
 
-    assert 'const CACHE_VERSION = "eduturnos-v11";' in service_worker
+    assert 'const CACHE_VERSION = "eduturnos-v17-voice-icon-cache";' in service_worker
     assert "keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key))" in service_worker
+    assert "/static/icons/eduturnos-192.png" in service_worker
+    assert "/static/icons/eduturnos-512.png" in service_worker
+    assert [icon["src"] for icon in manifest["icons"]] == [
+        "/static/icons/eduturnos-192.png",
+        "/static/icons/eduturnos-512.png",
+    ]
+    assert (ROOT / "static" / "icons" / "eduturnos-192.png").is_file()
+    assert (ROOT / "static" / "icons" / "eduturnos-512.png").is_file()
+
+
+def test_service_worker_has_a_single_versioned_registration():
+    app_script = (ROOT / "static" / "js" / "app.js").read_text(encoding="utf-8")
+    pwa_script = (ROOT / "static" / "js" / "pwa.js").read_text(encoding="utf-8")
+
+    assert 'navigator.serviceWorker.register("/service-worker.js")' not in app_script
+    assert 'navigator.serviceWorker.register("/service-worker.js?v=5"' in pwa_script
+
+
+def test_desktop_and_pwa_asset_versions_are_refreshed_across_page_shells():
+    templates = (
+        "templates/base.html",
+        "templates/index.html",
+        "templates/publico/base_publica.html",
+        "templates/auth/login.html",
+    )
+
+    for template_path in templates:
+        template = (ROOT / template_path).read_text(encoding="utf-8")
+        assert "js/pwa.js') }}?v=5" in template
+    for template_path in templates[:3]:
+        template = (ROOT / template_path).read_text(encoding="utf-8")
+        assert "20261107_desktop_pc_updates_v1" in template
 
 
 def test_report_exports_neutralize_spreadsheet_formulas():

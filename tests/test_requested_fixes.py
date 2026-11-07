@@ -504,6 +504,32 @@ def test_mobile_seguimiento_spacing_and_section_titles_are_consistent():
     assert "margin-top: 0 !important;" in responsive
 
 
+def test_mobile_seguimiento_uses_desktop_process_layout():
+    template = Path("templates/seguimiento/lista.html").read_text(encoding="utf-8")
+
+    assert ".seguimiento-descripcion-desktop{display:none!important;}" not in template
+    assert "grid-template-columns:100px minmax(0,1fr) 24px;" in template
+    assert "gap:16px;padding:24px;border-top:1px solid #d5e1fa;" in template
+    assert "max-height:calc(100dvh - 24px);padding:30px;" in template
+
+
+def test_voice_transcripts_are_submitted_and_responses_are_visible():
+    assistant_script = Path("static/js/asistente.js").read_text(encoding="utf-8")
+    templates = (
+        Path("templates/base.html").read_text(encoding="utf-8"),
+        Path("templates/index.html").read_text(encoding="utf-8"),
+        Path("templates/auth/login.html").read_text(encoding="utf-8"),
+        Path("templates/publico/base_publica.html").read_text(encoding="utf-8"),
+    )
+
+    assert "const submitVoiceMessage = () =>" in assistant_script
+    assert "submitVoiceMessage();" in assistant_script
+    assert "button.disabled && !voiceCallActive" in assistant_script
+    assert 'showVoiceMessage("EDUBOT", replyText)' in assistant_script
+    assert "showVoiceMessage(\"EDUBOT\", errorMessage)" in assistant_script
+    assert all("20261107_voice_input_feedback_v3" in template for template in templates)
+
+
 def test_student_name_and_mobile_directory_icons_match_shared_directory_style():
     responsive = Path("static/css/layout-responsive.css").read_text(encoding="utf-8")
     students = Path("templates/estudiantes/lista.html").read_text(encoding="utf-8")
@@ -678,7 +704,7 @@ def test_configuration_catalog_titles_follow_followup_page_heading_layout():
     assert "min-height: 58px !important;" in css
 
 
-def test_homepage_artwork_is_next_to_slogan_and_login_back_link_is_symbol_only():
+def test_homepage_artwork_is_next_to_slogan_and_login_back_link_is_visible_on_desktop():
     login = Path("templates/auth/login.html").read_text(encoding="utf-8")
     homepage = Path("templates/index.html").read_text(encoding="utf-8")
     illustration = Path("templates/_eduturnos_illustration.html").read_text(encoding="utf-8")
@@ -695,6 +721,7 @@ def test_homepage_artwork_is_next_to_slogan_and_login_back_link_is_symbol_only()
     assert 'class="eduturnos-recuperar-final-back account-settings-back"' in recovery
     assert '<svg aria-hidden="true" viewBox="0 0 24 24">' in recovery
     assert 'aria-label="Volver al inicio"' in login
+    assert 'class="mobile-back-link-label">Volver al inicio</span>' in login
 
 
 def test_homepage_artwork_scales_on_mobile_and_login_remains_plain():
@@ -789,15 +816,14 @@ def test_support_opens_prefilled_email_without_extra_form_or_chat():
 
     assert "('soporte.index', 'Ayuda y soporte')" in sidebar
     assert "'soporte.index': 'mail'" in sidebar
-    assert "mailto:coliejjfh@hotmail.com" in sidebar
-    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
     assert "desktop-support-link" not in sidebar
     assert "outlook.live.com" not in sidebar
     assert 'class="support-nav-link" href="{{ url_for(\'soporte.index\') }}"' not in assistant_widget
     assert "mail.google.com/mail/" not in sidebar
     assert "redirect(" in route
-    assert "mailto:coliejjfh@hotmail.com" in route
-    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in route
+    assert "https://mail.google.com/mail/" in route
+    assert "S.browser_fallback_url" in route
+    assert "Hola, necesito ayuda con EDUTURNOS" in route
     assert not Path("templates/soporte/index.html").exists()
     assert "Respuesta automática de EDUBOT" in email
 
@@ -859,8 +885,9 @@ def test_support_is_available_in_sidebar_and_legacy_gmail_composer_is_removed():
     assert "mail.google.com/mail/" not in sidebar
     assert "soporte_bp" in app_source
     assert "supportEmailLink" not in app_js
-    assert "mailto:coliejjfh@hotmail.com" in Path("routes/soporte.py").read_text(encoding="utf-8")
-    assert "mailto:coliejjfh@hotmail.com" in sidebar
+    route = Path("routes/soporte.py").read_text(encoding="utf-8")
+    assert "https://mail.google.com/mail/" in route
+    assert "S.browser_fallback_url" in route
 
 
 def test_requested_visual_fixes_are_scoped_to_desktop():

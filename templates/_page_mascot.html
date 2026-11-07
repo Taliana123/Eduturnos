@@ -1,0 +1,44 @@
+<button
+    class="page-mascot page-mascot--floating{% if request.endpoint == 'auth.dashboard' %} page-mascot--dashboard{% endif %}"
+    type="button"
+    aria-label="Agente de EDUTURNOS. Pulsa para hablar con EDUBOT y arrastra para moverlo."
+    data-page-mascot
+    data-assistant-voice-launch aria-expanded="false"
+>
+    <span class="page-mascot__frame" data-mascot-frame aria-hidden="true">
+        <span
+            class="page-mascot__sheet page-mascot__directions is-visible"
+            data-mascot-directions
+            style="background-image: url('{{ url_for('static', filename='mascots/drone-directions.webp') }}')"
+        ></span>
+        <span
+            class="page-mascot__sheet page-mascot__reactions"
+            data-mascot-reactions
+            style="background-image: url('{{ url_for('static', filename='mascots/drone-reactions.webp') }}')"
+        ></span>
+    </span>
+</button>
+<section class="assistant-voice-call" data-assistant-public-call role="dialog" aria-modal="false" aria-labelledby="assistant-public-call-title" aria-hidden="true" hidden>
+    <header class="assistant-voice-call__header">
+        <div>
+            <small>EDUTURNOS · ASISTENTE DE VOZ</small>
+            <h2 id="assistant-public-call-title">EDUBOT</h2>
+        </div>
+        <button type="button" class="assistant-voice-call__close" data-assistant-public-close aria-label="Cerrar llamada">×</button>
+    </header>
+    <div class="assistant-voice-call__stage">
+        <span class="assistant-voice-call__avatar assistant-drone-avatar" role="img" aria-label="Agente EDUBOT" style="background-image:url('{{ url_for('static', filename='mascots/drone-directions.webp') }}')"></span>
+        <p class="assistant-voice-call__state" data-assistant-public-state aria-live="polite">Listo para escucharte</p>
+        <p class="assistant-voice-call__transcript" data-assistant-public-transcript aria-live="polite"></p>
+        <div class="assistant-voice-call__wave" data-assistant-public-wave aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="assistant-voice-call__speaker" data-assistant-public-speaker>Tú</span>
+        <button type="button" class="assistant-voice-call__hangup" data-assistant-public-toggle aria-pressed="false" aria-label="Finalizar conversación por voz">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 14.2a12 12 0 0 1 14.8 0l-2.1 3.2a1.5 1.5 0 0 1-1.8.5l-2.1-.9a1.5 1.5 0 0 1-.9-1.4v-1a9 9 0 0 0-1 0v1a1.5 1.5 0 0 1-.9 1.4l-2.1.9a1.5 1.5 0 0 1-1.8-.5L4.6 14.2Z"/></svg>
+        </button>
+        <span class="assistant-voice-call__action" data-assistant-public-action>Iniciar llamada</span>
+    </div>
+    <p class="assistant-voice-call__privacy">En esta página puedo orientar sobre el acceso y las citas. Inicia sesión para recibir ayuda personalizada.</p>
+</section>
+<script src="{{ url_for('static', filename='js/page-mascot.js') }}?v=20261107_voice_input_feedback_v2" defer></script>

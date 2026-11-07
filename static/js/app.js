@@ -1,4 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
+	document.querySelectorAll("[data-google-calendar-open]").forEach((link) => {
+		link.addEventListener("click", (event) => {
+			const launcher = window.EDUTURNOSNativeCalendar;
+			if (!launcher || typeof launcher.openAt !== "function") return;
+			event.preventDefault();
+			const eventUrl = link.dataset.calendarEventUrl;
+			if (eventUrl && typeof launcher.openEvent === "function") {
+				launcher.openEvent(eventUrl);
+				return;
+			}
+			launcher.openAt(Number(link.dataset.calendarStart) || Date.now());
+		});
+	});
+
 	const mainContent = document.getElementById("contenido");
 	document.querySelectorAll(".sede-select").forEach((select) => {
 		const output = select.parentElement.querySelector("[data-sede-code]");
@@ -362,9 +376,3 @@ document.addEventListener("DOMContentLoaded", () => {
 	window.addEventListener("hashchange", openMobileDialogFromHash);
 	openMobileDialogFromHash();
 });
-
-if ("serviceWorker" in navigator) {
-	window.addEventListener("load", () => {
-		navigator.serviceWorker.register("/service-worker.js");
-	});
-}

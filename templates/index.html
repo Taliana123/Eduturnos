@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -10,8 +10,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="EDUTURNOS">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}" type="image/png" sizes="192x192">
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261107_voice_input_feedback_v2">
 
     <title>EDUTURNOS | Comunidad educativa</title>
 
@@ -701,6 +703,7 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
 </style>
 
 {% if beepy_inicio %}<script src="{{ url_for('static', filename='js/beepy.js') }}" defer></script>{% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_mascot_everywhere_v1">
 </head>
 
 <body class="public-home-page">
@@ -907,7 +910,9 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
 {% if request.args.get('mobile') == '1' or session.get('mobile_mode') or 'Android' in request.user_agent.string or 'iPhone' in request.user_agent.string or 'iPad' in request.user_agent.string %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_mobile_recovery_v64">
 {% endif %}
-<script src="{{ url_for('static', filename='js/pwa.js') }}?v=2" defer></script>
+<script src="{{ url_for('static', filename='js/pwa.js') }}?v=5" defer></script>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261107_voice_input_feedback_v3" defer></script>
+{% include '_page_mascot.html' %}
 </body>
 </html>
 
@@ -1119,7 +1124,7 @@ body {
 
 </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261028_home_reference_match_v1" media="(max-width: 900px)">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-ui-fixes.css') }}?v=20261026_desktop_account_config_v3" media="(min-width: 901px)">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-ui-fixes.css') }}?v=20261107_desktop_pc_updates_v1" media="(min-width: 901px)">
 <style id="eduturnos-home-hero-illustration">
     html body.public-home-page .hero-message-row {
         display: flex !important;
@@ -1305,7 +1310,7 @@ body {
 
     html body.public-home-page .pagina > main > .hero {
         min-height: 0 !important;
-        padding: 36px 0 38px !important;
+        padding: 18px 0 38px !important;
     }
 
     html body.public-home-page .hero .hero-interior {
@@ -1446,7 +1451,7 @@ body {
         width: 100% !important;
         min-height: 0 !important;
         margin: 0 !important;
-        padding: 36px 0 38px !important;
+        padding: 18px 0 38px !important;
         box-sizing: border-box !important;
         background: radial-gradient(circle at 80% 20%, rgba(255,255,255,.34), transparent 30%), linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%) !important;
     }
@@ -1620,7 +1625,7 @@ body {
 
     html body.public-home-page .pagina > main > .hero {
         min-height: 0 !important;
-        padding: 38px 0 30px !important;
+        padding: 18px 0 30px !important;
         background: linear-gradient(135deg, #b9def7 0%, #b5daf4 100%) !important;
     }
 

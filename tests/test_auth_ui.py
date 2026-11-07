@@ -172,6 +172,15 @@ def test_login_illustration_is_restored_only_on_desktop():
     assert "login-desktop-visual" not in mobile_styles
 
 
+def test_login_back_link_has_desktop_text_and_mobile_icon_only():
+    login = Path("templates/auth/login.html").read_text(encoding="utf-8")
+    mobile_rules = login.split("@media (max-width: 560px)", 1)[1].split("</style>", 1)[0]
+
+    assert 'class="mobile-back-link-label">Volver al inicio</span>' in login
+    assert ".mobile-back-link-label" in mobile_rules
+    assert "display: none;" in mobile_rules
+
+
 def test_account_title_and_description_align_with_personal_info_heading_on_mobile():
     template = Path("templates/cuenta/index.html").read_text(encoding="utf-8")
     mobile_styles = template.split("@media(max-width:720px)", 1)[1]
@@ -186,14 +195,13 @@ def test_support_link_opens_prefilled_email_to_institution():
     route = Path("routes/soporte.py").read_text(encoding="utf-8")
     assert "('soporte.index', 'Ayuda y soporte')" in sidebar
     assert "'soporte.index': 'mail'" in sidebar
-    assert "mailto:coliejjfh@hotmail.com" in sidebar
-    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in sidebar
     assert "desktop-support-link" not in sidebar
     assert "outlook.live.com" not in sidebar
     assert "url_for('soporte.index')" not in assistant_widget
     assert "redirect(" in route
-    assert "mailto:coliejjfh@hotmail.com" in route
-    assert "Hola%2C%20necesito%20ayuda%20con%20EDUTURNOS" in route
+    assert "https://mail.google.com/mail/" in route
+    assert "S.browser_fallback_url" in route
+    assert "Hola, necesito ayuda con EDUTURNOS" in route
     assert not Path("templates/soporte/index.html").exists()
 
 
@@ -632,7 +640,8 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'url_for(\'soporte.index\')' not in widget
     assert 'assistant-suggestions' not in widget
     assert 'Las preguntas abiertas se envían a Groq' not in widget
-    assert 'Por tu seguridad, no compartas información personal ni documentos.' in widget
+    assert 'No compartas información personal ni documentos.' in widget
+    assert 'tu voz se transcribe con el servicio del dispositivo o navegador' in widget
     assert 'datos de estudiantes' not in widget
     assert "{% include '_asistente_widget.html' %}" in lateral
     assert "{% include '_asistente_widget.html' %}" not in dashboard
@@ -642,8 +651,8 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
     assert "request.endpoint != 'soporte.index'" not in base
-    assert "css/edubot.css') }}?v=20261025_assistant_resize_v3" in base
-    assert "js/asistente.js') }}?v=20261025_assistant_resize_v3" in base
+    assert "css/edubot.css') }}?v=20261107_voice_input_feedback_v2" in base
+    assert "js/asistente.js') }}?v=20261107_voice_input_feedback_v2" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
     assert 'if (isOpen) {\n            clearChatPosition();\n            const defaultBounds = root.getBoundingClientRect();' in assistant_script
     assert 'assistantWidget' not in app_js
@@ -707,7 +716,15 @@ def test_edubot_local_se_integra_en_ayuda_sin_iframe_externo():
     script = Path('static/js/asistente.js').read_text(encoding='utf-8')
     environment = Path('.env.example').read_text(encoding='utf-8')
     assert '<iframe' not in plantilla
-    assert 'icons/edubot.png' in plantilla
+    assert 'icons/edubot.png' not in plantilla
+    assert 'assistant-sidebar-avatar assistant-drone-avatar' in plantilla
+    assert 'data-assistant-voice-view hidden' not in plantilla
+    assert 'data-assistant-voice-toggle aria-pressed="false"' in plantilla
+    assert 'data-create-citation-url=' in plantilla
+    assert 'data-assistant-dictate' not in plantilla
+    assert 'data-assistant-speak' not in plantilla
+    assert 'SpeechRecognition' in script
+    assert 'speechSynthesis' in script
     assert 'data-assistant-suggestion=' not in plantilla
     assert 'assistant-suggestions' not in styles
     base = Path('templates/base.html').read_text(encoding='utf-8')
@@ -716,10 +733,10 @@ def test_edubot_local_se_integra_en_ayuda_sin_iframe_externo():
     assert 'BOTPRESS_SHARE_URL' not in environment
     assert 'animation' not in plantilla
     assert 'css/edubot.css' in base
-    assert 'assistant-mark-float' in styles
+    assert 'animation: assistant-mark-float' not in styles
     assert 'background: #2458e8' in styles
+    assert 'assistant-action-link' in styles
     assert 'assistant-chat-body[hidden]' in styles
-    assert 'prefers-reduced-motion: reduce' in styles
     assert 'data-eduturnos-assistant' in script
     assert 'fetch(root.dataset.endpoint' in script
     assert 'data-assistant-clear' not in script

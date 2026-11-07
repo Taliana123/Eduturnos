@@ -1434,3 +1434,61 @@ html body.has-desktop-sidebar #contenido .administracion-page .configuracion-pag
         min-width: 170px;
     }
 }
+
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .config-entry-sede {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        width: 100% !important;
+        max-width: 960px !important;
+        gap: 8px 12px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .config-entry-sede > label:nth-of-type(1) {
+        grid-column: 1 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .config-entry-sede > label:nth-of-type(2) {
+        grid-column: 2 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .config-entry-sede > label:nth-of-type(3) {
+        grid-column: 3 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .config-entry-sede > label:nth-of-type(4) {
+        grid-column: 4 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .config-record-list {
+        width: 100% !important;
+        max-width: 960px !important;
+        margin-top: 8px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede {
+        grid-template-columns: minmax(0, 1.4fr) minmax(90px, .7fr) minmax(130px, .8fr) minmax(0, 1.5fr) !important;
+        gap: 8px 12px !important;
+        max-width: 960px !important;
+        padding: 8px 0 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede > .config-field-name {
+        grid-column: 1 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede > label:nth-of-type(2) {
+        grid-column: 2 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede > label:nth-of-type(3) {
+        grid-column: 3 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede > label:nth-of-type(4) {
+        grid-column: 4 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form .institution-city {
+        grid-column: 1 !important;
+    }
+}

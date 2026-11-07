@@ -1,6 +1,6 @@
 # Puente gratuito con Google Calendar
 
-EDUTURNOS puede publicar las citas en una única agenda institucional usando Google Apps Script. La persona dueña de esa agenda concede permiso una sola vez; el personal, acudientes y estudiantes no vinculan sus cuentas con EDUTURNOS. La cola existente guarda las operaciones y el servidor intenta publicarlas inmediatamente; el proceso programado sigue siendo necesario para reintentos.
+EDUTURNOS puede publicar las citas en una única agenda institucional usando Google Apps Script. La persona dueña de esa agenda concede permiso una sola vez; el personal, acudientes y estudiantes no vinculan sus cuentas con EDUTURNOS. La cola guarda las operaciones sin bloquear la creación o actualización de citas. Una tarea programada en AlwaysData debe procesarla cada cinco minutos; sin esa tarea, los eventos y recordatorios permanecerán pendientes hasta ejecutar la sincronización manual o configurar el proceso programado.
 
 El puente crea eventos genéricos (sin nombres ni observaciones), de 30 minutos, con avisos emergentes a 24 horas y 2 horas para la cuenta dueña de la agenda. Google trata los avisos de eventos como privados por usuario; compartir una agenda no copia esos avisos a todas las cuentas. Para que cada persona reciba el recordatorio en EDUTURNOS sin conectar una cuenta, usa también el proceso existente `tools/enviar_recordatorios.py`: crea notificaciones internas para participantes y envía correos si SMTP está configurado. Para recibir un aviso emergente de Google en el teléfono, cada usuario debe añadir la agenda compartida y configurar sus propias notificaciones; EDUTURNOS no puede activar remotamente las notificaciones de otros teléfonos.
 
@@ -28,7 +28,7 @@ GOOGLE_APPS_SCRIPT_SECRET=la_misma_clave_aleatoria_de_32_caracteres_o_mas
 
 Pega exactamente el mismo secreto en Apps Script y AlwaysData. No hace falta llenar `GOOGLE_OAUTH_CLIENT_ID` ni `GOOGLE_OAUTH_CLIENT_SECRET` para este modo. Reinicia la aplicación después de actualizar las variables.
 
-Luego, en EDUTURNOS, entra como Rector o Super Admin a **Mi cuenta → Calendarios conectados** y pulsa **Probar conexión**. La prueba debe confirmar que el script accede a la agenda. Al crear una cita, EDUTURNOS la pone en la cola transaccional y dispara un intento en segundo plano. Si Google o la red no responden, la tarea se reintenta con el proceso programado:
+Luego, en EDUTURNOS, entra como Rector o Super Admin a **Mi cuenta → Calendarios conectados** y pulsa **Probar conexión**. La prueba debe confirmar que el script accede a la agenda. Al crear o actualizar una cita, EDUTURNOS la pone en la cola transaccional; el proceso programado la envía a Google sin retrasar la respuesta de la página:
 
 ```text
 <ruta-del-entorno-python>/python <ruta-de-la-aplicacion>/tools/sincronizar_google_calendar.py
