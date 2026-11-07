@@ -399,6 +399,17 @@ const initializeEduturnosAssistant = () => {
                 ? "Llamada finalizada"
                 : "Iniciar llamada";
     };
+    const showVoiceMessage = (speaker, message) => {
+        callSpeaker.textContent = speaker;
+        callTranscript.textContent = `${speaker}: ${message}`;
+    };
+    const submitVoiceMessage = () => {
+        if (typeof form.requestSubmit === "function") {
+            form.requestSubmit();
+        } else {
+            form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+        }
+    };
     const refreshSend = () => {
         button.disabled = input.disabled || !input.value.trim();
         voiceToggle.disabled = !canRecognizeVoice;
@@ -501,7 +512,7 @@ const initializeEduturnosAssistant = () => {
                 input.dispatchEvent(new Event("input", { bubbles: true }));
                 setStatus("EDUBOT está preparando una respuesta…");
                 recognition.stop();
-                form.requestSubmit();
+                submitVoiceMessage();
                 return;
             }
         };
@@ -540,13 +551,13 @@ const initializeEduturnosAssistant = () => {
     });
     window.addEventListener("eduturnos-native-voice-result", (event) => {
         const transcript = event.detail?.text?.trim();
-        if (!voiceCallActive || !transcript) return;
+        if (!voiceCallActive || voiceCallBusy || !transcript) return;
         voiceCallBusy = true;
-        callTranscript.textContent = `Te escuché: ${transcript}`;
+        showVoiceMessage("Tú", transcript);
         input.value = transcript;
         input.dispatchEvent(new Event("input", { bubbles: true }));
         setStatus("EDUBOT está preparando una respuesta…");
-        form.requestSubmit();
+        submitVoiceMessage();
     });
     window.addEventListener("eduturnos-native-voice-partial-result", (event) => {
         const text = event.detail?.text?.trim();
@@ -876,7 +887,7 @@ const initializeEduturnosAssistant = () => {
 
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        if (button.disabled || input.disabled) return;
+        if (input.disabled || (button.disabled && !voiceCallActive)) return;
         const message = input.value.trim();
         if (!message || message.length > 1200) return;
 
@@ -917,9 +928,15 @@ const initializeEduturnosAssistant = () => {
                     ? data.error
                     : `El asistente respondió con un error (${response.status}).`;
                 input.value = message;
+                if (answerByVoice) {
+                    showVoiceMessage("EDUBOT", answer.textContent);
+                    setStatus("No se pudo completar la solicitud.");
+                    await speakResponse(answer.textContent);
+                }
             } else if (data && typeof data.respuesta === "string" && data.respuesta.trim()) {
                 renderAssistantMarkdown(answer, data.respuesta);
                 replyText = data.respuesta;
+                if (answerByVoice) showVoiceMessage("EDUBOT", replyText);
                 if (data.accion === "crear_cita" && root.dataset.createCitationUrl) {
                     const actionLink = document.createElement("a");
                     actionLink.className = "assistant-action-link";
@@ -930,6 +947,11 @@ const initializeEduturnosAssistant = () => {
             } else {
                 answer.textContent = "El asistente no devolvió una respuesta válida.";
                 input.value = message;
+                if (answerByVoice) {
+                    showVoiceMessage("EDUBOT", answer.textContent);
+                    setStatus("No se recibió una respuesta válida.");
+                    await speakResponse(answer.textContent);
+                }
             }
             output.append(answer);
             output.scrollTop = output.scrollHeight;
@@ -940,6 +962,11 @@ const initializeEduturnosAssistant = () => {
             if (controller.signal.aborted || currentRequest !== requestSequence) return;
             input.value = message;
             setStatus("No se pudo conectar con EDUTURNOS. Inténtalo nuevamente.");
+            if (answerByVoice) {
+                const errorMessage = "No se pudo conectar con EDUTURNOS. Inténtalo nuevamente.";
+                showVoiceMessage("EDUBOT", errorMessage);
+                await speakResponse(errorMessage);
+            }
             const answer = document.createElement("p");
             answer.className = "assistant-answer assistant-error";
             answer.textContent = "No se pudo conectar con EDUTURNOS. Inténtalo nuevamente.";

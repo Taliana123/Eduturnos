@@ -148,8 +148,8 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     ).read_text(encoding="utf-8")
     android_build = Path("mobile-app/android/app/build.gradle").read_text(encoding="utf-8")
     assert 'android:name="android.permission.RECORD_AUDIO"' in manifest
-    assert 'versionName "1.6"' in android_build
-    assert 'versionCode 7' in android_build
+    assert 'versionName "1.7"' in android_build
+    assert 'versionCode 8' in android_build
     assert "data-calendar-event-url=\"{{ calendar_open_event_url or '' }}\"" in calendar_template
     assert "calendar_open_event_url=calendar_open_event_url" in calendar_route
     assert "icons/edubot.png" not in Path("templates/_asistente_widget.html").read_text(encoding="utf-8")

@@ -504,6 +504,32 @@ def test_mobile_seguimiento_spacing_and_section_titles_are_consistent():
     assert "margin-top: 0 !important;" in responsive
 
 
+def test_mobile_seguimiento_uses_desktop_process_layout():
+    template = Path("templates/seguimiento/lista.html").read_text(encoding="utf-8")
+
+    assert ".seguimiento-descripcion-desktop{display:none!important;}" not in template
+    assert "grid-template-columns:100px minmax(0,1fr) 24px;" in template
+    assert "gap:16px;padding:24px;border-top:1px solid #d5e1fa;" in template
+    assert "max-height:calc(100dvh - 24px);padding:30px;" in template
+
+
+def test_voice_transcripts_are_submitted_and_responses_are_visible():
+    assistant_script = Path("static/js/asistente.js").read_text(encoding="utf-8")
+    templates = (
+        Path("templates/base.html").read_text(encoding="utf-8"),
+        Path("templates/index.html").read_text(encoding="utf-8"),
+        Path("templates/auth/login.html").read_text(encoding="utf-8"),
+        Path("templates/publico/base_publica.html").read_text(encoding="utf-8"),
+    )
+
+    assert "const submitVoiceMessage = () =>" in assistant_script
+    assert "submitVoiceMessage();" in assistant_script
+    assert "button.disabled && !voiceCallActive" in assistant_script
+    assert 'showVoiceMessage("EDUBOT", replyText)' in assistant_script
+    assert "showVoiceMessage(\"EDUBOT\", errorMessage)" in assistant_script
+    assert all("20261107_voice_input_feedback_v3" in template for template in templates)
+
+
 def test_student_name_and_mobile_directory_icons_match_shared_directory_style():
     responsive = Path("static/css/layout-responsive.css").read_text(encoding="utf-8")
     students = Path("templates/estudiantes/lista.html").read_text(encoding="utf-8")
