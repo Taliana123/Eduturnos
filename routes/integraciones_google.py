@@ -3,7 +3,7 @@ from __future__ import annotations
 import secrets
 from datetime import date, datetime, time, timedelta, timezone
 from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
-from urllib.parse import parse_qs, urlencode, urlsplit
+from urllib.parse import parse_qs, quote, urlencode, urlsplit
 
 from database.db import consultar, ejecutar
 from routes.helpers import login_requerido, roles_permitidos, usuario_actual
@@ -79,15 +79,36 @@ def _inicio_proxima_cita_ms(usuario):
     return int(ahora.timestamp() * 1000)
 
 
+def _url_intent_android(uri: str, scheme: str, fallback_url: str, content_type: str | None = None) -> str:
+    intent_url = (
+        f"intent://{uri}#Intent;scheme={scheme};action=android.intent.action.VIEW;"
+    )
+    if content_type:
+        intent_url += f"type={content_type};"
+    return (
+        intent_url
+        + "package=com.google.android.calendar;"
+        + f"S.browser_fallback_url={quote(fallback_url, safe='')};end"
+    )
+
+
 def _url_abrir_calendario(inicio_ms=None):
-    """Enlace web de Google Calendar para escritorio."""
+    """Abre Google Calendar en Android o el día correspondiente en la web."""
     inicio_ms = int(inicio_ms or datetime.now(timezone(timedelta(hours=-5))).timestamp() * 1000)
     bogota = timezone(timedelta(hours=-5))
     fecha = datetime.fromtimestamp(inicio_ms / 1000, tz=bogota).date()
-    return (
+    web_url = (
         "https://calendar.google.com/calendar/u/0/r/day/"
         f"{fecha.year}/{fecha.month}/{fecha.day}"
     )
+    if "Android" in request.user_agent.string:
+        return _url_intent_android(
+            f"com.android.calendar/time/{inicio_ms}",
+            "content",
+            web_url,
+            "time/epoch",
+        )
+    return web_url
 
 def _proxima_cita(usuario, solo_sincronizadas=False):
     from routes.calendario import citas_visibles
@@ -150,7 +171,12 @@ def _url_app_cita(cita, android: bool) -> str | None:
         or any(ch not in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-" for ch in eid)
     ):
         return None
-    return "https://www.google.com/calendar/event?" + urlencode({"eid": eid})
+    web_url = "https://www.google.com/calendar/event?" + urlencode({"eid": eid})
+    return _url_intent_android(
+        f"www.google.com/calendar/event?eid={eid}",
+        "https",
+        web_url,
+    )
 
 @integraciones_google_bp.get("/")
 @login_requerido
@@ -159,10 +185,7 @@ def index():
     android = "Android" in request.user_agent.string
     proxima_cita, calendar_open_start_ms = _proxima_cita(usuario, solo_sincronizadas=android)
     event_url = _url_app_cita(proxima_cita, android)
-    calendar_open_event_available = bool(proxima_cita and event_url)
-    # Android recibe el enlace HTTPS de la cita reconocido por Google Calendar.
-    # Si no hay un evento sincronizado, se muestra el aviso sin lanzar un intent.
-    calendar_open_url = event_url if android else (event_url or _url_abrir_calendario(calendar_open_start_ms))
+    calendar_open_url = event_url or _url_abrir_calendario(calendar_open_start_ms)
     oauth_activo = configuracion_oauth_lista()
     scope_institucional = _scope_institucional(usuario)
     puente_activo = apps_script_configurada() and scope_institucional == "institucional"
@@ -209,8 +232,6 @@ def index():
         institucion_nombre=institucion_nombre or "la institución",
         oauth_activo=oauth_activo,
         calendar_open_url=calendar_open_url,
-        android_device=android,
-        calendar_open_event_available=calendar_open_event_available,
         calendar_open_start_ms=calendar_open_start_ms,
         configuracion_lista=configuracion_lista(),
         callback_url=(uri_callback() if oauth_activo else "/integraciones-google/callback"),

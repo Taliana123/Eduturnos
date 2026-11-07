@@ -161,11 +161,15 @@ def test_apps_script_source_sets_two_popup_reminders():
 def test_integrations_page_offers_eduturnos_calendar_to_every_role():
     from pathlib import Path
     from routes.integraciones_google import _url_abrir_calendario
+    from urllib.parse import unquote, urlsplit
 
     source = Path("templates/integraciones_google.html").read_text(encoding="utf-8")
     route_source = Path("routes/integraciones_google.py").read_text(encoding="utf-8")
-    assert '"#Intent;scheme=content;action=android.intent.action.VIEW;type=time/epoch;"' in route_source
-    assert "Abrir app de Google Calendar" in source
+    assert "package=com.google.android.calendar;" in route_source
+    assert "S.browser_fallback_url=" in route_source
+    assert "Abrir Google Calendar" in source
+    assert "No hay una cita futura sincronizada" not in source
+    assert "{% if calendar_open_url %}" not in source
     assert "EDUTURNOS es el registro principal" in source
     assert source.count("<h2>Agenda") == 1
     assert "google-calendar-actions" in source
@@ -174,11 +178,45 @@ def test_integrations_page_offers_eduturnos_calendar_to_every_role():
     assert "Reintentar citas fallidas" in source
     assert "{% if usuario.rol_nombre in ['Estudiante','Acudiente'] %}" not in source
     with app.test_request_context(headers={"User-Agent": "Mozilla/5.0 (Linux; Android 14)"}):
-        assert _url_abrir_calendario(1793328513689) == (
+        intent_url = _url_abrir_calendario(1793328513689)
+        assert intent_url.startswith(
             "intent://com.android.calendar/time/1793328513689"
-            "#Intent;scheme=content;action=android.intent.action.VIEW;type=time/epoch;"
-            "component=com.google.android.calendar/com.android.calendar.AllInOneActivity;"
-            "package=com.google.android.calendar;end"
+            "#Intent;scheme=content;action=android.intent.action.VIEW;"
+            "type=time/epoch;package=com.google.android.calendar;"
+        )
+        fallback = urlsplit(intent_url).fragment.split("S.browser_fallback_url=", 1)[1].split(";end", 1)[0]
+        assert unquote(fallback).startswith(
+            "https://calendar.google.com/calendar/u/0/r/day/"
         )
     with app.test_request_context(headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0)"}):
         assert _url_abrir_calendario(1793328513689).startswith("https://calendar.google.com/calendar/u/0/r/day/")
+
+
+def test_android_synced_event_intent_targets_google_calendar_with_web_fallback(monkeypatch):
+    from routes import integraciones_google
+    from urllib.parse import unquote, urlsplit
+
+    monkeypatch.setattr(integraciones_google, "apps_script_configurada", lambda: True)
+    monkeypatch.setattr(
+        integraciones_google,
+        "consultar",
+        lambda *args, **kwargs: {"google_event_id": "stored-event-id"},
+    )
+    monkeypatch.setattr(
+        integraciones_google,
+        "enlace_evento_apps_script",
+        lambda event_id: "https://www.google.com/calendar/event?eid=abc_DEF-123",
+    )
+
+    with app.test_request_context(headers={"User-Agent": "Mozilla/5.0 (Linux; Android 14)"}):
+        intent_url = integraciones_google._url_app_cita({"id": 91}, android=True)
+
+    assert intent_url.startswith(
+        "intent://www.google.com/calendar/event?eid=abc_DEF-123"
+        "#Intent;scheme=https;action=android.intent.action.VIEW;"
+        "package=com.google.android.calendar;"
+    )
+    fallback = urlsplit(intent_url).fragment.split("S.browser_fallback_url=", 1)[1].split(";end", 1)[0]
+    assert unquote(fallback) == (
+        "https://www.google.com/calendar/event?eid=abc_DEF-123"
+    )
