@@ -42,6 +42,10 @@ class EduturnosSvgPathImage(SvgPathImage):
     QR_PATH_STYLE = {**SvgPathImage.QR_PATH_STYLE, "fill": "#1468E8"}
 
 
+class EduturnosDragonSvgPathImage(SvgPathImage):
+    QR_PATH_STYLE = {**SvgPathImage.QR_PATH_STYLE, "fill": "#17365D"}
+
+
 def _beepy_home_enabled():
     if not current_app.config.get("BEEPY_ENABLED", False) or request.endpoint != "inicio":
         return False
@@ -248,7 +252,12 @@ def create_app():
         )
         qr.add_data(destination)
         qr.make(fit=True)
-        image = qr.make_image(image_factory=EduturnosSvgPathImage)
+        image_factory = (
+            EduturnosDragonSvgPathImage
+            if request.args.get("estilo") == "dragon"
+            else EduturnosSvgPathImage
+        )
+        image = qr.make_image(image_factory=image_factory)
         output = BytesIO()
         image.save(output)
         response = current_app.response_class(output.getvalue(), mimetype="image/svg+xml")

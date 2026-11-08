@@ -41,15 +41,34 @@ set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
 @rem Find java.exe
 if defined JAVA_HOME goto findJavaFromJavaHome
 
+@rem Capacitor 7 requires JDK 21; do not select an incompatible Android Studio JBR.
+for /d %%D in ("%ProgramFiles%\Java\jdk-21*") do (
+  if exist "%%~D\bin\java.exe" (
+    set "JAVA_HOME=%%~D"
+    goto findJavaFromJavaHome
+  )
+)
+
+if exist "%ProgramFiles%\Android\Android Studio\jbr\bin\java.exe" (
+  "%ProgramFiles%\Android\Android Studio\jbr\bin\java.exe" -version 2>&1 | findstr /R /C:"version.*21[.]" >NUL
+  if not errorlevel 1 (
+    set "JAVA_HOME=%ProgramFiles%\Android\Android Studio\jbr"
+    goto findJavaFromJavaHome
+  )
+)
+
 set JAVA_EXE=java.exe
-%JAVA_EXE% -version >NUL 2>&1
-if %ERRORLEVEL% equ 0 goto execute
+where javac.exe >NUL 2>&1
+if %ERRORLEVEL% equ 0 (
+  for /f "tokens=2" %%V in ('javac.exe -version 2^>^&1') do set "JAVA_VERSION=%%V"
+  for /f "tokens=1 delims=." %%M in ("%JAVA_VERSION%") do set "JAVA_MAJOR=%%M"
+  if "%JAVA_MAJOR%"=="21" goto execute
+)
 
 echo. 1>&2
-echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH. 1>&2
+echo ERROR: JDK 21 is required by Capacitor 7, but no compatible JDK was found. 1>&2
 echo. 1>&2
-echo Please set the JAVA_HOME variable in your environment to match the 1>&2
-echo location of your Java installation. 1>&2
+echo Set JAVA_HOME to a JDK 21 installation and run this wrapper again. 1>&2
 
 goto fail
 
@@ -57,13 +76,28 @@ goto fail
 set JAVA_HOME=%JAVA_HOME:"=%
 set JAVA_EXE=%JAVA_HOME%/bin/java.exe
 
-if exist "%JAVA_EXE%" goto execute
+if not exist "%JAVA_EXE%" goto invalidJavaHome
+if not exist "%JAVA_HOME%\bin\javac.exe" goto invalidJdk
+for /f "tokens=2" %%V in ('"%JAVA_HOME%\bin\javac.exe" -version 2^>^&1') do set "JAVA_VERSION=%%V"
+for /f "tokens=1 delims=." %%M in ("%JAVA_VERSION%") do set "JAVA_MAJOR=%%M"
+if "%JAVA_MAJOR%"=="21" goto execute
 
+echo. 1>&2
+echo ERROR: JDK 21 is required by Capacitor 7; detected Java %JAVA_VERSION%. 1>&2
+echo Set JAVA_HOME to a JDK 21 installation and run this wrapper again. 1>&2
+goto fail
+
+:invalidJavaHome
 echo. 1>&2
 echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME% 1>&2
 echo. 1>&2
-echo Please set the JAVA_HOME variable in your environment to match the 1>&2
-echo location of your Java installation. 1>&2
+echo Set JAVA_HOME to the root of a valid JDK 21 installation. 1>&2
+goto fail
+
+:invalidJdk
+echo. 1>&2
+echo ERROR: JAVA_HOME does not point to a JDK with javac.exe: %JAVA_HOME% 1>&2
+echo Set JAVA_HOME to the root of a valid JDK 21 installation. 1>&2
 
 goto fail
 

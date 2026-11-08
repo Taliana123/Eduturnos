@@ -47,7 +47,6 @@ const initializeEduturnosAssistant = () => {
 
     const enableCallPanelControls = (panel) => {
         const header = panel.querySelector(".assistant-voice-call__header");
-        const resizeHandles = [...panel.querySelectorAll("[data-assistant-call-resize]")];
         let initialSize = null;
         let dragState = null;
         let resizeState = null;
@@ -76,15 +75,17 @@ const initializeEduturnosAssistant = () => {
         };
 
         panel.addEventListener("pointerdown", (event) => {
-            const handle = event.target instanceof Element
-                ? event.target.closest("[data-assistant-call-resize]")
-                : null;
-            if (!handle || !event.isPrimary || event.button !== 0) return;
+            if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+            const target = event.target instanceof Element ? event.target : null;
+            if (target?.closest("button, a, input, textarea, select, .assistant-voice-call__header")) return;
             const bounds = panel.getBoundingClientRect();
+            const onRight = bounds.right - event.clientX <= 18;
+            const onBottom = bounds.bottom - event.clientY <= 18;
+            if (!onRight && !onBottom) return;
             captureInitialSize();
             resizeState = {
                 pointerId: event.pointerId,
-                direction: handle.dataset.assistantCallResize,
+                direction: `${onBottom ? "s" : ""}${onRight ? "e" : ""}`,
                 startX: event.clientX,
                 startY: event.clientY,
                 startWidth: bounds.width,
@@ -92,7 +93,7 @@ const initializeEduturnosAssistant = () => {
                 startLeft: bounds.left,
                 startTop: bounds.top,
             };
-            handle.setPointerCapture(event.pointerId);
+            panel.setPointerCapture(event.pointerId);
             panel.classList.add("is-resizing");
             event.preventDefault();
         });
@@ -115,7 +116,19 @@ const initializeEduturnosAssistant = () => {
                 movePanel(event.clientX - dragState.offsetX, event.clientY - dragState.offsetY);
                 return;
             }
-            if (!resizeState || event.pointerId !== resizeState.pointerId) return;
+            if (!resizeState) {
+                if (event.pointerType === "mouse") {
+                    const bounds = panel.getBoundingClientRect();
+                    const onRight = bounds.right - event.clientX <= 18;
+                    const onBottom = bounds.bottom - event.clientY <= 18;
+                    panel.style.cursor = onRight && onBottom ? "nwse-resize"
+                        : onRight ? "ew-resize"
+                            : onBottom ? "ns-resize"
+                                : "";
+                }
+                return;
+            }
+            if (event.pointerId !== resizeState.pointerId) return;
 
             const { direction, startX, startY, startWidth, startHeight, startLeft, startTop } = resizeState;
             const limits = viewportLimits();

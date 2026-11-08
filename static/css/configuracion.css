@@ -1492,3 +1492,57 @@ html body.has-desktop-sidebar #contenido .administracion-page .configuracion-pag
         grid-column: 1 !important;
     }
 }
+
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form {
+        grid-template-columns: minmax(200px, 1.35fr) minmax(170px, 1fr) minmax(120px, .75fr) minmax(140px, .85fr) !important;
+        align-items: end !important;
+        gap: 14px 18px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form .institution-name,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form .institution-department,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form .institution-phone,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form .institution-city {
+        grid-column: auto !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form > .full-field,
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form > .institution-actions {
+        grid-column: 1 / -1 !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page form.config-record-sede {
+        grid-template-columns: minmax(0, 1.15fr) minmax(100px, .65fr) minmax(130px, .75fr) minmax(240px, 1.7fr) !important;
+        gap: 12px 18px !important;
+        padding: 14px 16px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .config-entry-sede {
+        grid-template-columns: minmax(200px, 1.2fr) minmax(135px, .7fr) minmax(260px, 1.6fr) minmax(130px, .7fr) auto !important;
+        gap: 14px 18px !important;
+    }
+}
+
+.administracion-page .configuracion-page > .panel {
+    margin: 0 0 22px !important;
+    padding: 20px 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.administracion-page .configuracion-page .config-record-list {
+    display: grid;
+    gap: 14px;
+}
+
+.administracion-page .configuracion-page .config-record-form {
+    margin: 0 !important;
+    padding: 14px 16px !important;
+    border: 0 !important;
+    border-radius: 12px !important;
+    background: #f7faff !important;
+    box-shadow: none !important;
+}

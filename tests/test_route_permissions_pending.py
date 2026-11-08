@@ -172,7 +172,7 @@ def test_seguimiento_lista_procesos_y_respeta_docente(monkeypatch):
 
         def consultar(sql, params):
             consultas.append((sql, params))
-            if "SELECT c.id,e.nombres" in sql:
+            if "SELECT c.id," in sql:
                 return [{"id": 17, "nombres": "Ana", "apellidos": "Perez", "estado": "Pendiente", "descripcion": None, "fecha": date(2026, 10, 9), "hora": time(10, 30), "grado": "9", "grupo": "2", "motivo": "Académica", "lugar": "Coordinación", "sede": "Sede Principal (Las Américas)", "acudiente": "Laura Acudiente"}]
             return []
 
@@ -198,7 +198,7 @@ def test_seguimiento_lista_procesos_y_respeta_docente(monkeypatch):
         assert "Encuentro con el acudiente" in html
         for sql, params in consultas:
             assert ("d.id_usuario=%s" in sql) == (rol == "Docente")
-            assert params == ((99,) if rol == "Docente" else ())
+            assert params == ((99, 99) if rol == "Docente" else ())
 
 
 def test_seguimiento_detalle_historial_por_cita(monkeypatch):
@@ -210,7 +210,7 @@ def test_seguimiento_detalle_historial_por_cita(monkeypatch):
     registros = [{"id_cita": 17, "fecha_seguimiento": datetime(2026, 10, 10, 9), "estado_actual": "Pendiente", "asistencia": "Pendiente", "observaciones": "Compromiso exclusivo cita 17", "usuario_n": "Rector", "usuario_a": "Prueba", "nombres": "Ana", "apellidos": "Perez"}]
     monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
     monkeypatch.setattr(seguimiento, "usuario_actual", lambda: usuario)
-    monkeypatch.setattr(seguimiento, "consultar", lambda sql, params: procesos if "SELECT c.id,e.nombres" in sql else registros)
+    monkeypatch.setattr(seguimiento, "consultar", lambda sql, params: procesos if "SELECT c.id," in sql else registros)
     response = app.test_client().get("/seguimiento/")
     assert response.status_code == 200
     html = response.get_data(as_text=True)

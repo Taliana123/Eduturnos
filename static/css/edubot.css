@@ -1124,6 +1124,35 @@
         transition: none;
     }
 
+    .dashboard-help-chat .assistant-header {
+        align-items: center;
+    }
+
+    .dashboard-help-chat .assistant-header .assistant-drone-avatar {
+        box-sizing: border-box;
+        width: 52px;
+        height: 52px;
+        flex-basis: 52px;
+        padding: 4px;
+        border: 1px solid #e4edf7;
+        border-radius: 12px;
+        background-color: #fff;
+    }
+
+    .assistant-voice-call__header {
+        align-items: center;
+    }
+
+    .assistant-voice-call__close {
+        align-self: center;
+        flex: 0 0 38px;
+        line-height: 1;
+    }
+
+    .assistant-voice-call {
+        cursor: default;
+    }
+
     .assistant-voice-call__wave i {
         animation: none !important;
     }

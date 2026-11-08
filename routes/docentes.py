@@ -1,22 +1,27 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from database.db import consultar, ejecutar
-from routes.helpers import roles_permitidos, auditoria, usuario_actual
+from routes import helpers as route_helpers
+from routes.helpers import roles_permitidos, auditoria
 from roles import es_correo_institucional
+
+usuario_actual = route_helpers.usuario_actual
 
 docentes_bp=Blueprint("docentes",__name__,url_prefix="/docentes")
 
 def catalogos():
-    u=usuario_actual(); tenant=u.get("id_institucion") if u and u["rol_nombre"]!="Super Admin" else None
+    u=usuario_actual(); tenant=u.get("id_institucion") if u and u.get("rol_nombre")!="Super Admin" else None
     return {"sedes":consultar("SELECT * FROM sedes WHERE estado=1 AND (%s IS NULL OR id_institucion=%s) ORDER BY nombre",(tenant,tenant)),"jornadas":consultar("SELECT * FROM jornadas WHERE estado=1 ORDER BY CASE nombre WHEN 'Mañana' THEN 1 WHEN 'Tarde' THEN 2 WHEN 'Noche' THEN 3 ELSE 4 END,nombre"),"estudiantes":consultar("SELECT e.id_estudiante,e.nombres,e.apellidos,e.documento FROM estudiantes e JOIN sedes s ON s.id=e.id_sede WHERE e.estado='Activo' AND (%s IS NULL OR s.id_institucion=%s) ORDER BY e.apellidos,e.nombres",(tenant,tenant)),"grupos":consultar("SELECT g.id,g.nombre,gr.nombre grado FROM grupos g JOIN grados gr ON gr.id=g.id_grado WHERE g.estado=1 ORDER BY CAST(gr.nombre AS UNSIGNED),gr.nombre,CAST(g.nombre AS UNSIGNED),g.nombre")}
 
 @docentes_bp.route("/")
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador")
 def lista():
-    u=usuario_actual(); tenant=u.get("id_institucion") if u["rol_nombre"]!="Super Admin" else None
+    u=usuario_actual() or {}
+    tenant=u.get("id_institucion") if u.get("rol_nombre")!="Super Admin" else None
     q = request.args.get("q", "").strip()
     like = f"%{q}%"
-    docentes = consultar(
-        """SELECT d.*,s.nombre sede,j.nombre jornada,
+    filtro = "(CONCAT(d.nombres,' ',d.apellidos) LIKE %s OR d.documento LIKE %s OR d.correo_institucional LIKE %s OR COALESCE(d.asignatura,'') LIKE %s OR COALESCE(s.nombre,'') LIKE %s OR COALESCE(j.nombre,'') LIKE %s OR COALESCE(asignaciones.estudiantes,'') LIKE %s OR COALESCE(asignaciones.grados_grupos,'') LIKE %s)"
+    params = [like, like, like, like, like, like, like, like]
+    sql = """SELECT d.*,s.nombre sede,j.nombre jornada,
                   asignaciones.estudiantes,asignaciones.grados_grupos
            FROM docentes d
            LEFT JOIN sedes s ON s.id=d.id_sede
@@ -36,17 +41,12 @@ def lista():
                WHERE ad.estado=1
                GROUP BY ad.id_docente
            ) asignaciones ON asignaciones.id_docente=d.id_docente
-           WHERE (%s IS NULL OR s.id_institucion=%s) AND (CONCAT(d.nombres,' ',d.apellidos) LIKE %s
-              OR d.documento LIKE %s
-              OR d.correo_institucional LIKE %s
-              OR COALESCE(d.asignatura,'') LIKE %s
-              OR COALESCE(s.nombre,'') LIKE %s
-              OR COALESCE(j.nombre,'') LIKE %s
-              OR COALESCE(asignaciones.estudiantes,'') LIKE %s
-              OR COALESCE(asignaciones.grados_grupos,'') LIKE %s)
-           ORDER BY d.apellidos,d.nombres""",
-        (tenant, tenant, like, like, like, like, like, like, like, like),
-    )
+           WHERE """
+    if tenant is not None:
+        sql += "(%s IS NULL OR s.id_institucion=%s) AND "
+        params = [tenant, tenant, *params]
+    sql += filtro + " ORDER BY d.apellidos,d.nombres"
+    docentes = consultar(sql, params)
     return render_template("docentes/lista.html", docentes=docentes, q=q)
 
 @docentes_bp.route("/nuevo",methods=["GET","POST"])
@@ -67,7 +67,8 @@ def nuevo():
 @docentes_bp.route("/<int:id>/editar",methods=["GET","POST"])
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador")
 def editar(id):
-    u=usuario_actual(); docente=consultar("SELECT d.* FROM docentes d JOIN sedes s ON s.id=d.id_sede WHERE d.id_docente=%s AND (%s='Super Admin' OR s.id_institucion=%s)",(id,u["rol_nombre"],u.get("id_institucion")),uno=True); cat=catalogos()
+    u=usuario_actual() or {}
+    docente=consultar("SELECT d.* FROM docentes d JOIN sedes s ON s.id=d.id_sede WHERE d.id_docente=%s AND (%s='Super Admin' OR s.id_institucion=%s)",(id,u.get("rol_nombre"),u.get("id_institucion")),uno=True); cat=catalogos()
     if not docente: return redirect(url_for("docentes.lista"))
     if request.method=="POST":
         d=request.form; correo=d.get("correo","").strip().lower()
@@ -78,7 +79,7 @@ def editar(id):
         try:
             sql="UPDATE docentes SET tipo_documento=%s,documento=%s,nombres=%s,apellidos=%s,correo_institucional=%s,telefono=%s,id_sede=%s,id_jornada=%s,asignatura=%s WHERE id_docente=%s"
             params=(d["tipo_documento"],d["documento"],d["nombres"],d["apellidos"],correo,d.get("telefono"),d["sede"],d["jornada"],d.get("asignatura"),id)
-            if u["rol_nombre"]!="Super Admin": sql+=" AND id_sede IN (SELECT id FROM sedes WHERE id_institucion=%s)"; params+=(u.get("id_institucion"),)
+            if u.get("rol_nombre")!="Super Admin": sql+=" AND id_sede IN (SELECT id FROM sedes WHERE id_institucion=%s)"; params+=(u.get("id_institucion"),)
             ejecutar(sql,params); auditoria("ACTUALIZAR","Docentes",id); flash("Docente actualizado.","success"); return redirect(url_for("docentes.lista"))
         except Exception: flash("No se pudo actualizar el docente.","error")
     return render_template("docentes/form.html",docente=docente,catalogos=cat)
@@ -86,7 +87,8 @@ def editar(id):
 @docentes_bp.route("/<int:id>/asignaciones",methods=["GET","POST"])
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador")
 def asignaciones(id):
-    u=usuario_actual(); docente=consultar("SELECT d.* FROM docentes d JOIN sedes s ON s.id=d.id_sede WHERE d.id_docente=%s AND (%s='Super Admin' OR s.id_institucion=%s)",(id,u["rol_nombre"],u.get("id_institucion")),uno=True)
+    u=usuario_actual() or {}
+    docente=consultar("SELECT d.* FROM docentes d JOIN sedes s ON s.id=d.id_sede WHERE d.id_docente=%s AND (%s='Super Admin' OR s.id_institucion=%s)",(id,u.get("rol_nombre"),u.get("id_institucion")),uno=True)
     if not docente: return redirect(url_for("docentes.lista"))
     if request.method=="POST":
         try: ejecutar("INSERT INTO asignaciones_docentes(id_docente,id_estudiante,id_grupo,estado) VALUES(%s,%s,%s,1)",(id,request.form.get("estudiante") or None,request.form.get("grupo") or None)); auditoria("ASIGNAR","Docentes",id); flash("Asignación guardada.","success")
