@@ -11,7 +11,7 @@
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}" type="image/png" sizes="192x192">
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261107_voice_input_feedback_v2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261107_agent_resize_v2">
     <title>EDUTURNOS · {{ titulo }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_public_menu_title_v65" media="(max-width: 900px)">
 
@@ -349,7 +349,7 @@
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout-responsive.css') }}?v=20261023_password_heading_back_v1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/desktop-ui-fixes.css') }}?v=20261107_desktop_pc_updates_v1" media="(min-width: 901px)">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_mascot_everywhere_v1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_agent_larger_v1">
     {% if request.endpoint == 'compartir_eduturnos' %}<link rel="stylesheet" href="{{ url_for('static', filename='css/qr-compartir.css') }}?v=3">{% endif %}
 </head>
 
@@ -417,7 +417,7 @@
         .public-info-page h1, .public-info-page h2 { scroll-margin-top: 90px; }
     }
 </style>
-<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261108_native_speech_v1" defer></script>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261107_agent_resize_v1" defer></script>
 {% include '_page_mascot.html' %}
 </body>
 </html>

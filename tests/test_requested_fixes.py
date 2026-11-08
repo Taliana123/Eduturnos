@@ -184,8 +184,8 @@ def test_llamada_de_voz_usa_sintesis_nativa_con_respaldo_web():
     assert 'eduturnos-native-tts-end' in activity
     assert "TextToSpeech.QUEUE_FLUSH" in activity
     assert "FEMALE_VOICE_NAME" in activity
-    assert 'versionName "2.2"' in android_build
-    assert "versionCode 13" in android_build
+    assert 'versionName "2.3"' in android_build
+    assert "versionCode 14" in android_build
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
@@ -603,6 +603,9 @@ def test_mobile_seguimiento_uses_desktop_process_layout():
     assert "grid-template-columns:100px minmax(0,1fr) 24px;" in template
     assert "gap:16px;padding:24px;border-top:1px solid #d5e1fa;" in template
     assert "max-height:calc(100dvh - 24px);padding:30px;" in template
+    assert "max-width:calc(100vw - 32px)!important;max-height:calc(100dvh - 56px)!important;padding:16px!important;" in template
+    assert "seguimiento-detail-heading h2{font-size:20px!important;}" in template
+    assert "seguimiento-detail-student h3{margin:12px 0 8px!important;font-size:21px!important;}" in template
 
 
 def test_voice_transcripts_are_submitted_and_responses_are_visible():
@@ -619,7 +622,7 @@ def test_voice_transcripts_are_submitted_and_responses_are_visible():
     assert "button.disabled && !voiceCallActive" in assistant_script
     assert 'showVoiceMessage("EDUBOT", replyText)' in assistant_script
     assert "showVoiceMessage(\"EDUBOT\", errorMessage)" in assistant_script
-    assert all("20261108_native_speech_v1" in template for template in templates)
+    assert all("20261107_agent_resize_v1" in template for template in templates)
 
 
 def test_student_name_and_mobile_directory_icons_match_shared_directory_style():

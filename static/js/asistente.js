@@ -45,6 +45,126 @@ const initializeEduturnosAssistant = () => {
         }
     });
 
+    const enableCallPanelControls = (panel) => {
+        const header = panel.querySelector(".assistant-voice-call__header");
+        const resizeHandles = [...panel.querySelectorAll("[data-assistant-call-resize]")];
+        let initialSize = null;
+        let dragState = null;
+        let resizeState = null;
+
+        const viewportLimits = () => ({
+            maxWidth: Math.max(1, Math.min(640, window.innerWidth - 16)),
+            maxHeight: Math.max(1, Math.min(760, window.innerHeight - 16)),
+        });
+        const constrainPosition = (left, top, width, height) => ({
+            left: Math.min(Math.max(8, left), Math.max(8, window.innerWidth - width - 8)),
+            top: Math.min(Math.max(8, top), Math.max(8, window.innerHeight - height - 8)),
+        });
+        const movePanel = (left, top) => {
+            const bounds = panel.getBoundingClientRect();
+            const position = constrainPosition(left, top, bounds.width, bounds.height);
+            panel.style.left = `${position.left}px`;
+            panel.style.top = `${position.top}px`;
+            panel.style.right = "auto";
+            panel.style.bottom = "auto";
+        };
+        const captureInitialSize = () => {
+            if (initialSize || panel.hidden) return;
+            const width = panel.offsetWidth;
+            const height = panel.offsetHeight;
+            if (width && height) initialSize = { width, height };
+        };
+
+        panel.addEventListener("pointerdown", (event) => {
+            const handle = event.target instanceof Element
+                ? event.target.closest("[data-assistant-call-resize]")
+                : null;
+            if (!handle || !event.isPrimary || event.button !== 0) return;
+            const bounds = panel.getBoundingClientRect();
+            captureInitialSize();
+            resizeState = {
+                pointerId: event.pointerId,
+                direction: handle.dataset.assistantCallResize,
+                startX: event.clientX,
+                startY: event.clientY,
+                startWidth: bounds.width,
+                startHeight: bounds.height,
+                startLeft: bounds.left,
+                startTop: bounds.top,
+            };
+            handle.setPointerCapture(event.pointerId);
+            panel.classList.add("is-resizing");
+            event.preventDefault();
+        });
+
+        header?.addEventListener("pointerdown", (event) => {
+            if (!event.isPrimary || event.button !== 0 || event.target.closest("button")) return;
+            const bounds = panel.getBoundingClientRect();
+            dragState = {
+                pointerId: event.pointerId,
+                offsetX: event.clientX - bounds.left,
+                offsetY: event.clientY - bounds.top,
+            };
+            header.setPointerCapture(event.pointerId);
+            panel.classList.add("is-dragging");
+            event.preventDefault();
+        });
+
+        panel.addEventListener("pointermove", (event) => {
+            if (dragState && event.pointerId === dragState.pointerId) {
+                movePanel(event.clientX - dragState.offsetX, event.clientY - dragState.offsetY);
+                return;
+            }
+            if (!resizeState || event.pointerId !== resizeState.pointerId) return;
+
+            const { direction, startX, startY, startWidth, startHeight, startLeft, startTop } = resizeState;
+            const limits = viewportLimits();
+            const growsLeft = direction.includes("w");
+            const growsTop = direction.includes("n");
+            const widthDelta = growsLeft ? startX - event.clientX : event.clientX - startX;
+            const heightDelta = growsTop ? startY - event.clientY : event.clientY - startY;
+            const width = Math.min(limits.maxWidth, Math.max(Math.min(initialSize.width, limits.maxWidth), startWidth + widthDelta));
+            const height = Math.min(limits.maxHeight, Math.max(Math.min(initialSize.height, limits.maxHeight), startHeight + heightDelta));
+            const left = growsLeft ? startLeft + startWidth - width : startLeft;
+            const top = growsTop ? startTop + startHeight - height : startTop;
+            const position = constrainPosition(left, top, width, height);
+
+            panel.style.width = `${width}px`;
+            panel.style.height = `${height}px`;
+            panel.style.left = `${position.left}px`;
+            panel.style.top = `${position.top}px`;
+            panel.style.right = "auto";
+            panel.style.bottom = "auto";
+        });
+
+        const finishPointerAction = (event) => {
+            if (dragState?.pointerId === event.pointerId) {
+                dragState = null;
+                panel.classList.remove("is-dragging");
+            }
+            if (resizeState?.pointerId === event.pointerId) {
+                resizeState = null;
+                panel.classList.remove("is-resizing");
+            }
+        };
+        panel.addEventListener("pointerup", finishPointerAction);
+        panel.addEventListener("pointercancel", finishPointerAction);
+        window.addEventListener("resize", () => {
+            if (panel.hidden) return;
+            const bounds = panel.getBoundingClientRect();
+            const limits = viewportLimits();
+            const width = Math.min(bounds.width, limits.maxWidth);
+            const height = Math.min(bounds.height, limits.maxHeight);
+            const position = constrainPosition(bounds.left, bounds.top, width, height);
+            panel.style.width = `${width}px`;
+            panel.style.height = `${height}px`;
+            panel.style.left = `${position.left}px`;
+            panel.style.top = `${position.top}px`;
+        });
+
+        return { captureInitialSize };
+    };
+
     const appendInlineMarkdown = (container, text) => {
         const tokenPattern = /(\*\*.+?\*\*|__.+?__|`[^`]+`|\*[^*\n]+\*)/g;
         let lastIndex = 0;
@@ -164,6 +284,7 @@ const initializeEduturnosAssistant = () => {
 
         panel.dataset.initialized = "true";
         document.body.append(panel);
+        const panelControls = enableCallPanelControls(panel);
         const NativeVoice = window.EDUTURNOSNativeVoice;
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let active = false;
@@ -384,6 +505,7 @@ const initializeEduturnosAssistant = () => {
             panel.setAttribute("aria-hidden", "false");
             panel.classList.remove("is-ended");
             panel.classList.add("is-open");
+            panelControls.captureInitialSize();
             positionPanel(launcher);
             launchers.forEach((item) => item.setAttribute("aria-expanded", "true"));
             active = true;
@@ -428,14 +550,18 @@ const initializeEduturnosAssistant = () => {
     const callWave = callPanel?.querySelector("[data-assistant-call-wave]");
     const callClose = callPanel?.querySelector("[data-assistant-call-close]");
     const callAction = callPanel?.querySelector("[data-assistant-call-action]");
+    const callActionLink = callPanel?.querySelector("[data-assistant-call-action-link]");
+    const callConfirmAction = callPanel?.querySelector("[data-assistant-call-confirm]");
     const sidebarToggles = [...(section?.querySelectorAll("[data-assistant-toggle]") || [])];
     const voiceLaunchers = [...document.querySelectorAll("[data-assistant-voice-launch]")];
     const openButton = sidebarToggles.find((toggle) => toggle.hasAttribute("data-assistant-open"));
     if (!form || !input || !output || !button || !status || !body || !voiceToggle || !openButton
-        || !callPanel || !callState || !callTranscript || !callSpeaker || !callToggle || !callWave || !callClose || !callAction) return false;
+        || !callPanel || !callState || !callTranscript || !callSpeaker || !callToggle || !callWave || !callClose
+        || !callAction || !callActionLink || !callConfirmAction) return false;
 
     root.dataset.eduturnosInitialized = "true";
     document.body.append(callPanel);
+    const callPanelControls = enableCallPanelControls(callPanel);
     let activeRequestController = null;
     let requestSequence = 0;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -446,6 +572,7 @@ const initializeEduturnosAssistant = () => {
     let voiceCallBusy = false;
     let voiceCallRestartTimer = 0;
     let voiceCallOverlayOpen = false;
+    let pendingCallCancellation = null;
     const setStatus = (message) => {
         status.textContent = message;
         callState.textContent = message || (voiceCallActive ? "Escuchando…" : "Listo para escucharte");
@@ -465,6 +592,37 @@ const initializeEduturnosAssistant = () => {
         callSpeaker.textContent = speaker;
         callTranscript.textContent = `${speaker}: ${message}`;
     };
+    const setCallPanelActionLink = (href, label) => {
+        const actionUrl = new URL(href, window.location.origin);
+        if (actionUrl.origin !== window.location.origin) return;
+        callActionLink.href = actionUrl.href;
+        callActionLink.textContent = label;
+        callActionLink.hidden = false;
+    };
+    const submitCancellation = (actionUrl, citaId, confirmButton) => {
+        if (!window.confirm(`¿Confirmas cancelar la cita #${citaId}? Se conservará en el historial.`)) return;
+        confirmButton.disabled = true;
+        const actionForm = document.createElement("form");
+        actionForm.method = "post";
+        actionForm.action = actionUrl;
+        [["csrf_token", root.dataset.csrf], ["estado", "Cancelada"]].forEach(([name, value]) => {
+            const field = document.createElement("input");
+            field.type = "hidden";
+            field.name = name;
+            field.value = value;
+            actionForm.append(field);
+        });
+        document.body.append(actionForm);
+        actionForm.requestSubmit();
+    };
+    callConfirmAction.addEventListener("click", () => {
+        if (!pendingCallCancellation) return;
+        submitCancellation(
+            pendingCallCancellation.actionUrl,
+            pendingCallCancellation.citaId,
+            callConfirmAction,
+        );
+    });
     const submitVoiceMessage = () => {
         if (typeof form.requestSubmit === "function") {
             form.requestSubmit();
@@ -721,6 +879,9 @@ const initializeEduturnosAssistant = () => {
         callPanel.hidden = true;
         callPanel.setAttribute("aria-hidden", "true");
         callPanel.classList.remove("is-open", "is-ended");
+        callActionLink.hidden = true;
+        callConfirmAction.hidden = true;
+        pendingCallCancellation = null;
         voiceLaunchers.forEach((launcher) => launcher.setAttribute("aria-expanded", "false"));
     };
 
@@ -944,6 +1105,10 @@ const initializeEduturnosAssistant = () => {
             callPanel.setAttribute("aria-hidden", "false");
             callPanel.classList.add("is-open");
             callPanel.classList.remove("is-ended");
+            callActionLink.hidden = true;
+            callConfirmAction.hidden = true;
+            pendingCallCancellation = null;
+            callPanelControls.captureInitialSize();
             callToggle.setAttribute("aria-label", "Finalizar conversación por voz");
             callToggle.innerHTML = "<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4.6 14.2a12 12 0 0 1 14.8 0l-2.1 3.2a1.5 1.5 0 0 1-1.8.5l-2.1-.9a1.5 1.5 0 0 1-.9-1.4v-1a9 9 0 0 0-1 0v1a1.5 1.5 0 0 1-.9 1.4l-2.1.9a1.5 1.5 0 0 1-1.8-.5L4.6 14.2Z\"/></svg>";
             voiceLaunchers.forEach((item) => item.setAttribute("aria-expanded", "true"));
@@ -1020,6 +1185,39 @@ const initializeEduturnosAssistant = () => {
                     actionLink.href = root.dataset.createCitationUrl;
                     actionLink.textContent = root.dataset.createCitationLabel || "Abrir formulario de citación";
                     answer.append(actionLink);
+                    if (voiceCallOverlayOpen) {
+                        setCallPanelActionLink(actionLink.href, actionLink.textContent);
+                    }
+                } else if (data.accion === "confirmar_cancelacion") {
+                    const actionUrl = new URL(data.accion_url, window.location.origin);
+                    const citaId = Number(data.cita_id);
+                    if (actionUrl.origin !== window.location.origin || !Number.isSafeInteger(citaId) || citaId < 1) {
+                        answer.classList.add("assistant-error");
+                        answer.append(document.createTextNode("No se pudo preparar una confirmación segura."));
+                    } else {
+                        pendingCallCancellation = { actionUrl: actionUrl.href, citaId };
+                        callActionLink.hidden = true;
+                        callConfirmAction.textContent = `Confirmar cancelación de cita #${citaId}`;
+                        callConfirmAction.hidden = !voiceCallOverlayOpen;
+                        const confirmButton = document.createElement("button");
+                        confirmButton.className = "assistant-action-confirm";
+                        confirmButton.type = "button";
+                        confirmButton.textContent = `Confirmar cancelación de cita #${citaId}`;
+                        confirmButton.addEventListener("click", () => submitCancellation(actionUrl.href, citaId, confirmButton));
+                        answer.append(confirmButton);
+                    }
+                } else if (typeof data.accion_url === "string" && typeof data.accion_label === "string") {
+                    const actionUrl = new URL(data.accion_url, window.location.origin);
+                    if (actionUrl.origin === window.location.origin) {
+                        const actionLink = document.createElement("a");
+                        actionLink.className = "assistant-action-link";
+                        actionLink.href = actionUrl.href;
+                        actionLink.textContent = data.accion_label;
+                        answer.append(actionLink);
+                        if (voiceCallOverlayOpen) {
+                            setCallPanelActionLink(actionLink.href, actionLink.textContent);
+                        }
+                    }
                 }
             } else {
                 answer.textContent = "El asistente no devolvió una respuesta válida.";

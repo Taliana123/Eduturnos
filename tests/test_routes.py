@@ -664,6 +664,167 @@ def test_asistente_guia_creacion_de_citas_sin_saltar_permisos(
     assert response.json.get("accion") == accion
 
 
+def test_asistente_muestra_seguimiento_resumido_sin_datos_personales(monkeypatch):
+    from routes import asistente as asistente_routes
+
+    usuario = {
+        "id_usuario": 12,
+        "id_institucion": 4,
+        "rol_nombre": "Docente",
+    }
+    consultas = []
+    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(asistente_routes, "usuario_actual", lambda: usuario)
+
+    def consultar_seguimiento(sql, parametros, uno=False):
+        consultas.append((sql, parametros, uno))
+        return [
+            {
+                "id": 41,
+                "fecha": "2026-11-07",
+                "hora": "09:30",
+                "estado": "Pendiente",
+                "seguimientos": 2,
+                "compromisos": 1,
+            }
+        ]
+
+    monkeypatch.setattr(asistente_routes, "consultar", consultar_seguimiento)
+    monkeypatch.setattr(
+        asistente_routes,
+        "generar_respuesta",
+        lambda *_args, **_kwargs: pytest.fail("El seguimiento no debe enviarse al proveedor externo."),
+    )
+    client = app.test_client()
+    with client.session_transaction() as sesion:
+        sesion["_csrf_token"] = "chat-csrf"
+
+    response = client.post(
+        "/asistente/preguntar",
+        json={"mensaje": "Mire el seguimiento"},
+        headers={"X-CSRFToken": "chat-csrf"},
+    )
+
+    assert response.status_code == 200
+    assert "Cita #41" in response.json["respuesta"]
+    assert "Nombre protegido" not in response.json["respuesta"]
+    assert "Camila" not in response.json["respuesta"]
+    assert response.json["accion_url"] == "/seguimiento/"
+    sql, parametros, uno = consultas[0]
+    assert "nombres" not in sql.lower()
+    assert "observaciones" not in sql.lower()
+    assert "c.id_institucion=%s" in sql
+    assert parametros == (4, 12, 12)
+    assert not uno
+
+
+def test_asistente_prepara_cancelacion_de_cita_con_confirmacion_explicita(monkeypatch):
+    from routes import asistente as asistente_routes
+
+    usuario = {"id_usuario": 12, "rol_nombre": "Rector", "id_institucion": 4}
+    cita = {
+        "id": 41,
+        "fecha": "2026-11-07",
+        "hora": "09:30",
+        "estado": "Pendiente",
+        "id_docente": 8,
+        "estudiante": "Nombre protegido",
+    }
+    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(asistente_routes, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(citas_routes, "_cita_autorizada", lambda *_args: cita)
+    monkeypatch.setattr(
+        asistente_routes,
+        "generar_respuesta",
+        lambda *_args, **_kwargs: pytest.fail("Una acción no debe enviarse al proveedor externo."),
+    )
+    client = app.test_client()
+    with client.session_transaction() as sesion:
+        sesion["_csrf_token"] = "chat-csrf"
+
+    response = client.post(
+        "/asistente/preguntar",
+        json={"mensaje": "Cancela la cita #41"},
+        headers={"X-CSRFToken": "chat-csrf"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["accion"] == "confirmar_cancelacion"
+    assert response.json["accion_url"] == "/citas/41/estado"
+    assert response.json["cita_id"] == 41
+    assert "conservará en el historial" in response.json["respuesta"]
+    assert "Nombre protegido" not in response.json["respuesta"]
+
+
+def test_asistente_no_permite_cancelacion_a_estudiantes(monkeypatch):
+    from routes import asistente as asistente_routes
+
+    usuario = {"id_usuario": 12, "rol_nombre": "Estudiante"}
+    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(asistente_routes, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(
+        citas_routes,
+        "_cita_autorizada",
+        lambda *_args: pytest.fail("No debe consultar citas para un rol sin permiso de cancelación."),
+    )
+    client = app.test_client()
+    with client.session_transaction() as sesion:
+        sesion["_csrf_token"] = "chat-csrf"
+
+    response = client.post(
+        "/asistente/preguntar",
+        json={"mensaje": "Elimina la cita #41"},
+        headers={"X-CSRFToken": "chat-csrf"},
+    )
+
+    assert response.status_code == 200
+    assert "no tiene permiso" in response.json["respuesta"].lower()
+    assert "accion" not in response.json
+
+
+def test_asistente_abre_secciones_con_enlaces_locales(monkeypatch):
+    from routes import asistente as asistente_routes
+
+    usuario = {"id_usuario": 12, "rol_nombre": "Estudiante"}
+    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(asistente_routes, "usuario_actual", lambda: usuario)
+    client = app.test_client()
+    with client.session_transaction() as sesion:
+        sesion["_csrf_token"] = "chat-csrf"
+
+    response = client.post(
+        "/asistente/preguntar",
+        json={"mensaje": "Abre el calendario"},
+        headers={"X-CSRFToken": "chat-csrf"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["accion"] == "abrir_seccion"
+    assert response.json["accion_url"] == "/calendario/"
+
+
+def test_asistente_abre_detalle_de_cita_para_editar_sin_guardar_por_si_mismo(monkeypatch):
+    from routes import asistente as asistente_routes
+
+    usuario = {"id_usuario": 12, "rol_nombre": "Docente"}
+    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(asistente_routes, "usuario_actual", lambda: usuario)
+    client = app.test_client()
+    with client.session_transaction() as sesion:
+        sesion["_csrf_token"] = "chat-csrf"
+
+    response = client.post(
+        "/asistente/preguntar",
+        json={"mensaje": "Reprogramar la cita #41"},
+        headers={"X-CSRFToken": "chat-csrf"},
+    )
+
+    assert response.status_code == 200
+    assert response.json["accion"] == "abrir_detalle_cita"
+    assert response.json["accion_url"] == "/citas/#cita-desktop-detail-41"
+    assert "confirma el formulario" in response.json["respuesta"]
+
+
 def test_asistente_responde_pregunta_abierta_con_el_perfil_actual(monkeypatch):
     from routes import asistente as asistente_routes
 

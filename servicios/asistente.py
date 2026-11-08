@@ -16,7 +16,7 @@ INSTRUCCION = (
     "ayuden; evita tablas y no muestres etiquetas Markdown sin formato. Nombra las secciones y pasos "
     "confirmados; adapta permisos al perfil "
     "recibido y no inventes opciones, políticas, horarios, estados ni datos institucionales. "
-    "No tienes acceso a cuentas, citas, estudiantes ni expedientes; no solicites datos personales, "
+    "No tienes acceso a cuentas, datos personales ni expedientes; no solicites nombres, documentos, teléfonos, "
     "contraseñas ni códigos. Si no hay información suficiente para una respuesta segura, dilo "
     "brevemente y pregunta qué sección o acción necesita aclarar."
 )
@@ -31,9 +31,9 @@ RESPUESTAS_RAPIDAS = (
     ),
     (
         ("cancelar citacion", "cancelar cita", "reprogramar citacion", "cambiar fecha", "cambiar hora"),
-        "Abre «Citaciones» o «Solicitudes» y busca la reunión correspondiente. Si aparece una opción para cancelar o "
-        "proponer otro horario, úsala desde allí. Si no está disponible para tu perfil o la cita ya fue confirmada, "
-        "contacta a coordinación; EDUBOT no puede modificar citas.",
+        "Puedo preparar la cancelación de una cita que tu perfil tenga permiso para gestionar. Indica el número de la "
+        "cita, revisa su fecha, hora y estado, y confirma antes de cancelar. La cita quedará en el historial; EDUBOT "
+        "no borra datos personales ni elimina registros definitivamente.",
     ),
     (
         ("estado de mi cita", "estado de la cita", "confirmar cita", "cita pendiente", "cita confirmada", "no asistio"),
@@ -49,9 +49,8 @@ RESPUESTAS_RAPIDAS = (
     ),
     (
         ("seguimiento", "compromiso", "acuerdo", "tarea pendiente", "seguimiento de cita"),
-        "Abre «Seguimiento» desde el menú para consultar los compromisos registrados. El acceso depende del perfil "
-        "institucional y de la información vinculada a tu cuenta. Si no aparece un compromiso, solicita a la persona "
-        "responsable que revise el registro.",
+        "Puedo resumir los procesos de seguimiento más recientes sin incluir nombres ni observaciones. El detalle "
+        "completo está en «Seguimiento» para los perfiles autorizados.",
     ),
     (
         ("justificacion", "justificar inasistencia", "excusa", "no pude asistir", "inasistencia"),
