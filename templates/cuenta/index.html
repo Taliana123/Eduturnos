@@ -14,7 +14,7 @@
 
     <section class="cuenta-avatar-card" aria-label="Tu personaje">
         <button class="cuenta-avatar-preview" type="button" data-avatar-open data-avatar-user="{{ usuario.id_usuario }}" data-avatar-config="{{ avatar_config|tojson|forceescape }}" aria-haspopup="dialog" aria-controls="avatar-customizer" aria-label="Personalizar mi personaje">
-            {{ avatar_art() }}
+            {{ avatar_art(avatar_config) }}
         </button>
         <div>
             <h2>Tu personaje</h2>

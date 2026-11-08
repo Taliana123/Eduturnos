@@ -478,6 +478,14 @@
     border-radius: 9px;
 }
 
+.eduturnos-desktop-sidebar .assistant-sidebar-entry .assistant-sidebar-avatar {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
 .eduturnos-desktop-sidebar .assistant-sidebar-avatar.assistant-drone-avatar {
     background-repeat: no-repeat;
     background-size: 300% 300%;

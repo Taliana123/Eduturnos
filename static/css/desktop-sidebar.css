@@ -751,7 +751,10 @@ button.desktop-sidebar-account-avatar{
   color:#17365d!important;
   cursor:pointer!important;
 }
-.user-avatar-drawing{display:block;grid-area:1/1;width:100%;height:100%;overflow:hidden;filter:drop-shadow(0 2px 2px rgba(37,54,78,.14));}
+.desktop-sidebar-account-avatar,
+.cuenta-avatar-preview,
+.avatar-customizer-preview{isolation:isolate;}
+.user-avatar-drawing{position:relative;display:block;grid-area:auto;width:100%;height:100%;overflow:hidden;filter:drop-shadow(0 2px 2px rgba(37,54,78,.14));}
 .user-avatar-face,.user-avatar-neck,.user-avatar-ear{fill:var(--avatar-skin,#efc19a);stroke:rgba(95,54,43,.42);stroke-width:1.4;stroke-linejoin:round;}
 .user-avatar-blush{fill:#e87972;opacity:.23;}
 .user-avatar-hair-back,.user-avatar-hair-front{fill:var(--avatar-hair,#282331);stroke:rgba(42,31,34,.5);stroke-width:1.3;stroke-linejoin:round;}
@@ -781,7 +784,11 @@ button.desktop-sidebar-account-avatar{
 .user-avatar-drawing[data-hairstyle="wavy"] [data-avatar-hair]:not([data-avatar-hair="wavy"]),
 .user-avatar-drawing[data-hairstyle="curly"] [data-avatar-hair]:not([data-avatar-hair="curly"]),
 .user-avatar-drawing[data-hairstyle="bun"] [data-avatar-hair]:not([data-avatar-hair="bun"]),
-.user-avatar-drawing[data-hairstyle="straight"] [data-avatar-hair]:not([data-avatar-hair="straight"]){display:none;}
+.user-avatar-drawing[data-hairstyle="straight"] [data-avatar-hair]:not([data-avatar-hair="straight"]),
+.user-avatar-drawing[data-hairstyle="bob"] [data-avatar-hair]:not([data-avatar-hair="bob"]),
+.user-avatar-drawing[data-hairstyle="afro"] [data-avatar-hair]:not([data-avatar-hair="afro"]),
+.user-avatar-drawing[data-hairstyle="braids"] [data-avatar-hair]:not([data-avatar-hair="braids"]),
+.user-avatar-drawing[data-hairstyle="side-swept"] [data-avatar-hair]:not([data-avatar-hair="side-swept"]){display:none;}
 .user-avatar-drawing[data-outfit="shirt"] [data-avatar-outfit="shirt"],
 .user-avatar-drawing[data-outfit="hoodie"] [data-avatar-outfit="hoodie"],
 .user-avatar-drawing[data-outfit="uniform"] [data-avatar-outfit="uniform"],
@@ -840,3 +847,105 @@ button.desktop-sidebar-account-avatar{
 .avatar-customizer-status{min-height:1.25em;margin:-10px 0 0;color:#31516f;font-size:12px;}
 @media(max-width:620px){.avatar-customizer-fields{grid-template-columns:1fr;}.avatar-customizer{max-height:92dvh;border-radius:17px;}.avatar-customizer-preview{width:132px;height:150px;}}
 @media(max-width:420px){.cuenta-avatar-card{flex-wrap:wrap;}.cuenta-avatar-card>div{flex:1;min-width:0}.cuenta-avatar-edit{margin-left:72px;}}
+
+html body dialog.avatar-customizer{
+  box-sizing:border-box!important;
+  width:min(760px,calc(100vw - 24px))!important;
+  max-width:calc(100vw - 24px)!important;
+  max-height:calc(100dvh - 24px)!important;
+  margin:auto!important;
+  padding:0!important;
+  overflow:auto!important;
+}
+html body dialog.avatar-customizer form{
+  box-sizing:border-box!important;
+  min-width:0!important;
+  gap:14px!important;
+  padding:clamp(14px,3vw,24px)!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-header{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 40px!important;
+  align-items:start!important;
+  gap:12px!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-header h2{
+  font-size:clamp(19px,3vw,23px)!important;
+  line-height:1.2!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-header p{
+  font-size:13px!important;
+  line-height:1.45!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-header>[data-avatar-close]{
+  display:grid!important;
+  flex:0 0 40px!important;
+  width:40px!important;
+  min-width:40px!important;
+  max-width:40px!important;
+  height:40px!important;
+  min-height:40px!important;
+  max-height:40px!important;
+  place-items:center!important;
+  margin:0!important;
+  padding:0!important;
+  border:1px solid #d5e1fa!important;
+  border-radius:50%!important;
+  background:#eef4fb!important;
+  color:#31516f!important;
+  box-shadow:none!important;
+  font-size:22px!important;
+  line-height:1!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-preview{
+  width:132px!important;
+  height:150px!important;
+  flex:none!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-fields{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+html body dialog.avatar-customizer .avatar-option-group{min-width:0!important;padding:9px!important;}
+html body dialog.avatar-customizer .avatar-choice-grid{gap:5px!important;}
+html body dialog.avatar-customizer .avatar-choice{
+  box-sizing:border-box!important;
+  min-width:0!important;
+  min-height:36px!important;
+  padding:6px 8px!important;
+  font-size:12px!important;
+  line-height:1.2!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-actions{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:8px!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-actions button{
+  flex:1 1 150px!important;
+  min-width:0!important;
+  min-height:42px!important;
+  padding:9px 12px!important;
+  font-size:14px!important;
+  line-height:1.2!important;
+}
+@media(max-width:620px){
+  html body dialog.avatar-customizer{
+    width:calc(100vw - 20px)!important;
+    max-width:calc(100vw - 20px)!important;
+    max-height:calc(100dvh - 24px - env(safe-area-inset-top))!important;
+    border-radius:16px!important;
+  }
+  html body dialog.avatar-customizer form{gap:11px!important;padding:14px!important;}
+  html body dialog.avatar-customizer .avatar-customizer-preview{width:92px!important;height:108px!important;}
+  html body dialog.avatar-customizer .avatar-customizer-fields{grid-template-columns:minmax(0,1fr)!important;gap:8px!important;}
+  html body dialog.avatar-customizer .avatar-option-group{padding:8px!important;}
+  html body dialog.avatar-customizer .avatar-choice-grid{gap:5px!important;}
+  html body dialog.avatar-customizer .avatar-choice{min-height:34px!important;padding:5px 7px!important;font-size:11px!important;}
+  html body dialog.avatar-customizer .avatar-customizer-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  html body dialog.avatar-customizer .avatar-customizer-actions button{min-height:40px!important;padding:8px 6px!important;font-size:13px!important;}
+}
+@media(max-width:360px){
+  html body dialog.avatar-customizer .avatar-customizer-header{grid-template-columns:minmax(0,1fr) 36px!important;gap:8px!important;}
+  html body dialog.avatar-customizer .avatar-customizer-header>[data-avatar-close]{width:36px!important;min-width:36px!important;max-width:36px!important;height:36px!important;min-height:36px!important;max-height:36px!important;}
+}

@@ -27,6 +27,18 @@ def test_normalizar_avatar_rechaza_opciones_no_permitidas():
         avatar.normalizar_avatar({**avatar.DEFAULT_AVATAR, "extra": "value"})
 
 
+def test_avatar_ofrece_mas_peinados_y_acepta_sus_capas():
+    hairstyles = {
+        option["value"] for option in avatar.AVATAR_CHOICES["hairstyle"]["options"]
+    }
+
+    assert {"afro", "braids", "bob", "side-swept"} <= hairstyles
+    for hairstyle in hairstyles:
+        assert avatar.normalizar_avatar(
+            {**avatar.DEFAULT_AVATAR, "hairstyle": hairstyle}
+        )["hairstyle"] == hairstyle
+
+
 def test_obtener_avatar_persiste_una_combinacion_inicial(monkeypatch):
     stored = {}
     writes = []
@@ -107,6 +119,12 @@ def test_personalizador_usa_piezas_vectoriales_y_persistencia_de_cuenta():
     assert "FOREIGN KEY (id_usuario)" in schema
     assert "[data-hairstyle=" in stylesheet
     assert "background-image:url(" not in art
+    assert 'data-hairstyle="{{ avatar.hairstyle }}"' in art
+    assert 'data-avatar-hair="afro"' in art
+    assert 'data-avatar-hair="braids"' in art
+    assert 'data-avatar-hair="bob"' in art
+    assert 'data-avatar-hair="side-swept"' in art
+    assert ".user-avatar-drawing[data-hairstyle=\"afro\"]" in stylesheet
 
 
 def test_menu_y_mi_cuenta_renderizan_el_avatar_con_sus_opciones():
@@ -146,3 +164,5 @@ def test_menu_y_mi_cuenta_renderizan_el_avatar_con_sus_opciones():
     ET.fromstring(svg.group(0))
     assert 'data-avatar-open' in account
     assert 'class="cuenta-avatar-preview"' in account
+    assert 'data-hairstyle="short"' in sidebar
+    assert f'style="--avatar-hair:{initial["hairColor"]};' in sidebar

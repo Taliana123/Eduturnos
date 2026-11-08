@@ -223,8 +223,8 @@ def test_llamada_de_voz_usa_sintesis_nativa_con_respaldo_web():
     assert 'eduturnos-native-tts-end' in activity
     assert "TextToSpeech.QUEUE_FLUSH" in activity
     assert "FEMALE_VOICE_NAME" in activity
-    assert 'versionName "2.8"' in android_build
-    assert "versionCode 18" in android_build
+    assert 'versionName "2.9"' in android_build
+    assert "versionCode 19" in android_build
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
@@ -645,6 +645,8 @@ def test_mobile_seguimiento_uses_desktop_process_layout():
     assert "max-width:calc(100vw - 32px)!important;max-height:calc(100dvh - 56px)!important;padding:16px!important;" in template
     assert "seguimiento-detail-heading h2{font-size:20px!important;}" in template
     assert "seguimiento-detail-student h3{margin:12px 0 8px!important;font-size:21px!important;}" in template
+    assert '<select id="seguimiento-filtro-situacion"' in template
+    assert "data-seguimiento-count" in template
 
 
 def test_voice_transcripts_are_submitted_and_responses_are_visible():

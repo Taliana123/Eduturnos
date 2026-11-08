@@ -44,10 +44,51 @@ def test_ajustes_visuales_de_edubot_y_administracion():
     assert "max-width: 760px !important;" in admin_styles
 
 
+def test_mascota_cerrada_sin_fondo_y_chat_conserva_su_avatar():
+    styles = (ROOT / "static" / "css" / "edubot.css").read_text(
+        encoding="utf-8"
+    )
+    widget = (ROOT / "templates" / "_asistente_widget.html").read_text(
+        encoding="utf-8"
+    )
+
+    assert ".assistant-sidebar-entry .assistant-sidebar-avatar" in styles
+    assert "background-color: transparent;" in styles
+    assert ".dashboard-help-chat .assistant-avatar" in styles
+    assert "class=\"assistant-avatar assistant-drone-avatar\"" in widget
+
+
+def test_filtro_de_seguimiento_es_compacto_y_actualiza_cantidad():
+    template = (ROOT / "templates" / "seguimiento" / "lista.html").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'id="seguimiento-filtro-situacion"' in template
+    assert '<select id="seguimiento-filtro-situacion"' in template
+    assert "data-seguimiento-empty" in template
+    assert "data-seguimiento-count" in template
+    assert 'data-seguimiento-filter="observador"' not in template
+    assert 'data-seguimiento-filter="segunda-cita"' not in template
+    assert "const matches = filter === \"todos\"" in template
+    assert "if (empty) empty.hidden = visible !== 0" in template
+    assert ".seguimiento-filtros select" in template
+
+
+def test_modal_avatar_movil_tiene_cierre_de_tamano_limitado():
+    styles = (ROOT / "static" / "css" / "desktop-sidebar.css").read_text(
+        encoding="utf-8"
+    )
+
+    assert "html body dialog.avatar-customizer .avatar-customizer-header>[data-avatar-close]" in styles
+    assert "width:40px!important" in styles
+    assert "max-height:calc(100dvh - 24px - env(safe-area-inset-top))!important" in styles
+    assert "grid-template-columns:repeat(2,minmax(0,1fr))!important;" in styles
+
+
 def test_android_incrementa_la_version_de_la_app():
     gradle = (ROOT / "mobile-app" / "android" / "app" / "build.gradle").read_text(
         encoding="utf-8"
     )
 
-    assert "versionCode 18" in gradle
-    assert 'versionName "2.8"' in gradle
+    assert "versionCode 19" in gradle
+    assert 'versionName "2.9"' in gradle

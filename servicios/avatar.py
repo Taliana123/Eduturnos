@@ -29,6 +29,10 @@ AVATAR_CHOICES = {
             {"value": "curly", "label": "Rizado", "swatch": "#30384d"},
             {"value": "bun", "label": "Recogido", "swatch": "#30384d"},
             {"value": "straight", "label": "Liso", "swatch": "#30384d"},
+            {"value": "bob", "label": "Bob", "swatch": "#30384d"},
+            {"value": "afro", "label": "Afro", "swatch": "#30384d"},
+            {"value": "braids", "label": "Trenzas", "swatch": "#30384d"},
+            {"value": "side-swept", "label": "De lado", "swatch": "#30384d"},
         ],
     },
     "hairColor": {

@@ -1,5 +1,6 @@
-{% macro avatar_art() -%}
-<svg viewBox="0 0 120 144" class="user-avatar-drawing" aria-hidden="true" focusable="false">
+{% macro avatar_art(config=None) -%}
+{% set avatar = config or {'character': 'neutral', 'ageStyle': 'teen', 'hairstyle': 'short', 'hairColor': '#282331', 'skinColor': '#efc19a', 'eyeColor': '#493124', 'outfit': 'hoodie', 'shirtColor': '#2875c7', 'accessory': 'none'} %}
+<svg viewBox="0 0 120 144" class="user-avatar-drawing" data-character="{{ avatar.character }}" data-age-style="{{ avatar.ageStyle }}" data-hairstyle="{{ avatar.hairstyle }}" data-outfit="{{ avatar.outfit }}" data-accessory="{{ avatar.accessory }}" style="--avatar-hair:{{ avatar.hairColor }};--avatar-skin:{{ avatar.skinColor }};--avatar-eyes:{{ avatar.eyeColor }};--avatar-shirt:{{ avatar.shirtColor }};" aria-hidden="true" focusable="false">
   <g class="user-avatar-hair-back">
     <path data-avatar-hair="short" d="M27 58C23 35 37 19 60 19s37 16 33 39l-5 24-12-5-2-18H46l-2 18-12 5-5-24Z"/>
     <path data-avatar-hair="long" d="M27 58C23 35 37 19 60 19s37 16 33 39l-2 53-13 9-5-43H47l-5 43-13-9-2-53Z"/>
@@ -8,6 +9,11 @@
     <path data-avatar-hair="bun" d="M28 58C24 35 38 20 60 20s36 15 32 38l-4 24-12-5-2-18H46l-2 18-12 5-4-24Z"/>
     <circle data-avatar-hair="bun" cx="60" cy="19" r="13"/>
     <path data-avatar-hair="straight" d="M27 58C23 35 37 19 60 19s37 16 33 39l-2 60-13 4-4-58H46l-4 58-13-4-2-60Z"/>
+    <path data-avatar-hair="bob" d="M27 58C23 35 37 19 60 19s37 16 33 39l-3 42-12 7-5-45H47l-5 45-12-7-3-42Z"/>
+    <path data-avatar-hair="afro" d="M27 63c-9-5-10-17-3-23-4-11 5-20 14-19 4-13 19-17 27-9 10-9 25-2 25 8 12 3 17 17 8 25 7 8 2 18-6 21l-3 35-12 5-5-43H48l-5 43-12-5-3-35c-7-1-11-12-1-18Z"/>
+    <path data-avatar-hair="braids" d="M27 58C23 35 37 19 60 19s37 16 33 39l-2 16-11-5-2-18H46l-2 18-11 5-2-16Z"/>
+    <path data-avatar-hair="braids" d="M30 66c-5 8-3 19 3 24l-3 18 7 13 7-13-4-19 3-17m47-6c5 8 3 19-3 24l3 18-7 13-7-13 4-19-3-17"/>
+    <path data-avatar-hair="side-swept" d="M27 58C23 35 37 19 60 19s37 16 33 39l-2 60-13 4-4-58H46l-4 58-13-4-2-60Z"/>
   </g>
   <path class="user-avatar-shirt user-avatar-outfit" data-avatar-outfit="shirt" d="m45 103-18 8c-8 4-12 14-14 27h94c-2-13-6-23-14-27l-18-8-15 9-15-9Z"/>
   <path class="user-avatar-shirt user-avatar-outfit" data-avatar-outfit="hoodie" d="m44 101-17 9c-9 5-13 15-15 28h96c-2-13-6-23-15-28l-17-9-16 12-16-12Z"/>
@@ -39,6 +45,10 @@
   <path class="user-avatar-hair-front" data-avatar-hair="curly" d="M34 54c-5-15 3-28 12-27 4-8 13-8 17-2 9-6 18 1 18 8 8 5 8 15 5 22-7-1-11-7-14-13-6 8-20 13-38 12Z"/>
   <path class="user-avatar-hair-front" data-avatar-hair="bun" d="M34 52c-1-19 9-29 26-29 16 0 26 10 26 29-8-1-14-7-17-14-8 9-20 13-35 14Z"/>
   <path class="user-avatar-hair-front" data-avatar-hair="straight" d="M34 53V47c0-16 10-24 26-24s26 8 26 24v6c-9-2-15-7-19-14-8 8-18 12-33 14Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="bob" d="M34 53c-1-19 9-30 26-30 16 0 26 11 26 30-8-2-13-7-17-14-8 10-20 14-35 14Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="afro" d="M31 54c-5-18 7-34 20-31 6-10 20-10 26-1 13-2 20 12 13 23-5 7-11 9-17 9-4-8-8-12-13-13-8 9-17 13-29 13Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="braids" d="M34 52c-1-19 9-29 26-29 16 0 26 10 26 29-8-1-14-7-17-14-8 9-20 13-35 14Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="side-swept" d="M34 53c-1-19 9-30 26-30 16 0 26 11 26 30-12 1-19-4-23-13-6 10-15 13-29 13Z"/>
   <path class="user-avatar-headband" d="M35 48c13 6 37 6 50 0l2 5c-17 8-37 8-54 0l2-5Z"/>
   <g class="user-avatar-glasses">
     <circle cx="48" cy="62" r="10"/>
