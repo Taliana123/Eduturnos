@@ -25,6 +25,8 @@ import com.getcapacitor.BridgeActivity;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -314,14 +316,21 @@ public class MainActivity extends BridgeActivity {
         speechSynthesizer.setSpeechRate(1.0f);
 
         Set<Voice> availableVoices = speechSynthesizer.getVoices();
-        List<Voice> voices = availableVoices == null
-                ? new ArrayList<>()
-                : new ArrayList<>(availableVoices);
-        voices.removeIf(voice -> !"es".equalsIgnoreCase(voice.getLocale().getLanguage()));
-        voices.sort((first, second) -> Integer.compare(
-                voicePreference(first, colombianSpanish),
-                voicePreference(second, colombianSpanish)
-        ));
+        List<Voice> voices = new ArrayList<>();
+        if (availableVoices != null) {
+            for (Voice voice : availableVoices) {
+                if ("es".equalsIgnoreCase(voice.getLocale().getLanguage())) voices.add(voice);
+            }
+        }
+        Collections.sort(voices, new Comparator<Voice>() {
+            @Override
+            public int compare(Voice first, Voice second) {
+                return Integer.compare(
+                        voicePreference(first, colombianSpanish),
+                        voicePreference(second, colombianSpanish)
+                );
+            }
+        });
         if (!voices.isEmpty()) speechSynthesizer.setVoice(voices.get(0));
     }
 
