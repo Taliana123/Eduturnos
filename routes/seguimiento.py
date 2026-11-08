@@ -63,10 +63,21 @@ def lista():
     historial_por_cita = {}
     for registro in rows:
         historial_por_cita.setdefault(registro["id_cita"], []).append(registro)
+    tipos_por_cita = {}
+    for proceso in procesos:
+        tipos = []
+        if proceso.get("descripcion") or proceso.get("observaciones"):
+            tipos.append("observador")
+        if proceso.get("requiere_otra_cita"):
+            tipos.append("segunda-cita")
+        if proceso.get("asistencia") == "No asistió":
+            tipos.append("inasistencia")
+        tipos_por_cita[proceso["id"]] = tipos or ["general"]
     return render_template(
         "seguimiento/lista.html",
         seguimientos=rows[:500],
         procesos=procesos,
+        tipos_por_cita=tipos_por_cita,
         historial_por_cita=historial_por_cita,
         compromisos_por_cita=compromisos_por_cita,
     )

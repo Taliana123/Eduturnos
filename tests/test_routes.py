@@ -539,7 +539,8 @@ def test_soporte_en_android_abre_gmail_con_el_mensaje_preparado():
 def test_google_calendar_respeta_alcance_y_rol(scope, rol, permitido):
     from routes.integraciones_google import _permite
 
-    assert _permite(scope, rol) is permitido
+    usuario = {"id_institucion": 1} if scope == "institucional" and rol == "Rector" else {}
+    assert _permite(scope, rol, usuario) is permitido
 
 
 def test_callback_google_encola_citas_futuras_al_conectar_acudiente(monkeypatch):

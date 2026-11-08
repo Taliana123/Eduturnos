@@ -52,7 +52,28 @@
     font-size: clamp(1.25rem, 3vw, 1.6rem);
 }
 
+.eduturnos-qr-picker {
+    display: grid;
+    width: min(100%, 19rem);
+    gap: 0.4rem;
+    color: #31516f;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-align: left;
+}
+
+.eduturnos-qr-picker select {
+    min-height: 2.8rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #b9d1ef;
+    border-radius: 0.75rem;
+    background: #fff;
+    color: #173c70;
+    font: inherit;
+}
+
 .eduturnos-share-qr-frame {
+    position: relative;
     display: grid;
     width: min(100%, 19rem);
     aspect-ratio: 1;
@@ -69,6 +90,38 @@
     width: 100%;
     height: 100%;
     image-rendering: pixelated;
+}
+
+.eduturnos-qr-dragon-mark[hidden] {
+    display: none;
+}
+
+.eduturnos-qr-dragon-mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    width: 18%;
+    aspect-ratio: 1;
+    place-items: center;
+    padding: 0.12rem;
+    border: 2px solid #17365d;
+    border-radius: 32%;
+    background: #fff;
+    transform: translate(-50%, -50%);
+}
+
+.eduturnos-qr-dragon-mark svg {
+    width: 100%;
+    height: 100%;
+    fill: #17365d;
+}
+
+.eduturnos-qr-dragon-mark svg path + path {
+    fill: none;
+    stroke: #fff;
+    stroke-linecap: round;
+    stroke-width: 2.5;
 }
 
 .eduturnos-share-description {

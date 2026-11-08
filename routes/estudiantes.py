@@ -35,13 +35,15 @@ def validar_formulario(datos):
         return "Los nombres y apellidos solo pueden contener letras y espacios."
     if any(not datos.get(campo, "").isdigit() for campo in ("sede", "jornada", "periodo")):
         return "Selecciona una sede, jornada y periodo válidos."
-    from routes.helpers import usuario_actual
-    usuario = usuario_actual()
-    if usuario and usuario["rol_nombre"] != "Super Admin":
-        if not consultar("SELECT id FROM sedes WHERE id=%s AND id_institucion=%s AND estado=1", (datos["sede"], usuario.get("id_institucion")), uno=True):
-            return "La sede seleccionada no pertenece a tu institución."
-        if not consultar("SELECT id FROM periodos_academicos WHERE id=%s AND id_institucion=%s", (datos["periodo"], usuario.get("id_institucion")), uno=True):
-            return "El periodo seleccionado no pertenece a tu institución."
+    from routes import helpers as route_helpers
+    usuario = route_helpers.usuario_actual()
+    if usuario and usuario.get("rol_nombre") != "Super Admin":
+        tenant = usuario.get("id_institucion")
+        if tenant is not None:
+            if not consultar("SELECT id FROM sedes WHERE id=%s AND id_institucion=%s AND estado=1", (datos["sede"], tenant), uno=True):
+                return "La sede seleccionada no pertenece a tu institución."
+            if not consultar("SELECT id FROM periodos_academicos WHERE id=%s AND id_institucion=%s", (datos["periodo"], tenant), uno=True):
+                return "El periodo seleccionado no pertenece a tu institución."
 
     grado = datos.get("grado", "").strip()
     grupo = datos.get("grupo", "").strip()
@@ -64,7 +66,8 @@ def validar_formulario(datos):
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador","Docente")
 def lista():
     from routes.helpers import usuario_actual
-    u=usuario_actual(); q=request.args.get("q","").strip(); like=f"%{q}%"
+    u=usuario_actual() or {}
+    q=request.args.get("q","").strip(); like=f"%{q}%"
     base="""SELECT DISTINCT e.*,s.nombre sede,j.nombre jornada,gr.nombre grado,g.nombre grupo,
                      (SELECT GROUP_CONCAT(CONCAT(a.nombres,' ',a.apellidos) ORDER BY ea.principal DESC,a.apellidos,a.nombres SEPARATOR ', ')
                       FROM estudiante_acudiente ea JOIN acudientes a ON a.id_acudiente=ea.id_acudiente
@@ -74,16 +77,17 @@ def lista():
     filtro="""(CONCAT(e.nombres,' ',e.apellidos) LIKE %s OR e.documento LIKE %s OR COALESCE(e.curso,'') LIKE %s
                OR COALESCE(s.nombre,'') LIKE %s OR COALESCE(gr.nombre,'') LIKE %s OR COALESCE(g.nombre,'') LIKE %s)"""
     parametros=(like,)*6
-    if u["rol_nombre"] != "Super Admin" and u.get("id_institucion"):
+    rol = u.get("rol_nombre")
+    if rol != "Super Admin" and u.get("id_institucion"):
         filtro += " AND s.id_institucion=%s"
         parametros += (u["id_institucion"],)
-    if u["rol_nombre"]=="Docente":
+    if rol=="Docente":
         rows=consultar(base+""" JOIN asignaciones_docentes ad ON (ad.id_estudiante=e.id_estudiante OR (ad.id_grupo=e.id_grupo AND e.id_grupo IS NOT NULL))
                      JOIN docentes d ON d.id_docente=ad.id_docente
-                     WHERE ad.estado=1 AND d.id_usuario=%s AND """+filtro+" ORDER BY e.apellidos,e.nombres",(u["id_usuario"],)+parametros)
+                     WHERE ad.estado=1 AND d.id_usuario=%s AND """+filtro+" ORDER BY e.apellidos,e.nombres",(u.get("id_usuario"),)+parametros)
     else:
         rows=consultar(base+" WHERE "+filtro+" ORDER BY e.apellidos,e.nombres",parametros)
-    return render_template("estudiantes/lista.html",estudiantes=rows,q=q,puede_gestionar=u["rol_nombre"] in ("Super Admin","Rector","Administrador / Coordinador"))
+    return render_template("estudiantes/lista.html",estudiantes=rows,q=q,puede_gestionar=rol in ("Super Admin","Rector","Administrador / Coordinador"))
 
 @estudiantes_bp.route("/nuevo",methods=["GET","POST"])
 @roles_permitidos("Super Admin","Rector","Administrador / Coordinador")

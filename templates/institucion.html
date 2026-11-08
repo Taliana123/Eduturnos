@@ -5,7 +5,7 @@
     <header class="institucion-heading">
         <p class="institucion-kicker">Institución educativa</p>
         <div class="institucion-title-row">
-            <a class="link-back institucion-back account-settings-back history-back-button" href="{{ url_for('inicio') }}" aria-label="Volver al inicio" title="Volver al inicio"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg></a>
+            <a class="institucion-back account-settings-back history-back-button" href="{{ url_for('inicio') }}" aria-label="Volver al inicio" title="Volver al inicio"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg></a>
             <h1>{{ informacion.nombre }}</h1>
         </div>
         <p>Información institucional y ubicaciones de sus sedes en {{ informacion.municipio }}{% if informacion.departamento %}, {{ informacion.departamento }}{% endif %}.</p>
@@ -61,8 +61,8 @@
 
 <style>
 .institucion-page{width:100%;max-width:1180px;margin:0 auto;padding:24px 18px 48px;}
-.institucion-heading{max-width:780px;margin:0 0 30px;}
-.institucion-heading .institucion-back{display:none;flex:0 0 36px;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid #dce4eb;border-radius:8px;background:#fff;color:#1769aa;text-decoration:none;}
+.institucion-heading{max-width:780px;margin:0 0 16px;}
+.institucion-heading .institucion-back{display:inline-flex;flex:0 0 36px;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid #dce4eb;border-radius:8px;background:#fff;color:#1769aa;text-decoration:none;}
 .institucion-title-row{min-width:0;}
 .institucion-heading .institucion-back svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .institucion-kicker{margin:0 0 8px;color:#2875c7;font-size:12px;font-weight:700;}
@@ -80,8 +80,8 @@
 .institucion-section-head h2{margin-bottom:5px;}
 .institucion-section-head p{margin:0;color:#5c6e80;font-size:14px;}
 .institucion-section-head>span{color:#66788a;font-size:12px;white-space:nowrap;}
-.institucion-sedes-list{border-top:1px solid #dce4eb;}
-.institucion-sede{margin-bottom:8px;padding:0 12px;border:1px solid #dce4eb;border-radius:6px;background:#fff;}
+.institucion-sedes-list{display:grid;gap:12px;}
+.institucion-sede{margin:0;padding:0 12px;border:0;border-radius:10px;background:#fff;box-shadow:0 3px 14px rgba(23,54,93,.07);}
 .institucion-sede summary{display:flex;align-items:center;min-height:64px;padding:12px 4px;cursor:pointer;list-style:none;}
 .institucion-sede summary::-webkit-details-marker{display:none;}
 .institucion-sede summary::after{content:'+';margin-left:auto;padding-left:14px;color:#1769aa;font-size:20px;}
@@ -94,7 +94,7 @@
 .institucion-sede-content iframe{display:block;width:100%;height:300px;border:0;border-radius:6px;background:#f0f3f6;}
 @media(max-width:760px){
     .institucion-page{padding:18px 14px 30px;}
-    .institucion-heading{margin-bottom:22px;padding-top:8px;}
+    .institucion-heading{margin-bottom:12px;padding-top:8px;}
     .institucion-title-row{display:flex;align-items:center;gap:8px;}
     html body #contenido .institucion-page .institucion-heading .institucion-back{display:inline-flex;flex:0 0 36px;width:36px;min-width:36px;max-width:36px;height:36px;min-height:36px;max-height:36px;box-sizing:border-box;padding:0;background:#fff!important;border:1px solid #d5e1fa!important;border-radius:8px;color:#1769aa!important;}
     html body #contenido .institucion-page .institucion-heading .institucion-back:hover{background:#fff!important;border-color:#d5e1fa!important;color:#1769aa!important;}

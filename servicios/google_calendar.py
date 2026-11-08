@@ -35,6 +35,23 @@ def configuracion_lista() -> bool:
     return apps_script_configurada() or configuracion_oauth_lista()
 
 
+def _descripcion_evento_cita() -> str:
+    descripcion = "Consulta los detalles de la cita en EDUTURNOS."
+    origen = (current_app.config.get("APP_ORIGIN") or "").strip().rstrip("/")
+    try:
+        parsed_origen = urlsplit(origen)
+    except ValueError:
+        return descripcion
+    if (
+        parsed_origen.scheme == "https"
+        and parsed_origen.hostname
+        and not parsed_origen.username
+        and not parsed_origen.password
+    ):
+        return f"{descripcion}\n{origen}/citas/"
+    return descripcion
+
+
 def configuracion_oauth_lista() -> bool:
     origen = current_app.config.get("APP_ORIGIN", "").strip()
     try:
@@ -583,7 +600,7 @@ def sincronizar_cita(
             event = {
                 "id": event_id,
                 "summary": "Citación escolar",
-                "description": "Consulta los detalles de la cita en EDUTURNOS.",
+                "description": _descripcion_evento_cita(),
                 "location": cita.get("lugar") or cita.get("sede") or "Ibagué, Tolima",
                 "start": {"dateTime": inicio.isoformat(), "timeZone": "America/Bogota"},
                 "end": {"dateTime": fin.isoformat(), "timeZone": "America/Bogota"},
@@ -731,7 +748,7 @@ def _procesar_tarea_apps_script(tarea: dict) -> None:
                 emails.add(correo)
         payload.update({
             "title": "Citaci\u00f3n escolar",
-            "description": "Consulta los detalles de la cita en EDUTURNOS.",
+            "description": _descripcion_evento_cita(),
             "location": cita.get("lugar") or cita.get("sede") or "Ibagu\u00e9, Tolima",
             "end": (inicio + timedelta(minutes=30)).isoformat(),
             "attendees": sorted(emails),

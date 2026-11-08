@@ -50,10 +50,12 @@
 </section>
 
 <section class="creadores-historia" aria-label="Historia y desarrollo de EDUTURNOS">
-    <article><h2>El problema</h2><p>La información de las reuniones podía quedar repartida entre llamadas, mensajes y registros separados. Eso hacía más difícil confirmar horarios, saber quién había sido informado y dar continuidad a los acuerdos.</p></article>
-    <article><h2>Por qué nació la solución</h2><p>EDUTURNOS nació para reunir en un mismo lugar las citaciones, la comunicación con las familias y el seguimiento de cada encuentro, con información clara para la comunidad educativa.</p></article>
-    <article><h2>Cómo se desarrolló</h2><p>El equipo organizó el flujo de solicitud, confirmación, reunión y seguimiento; definió permisos por rol y construyó pantallas para computador y celular. También incorporó avisos y conexión con Google Calendar.</p></article>
-    <article><h2>Estructura y programación</h2><p>La aplicación usa Python y Flask en el servidor, rutas modulares por función, plantillas Jinja, HTML, CSS y JavaScript en la interfaz, y MySQL para los datos. La autenticación y los roles controlan el acceso; servicios separados atienden notificaciones y la sincronización con Google Calendar.</p></article>
+    <article><h2>¿Cuál es el problema?</h2><p>En la Institución Educativa José Joaquín Flórez Hernández, las citaciones a padres de familia se realizaban manualmente mediante formatos físicos y anotaciones. Esto ocasionaba desorganización de la información, dificultades de comunicación y problemas para hacer seguimiento a las citas e inasistencias.</p></article>
+    <article><h2>¿Por qué nació EDUTURNOS?</h2><p>Nació de la necesidad de mejorar y digitalizar el proceso de atención a padres de familia, creando una plataforma que permitiera organizar las citaciones, controlar los horarios, enviar notificaciones y realizar seguimiento desde un solo lugar.</p></article>
+    <article><h2>¿Cómo se desarrolló?</h2><p>El proyecto se desarrolló por etapas:</p><ol><li>Identificación de las dificultades del proceso manual.</li><li>Diseño de módulos, usuarios y funcionalidades.</li><li>Programación de la interfaz, la aplicación y la base de datos.</li><li>Integración de los componentes.</li><li>Pruebas, corrección de errores y mejoras.</li></ol></article>
+    <article><h2>¿Cuál es su estructura?</h2><p>EDUTURNOS está dividido en seis módulos principales:</p><ul><li>Administración.</li><li>Registro y verificación.</li><li>Autenticación y permisos.</li><li>Gestión de citaciones.</li><li>Seguimiento.</li><li>Reportes.</li></ul><p>Cuenta con roles de superadministrador, administrador o coordinador, docente, acudiente, estudiante e invitado.</p></article>
+    <article><h2>¿Cómo está programado?</h2><p>Se utiliza una arquitectura de tres partes:</p><ul><li><strong>Frontend:</strong> HTML, CSS y JavaScript para la interfaz.</li><li><strong>Backend:</strong> Python y Flask para la lógica y el funcionamiento.</li><li><strong>Base de datos:</strong> MySQL para almacenar y organizar la información.</li></ul><p>También se utiliza Git y GitHub para guardar el código y trabajar en equipo.</p></article>
+    <article><h2>Conclusión</h2><p>EDUTURNOS es una solución tecnológica que busca reemplazar los procesos manuales de citación por un sistema digital, facilitando la organización, la comunicación y el seguimiento institucional. Además, permitió aplicar nuestros conocimientos de programación y desarrollar un proyecto en equipo.</p></article>
 </section>
 <style>
 .creadores-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;gap:14px;margin:24px 0 30px}
@@ -74,9 +76,10 @@
 .creadores-edubot li{padding:7px 11px;border:1px solid #dce8f4;border-radius:999px;background:#fff;color:#31516f;font-size:13px;font-weight:700}
 .creadores-edubot-avatar{display:block;width:200px;height:220px;justify-self:center;background-repeat:no-repeat;background-size:300% 300%;background-position:50% 50%}
 .creadores-historia{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.creadores-historia article{padding:19px;border-left:3px solid #2a72b8;border-radius:8px;background:#f2f7fc}
+.creadores-historia article{padding:19px;border-radius:12px;background:#f2f7fc}
 .creadores-historia h2{margin:0 0 7px;color:#17365d;font-size:19px}
 .creadores-historia p{margin:0;color:#526d86;font-size:14px;line-height:1.65}
+.creadores-historia ol,.creadores-historia ul{margin:8px 0;padding-left:22px;color:#526d86;font-size:14px;line-height:1.65}
 @media(max-width:760px){.creadores-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:20px 0 24px}.creador-card{grid-template-rows:88px minmax(2.8em,1fr) 25px;gap:9px;min-height:202px;padding:14px 9px;border-radius:18px}.creador-foto{width:78px;height:88px;border-radius:14px}.creador-card h2{font-size:14px;line-height:1.35}.creadores-edubot{grid-template-columns:1fr;gap:8px;padding:18px}.creadores-edubot-avatar{grid-row:1;width:150px;height:160px}.creadores-edubot p{font-size:14px}.creadores-edubot ul{gap:6px}.creadores-edubot li{font-size:12px}.creadores-historia{grid-template-columns:1fr;gap:10px}.creadores-historia article{padding:15px}}
 @media(max-width:380px){.creadores-grid{grid-template-columns:1fr}.creador-card{min-height:210px}.creadores-edubot{padding-inline:18px}}
 </style>

@@ -701,7 +701,6 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
             }
         }
 </style>
-
 {% if beepy_inicio %}<script src="{{ url_for('static', filename='js/beepy.js') }}" defer></script>{% endif %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261109_release24_cache_v1">
 </head>
@@ -912,8 +911,8 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
 {% if request.args.get('mobile') == '1' or session.get('mobile_mode') or 'Android' in request.user_agent.string or 'iPhone' in request.user_agent.string or 'iPad' in request.user_agent.string %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_mobile_recovery_v64">
 {% endif %}
-<script src="{{ url_for('static', filename='js/pwa.js') }}?v=6" defer></script>
-<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261109_release24_cache_v1" defer></script>
+<script src="{{ url_for('static', filename='js/pwa.js') }}?v=7" defer></script>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261108_ui_refresh_v1" defer></script>
 {% include '_page_mascot.html' %}
 </body>
 </html>
@@ -1723,4 +1722,52 @@ body {
     }
 }
 
+</style>
+<style id="eduturnos-home-spacing-polish-final">
+    html body.public-home-page .marca-logo {
+        width: 38px !important;
+        height: 38px !important;
+        object-fit: contain !important;
+    }
+
+    html body.public-home-page .hero-interior > div > .etiqueta {
+        margin-bottom: 4px !important;
+    }
+
+    html body.public-home-page .hero .acciones a:focus-visible {
+        outline: 3px solid #fff !important;
+        outline-offset: 3px !important;
+    }
+
+    @media (min-width: 901px) {
+        html body.public-home-page .hero-message-row {
+            margin-bottom: 8px !important;
+            transform: translateY(-18px) !important;
+        }
+
+        html body.public-home-page .hero-message-row > .hero-illustration {
+            transform: translateY(-7px) !important;
+        }
+
+        html body.public-home-page .hero-texto {
+            transform: translateY(-16px) !important;
+        }
+    }
+
+    @media (max-width: 900px) {
+        html body.public-home-page .marca-logo {
+            width: 34px !important;
+            height: 34px !important;
+        }
+
+        html body.public-home-page .hero-message-row {
+            margin-bottom: 6px !important;
+            transform: translateY(-4px) !important;
+        }
+
+        html body.public-home-page .hero-message-row > .hero-illustration,
+        html body.public-home-page .hero-texto {
+            transform: translateY(-4px) !important;
+        }
+    }
 </style>

@@ -9,15 +9,28 @@
 </header>
 <section class="seguimiento-procesos" aria-labelledby="seguimiento-procesos-titulo">
 	<header class="seguimiento-procesos-header">
-		<h2 id="seguimiento-procesos-titulo">Compromisos y asistencia</h2>
+		<div><h2 id="seguimiento-procesos-titulo">Seguimiento por situación</h2><p class="muted">Compromisos y asistencia: revisa anotaciones del observador, segundas citaciones e inasistencias.</p></div>
 		<span>{{ procesos|length }} {{ 'proceso' if procesos|length == 1 else 'procesos' }}</span>
 	</header>
+	<nav class="seguimiento-filtros" aria-label="Filtrar casos de seguimiento">
+		<button type="button" data-seguimiento-filter="todos" aria-pressed="true">Todos</button>
+		<button type="button" data-seguimiento-filter="observador" aria-pressed="false">Anotaciones</button>
+		<button type="button" data-seguimiento-filter="segunda-cita" aria-pressed="false">Segunda cita</button>
+		<button type="button" data-seguimiento-filter="inasistencia" aria-pressed="false">Inasistencias</button>
+	</nav>
 	{% for proceso in procesos %}
-	<a class="seguimiento-proceso" href="#seguimiento-detalle-{{ proceso.id }}" data-seguimiento-dialog="seguimiento-detalle-{{ proceso.id }}" aria-haspopup="dialog" aria-label="Ver compromisos de {{ proceso.nombres }} {{ proceso.apellidos }}">
+	{% set tipos = tipos_por_cita.get(proceso.id, ['general']) %}
+	<a class="seguimiento-proceso" href="{{ url_for('seguimiento.registrar', id=proceso.id) }}" data-seguimiento-dialog="seguimiento-detalle-{{ proceso.id }}" data-seguimiento-types="{{ tipos|join(' ') }}" aria-haspopup="dialog" aria-label="Ver seguimiento de {{ proceso.nombres }} {{ proceso.apellidos }}">
 		<span class="badge seguimiento-estado seguimiento-estado-{{ proceso.estado|lower|replace(' ', '-') }}">{{ proceso.estado }}</span>
 		<div class="seguimiento-proceso-info">
 			<strong>{{ proceso.nombres }} {{ proceso.apellidos }}</strong>
 			<p class="muted">{{ proceso.descripcion or 'Encuentro con el acudiente para revisar los compromisos del estudiante y acordar acciones de acompañamiento.' }}</p>
+			<span class="seguimiento-tipos">
+				{% if 'observador' in tipos %}<small>Anotación / observador</small>{% endif %}
+				{% if 'segunda-cita' in tipos %}<small>Requiere segunda cita</small>{% endif %}
+				{% if 'inasistencia' in tipos %}<small>Inasistencia</small>{% endif %}
+				{% if 'general' in tipos %}<small>Seguimiento de citación</small>{% endif %}
+			</span>
 		</div>
 		<span class="seguimiento-proceso-abrir" aria-hidden="true">↗</span>
 	</a>
@@ -75,6 +88,15 @@
 <style>
 .seguimiento-procesos{display:block;background:#fff;border:1px solid #d5e1fa;border-radius:6px;overflow:hidden;margin-top:0;}
 .seguimiento-historial{display:none!important;}
+html body #contenido .seguimiento-procesos-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:20px 22px 10px;border:0;}
+html body #contenido .seguimiento-procesos-header h2{margin:0;font-size:19px;line-height:1.3;}
+html body #contenido .seguimiento-procesos-header p{margin:5px 0 0;font-size:13px;line-height:1.5;}
+html body #contenido .seguimiento-filtros{display:flex;flex-wrap:wrap;gap:8px;padding:8px 22px 14px;}
+html body #contenido .seguimiento-filtros button{min-height:34px;padding:7px 12px;border:1px solid #d5e1fa;border-radius:999px;background:#fff;color:#31516f;font:inherit;font-size:12px;font-weight:700;cursor:pointer;}
+html body #contenido .seguimiento-filtros button[aria-pressed="true"]{border-color:#2458d6;background:#2458d6;color:#fff;}
+html body #contenido .seguimiento-proceso[hidden]{display:none!important;}
+html body #contenido .seguimiento-tipos{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+html body #contenido .seguimiento-tipos small{padding:4px 8px;border-radius:999px;background:#edf4ff;color:#315b91;font-size:11px;font-weight:700;line-height:1.25;}
 html body dialog.seguimiento-detail-dialog{width:620px;max-width:calc(100vw - 40px);max-height:calc(100dvh - 40px);padding:30px;margin:auto;border:1px solid #d5e1fa;border-radius:6px;background:#fff;color:#142d50;overflow-y:auto;font-family:inherit;}
 .seguimiento-detail-dialog::backdrop{background:rgba(20,45,80,.45);}
 html body .seguimiento-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:24px;border-bottom:1px solid #d5e1fa;}
@@ -149,6 +171,19 @@ html body .seguimiento-detail-history article p{margin:6px 0 0;}
 	html body .seguimiento-detail-history article{padding:10px 0!important;}
 }
 </style>
+<script>
+document.querySelectorAll("[data-seguimiento-filter]").forEach((button) => {
+	button.addEventListener("click", () => {
+		const filter = button.dataset.seguimientoFilter;
+		document.querySelectorAll("[data-seguimiento-filter]").forEach((item) => {
+			item.setAttribute("aria-pressed", String(item === button));
+		});
+		document.querySelectorAll(".seguimiento-proceso[data-seguimiento-types]").forEach((item) => {
+			item.hidden = filter !== "todos" && !item.dataset.seguimientoTypes.split(" ").includes(filter);
+		});
+	});
+});
+</script>
 
 
 

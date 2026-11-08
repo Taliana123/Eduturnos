@@ -117,6 +117,12 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
     assert qr.headers["Cache-Control"] == "public, max-age=3600"
     assert destinations == ["https://eduturnos.example/"]
 
+    dragon_qr = client.get("/compartir/eduturnos.svg?estilo=dragon")
+    assert dragon_qr.status_code == 200
+    assert dragon_qr.mimetype == "image/svg+xml"
+    assert b"<svg" in dragon_qr.data
+    assert destinations == ["https://eduturnos.example/", "https://eduturnos.example/"]
+
     share = client.get("/compartir")
     assert share.status_code == 200
     assert b"Compartir EDUTURNOS" in share.data
@@ -136,8 +142,10 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
         "templates/dashboard.html",
         "templates/integraciones_google.html",
         "templates/citas/index.html",
+        "templates/citaciones/lista.html",
     ):
         assert '{% include "_qr_compartir.html" %}' not in Path(template).read_text(encoding="utf-8")
+        assert "qr" not in Path(template).read_text(encoding="utf-8").lower()
 
     sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
     assert sidebar.index("('soporte.index', 'Ayuda y soporte')") < sidebar.index(
@@ -184,8 +192,8 @@ def test_llamada_de_voz_usa_sintesis_nativa_con_respaldo_web():
     assert 'eduturnos-native-tts-end' in activity
     assert "TextToSpeech.QUEUE_FLUSH" in activity
     assert "FEMALE_VOICE_NAME" in activity
-    assert 'versionName "2.4"' in android_build
-    assert "versionCode 15" in android_build
+    assert 'versionName "2.6"' in android_build
+    assert "versionCode 16" in android_build
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
@@ -480,7 +488,7 @@ def test_requested_account_calendar_search_and_followup_navigation():
 
     assert "← Panel" not in cuenta
     assert calendarios.count('">Conectar</a>') == 2
-    assert 'class="link-back institucion-back account-settings-back history-back-button"' in institucion
+    assert 'class="institucion-back account-settings-back history-back-button"' in institucion
     assert 'aria-label="Volver al inicio"' in institucion
     assert "url_for('cuenta.index')" not in institucion
     assert 'class="directory-search-all"' in estudiantes

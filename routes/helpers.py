@@ -1,11 +1,13 @@
 from functools import wraps
-from flask import session, redirect, url_for, flash, abort
+from flask import has_request_context, session, redirect, url_for, flash, abort
 from time import time
 from database.db import consultar, ejecutar
 from flask import current_app
 
 
 def usuario_actual():
+    if not has_request_context():
+        return None
     uid = session.get("usuario_id")
     if not uid:
         return None

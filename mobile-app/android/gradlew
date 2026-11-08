@@ -117,9 +117,19 @@ esac
 
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
+is_jdk21() {
+    [ -x "$1/bin/java" ] &&
+        [ -x "$1/bin/javac" ] &&
+        "$1/bin/javac" -version 2>&1 | grep -Eq '^javac 21([.]|$)'
+}
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
+    if ! is_jdk21 "$JAVA_HOME"; then
+        die "ERROR: JDK 21 is required by Capacitor 7; JAVA_HOME points to an incompatible JDK.
+
+Set JAVA_HOME to the root of a JDK 21 installation."
+    fi
     if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
         # IBM's JDK on AIX uses strange locations for the executables
         JAVACMD=$JAVA_HOME/jre/sh/java
@@ -133,13 +143,30 @@ Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
     fi
 else
-    JAVACMD=java
-    if ! command -v java >/dev/null 2>&1
-    then
-        die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+    for jdk_dir in \
+        "/Applications/Android Studio.app/Contents/jbr/Contents/Home" \
+        "/Applications/Android Studio Preview.app/Contents/jbr/Contents/Home" \
+        "/c/Program Files/Android/Android Studio/jbr" \
+        "/usr/lib/jvm/default-java" \
+        "/usr/lib/jvm/java-21-openjdk-amd64"; do
+        if is_jdk21 "$jdk_dir"; then
+            JAVA_HOME="$jdk_dir"
+            JAVACMD="$JAVA_HOME/bin/java"
+            break
+        fi
+    done
 
-Please set the JAVA_HOME variable in your environment to match the
-location of your Java installation."
+    if [ -z "$JAVACMD" ] || [ ! -x "$JAVACMD" ]; then
+        JAVACMD=java
+        if ! command -v java >/dev/null 2>&1 ||
+            ! command -v javac >/dev/null 2>&1 ||
+            ! javac -version 2>&1 | grep -Eq '^javac 21([.]|$)' ||
+            ! java -version 2>&1 | grep -Eq 'version "21([.]|")'
+        then
+            die "ERROR: JDK 21 is required by Capacitor 7, but no compatible JDK was found.
+
+Set JAVA_HOME to the root of a JDK 21 installation."
+        fi
     fi
 fi
 

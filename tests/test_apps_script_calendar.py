@@ -113,6 +113,7 @@ def test_apps_script_config_enqueues_institutional_calendar_without_user_connect
 def test_apps_script_worker_sends_generic_event_and_records_id(monkeypatch):
     monkeypatch.setitem(app.config, "GOOGLE_APPS_SCRIPT_URL", "https://script.google.com/macros/s/test-id/exec")
     monkeypatch.setitem(app.config, "GOOGLE_APPS_SCRIPT_SECRET", "s" * 32)
+    monkeypatch.setitem(app.config, "APP_ORIGIN", "https://eduturnos.example")
     monkeypatch.setattr(google_calendar, "apps_script_configurada", lambda: True)
     cita = {
         "id": 91,
@@ -142,8 +143,25 @@ def test_apps_script_worker_sends_generic_event_and_records_id(monkeypatch):
 
     assert payloads[0]["title"] == "Citación escolar"
     assert payloads[0]["start"].endswith("-05:00")
+    assert payloads[0]["description"] == (
+        "Consulta los detalles de la cita en EDUTURNOS.\nhttps://eduturnos.example/citas/"
+    )
     assert "estudiante" not in json.dumps(payloads[0], ensure_ascii=False).lower()
     assert writes[0][1] == (91, "institucional", "google-event-id")
+
+
+def test_calendar_event_description_links_only_to_configured_https_eduturnos(monkeypatch):
+    monkeypatch.setitem(app.config, "APP_ORIGIN", "https://eduturnos.example")
+    with app.app_context():
+        assert google_calendar._descripcion_evento_cita() == (
+            "Consulta los detalles de la cita en EDUTURNOS.\nhttps://eduturnos.example/citas/"
+        )
+
+    monkeypatch.setitem(app.config, "APP_ORIGIN", "http://insecure.example")
+    with app.app_context():
+        assert google_calendar._descripcion_evento_cita() == (
+            "Consulta los detalles de la cita en EDUTURNOS."
+        )
 
 
 def test_apps_script_source_sets_two_popup_reminders():
