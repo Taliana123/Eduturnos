@@ -28,6 +28,7 @@ from routes.justificaciones import justificaciones_bp
 from routes.notificaciones import notificaciones_bp
 from routes.passwords import passwords_bp
 from routes.reportes import reportes_bp
+from routes.retroalimentacion import retroalimentacion_bp
 from routes.seguimiento import seguimiento_bp
 from routes.solicitudes import solicitudes_bp
 from routes.soporte import soporte_bp
@@ -148,6 +149,7 @@ def create_app():
         calendario_bp,
         notificaciones_bp,
         reportes_bp,
+        retroalimentacion_bp,
         estudiantes_bp,
         acudientes_bp,
         docentes_bp,

@@ -29,6 +29,8 @@
       'configuracion.index': 'settings',
       'justificaciones.index': 'file-text',
       'soporte.index': 'mail',
+      'retroalimentacion.enviar': 'file-text',
+      'retroalimentacion.administrar': 'inbox',
     } %}
     {% set enlaces = [('auth.dashboard', 'Resumen')] %}
     {% if personal %}{% set enlaces = enlaces + [('citas.nueva', 'Nueva citación')] %}{% endif %}
@@ -36,9 +38,11 @@
     {% if personal %}{% set enlaces = enlaces + [('estudiantes.lista', 'Estudiantes'), ('seguimiento.lista', 'Seguimiento'), ('solicitudes.index', 'Solicitudes')] %}{% endif %}
     {% if gestion %}{% set enlaces = enlaces + [('reportes.index', 'Reportes'), ('acudientes.lista', 'Acudientes'), ('docentes.lista', 'Docentes')] %}{% endif %}
     {% if gestion %}{% set enlaces = enlaces + [('configuracion.index', 'Administración')] %}{% endif %}
+    {% if rol in ['Rector', 'Administrador / Coordinador'] %}{% set enlaces = enlaces + [('retroalimentacion.administrar', 'Opiniones de usuarios')] %}{% endif %}
     {% if visitante %}{% set enlaces = enlaces + [('justificaciones.index', 'Justificaciones')] %}{% endif %}
     {% set enlaces = enlaces + [('soporte.index', 'Ayuda y soporte')] %}
     {% set enlaces = enlaces + [('compartir_eduturnos', 'Compartir EDUTURNOS')] %}
+    {% if rol in ['Docente', 'Estudiante', 'Acudiente'] %}{% set enlaces = enlaces + [('retroalimentacion.enviar', 'Quejas, reseñas y mejoras')] %}{% endif %}
     {% for destino, nombre in enlaces %}
     {% if destino == 'citas.nueva' %}
     {% set activo = endpoint == destino %}

@@ -181,6 +181,16 @@ def test_login_back_link_has_desktop_text_and_mobile_icon_only():
     assert "display: none;" in mobile_rules
 
 
+def test_login_desktop_back_arrow_is_white_and_aligned_to_header_right():
+    login = Path("templates/auth/login.html").read_text(encoding="utf-8")
+    desktop_rules = login.rsplit("@media (min-width: 901px)", 1)[1].split("</style>", 1)[0]
+
+    assert "header.eduturnos-header > .mobile-back-link" in desktop_rules
+    assert "right: 46px !important;" in desktop_rules
+    assert "color: #fff !important;" in desktop_rules
+    assert "border-radius: 50% !important;" in desktop_rules
+
+
 def test_account_title_and_description_align_with_personal_info_heading_on_mobile():
     template = Path("templates/cuenta/index.html").read_text(encoding="utf-8")
     mobile_styles = template.split("@media(max-width:720px)", 1)[1]

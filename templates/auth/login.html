@@ -1403,7 +1403,31 @@ html body.login-page .personal-login .personal-field-jornada select {
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261023_login_center_v2" media="(max-width: 900px)">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/password-controls.css') }}?v=20261012_password_desktop_v1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261109_release24_cache_v1">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261118_voice_avatar_v3">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261118_voice_avatar_v5">
+<style>
+    @media (min-width: 901px) {
+        html body header.eduturnos-header > .mobile-back-link,
+        html body header.eduturnos-header > .mobile-back-link:hover,
+        html body header.eduturnos-header > .mobile-back-link:focus-visible {
+            display: inline-flex !important;
+            top: 50% !important;
+            right: 46px !important;
+            width: 38px !important;
+            min-width: 38px !important;
+            height: 38px !important;
+            min-height: 38px !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 1px solid rgba(255,255,255,.55) !important;
+            border-radius: 50% !important;
+            background: transparent !important;
+            color: #fff !important;
+            box-shadow: none !important;
+            transform: translateY(-50%) !important;
+        }
+    }
+</style>
 </head>
 
 

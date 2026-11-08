@@ -36,8 +36,8 @@ def test_ajustes_visuales_de_edubot_y_administracion():
         encoding="utf-8"
     )
 
-    assert "flex: 0 0 76px;" in edubot_styles
-    assert "width: 76px;" in edubot_styles
+    assert "flex: 0 0 88px;" in edubot_styles
+    assert "width: 88px;" in edubot_styles
     assert ".state-list {" in admin_styles
     assert ".administracion-page .configuracion-page .state-form-row" in admin_styles
     assert "grid-template-columns: minmax(0, 1fr) !important;" in admin_styles
@@ -90,5 +90,5 @@ def test_android_incrementa_la_version_de_la_app():
         encoding="utf-8"
     )
 
-    assert "versionCode 19" in gradle
-    assert 'versionName "2.9"' in gradle
+    assert "versionCode 20" in gradle
+    assert 'versionName "3.0"' in gradle

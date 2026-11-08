@@ -123,9 +123,13 @@
     left: 30%;
     width: 40%;
     padding: 0.4rem;
-    border: 0.25rem solid #fff;
+    border: 0.2rem solid #fff;
     border-radius: 0.5rem;
     box-shadow: 0 0.4rem 1.5rem rgb(0 13 40 / 48%);
+}
+
+.eduturnos-share-qr-frame .eduturnos-qr-frame-label {
+    display: none;
 }
 
 .eduturnos-share-qr-frame.is-institutional {
