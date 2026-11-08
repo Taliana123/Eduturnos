@@ -31,8 +31,93 @@
     </header>
 
 
-    {% if solicitudes %}
+    <style>
+        .solicitudes-page {
+            background: transparent;
+        }
 
+        .solicitudes-page .solicitudes-final-card {
+            background: #ffffff;
+            border: 1px solid #edf2f8;
+            border-radius: 16px;
+            box-shadow: none;
+            overflow: hidden;
+        }
+
+        .solicitudes-page .card-header {
+            background: #ffffff;
+            border-bottom: none;
+            padding: 20px 24px 12px;
+        }
+
+        .solicitudes-page .card-header h2,
+        .solicitudes-page .card-header p {
+            margin: 0;
+        }
+
+        .solicitudes-page .card-header h2 {
+            color: #162942;
+        }
+
+        .solicitudes-page .card-header p {
+            color: #5c6d83;
+            margin-top: 6px;
+        }
+
+        .solicitudes-page .table-responsive {
+            background: #ffffff;
+            border-top: none;
+        }
+
+        .solicitudes-page .solicitudes-table {
+            background: #ffffff;
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+
+        .solicitudes-page .solicitudes-table thead th {
+            background: #ffffff;
+            color: #49678d;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-bottom: 1px solid #edf2f8;
+            border-top: none;
+            padding: 14px 16px;
+        }
+
+        .solicitudes-page .solicitudes-table tbody td {
+            background: #ffffff;
+            color: #213654;
+            border-bottom: 1px solid #edf2f8;
+            border-top: none;
+            padding: 14px 16px;
+            vertical-align: middle;
+        }
+
+        .solicitudes-page .solicitudes-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .solicitudes-page .solicitudes-table tbody tr:hover td {
+            background: #f8fbff;
+        }
+
+        @media (max-width: 900px) {
+            .solicitudes-page .solicitudes-final-card {
+                border-radius: 14px;
+            }
+
+            .solicitudes-page .table-responsive {
+                border-top: none;
+            }
+        }
+    </style>
+
+
+    {% if solicitudes %}
     <div class="card solicitudes-final-card">
 
         <div class="card-header">
