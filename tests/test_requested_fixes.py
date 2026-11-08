@@ -124,14 +124,34 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
     assert b"#17365D" in navy_qr.data
     assert destinations == ["https://eduturnos.example/", "https://eduturnos.example/"]
 
+    dragon_qr = client.get("/compartir/eduturnos.svg?estilo=dragon")
+    assert dragon_qr.status_code == 200
+    assert b"#1468E8" in dragon_qr.data
+    assert destinations == [
+        "https://eduturnos.example/",
+        "https://eduturnos.example/",
+        "https://eduturnos.example/",
+    ]
+
     share = client.get("/compartir")
     assert share.status_code == 200
     assert b"Compartir EDUTURNOS" in share.data
     assert b"Comparte el acceso a EDUTURNOS con la comunidad educativa" in share.data
     assert b'data-share-eduturnos' in share.data
     assert b"QR EDUTURNOS" in share.data
-    assert b"Drag\xc3\xb3n" not in share.data
-    assert b"dragon" not in share.data.lower()
+    assert b"Animada (drag\xc3\xb3n)" in share.data
+    assert b"Normal (azul institucional)" in share.data
+    assert b'data-qr-dragon="/compartir/eduturnos.svg?v=5"' in share.data
+    assert b'data-qr-institutional="/compartir/eduturnos.svg?estilo=navy&amp;v=2"' in share.data
+    assert b"mascots/qr-dragon-eduturnos.png" in share.data
+    assert b'value="institutional" selected' in share.data
+    assert Path("static/mascots/qr-dragon-eduturnos.png").is_file()
+    qr_script = Path("static/js/share-eduturnos.js").read_text(encoding="utf-8")
+    qr_styles = Path("static/css/qr-compartir.css").read_text(encoding="utf-8")
+    assert 'document.querySelector(".eduturnos-qr-code-image")' in qr_script
+    assert "is-dragon" in qr_script
+    assert "@keyframes eduturnos-qr-dragon-float" in qr_styles
+    assert "@media (prefers-reduced-motion: reduce)" in qr_styles
     assert b"Descargar c\xc3\xb3digo QR" not in share.data
     assert b"https://eduturnos.example/" not in share.data
 

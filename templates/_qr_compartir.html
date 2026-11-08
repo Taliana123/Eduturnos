@@ -3,25 +3,34 @@
     <label class="eduturnos-qr-picker">
         <span>Diseño del código QR</span>
         <select data-qr-style aria-label="Elegir diseño del código QR">
-            <option value="blue">Azul EDUTURNOS</option>
-            <option value="navy">Azul institucional</option>
+            <option value="dragon">Animada (dragón)</option>
+            <option value="institutional" selected>Normal (azul institucional)</option>
         </select>
     </label>
-    <div class="eduturnos-share-qr-frame" data-qr-frame>
+    <div class="eduturnos-share-qr-frame is-institutional" data-qr-frame>
         <span class="eduturnos-qr-corner eduturnos-qr-corner--top-left" aria-hidden="true"></span>
         <span class="eduturnos-qr-corner eduturnos-qr-corner--top-right" aria-hidden="true"></span>
         <span class="eduturnos-qr-corner eduturnos-qr-corner--bottom-left" aria-hidden="true"></span>
         <span class="eduturnos-qr-corner eduturnos-qr-corner--bottom-right" aria-hidden="true"></span>
+        <img
+            class="eduturnos-qr-dragon-art"
+            src="{{ url_for('static', filename='mascots/qr-dragon-eduturnos.png') }}"
+            alt=""
+            aria-hidden="true"
+            width="691"
+            height="699"
+        >
         <span class="eduturnos-qr-frame-label eduturnos-qr-frame-label--top"><span aria-hidden="true">✓</span> QR EDUTURNOS</span>
         <div class="eduturnos-qr-code">
-        <img
-            src="{{ url_for('compartir_qr_eduturnos') }}?v=4"
-            data-qr-blue="{{ url_for('compartir_qr_eduturnos') }}?v=4"
-            data-qr-navy="{{ url_for('compartir_qr_eduturnos') }}?estilo=navy&amp;v=1"
-            alt="Código QR azul de EDUTURNOS para abrir el sitio oficial"
-            width="260"
-            height="260"
-        >
+            <img
+                class="eduturnos-qr-code-image"
+                src="{{ url_for('compartir_qr_eduturnos') }}?estilo=navy&amp;v=2"
+                data-qr-dragon="{{ url_for('compartir_qr_eduturnos') }}?v=5"
+                data-qr-institutional="{{ url_for('compartir_qr_eduturnos') }}?estilo=navy&amp;v=2"
+                alt="Código QR azul institucional de EDUTURNOS para abrir el sitio oficial"
+                width="260"
+                height="260"
+            >
         </div>
         <span class="eduturnos-qr-frame-label eduturnos-qr-frame-label--bottom">ESCANEA PARA ABRIR EDUTURNOS</span>
     </div>

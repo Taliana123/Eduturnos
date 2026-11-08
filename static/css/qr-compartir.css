@@ -87,6 +87,64 @@
     isolation: isolate;
 }
 
+.eduturnos-qr-dragon-art {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.eduturnos-share-qr-frame.is-dragon {
+    aspect-ratio: 691 / 699;
+    padding: 1rem;
+    border-color: #12355f;
+    background: #071b37;
+}
+
+.eduturnos-share-qr-frame.is-dragon .eduturnos-qr-dragon-art {
+    animation: eduturnos-qr-dragon-float 7s ease-in-out infinite;
+    opacity: 1;
+}
+
+.eduturnos-share-qr-frame.is-dragon .eduturnos-qr-frame-label {
+    border-color: #73e5ff;
+    background: rgb(5 26 54 / 92%);
+    box-shadow: 0 0 0.8rem rgb(70 218 255 / 55%);
+    color: #e7fbff;
+}
+
+.eduturnos-share-qr-frame.is-dragon .eduturnos-qr-corner {
+    border-color: #73e5ff;
+}
+
+.eduturnos-share-qr-frame.is-dragon .eduturnos-qr-code {
+    width: min(60%, 14rem);
+    padding: 0.4rem;
+    border: 0.25rem solid #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.4rem 1.5rem rgb(0 13 40 / 48%);
+}
+
+@keyframes eduturnos-qr-dragon-float {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.025);
+    }
+}
+
+.eduturnos-share-qr-frame.is-institutional {
+    background: #101d31;
+}
+
 .eduturnos-qr-code {
     position: relative;
     z-index: 0;
@@ -99,14 +157,14 @@
     background: #fff;
 }
 
-.eduturnos-share-qr-frame img {
+.eduturnos-qr-code-image {
     display: block;
     width: 100%;
     height: 100%;
     image-rendering: pixelated;
 }
 
-.eduturnos-share-qr-frame.is-navy .eduturnos-qr-code {
+.eduturnos-share-qr-frame.is-institutional .eduturnos-qr-code {
     background: #f7fbff;
 }
 
@@ -181,8 +239,14 @@
     border-radius: 0 0 0.35rem;
 }
 
-.eduturnos-share-qr-frame.is-navy .eduturnos-qr-corner {
+.eduturnos-share-qr-frame.is-institutional .eduturnos-qr-corner {
     border-color: #f6d85b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .eduturnos-share-qr-frame.is-dragon .eduturnos-qr-dragon-art {
+        animation: none;
+    }
 }
 
 .eduturnos-share-description {
