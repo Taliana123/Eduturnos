@@ -1477,41 +1477,123 @@ def test_creador_acepta_solicitud_y_actualiza_cita(monkeypatch):
     assert avisos[0][0] == 5
 
 
-def test_crear_cita_movil_aparece_en_calendario_sin_segunda_creacion(monkeypatch):
+def test_crear_cita_movil_conserva_aprobacion_antes_de_sincronizar(monkeypatch):
     fecha = (date.today() + timedelta(days=40)).isoformat()
     usuario = {"id_usuario": 7, "rol_nombre": "Rector"}
-    creadas = []
+    solicitudes = []
+    reservas = []
     monkeypatch.setattr(citas_routes, "usuario_actual", lambda: usuario)
-    monkeypatch.setattr(citas_routes, "catalogos", lambda: {})
+    monkeypatch.setattr(citas_routes, "catalogos", lambda usuario=None: {})
     monkeypatch.setattr(citas_routes, "consultar", lambda *args, **kwargs: {"id": 1, "id_usuario": 7})
     monkeypatch.setattr(citas_routes, "_cita_horario_ocupado", lambda *args: None)
-    monkeypatch.setattr(citas_routes, "_notificar", lambda *args, **kwargs: None)
     monkeypatch.setattr(citas_routes, "auditoria", lambda *args: None)
-    def ejecutar(sql, params):
-        assert "INSERT INTO citas" in sql
-        creadas.append({"id": 901, "fecha": params[6], "hora": params[7], "estudiante": "Prueba", "estado_nombre": "Pendiente"})
-        return 901
-    monkeypatch.setattr(citas_routes, "reservar_cita", ejecutar)
+    monkeypatch.setattr(
+        citas_routes,
+        "_crear_solicitud_desde_nueva",
+        lambda *args: solicitudes.append(args) or 77,
+    )
+    monkeypatch.setattr(
+        citas_routes,
+        "reservar_cita",
+        lambda *args: reservas.append(args),
+    )
     monkeypatch.setattr(citas_routes, "validar_disponibilidad", lambda *args: None)
     datos = {"id_estudiante": "1", "id_docente": "1", "id_acudiente": "1", "id_motivo": "1", "id_periodo": "1", "fecha": fecha, "hora": "10:30", "vista_movil": "1"}
     with app.test_request_context("/citas/nueva", method="POST", data=datos):
         response = citas_routes.nueva.__wrapped__()
     assert response.status_code == 302
-    assert len(creadas) == 1
-    assert urlsplit(response.location).path == "/calendario/"
-    monkeypatch.setattr(calendario_routes, "usuario_actual", lambda: usuario)
-    monkeypatch.setattr(calendario_routes, "citas_visibles", lambda usuario: creadas)
-    monkeypatch.setattr(calendario_routes, "consultar", lambda *args, **kwargs: [])
-    contexto = {}
-    def render_template(template, **kwargs):
-        contexto.update(kwargs)
-        return "Calendario"
-    monkeypatch.setattr(calendario_routes, "render_template", render_template)
-    with app.test_request_context(response.location):
-        calendario_routes.index.__wrapped__()
-    celda = next(dia for semana in contexto["semanas"] for dia in semana if dia["iso"] == fecha)
-    assert celda["citas"][0]["id"] == 901
-    assert contexto["citas_del_dia"][0]["id"] == 901
+    assert urlsplit(response.location).path == "/solicitudes/"
+    assert len(solicitudes) == 1
+    assert solicitudes[0][1] == "Estudiante"
+    assert reservas == []
+
+
+def test_aceptar_solicitud_encola_la_cita_en_la_misma_transaccion(monkeypatch):
+    from routes import solicitudes as solicitudes_routes
+    from servicios import google_calendar, reuniones
+
+    fecha = date.today() + timedelta(days=40)
+    solicitud = {
+        "id": 77,
+        "estado": "Pendiente",
+        "fecha_solicitada": fecha,
+        "hora_solicitada": "10:30",
+        "id_docente": 3,
+        "id_estudiante": 2,
+        "id_acudiente": 4,
+        "id_motivo": 5,
+        "motivo_texto": "Reunión escolar",
+        "solicitante_usuario_id": 8,
+        "creador_usuario_id": 8,
+        "id_periodo": 10,
+        "id_institucion": 9,
+    }
+    eventos = []
+    escrituras = []
+
+    class Cursor:
+        lastrowid = 321
+
+        def execute(self, sql, params=()):
+            eventos.append(("insert", sql, params))
+
+        def close(self):
+            pass
+
+    class Connection:
+        def cursor(self, **kwargs):
+            return Cursor()
+
+    @contextmanager
+    def transaction():
+        yield Connection()
+        eventos.append(("commit",))
+
+    def consultar(sql, params=(), uno=False):
+        if "FROM solicitudes_cita" in sql:
+            return solicitud
+        if "FROM estados_cita" in sql:
+            return {"id": 6}
+        if "periodos_academicos" in sql:
+            return {"id": 10}
+        return None
+
+    monkeypatch.setattr(solicitudes_routes, "usuario_actual", lambda: {
+        "id_usuario": 7,
+        "rol_nombre": "Rector",
+        "id_institucion": 9,
+    })
+    monkeypatch.setattr(solicitudes_routes, "consultar", consultar)
+    monkeypatch.setattr(
+        solicitudes_routes,
+        "ejecutar",
+        lambda sql, params=(): escrituras.append((sql, params)),
+    )
+    monkeypatch.setattr(solicitudes_routes, "_validar_horario_disponible", lambda *args: None)
+    monkeypatch.setattr(solicitudes_routes, "notificar", lambda *args: None)
+    monkeypatch.setattr(solicitudes_routes, "auditoria", lambda *args: None)
+    monkeypatch.setattr(solicitudes_routes, "reservar_cita", reuniones.reservar_cita)
+    monkeypatch.setattr(reuniones, "transaccion", transaction)
+    monkeypatch.setattr(reuniones, "validar_disponibilidad", lambda *args: None)
+    monkeypatch.setattr(reuniones, "bloquear_agenda", lambda *args: None)
+    monkeypatch.setattr(reuniones, "comprobar_hueco", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        google_calendar,
+        "encolar_cita_cursor",
+        lambda cursor, cita_id, creador_id: eventos.append(("outbox", cita_id, creador_id)),
+    )
+
+    with app.test_request_context(
+        "/solicitudes/77/resolver",
+        method="POST",
+        data={"accion": "aceptar"},
+    ):
+        response = solicitudes_routes.resolver.__wrapped__(77)
+
+    assert response.status_code == 302
+    assert [evento[0] for evento in eventos] == ["insert", "outbox", "commit"]
+    assert eventos[1] == ("outbox", 321, 7)
+    assert any("cita_id=%s" in sql and params[-1] == 77 for sql, params in escrituras)
 
 
 @pytest.mark.parametrize("asistencia,resultado", [("Pendiente", "Resultado"), ("Asistió", " "), ("No asistió", "x" * 10001)])

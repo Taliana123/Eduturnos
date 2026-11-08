@@ -184,8 +184,8 @@ def test_llamada_de_voz_usa_sintesis_nativa_con_respaldo_web():
     assert 'eduturnos-native-tts-end' in activity
     assert "TextToSpeech.QUEUE_FLUSH" in activity
     assert "FEMALE_VOICE_NAME" in activity
-    assert 'versionName "2.3"' in android_build
-    assert "versionCode 14" in android_build
+    assert 'versionName "2.4"' in android_build
+    assert "versionCode 15" in android_build
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
@@ -622,7 +622,7 @@ def test_voice_transcripts_are_submitted_and_responses_are_visible():
     assert "button.disabled && !voiceCallActive" in assistant_script
     assert 'showVoiceMessage("EDUBOT", replyText)' in assistant_script
     assert "showVoiceMessage(\"EDUBOT\", errorMessage)" in assistant_script
-    assert all("20261107_agent_resize_v1" in template for template in templates)
+    assert all("20261109_release24_cache_v1" in template for template in templates)
 
 
 def test_student_name_and_mobile_directory_icons_match_shared_directory_style():
