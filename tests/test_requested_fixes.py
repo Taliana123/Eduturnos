@@ -117,17 +117,46 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
     assert qr.headers["Cache-Control"] == "public, max-age=3600"
     assert destinations == ["https://eduturnos.example/"]
 
+    navy_qr = client.get("/compartir/eduturnos.svg?estilo=navy")
+    assert navy_qr.status_code == 200
+    assert navy_qr.mimetype == "image/svg+xml"
+    assert b"<svg" in navy_qr.data
+    assert b"#17365D" in navy_qr.data
+    assert destinations == ["https://eduturnos.example/", "https://eduturnos.example/"]
+
     dragon_qr = client.get("/compartir/eduturnos.svg?estilo=dragon")
     assert dragon_qr.status_code == 200
-    assert dragon_qr.mimetype == "image/svg+xml"
-    assert b"<svg" in dragon_qr.data
-    assert destinations == ["https://eduturnos.example/", "https://eduturnos.example/"]
+    assert b"#1468E8" in dragon_qr.data
+    assert destinations == [
+        "https://eduturnos.example/",
+        "https://eduturnos.example/",
+        "https://eduturnos.example/",
+    ]
 
     share = client.get("/compartir")
     assert share.status_code == 200
     assert b"Compartir EDUTURNOS" in share.data
     assert b"Comparte el acceso a EDUTURNOS con la comunidad educativa" in share.data
     assert b'data-share-eduturnos' in share.data
+    assert b"QR EDUTURNOS" in share.data
+    assert b"Imagen del drag\xc3\xb3n" in share.data
+    assert b"Normal (azul institucional)" in share.data
+    assert b'data-qr-dragon="/compartir/eduturnos.svg?v=5"' in share.data
+    assert b'data-qr-institutional="/compartir/eduturnos.svg?estilo=navy&amp;v=2"' in share.data
+    assert b"mascots/qr-dragon-eduturnos.png?v=2" in share.data
+    assert b'value="institutional" selected' in share.data
+    assert Path("static/mascots/qr-dragon-eduturnos.png").is_file()
+    qr_script = Path("static/js/share-eduturnos.js").read_text(encoding="utf-8")
+    qr_styles = Path("static/css/qr-compartir.css").read_text(encoding="utf-8")
+    assert 'document.querySelector(".eduturnos-qr-code-image")' in qr_script
+    assert "is-dragon" in qr_script
+    assert "animation:" not in qr_styles
+    assert "@keyframes eduturnos-qr-dragon-float" not in qr_styles
+    assert "aspect-ratio: 1;" in qr_styles
+    assert "top: 34%;" in qr_styles
+    assert "left: 30%;" in qr_styles
+    assert ".eduturnos-share-qr-frame.is-dragon .eduturnos-qr-frame-label" in qr_styles
+    assert "@media (prefers-reduced-motion: reduce)" not in qr_styles
     assert b"Descargar c\xc3\xb3digo QR" not in share.data
     assert b"https://eduturnos.example/" not in share.data
 
@@ -148,6 +177,8 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
         assert "qr" not in Path(template).read_text(encoding="utf-8").lower()
 
     sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
+    citations = Path("templates/citas/index.html").read_text(encoding="utf-8")
+    assert "qr" not in citations.lower()
     assert sidebar.index("('soporte.index', 'Ayuda y soporte')") < sidebar.index(
         "('compartir_eduturnos', 'Compartir EDUTURNOS')"
     )
@@ -192,8 +223,8 @@ def test_llamada_de_voz_usa_sintesis_nativa_con_respaldo_web():
     assert 'eduturnos-native-tts-end' in activity
     assert "TextToSpeech.QUEUE_FLUSH" in activity
     assert "FEMALE_VOICE_NAME" in activity
-    assert 'versionName "2.6"' in android_build
-    assert "versionCode 16" in android_build
+    assert 'versionName "2.9"' in android_build
+    assert "versionCode 19" in android_build
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
@@ -614,6 +645,8 @@ def test_mobile_seguimiento_uses_desktop_process_layout():
     assert "max-width:calc(100vw - 32px)!important;max-height:calc(100dvh - 56px)!important;padding:16px!important;" in template
     assert "seguimiento-detail-heading h2{font-size:20px!important;}" in template
     assert "seguimiento-detail-student h3{margin:12px 0 8px!important;font-size:21px!important;}" in template
+    assert '<select id="seguimiento-filtro-situacion"' in template
+    assert "data-seguimiento-count" in template
 
 
 def test_voice_transcripts_are_submitted_and_responses_are_visible():
@@ -769,7 +802,11 @@ def test_configuration_catalog_forms_follow_motives_layout_without_changing_inst
     assert 'class="motivo-edit-form config-record-form"' in template
     assert 'class="state-form state-form-row config-record-form"' in template
     assert "config-record-actions" in template
-    assert "20261021_mobile_config_v28" in template
+    assert "20261118_vertical_institution_v3" in template
+    assert 'class="full-field institution-address"' in template
+    assert 'class="institution-identity"' in template
+    assert "minmax(300px, 1.8fr)" in css
+    assert "grid-row: 1 / span 2 !important;" in css
     assert ".configuracion-page .config-entry-form," in css
     assert "height: 38px !important;" in css
     assert "flex: 0 0 108px !important;" in css
@@ -801,7 +838,7 @@ def test_configuration_catalog_titles_follow_followup_page_heading_layout():
     seguimiento = Path("templates/seguimiento/lista.html").read_text(encoding="utf-8")
 
     assert 'class="page-head seguimiento-page-head"' in seguimiento
-    assert template.count('class="page-head config-section-heading"') == 6
+    assert template.count('class="page-head config-section-heading"') == 7
     assert ".configuracion-page .panel > .config-section-heading" in css
     assert ".configuracion-page .config-section-heading h2" in css
     assert "min-height: 58px !important;" in css

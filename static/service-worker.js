@@ -1,6 +1,6 @@
 // Preloads essential app resources and a generic offline fallback without
 // storing authenticated pages or user data.
-const CACHE_VERSION = "eduturnos-v19-ui-refresh";
+const CACHE_VERSION = "eduturnos-v20-avatar-qr-refresh";
 const OFFLINE_URL = "/static/offline.html";
 const APP_SHELL = [
   OFFLINE_URL,

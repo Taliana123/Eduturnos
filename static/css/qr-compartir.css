@@ -33,7 +33,7 @@
     width: min(100%, 34rem);
     align-items: center;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.1rem;
     margin: 0 auto 2rem;
     padding: clamp(1.25rem, 5vw, 2.5rem);
     overflow: hidden;
@@ -74,54 +74,160 @@
 
 .eduturnos-share-qr-frame {
     position: relative;
-    display: grid;
-    width: min(100%, 19rem);
+    display: flex;
+    width: min(100%, 21rem);
     aspect-ratio: 1;
-    place-items: center;
-    padding: 1rem;
-    border: 1px solid #cfe0f8;
-    border-radius: 1.5rem;
-    background: linear-gradient(145deg, #fff, #f4f8ff);
-    box-shadow: 0 0.8rem 2rem rgb(23 76 139 / 13%);
+    align-items: center;
+    justify-content: center;
+    padding: 2.4rem 1rem;
+    border: 1px solid #2c4b70;
+    border-radius: 1rem;
+    background: #101d31;
+    box-shadow: 0 0.8rem 2rem rgb(16 36 65 / 23%);
+    isolation: isolate;
 }
 
-.eduturnos-share-qr-frame img {
+.eduturnos-qr-dragon-art {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.eduturnos-share-qr-frame.is-dragon {
+    aspect-ratio: 1;
+    padding: 0;
+    overflow: hidden;
+    border-color: #12355f;
+    background: #071b37;
+}
+
+.eduturnos-share-qr-frame.is-dragon .eduturnos-qr-dragon-art {
+    opacity: 1;
+}
+
+.eduturnos-share-qr-frame.is-dragon .eduturnos-qr-corner,
+.eduturnos-share-qr-frame.is-dragon .eduturnos-qr-frame-label {
+    display: none;
+}
+
+.eduturnos-share-qr-frame.is-dragon .eduturnos-qr-code {
+    position: absolute;
+    z-index: 1;
+    top: 34%;
+    left: 30%;
+    width: 40%;
+    padding: 0.4rem;
+    border: 0.25rem solid #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.4rem 1.5rem rgb(0 13 40 / 48%);
+}
+
+.eduturnos-share-qr-frame.is-institutional {
+    background: #101d31;
+}
+
+.eduturnos-qr-code {
+    position: relative;
+    z-index: 0;
+    display: grid;
+    width: min(76%, 15.5rem);
+    aspect-ratio: 1;
+    place-items: center;
+    padding: 0.45rem;
+    border-radius: 0.2rem;
+    background: #fff;
+}
+
+.eduturnos-qr-code-image {
     display: block;
     width: 100%;
     height: 100%;
     image-rendering: pixelated;
 }
 
-.eduturnos-qr-dragon-mark[hidden] {
-    display: none;
+.eduturnos-share-qr-frame.is-institutional .eduturnos-qr-code {
+    background: #f7fbff;
 }
 
-.eduturnos-qr-dragon-mark {
+.eduturnos-qr-frame-label {
     position: absolute;
-    top: 50%;
+    z-index: 2;
     left: 50%;
-    display: grid;
-    width: 18%;
-    aspect-ratio: 1;
-    place-items: center;
-    padding: 0.12rem;
-    border: 2px solid #17365d;
-    border-radius: 32%;
-    background: #fff;
-    transform: translate(-50%, -50%);
+    display: inline-flex;
+    max-width: calc(100% - 5rem);
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.28rem 0.65rem;
+    border: 1px solid #c7a737;
+    border-radius: 999px;
+    background: #0b1728;
+    box-shadow: 0 0 0.65rem rgb(214 179 56 / 18%);
+    color: #f6d85b;
+    font-size: clamp(0.52rem, 2.4vw, 0.67rem);
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateX(-50%);
 }
 
-.eduturnos-qr-dragon-mark svg {
-    width: 100%;
-    height: 100%;
-    fill: #17365d;
+.eduturnos-qr-frame-label--top {
+    top: 0.7rem;
 }
 
-.eduturnos-qr-dragon-mark svg path + path {
-    fill: none;
-    stroke: #fff;
-    stroke-linecap: round;
-    stroke-width: 2.5;
+.eduturnos-qr-frame-label--bottom {
+    bottom: 0.7rem;
+    max-width: calc(100% - 3.5rem);
+    font-size: clamp(0.48rem, 2.2vw, 0.6rem);
+}
+
+.eduturnos-qr-corner {
+    position: absolute;
+    z-index: 1;
+    width: 1rem;
+    height: 1rem;
+    border-color: #51b7ff;
+    border-style: solid;
+}
+
+.eduturnos-qr-corner--top-left {
+    top: 0.35rem;
+    left: 0.35rem;
+    border-width: 2px 0 0 2px;
+    border-radius: 0.35rem 0 0;
+}
+
+.eduturnos-qr-corner--top-right {
+    top: 0.35rem;
+    right: 0.35rem;
+    border-width: 2px 2px 0 0;
+    border-radius: 0 0.35rem 0 0;
+}
+
+.eduturnos-qr-corner--bottom-left {
+    bottom: 0.35rem;
+    left: 0.35rem;
+    border-width: 0 0 2px 2px;
+    border-radius: 0 0 0 0.35rem;
+}
+
+.eduturnos-qr-corner--bottom-right {
+    right: 0.35rem;
+    bottom: 0.35rem;
+    border-width: 0 2px 2px 0;
+    border-radius: 0 0 0.35rem;
+}
+
+.eduturnos-share-qr-frame.is-institutional .eduturnos-qr-corner {
+    border-color: #f6d85b;
 }
 
 .eduturnos-share-description {

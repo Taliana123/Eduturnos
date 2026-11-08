@@ -10,14 +10,17 @@
 <section class="seguimiento-procesos" aria-labelledby="seguimiento-procesos-titulo">
 	<header class="seguimiento-procesos-header">
 		<div><h2 id="seguimiento-procesos-titulo">Seguimiento por situación</h2><p class="muted">Compromisos y asistencia: revisa anotaciones del observador, segundas citaciones e inasistencias.</p></div>
-		<span>{{ procesos|length }} {{ 'proceso' if procesos|length == 1 else 'procesos' }}</span>
+		<span data-seguimiento-count aria-live="polite">{{ procesos|length }} {{ 'proceso' if procesos|length == 1 else 'procesos' }}</span>
 	</header>
-	<nav class="seguimiento-filtros" aria-label="Filtrar casos de seguimiento">
-		<button type="button" data-seguimiento-filter="todos" aria-pressed="true">Todos</button>
-		<button type="button" data-seguimiento-filter="observador" aria-pressed="false">Anotaciones</button>
-		<button type="button" data-seguimiento-filter="segunda-cita" aria-pressed="false">Segunda cita</button>
-		<button type="button" data-seguimiento-filter="inasistencia" aria-pressed="false">Inasistencias</button>
-	</nav>
+	<div class="seguimiento-filtros">
+		<label for="seguimiento-filtro-situacion">Filtrar por situación</label>
+		<select id="seguimiento-filtro-situacion" data-seguimiento-filter aria-label="Filtrar casos de seguimiento">
+			<option value="todos">Todos los procesos</option>
+			<option value="observador">Anotaciones del observador</option>
+			<option value="segunda-cita">Segunda cita</option>
+			<option value="inasistencia">Inasistencias</option>
+		</select>
+	</div>
 	{% for proceso in procesos %}
 	{% set tipos = tipos_por_cita.get(proceso.id, ['general']) %}
 	<a class="seguimiento-proceso" href="{{ url_for('seguimiento.registrar', id=proceso.id) }}" data-seguimiento-dialog="seguimiento-detalle-{{ proceso.id }}" data-seguimiento-types="{{ tipos|join(' ') }}" aria-haspopup="dialog" aria-label="Ver seguimiento de {{ proceso.nombres }} {{ proceso.apellidos }}">
@@ -37,6 +40,7 @@
 	{% else %}
 	<p class="muted seguimiento-procesos-vacio">No hay citaciones para realizar seguimiento.</p>
 	{% endfor %}
+	<p class="muted seguimiento-procesos-vacio" data-seguimiento-empty hidden>No hay procesos en esta situación.</p>
 </section>
 {% for proceso in procesos %}
 <dialog id="seguimiento-detalle-{{ proceso.id }}" class="seguimiento-detail-dialog" aria-labelledby="seguimiento-detalle-titulo-{{ proceso.id }}">
@@ -91,10 +95,11 @@
 html body #contenido .seguimiento-procesos-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:20px 22px 10px;border:0;}
 html body #contenido .seguimiento-procesos-header h2{margin:0;font-size:19px;line-height:1.3;}
 html body #contenido .seguimiento-procesos-header p{margin:5px 0 0;font-size:13px;line-height:1.5;}
-html body #contenido .seguimiento-filtros{display:flex;flex-wrap:wrap;gap:8px;padding:8px 22px 14px;}
-html body #contenido .seguimiento-filtros button{min-height:34px;padding:7px 12px;border:1px solid #d5e1fa;border-radius:999px;background:#fff;color:#31516f;font:inherit;font-size:12px;font-weight:700;cursor:pointer;}
-html body #contenido .seguimiento-filtros button[aria-pressed="true"]{border-color:#2458d6;background:#2458d6;color:#fff;}
+html body #contenido .seguimiento-filtros{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 22px 14px;}
+html body #contenido .seguimiento-filtros label{color:#526b89;font-size:12px;font-weight:700;}
+html body #contenido .seguimiento-filtros select{box-sizing:border-box;width:min(100%,300px);min-height:38px;padding:7px 34px 7px 11px;border:1px solid #cbd9ed;border-radius:8px;background:#fff;color:#234365;font:inherit;font-size:13px;cursor:pointer;}
 html body #contenido .seguimiento-proceso[hidden]{display:none!important;}
+html body #contenido .seguimiento-procesos-vacio[hidden]{display:none!important;}
 html body #contenido .seguimiento-tipos{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
 html body #contenido .seguimiento-tipos small{padding:4px 8px;border-radius:999px;background:#edf4ff;color:#315b91;font-size:11px;font-weight:700;line-height:1.25;}
 html body dialog.seguimiento-detail-dialog{width:620px;max-width:calc(100vw - 40px);max-height:calc(100dvh - 40px);padding:30px;margin:auto;border:1px solid #d5e1fa;border-radius:6px;background:#fff;color:#142d50;overflow-y:auto;font-family:inherit;}
@@ -155,6 +160,8 @@ html body .seguimiento-detail-history article p{margin:6px 0 0;}
 	html body .seguimiento-detail-dialog{width:620px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);padding:30px;}
 }
 @media(max-width:900px){
+	html body #contenido .seguimiento-filtros{align-items:flex-start;flex-direction:column;gap:6px;padding:4px 16px 14px;}
+	html body #contenido .seguimiento-filtros select{width:100%;max-width:420px;}
 	html body #contenido a.seguimiento-proceso{grid-template-columns:minmax(76px,max-content) minmax(0,1fr) 24px!important;align-items:center!important;gap:14px!important;padding:18px 16px!important;}
 	html body #contenido .seguimiento-proceso-info{min-width:0!important;}
 	html body #contenido .seguimiento-proceso-info strong{font-size:14px!important;}
@@ -172,17 +179,23 @@ html body .seguimiento-detail-history article p{margin:6px 0 0;}
 }
 </style>
 <script>
-document.querySelectorAll("[data-seguimiento-filter]").forEach((button) => {
-	button.addEventListener("click", () => {
-		const filter = button.dataset.seguimientoFilter;
-		document.querySelectorAll("[data-seguimiento-filter]").forEach((item) => {
-			item.setAttribute("aria-pressed", String(item === button));
+const seguimientoFilter = document.querySelector("[data-seguimiento-filter]");
+if (seguimientoFilter) {
+	const cards = [...document.querySelectorAll(".seguimiento-proceso[data-seguimiento-types]")];
+	const count = document.querySelector("[data-seguimiento-count]");
+	const empty = document.querySelector("[data-seguimiento-empty]");
+	seguimientoFilter.addEventListener("change", () => {
+		const filter = seguimientoFilter.value;
+		let visible = 0;
+		cards.forEach((item) => {
+			const matches = filter === "todos" || item.dataset.seguimientoTypes.split(" ").includes(filter);
+			item.hidden = !matches;
+			if (matches) visible += 1;
 		});
-		document.querySelectorAll(".seguimiento-proceso[data-seguimiento-types]").forEach((item) => {
-			item.hidden = filter !== "todos" && !item.dataset.seguimientoTypes.split(" ").includes(filter);
-		});
+		if (count) count.textContent = `${visible} ${visible === 1 ? "proceso" : "procesos"}`;
+		if (empty) empty.hidden = visible !== 0;
 	});
-});
+}
 </script>
 
 

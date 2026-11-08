@@ -1,0 +1,64 @@
+{% macro avatar_art(config=None) -%}
+{% set avatar = config or {'character': 'neutral', 'ageStyle': 'teen', 'hairstyle': 'short', 'hairColor': '#282331', 'skinColor': '#efc19a', 'eyeColor': '#493124', 'outfit': 'hoodie', 'shirtColor': '#2875c7', 'accessory': 'none'} %}
+<svg viewBox="0 0 120 144" class="user-avatar-drawing" data-character="{{ avatar.character }}" data-age-style="{{ avatar.ageStyle }}" data-hairstyle="{{ avatar.hairstyle }}" data-outfit="{{ avatar.outfit }}" data-accessory="{{ avatar.accessory }}" style="--avatar-hair:{{ avatar.hairColor }};--avatar-skin:{{ avatar.skinColor }};--avatar-eyes:{{ avatar.eyeColor }};--avatar-shirt:{{ avatar.shirtColor }};" aria-hidden="true" focusable="false">
+  <g class="user-avatar-hair-back">
+    <path data-avatar-hair="short" d="M27 58C23 35 37 19 60 19s37 16 33 39l-5 24-12-5-2-18H46l-2 18-12 5-5-24Z"/>
+    <path data-avatar-hair="long" d="M27 58C23 35 37 19 60 19s37 16 33 39l-2 53-13 9-5-43H47l-5 43-13-9-2-53Z"/>
+    <path data-avatar-hair="wavy" d="M27 58C23 35 37 19 60 19s37 16 33 39l-3 15c-7 4-4 14-10 18l-7-8-4 27-9-8-9 8-4-27-7 8c-6-4-3-14-10-18l-3-15Z"/>
+    <path data-avatar-hair="curly" d="M25 59c-8-8-1-18 5-19-4-11 5-20 13-18 2-12 14-15 21-8 9-8 21-2 21 7 11 2 15 13 9 21 9 8 3 19-4 21l-3 29-11 5-5-39H48l-5 39-11-5-3-29c-7-2-12-12-4-20Z"/>
+    <path data-avatar-hair="bun" d="M28 58C24 35 38 20 60 20s36 15 32 38l-4 24-12-5-2-18H46l-2 18-12 5-4-24Z"/>
+    <circle data-avatar-hair="bun" cx="60" cy="19" r="13"/>
+    <path data-avatar-hair="straight" d="M27 58C23 35 37 19 60 19s37 16 33 39l-2 60-13 4-4-58H46l-4 58-13-4-2-60Z"/>
+    <path data-avatar-hair="bob" d="M27 58C23 35 37 19 60 19s37 16 33 39l-3 42-12 7-5-45H47l-5 45-12-7-3-42Z"/>
+    <path data-avatar-hair="afro" d="M27 63c-9-5-10-17-3-23-4-11 5-20 14-19 4-13 19-17 27-9 10-9 25-2 25 8 12 3 17 17 8 25 7 8 2 18-6 21l-3 35-12 5-5-43H48l-5 43-12-5-3-35c-7-1-11-12-1-18Z"/>
+    <path data-avatar-hair="braids" d="M27 58C23 35 37 19 60 19s37 16 33 39l-2 16-11-5-2-18H46l-2 18-11 5-2-16Z"/>
+    <path data-avatar-hair="braids" d="M30 66c-5 8-3 19 3 24l-3 18 7 13 7-13-4-19 3-17m47-6c5 8 3 19-3 24l3 18-7 13-7-13 4-19-3-17"/>
+    <path data-avatar-hair="side-swept" d="M27 58C23 35 37 19 60 19s37 16 33 39l-2 60-13 4-4-58H46l-4 58-13-4-2-60Z"/>
+  </g>
+  <path class="user-avatar-shirt user-avatar-outfit" data-avatar-outfit="shirt" d="m45 103-18 8c-8 4-12 14-14 27h94c-2-13-6-23-14-27l-18-8-15 9-15-9Z"/>
+  <path class="user-avatar-shirt user-avatar-outfit" data-avatar-outfit="hoodie" d="m44 101-17 9c-9 5-13 15-15 28h96c-2-13-6-23-15-28l-17-9-16 12-16-12Z"/>
+  <path class="user-avatar-shirt user-avatar-outfit" data-avatar-outfit="uniform" d="m45 102-18 8c-9 5-13 15-15 28h96c-2-13-6-23-15-28l-18-8-15 10-15-10Z"/>
+  <path class="user-avatar-shirt user-avatar-outfit" data-avatar-outfit="jacket" d="m44 101-17 9c-9 5-13 15-15 28h96c-2-13-6-23-15-28l-17-9-16 12-16-12Z"/>
+  <path class="user-avatar-shirt user-avatar-outfit" data-avatar-outfit="sweater" d="m45 102-18 8c-9 5-13 15-15 28h96c-2-13-6-23-15-28l-18-8-15 10-15-10Z"/>
+  <path class="user-avatar-outfit-detail" data-avatar-outfit-detail="hoodie" d="M44 101c1 12 9 18 16 18s15-6 16-18l-16 12-16-12Z"/>
+  <path class="user-avatar-outfit-detail" data-avatar-outfit-detail="uniform" d="m53 104 7 7 7-7 7 34H46l7-34Z"/>
+  <path class="user-avatar-outfit-detail" data-avatar-outfit-detail="jacket" d="m59 111-8-8-5 35h14v-27Zm2 0 8-8 5 35H60v-27Z"/>
+  <path class="user-avatar-outfit-detail" data-avatar-outfit-detail="sweater" d="M36 116h48v4H36z"/>
+  <path class="user-avatar-neck" d="M50 89h20v19c0 8-20 8-20 0V89Z"/>
+  <path class="user-avatar-ear" d="M31 61c-11-5-14 4-10 14 2 5 7 7 12 5m54-19c11-5 14 4 10 14-2 5-7 7-12 5"/>
+  <path class="user-avatar-face" d="M34 53c0-22 11-32 26-32s26 10 26 32c0 23-11 41-26 41S34 76 34 53Z"/>
+  <ellipse class="user-avatar-blush" cx="42" cy="70" rx="7" ry="3.5"/>
+  <ellipse class="user-avatar-blush" cx="78" cy="70" rx="7" ry="3.5"/>
+  <path class="user-avatar-brow" d="M41 54c5-4 10-4 15-1m8 0c5-3 10-3 15 1"/>
+  <ellipse class="user-avatar-eye-white" cx="48" cy="62" rx="6.5" ry="8"/>
+  <ellipse class="user-avatar-eye-white" cx="72" cy="62" rx="6.5" ry="8"/>
+  <circle class="user-avatar-eye" cx="49" cy="63" r="4.3"/>
+  <circle class="user-avatar-eye" cx="71" cy="63" r="4.3"/>
+  <circle class="user-avatar-eye-light" cx="50.5" cy="61.5" r="1.5"/>
+  <circle class="user-avatar-eye-light" cx="72.5" cy="61.5" r="1.5"/>
+  <path class="user-avatar-lashes" d="m42 56-3-3m7-2-1-4m9 6 2-3m23 6 3-3m-7-2 1-4m-9 6-2-3"/>
+  <path class="user-avatar-nose" d="M59 64c-2 5-4 9 1 9"/>
+  <path class="user-avatar-mouth" d="M51 79c5 5 13 5 18 0"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="short" d="M34 52c-1-19 9-29 26-29 16 0 26 10 26 29-8-1-14-7-17-14-8 9-20 13-35 14Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="long" d="M34 52c-1-19 9-29 26-29 16 0 26 10 26 29-8-1-14-7-17-14-8 9-20 13-35 14Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="wavy" d="M34 53c-4-18 8-31 26-30 17 0 28 12 26 31-6-3-8-8-10-13-5 6-8 5-12-1-7 9-15 11-30 13Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="curly" d="M34 54c-5-15 3-28 12-27 4-8 13-8 17-2 9-6 18 1 18 8 8 5 8 15 5 22-7-1-11-7-14-13-6 8-20 13-38 12Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="bun" d="M34 52c-1-19 9-29 26-29 16 0 26 10 26 29-8-1-14-7-17-14-8 9-20 13-35 14Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="straight" d="M34 53V47c0-16 10-24 26-24s26 8 26 24v6c-9-2-15-7-19-14-8 8-18 12-33 14Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="bob" d="M34 53c-1-19 9-30 26-30 16 0 26 11 26 30-8-2-13-7-17-14-8 10-20 14-35 14Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="afro" d="M31 54c-5-18 7-34 20-31 6-10 20-10 26-1 13-2 20 12 13 23-5 7-11 9-17 9-4-8-8-12-13-13-8 9-17 13-29 13Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="braids" d="M34 52c-1-19 9-29 26-29 16 0 26 10 26 29-8-1-14-7-17-14-8 9-20 13-35 14Z"/>
+  <path class="user-avatar-hair-front" data-avatar-hair="side-swept" d="M34 53c-1-19 9-30 26-30 16 0 26 11 26 30-12 1-19-4-23-13-6 10-15 13-29 13Z"/>
+  <path class="user-avatar-headband" d="M35 48c13 6 37 6 50 0l2 5c-17 8-37 8-54 0l2-5Z"/>
+  <g class="user-avatar-glasses">
+    <circle cx="48" cy="62" r="10"/>
+    <circle cx="72" cy="62" r="10"/>
+    <path d="M58 62h4m-24-2-5-2m53 2 5-2"/>
+  </g>
+  <g class="user-avatar-cap">
+    <path d="M34 48c1-17 11-25 26-25s25 8 26 25c-13-6-39-6-52 0Z"/>
+    <path d="M33 48c15-7 39-7 54 0-5 6-14 8-26 8s-23-2-28-8Z"/>
+    <path d="M60 25v17"/>
+  </g>
+</svg>
+{%- endmacro %}

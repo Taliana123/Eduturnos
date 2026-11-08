@@ -77,6 +77,25 @@ const initializeEduturnosAssistant = () => {
         panel.addEventListener("pointerdown", (event) => {
             if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
             const target = event.target instanceof Element ? event.target : null;
+            const resizeHandle = target?.closest("[data-assistant-call-resize]");
+            if (resizeHandle) {
+                const bounds = panel.getBoundingClientRect();
+                captureInitialSize();
+                resizeState = {
+                    pointerId: event.pointerId,
+                    direction: resizeHandle.dataset.assistantCallResize,
+                    startX: event.clientX,
+                    startY: event.clientY,
+                    startWidth: bounds.width,
+                    startHeight: bounds.height,
+                    startLeft: bounds.left,
+                    startTop: bounds.top,
+                };
+                panel.setPointerCapture(event.pointerId);
+                panel.classList.add("is-resizing");
+                event.preventDefault();
+                return;
+            }
             if (target?.closest("button, a, input, textarea, select, .assistant-voice-call__header")) return;
             const bounds = panel.getBoundingClientRect();
             const onRight = bounds.right - event.clientX <= 18;

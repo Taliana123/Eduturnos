@@ -100,6 +100,15 @@ CREATE TABLE IF NOT EXISTS usuarios (
     INDEX idx_usuario_rol (id_rol)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS avatares_usuario (
+    id_usuario INT NOT NULL PRIMARY KEY,
+    avatar_json JSON NOT NULL,
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_avatar_usuario
+        FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS estudiantes (
     id_estudiante INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NULL UNIQUE,

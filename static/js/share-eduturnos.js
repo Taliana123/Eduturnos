@@ -1,21 +1,18 @@
 (() => {
     const qrPicker = document.querySelector("[data-qr-style]");
-    const qrImage = document.querySelector(".eduturnos-share-qr-frame img");
-    const dragonMark = document.querySelector("[data-qr-dragon-mark]");
+    const qrImage = document.querySelector(".eduturnos-qr-code-image");
     const qrFrame = document.querySelector(".eduturnos-share-qr-frame");
     const qrDescription = document.querySelector("[data-qr-description]");
     if (qrPicker && qrImage) {
         qrPicker.addEventListener("change", () => {
             const dragon = qrPicker.value === "dragon";
-            qrImage.src = dragon ? qrImage.dataset.qrDragon : qrImage.dataset.qrStandard;
+            qrImage.src = dragon ? qrImage.dataset.qrDragon : qrImage.dataset.qrInstitutional;
             qrImage.alt = dragon
-                ? "Código QR azul con diseño de dragón para abrir EDUTURNOS"
-                : "Código QR azul EDUTURNOS";
-            dragonMark.hidden = !dragon;
+                ? "Código QR azul de EDUTURNOS sobre la imagen del dragón para abrir el sitio oficial"
+                : "Código QR azul institucional de EDUTURNOS para abrir el sitio oficial";
             qrFrame.classList.toggle("is-dragon", dragon);
-            qrDescription.textContent = dragon
-                ? "Diseño Dragón: escanéalo para abrir el mismo acceso oficial de EDUTURNOS."
-                : "Escanea el código para abrir EDUTURNOS e iniciar sesión.";
+            qrFrame.classList.toggle("is-institutional", !dragon);
+            qrDescription.textContent = "Escanea el código para abrir EDUTURNOS e iniciar sesión.";
         });
     }
 

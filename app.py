@@ -36,13 +36,14 @@ from roles import SEDES_INSTITUCIONALES
 from security import csrf_token, require_configured_secret, validar_csrf
 from servicios.mail import mail
 from servicios.reuniones import HORARIOS_CITAS, formatear_hora
+from servicios.avatar import AVATAR_CHOICES, avatar_inicial, obtener_o_crear_avatar
 
 
 class EduturnosSvgPathImage(SvgPathImage):
     QR_PATH_STYLE = {**SvgPathImage.QR_PATH_STYLE, "fill": "#1468E8"}
 
 
-class EduturnosDragonSvgPathImage(SvgPathImage):
+class EduturnosNavySvgPathImage(SvgPathImage):
     QR_PATH_STYLE = {**SvgPathImage.QR_PATH_STYLE, "fill": "#17365D"}
 
 
@@ -121,7 +122,21 @@ def create_app():
         endpoint = request.endpoint or ""
         publica = endpoint.startswith("auth.") and endpoint != "auth.dashboard"
         usuario = usuario_actual() if session.get("usuario_id") and not publica else None
-        return {"usuario_navegacion": usuario}
+        avatar_config = None
+        if usuario:
+            try:
+                avatar_config = obtener_o_crear_avatar(usuario["id_usuario"])
+            except MySQLError:
+                app.logger.exception(
+                    "No se pudo cargar el personaje del usuario %s",
+                    usuario["id_usuario"],
+                )
+                avatar_config = avatar_inicial(usuario["id_usuario"])
+        return {
+            "usuario_navegacion": usuario,
+            "avatar_config": avatar_config,
+            "avatar_choices": AVATAR_CHOICES,
+        }
 
     # Blueprint de autenticaciÃ³n
     app.register_blueprint(auth_bp, url_prefix="/auth")
@@ -252,11 +267,7 @@ def create_app():
         )
         qr.add_data(destination)
         qr.make(fit=True)
-        image_factory = (
-            EduturnosDragonSvgPathImage
-            if request.args.get("estilo") == "dragon"
-            else EduturnosSvgPathImage
-        )
+        image_factory = EduturnosNavySvgPathImage if request.args.get("estilo") == "navy" else EduturnosSvgPathImage
         image = qr.make_image(image_factory=image_factory)
         output = BytesIO()
         image.save(output)

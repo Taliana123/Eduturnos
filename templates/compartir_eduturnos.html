@@ -3,7 +3,7 @@
 {% block title %}Compartir EDUTURNOS{% endblock %}
 
 {% block page_styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/qr-compartir.css') }}?v=4">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/qr-compartir.css') }}?v=8">
 {% endblock %}
 
 {% block content %}
@@ -15,5 +15,5 @@
     </div>
 </section>
 {% include "_qr_compartir.html" %}
-<script src="{{ url_for('static', filename='js/share-eduturnos.js') }}?v=2" defer></script>
+<script src="{{ url_for('static', filename='js/share-eduturnos.js') }}?v=4" defer></script>
 {% endblock %}
