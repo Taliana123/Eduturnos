@@ -5,12 +5,12 @@
     bottom: max(88px, calc(env(safe-area-inset-bottom) + 72px));
     display: block;
     box-sizing: border-box;
-    width: 106px !important;
-    min-width: 106px !important;
-    max-width: 106px !important;
-    height: 106px !important;
-    min-height: 106px !important;
-    max-height: 106px !important;
+    width: 136px !important;
+    min-width: 136px !important;
+    max-width: 136px !important;
+    height: 136px !important;
+    min-height: 136px !important;
+    max-height: 136px !important;
     padding: 0;
     border: 0 !important;
     border-radius: 0 !important;
@@ -91,12 +91,12 @@
     .page-mascot {
         right: max(10px, env(safe-area-inset-right));
         bottom: max(78px, calc(env(safe-area-inset-bottom) + 64px));
-        width: 98px !important;
-        min-width: 98px !important;
-        max-width: 98px !important;
-        height: 98px !important;
-        min-height: 98px !important;
-        max-height: 98px !important;
+        width: 128px !important;
+        min-width: 128px !important;
+        max-width: 128px !important;
+        height: 128px !important;
+        min-height: 128px !important;
+        max-height: 128px !important;
     }
 }
 

@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from pathlib import Path
 
 import pytest
+import qrcode
 from flask import render_template
 
 from app import app
@@ -94,6 +95,97 @@ def test_registro_conserva_campos_y_aplica_reglas_de_password_y_documento():
     assert "field.reportValidity()" in script
     assert "option.dataset.idGrado === gradeId" in script
     assert 'groupSelect.disabled = !gradeId' in script
+
+
+def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch):
+    monkeypatch.setitem(app.config, "APP_ORIGIN", "https://eduturnos.example")
+    client = app.test_client()
+    destinations = []
+    add_data = qrcode.QRCode.add_data
+
+    def capture_destination(qr, data, *args, **kwargs):
+        destinations.append(data)
+        return add_data(qr, data, *args, **kwargs)
+
+    monkeypatch.setattr(qrcode.QRCode, "add_data", capture_destination)
+
+    qr = client.get("/compartir/eduturnos.svg")
+    assert qr.status_code == 200
+    assert qr.mimetype == "image/svg+xml"
+    assert b"<svg" in qr.data
+    assert b"#1468E8" in qr.data
+    assert qr.headers["Cache-Control"] == "public, max-age=3600"
+    assert destinations == ["https://eduturnos.example/"]
+
+    share = client.get("/compartir")
+    assert share.status_code == 200
+    assert b"Compartir EDUTURNOS" in share.data
+    assert b"Comparte el acceso a EDUTURNOS con la comunidad educativa" in share.data
+    assert b'data-share-eduturnos' in share.data
+    assert b"Descargar c\xc3\xb3digo QR" not in share.data
+    assert b"https://eduturnos.example/" not in share.data
+
+    home = client.get("/")
+    assert home.status_code == 200
+    assert b"Compartir EDUTURNOS con QR" not in home.data
+    assert b'href="/compartir"' in home.data
+    public_base = Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
+    assert public_base.count("url_for('compartir_eduturnos')") == 2
+    for template in (
+        "templates/index.html",
+        "templates/dashboard.html",
+        "templates/integraciones_google.html",
+        "templates/citas/index.html",
+    ):
+        assert '{% include "_qr_compartir.html" %}' not in Path(template).read_text(encoding="utf-8")
+
+    sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
+    assert sidebar.index("('soporte.index', 'Ayuda y soporte')") < sidebar.index(
+        "('compartir_eduturnos', 'Compartir EDUTURNOS')"
+    )
+
+
+def test_compartir_eduturnos_sin_pasos_numerados_y_con_flecha_solo_publica():
+    template = Path("templates/publico/compartir_eduturnos.html").read_text(encoding="utf-8")
+    public_base = Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
+    home = Path("templates/index.html").read_text(encoding="utf-8")
+
+    assert "01 · ESCANEA" not in template
+    assert "02 · COMPARTE" not in template
+    assert "{% if not usuario_navegacion %}" in template
+    assert public_base.index("url_for('terminos')") < public_base.index("url_for('compartir_eduturnos')")
+    assert home.index("url_for('terminos')") < home.index("url_for('compartir_eduturnos')")
+
+
+def test_paginas_legales_reducen_espacio_y_solicitudes_ocultan_ver_en_escritorio():
+    privacy = Path("templates/publico/privacidad.html").read_text(encoding="utf-8")
+    terms = Path("templates/publico/terminos.html").read_text(encoding="utf-8")
+    public_base = Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
+    requests = Path("templates/solicitudes/index.html").read_text(encoding="utf-8")
+
+    assert 'class="intro legal-intro"' in privacy
+    assert 'class="intro legal-intro"' in terms
+    assert ".intro.legal-intro" in public_base
+    assert "@media(min-width:761px)" in requests
+    assert "#contenido .solicitudes-table .solicitud-mobile-toggle { display:none !important; }" in requests
+
+
+def test_llamada_de_voz_usa_sintesis_nativa_con_respaldo_web():
+    assistant = Path("static/js/asistente.js").read_text(encoding="utf-8")
+    activity = Path(
+        "mobile-app/android/app/src/main/java/co/eduturnos/app/MainActivity.java"
+    ).read_text(encoding="utf-8")
+    android_build = Path("mobile-app/android/app/build.gradle").read_text(encoding="utf-8")
+
+    assert "speakWithNativeVoice" in assistant
+    assert 'nativeVoice?.speak' in assistant
+    assert "window.speechSynthesis.speak(utterance)" in assistant
+    assert 'eduturnos-native-tts-start' in activity
+    assert 'eduturnos-native-tts-end' in activity
+    assert "TextToSpeech.QUEUE_FLUSH" in activity
+    assert "FEMALE_VOICE_NAME" in activity
+    assert 'versionName "2.4"' in android_build
+    assert "versionCode 15" in android_build
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
@@ -511,6 +603,9 @@ def test_mobile_seguimiento_uses_desktop_process_layout():
     assert "grid-template-columns:100px minmax(0,1fr) 24px;" in template
     assert "gap:16px;padding:24px;border-top:1px solid #d5e1fa;" in template
     assert "max-height:calc(100dvh - 24px);padding:30px;" in template
+    assert "max-width:calc(100vw - 32px)!important;max-height:calc(100dvh - 56px)!important;padding:16px!important;" in template
+    assert "seguimiento-detail-heading h2{font-size:20px!important;}" in template
+    assert "seguimiento-detail-student h3{margin:12px 0 8px!important;font-size:21px!important;}" in template
 
 
 def test_voice_transcripts_are_submitted_and_responses_are_visible():
@@ -527,7 +622,7 @@ def test_voice_transcripts_are_submitted_and_responses_are_visible():
     assert "button.disabled && !voiceCallActive" in assistant_script
     assert 'showVoiceMessage("EDUBOT", replyText)' in assistant_script
     assert "showVoiceMessage(\"EDUBOT\", errorMessage)" in assistant_script
-    assert all("20261107_voice_input_feedback_v3" in template for template in templates)
+    assert all("20261109_release24_cache_v1" in template for template in templates)
 
 
 def test_student_name_and_mobile_directory_icons_match_shared_directory_style():

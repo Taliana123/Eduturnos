@@ -13,9 +13,9 @@ def test_drone_mascot_is_shared_by_login_and_dashboard():
     assert "{% include '_page_mascot.html' %}" in Path("templates/base.html").read_text(encoding="utf-8")
     assert "{% include '_page_mascot.html' %}" in Path("templates/index.html").read_text(encoding="utf-8")
     assert "{% include '_page_mascot.html' %}" in Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
-    assert "20261107_mascot_everywhere_v1" in login
-    assert "20261107_mascot_everywhere_v1" in Path("templates/base.html").read_text(encoding="utf-8")
-    assert "20261107_voice_input_feedback_v2" in mascot
+    assert "20261109_release24_cache_v1" in login
+    assert "20261109_release24_cache_v1" in Path("templates/base.html").read_text(encoding="utf-8")
+    assert "20261109_release24_cache_v1" in mascot
     assert "mascots/drone-directions.webp" in mascot
     assert "mascots/drone-reactions.webp" in mascot
     assert "page-mascot--login" not in mascot
@@ -23,11 +23,13 @@ def test_drone_mascot_is_shared_by_login_and_dashboard():
     assert Path("static/mascots/drone-reactions.webp").is_file()
     assert Path("static/mascots/LICENSE.page-mascot.txt").is_file()
     assert "background-size: 300% 300%" in styles
-    assert "width: 106px !important" in styles
-    assert "height: 106px !important" in styles
+    assert "width: 136px !important" in styles
+    assert "height: 136px !important" in styles
+    assert "width: 128px !important" in styles
+    assert "height: 128px !important" in styles
     assert ".page-mascot--floating" in styles
     assert "bottom: max(88px, calc(env(safe-area-inset-bottom) + 72px))" in styles
-    assert "max-height: 98px !important" in styles
+    assert "max-height: 136px !important" in styles
     assert "background: transparent !important" in styles
     assert "setPointerCapture" in script
     assert 'addEventListener("pointerdown"' in script
@@ -48,7 +50,7 @@ def test_drone_sprite_sheets_are_served_by_flask():
     assert b"/static/mascots/drone-directions.webp" in login.data
     assert b"/static/mascots/drone-reactions.webp" in login.data
     assert b"data-assistant-public-call" in login.data
-    assert b"/static/js/asistente.js?v=20261107_voice_input_feedback_v2" in login.data
+    assert b"/static/js/asistente.js?v=20261109_release24_cache_v1" in login.data
     assert b"page-mascot--login" not in login.data
     assert login.data.index(b"page-mascot--floating") > login.data.index(b"</main>")
 
@@ -62,7 +64,7 @@ def test_drone_sprite_sheets_are_served_by_flask():
     home = client.get("/")
     assert home.status_code == 200
     assert b"data-assistant-public-call" in home.data
-    assert b"/static/js/asistente.js?v=20261107_voice_input_feedback_v2" in home.data
+    assert b"/static/js/asistente.js?v=20261109_release24_cache_v1" in home.data
 
 
 def test_legacy_floating_robot_widget_is_removed_without_removing_chat_avatar():
@@ -120,9 +122,32 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     assert "EXTRA_PARTIAL_RESULTS, true" in native_activity
     assert "eduturnos-native-voice-result" in native_activity
     assert "SpeechRecognizer" in native_activity
+    assert "startSystemVoiceInput()" in native_activity
+    assert "RecognizerIntent.ACTION_RECOGNIZE_SPEECH" in native_activity
+    assert "spanishFemaleVoicePattern" in assistant_script
+    assert "selectSpanishVoice()" in assistant_script
+    assert "speakWithNativeVoice" in assistant_script
+    assert "TextToSpeech" in native_activity
+    assert "FEMALE_VOICE_NAME" in native_activity
+    assert "stopSpeaking" in native_activity
+    assert assistant_script.count("utterance.voice = selectSpanishVoice();") == 2
     assert "Manifest.permission.RECORD_AUDIO" in native_activity
     assert "callPanel.hidden = false" in assistant_script
     assert "positionCallNearLauncher(launcher)" in assistant_script
+    assert "enableCallPanelControls(panel)" in assistant_script
+    assert "enableCallPanelControls(callPanel)" in assistant_script
+    assert "data-assistant-call-resize=\"nw\"" in help_widget
+    assert "data-assistant-call-resize=\"se\"" in help_widget
+    assert "data-assistant-call-action-link" in help_widget
+    assert "data-assistant-call-confirm" in help_widget
+    assert "window.confirm(`¿Confirmas cancelar la cita #${citaId}?" in assistant_script
+    assert "actionForm.action = actionUrl" in assistant_script
+    assert "data-assistant-call-resize=\"nw\"" in mascot
+    assert "data-assistant-call-resize=\"se\"" in mascot
+    assert "handle.setPointerCapture(event.pointerId)" in assistant_script
+    assert "initialSize.width" in assistant_script
+    assert "assistant-voice-call.is-dragging" in assistant_styles
+    assert ".assistant-voice-call__resize-se" in assistant_styles
     assert "placeChatNearLauncher" not in assistant_script
     assert "setChatOpen(true, launcher" not in assistant_script
     assert "No se concedió permiso al micrófono" not in assistant_script
@@ -148,8 +173,10 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     ).read_text(encoding="utf-8")
     android_build = Path("mobile-app/android/app/build.gradle").read_text(encoding="utf-8")
     assert 'android:name="android.permission.RECORD_AUDIO"' in manifest
-    assert 'versionName "1.7"' in android_build
-    assert 'versionCode 8' in android_build
+    assert 'android.speech.RecognitionService' in manifest
+    assert 'android.speech.action.RECOGNIZE_SPEECH' in manifest
+    assert 'versionName "2.4"' in android_build
+    assert 'versionCode 15' in android_build
     assert "data-calendar-event-url=\"{{ calendar_open_event_url or '' }}\"" in calendar_template
     assert "calendar_open_event_url=calendar_open_event_url" in calendar_route
     assert "icons/edubot.png" not in Path("templates/_asistente_widget.html").read_text(encoding="utf-8")

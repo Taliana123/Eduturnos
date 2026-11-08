@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Compartir EDUTURNOS{% endblock %}
+
+{% block page_styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/qr-compartir.css') }}?v=2">
+{% endblock %}
+
+{% block content %}
+<section class="page-head eduturnos-share-page-head">
+    <div>
+        <p class="eduturnos-share-eyebrow">COMUNIDAD EDUCATIVA</p>
+        <h1>Compartir EDUTURNOS</h1>
+        <p>Invita a otras personas a conocer la plataforma.</p>
+    </div>
+</section>
+{% include "_qr_compartir.html" %}
+<script src="{{ url_for('static', filename='js/share-eduturnos.js') }}?v=1" defer></script>
+{% endblock %}

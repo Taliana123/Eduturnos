@@ -3,7 +3,10 @@ from mysql.connector import Error as MySQLError
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.exceptions import BadRequest
 from urllib.parse import quote
+from io import BytesIO
 import unicodedata
+import qrcode
+from qrcode.image.svg import SvgPathImage
 
 from config import Config
 from database.bootstrap import ensure_database
@@ -33,6 +36,10 @@ from roles import SEDES_INSTITUCIONALES
 from security import csrf_token, require_configured_secret, validar_csrf
 from servicios.mail import mail
 from servicios.reuniones import HORARIOS_CITAS, formatear_hora
+
+
+class EduturnosSvgPathImage(SvgPathImage):
+    QR_PATH_STYLE = {**SvgPathImage.QR_PATH_STYLE, "fill": "#1468E8"}
 
 
 def _beepy_home_enabled():
@@ -225,6 +232,29 @@ def create_app():
         respuesta = current_app.make_response(render_template("index.html"))
         respuesta.headers["Cache-Control"] = "no-store"
         return respuesta
+
+    @app.get("/compartir")
+    def compartir_eduturnos():
+        return render_template("publico/compartir_eduturnos.html")
+
+    @app.get("/compartir/eduturnos.svg")
+    def compartir_qr_eduturnos():
+        origin = (current_app.config.get("APP_ORIGIN") or request.url_root).strip().rstrip("/")
+        destination = f"{origin}/"
+        qr = qrcode.QRCode(
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size=8,
+            border=4,
+        )
+        qr.add_data(destination)
+        qr.make(fit=True)
+        image = qr.make_image(image_factory=EduturnosSvgPathImage)
+        output = BytesIO()
+        image.save(output)
+        response = current_app.response_class(output.getvalue(), mimetype="image/svg+xml")
+        response.headers["Cache-Control"] = "public, max-age=3600"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
 
     # Páginas públicas adicionales
     @app.route("/como-funciona")

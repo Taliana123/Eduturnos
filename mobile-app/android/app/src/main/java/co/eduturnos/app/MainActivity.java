@@ -11,6 +11,9 @@ import android.provider.CalendarContract;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
+import android.speech.tts.Voice;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
 
@@ -22,11 +25,27 @@ import com.getcapacitor.BridgeActivity;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 public class MainActivity extends BridgeActivity {
     private static final int REQUEST_RECORD_AUDIO = 4002;
+    private static final int REQUEST_SYSTEM_VOICE_INPUT = 4003;
+    private static final Pattern FEMALE_VOICE_NAME = Pattern.compile(
+            "(female|feminine|fem|mujer)", Pattern.CASE_INSENSITIVE
+    );
     private SpeechRecognizer voiceRecognizer;
+    private TextToSpeech speechSynthesizer;
+    private boolean speechSynthesizerReady;
+    private boolean speechSynthesizerInitializationComplete;
+    private String pendingSpeechText;
+    private long speechUtteranceSequence;
     private boolean voiceStartPending;
+    private boolean voiceFallbackPending;
     private boolean voiceCancellationRequested;
 
     @Override
@@ -37,15 +56,47 @@ public class MainActivity extends BridgeActivity {
         // dispatch intent:// links originating from a remote page.
         getBridge().getWebView().addJavascriptInterface(new CalendarLauncher(), "EDUTURNOSNativeCalendar");
         getBridge().getWebView().addJavascriptInterface(new VoiceLauncher(), "EDUTURNOSNativeVoice");
+        initializeSpeechSynthesizer();
     }
 
     @Override
     public void onDestroy() {
         voiceStartPending = false;
+        voiceFallbackPending = false;
         voiceCancellationRequested = true;
         if (voiceRecognizer != null) voiceRecognizer.cancel();
         releaseVoiceRecognizer();
+        if (speechSynthesizer != null) {
+            speechSynthesizer.stop();
+            speechSynthesizer.shutdown();
+            speechSynthesizer = null;
+        }
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQUEST_SYSTEM_VOICE_INPUT) return;
+        voiceFallbackPending = false;
+        if (voiceCancellationRequested) {
+            dispatchVoiceEvent("eduturnos-native-voice-end", null, null);
+            return;
+        }
+
+        if (resultCode == RESULT_OK && data != null) {
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches != null && !matches.isEmpty() && !matches.get(0).trim().isEmpty()) {
+                dispatchVoiceEvent("eduturnos-native-voice-speech-start", null, null);
+                dispatchVoiceEvent("eduturnos-native-voice-speech-end", null, null);
+                dispatchVoiceEvent("eduturnos-native-voice-result", "text", matches.get(0).trim());
+            } else {
+                dispatchVoiceEvent("eduturnos-native-voice-error", "error", "no-speech");
+            }
+        } else {
+            dispatchVoiceEvent("eduturnos-native-voice-error", "error", "cancelled");
+        }
+        dispatchVoiceEvent("eduturnos-native-voice-end", null, null);
     }
 
     @Override
@@ -76,12 +127,12 @@ public class MainActivity extends BridgeActivity {
     }
 
     private void startVoiceRecognition() {
+        voiceCancellationRequested = false;
         if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-            dispatchVoiceEvent("eduturnos-native-voice-error", "error", "unavailable");
+            startSystemVoiceInput();
             return;
         }
         releaseVoiceRecognizer();
-        voiceCancellationRequested = false;
         voiceRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         voiceRecognizer.setRecognitionListener(new RecognitionListener() {
             @Override
@@ -110,6 +161,11 @@ public class MainActivity extends BridgeActivity {
             @Override
             public void onError(int error) {
                 if (!voiceCancellationRequested) {
+                    if (error == SpeechRecognizer.ERROR_CLIENT || error == SpeechRecognizer.ERROR_SERVER) {
+                        releaseVoiceRecognizer();
+                        startSystemVoiceInput();
+                        return;
+                    }
                     String message = error == SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS
                             ? "not-allowed"
                             : error == SpeechRecognizer.ERROR_NO_MATCH
@@ -162,6 +218,24 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
+    private void startSystemVoiceInput() {
+        if (voiceFallbackPending || voiceCancellationRequested) return;
+        releaseVoiceRecognizer();
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                .putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es-CO")
+                .putExtra(RecognizerIntent.EXTRA_PROMPT, "Habla con EDUBOT")
+                .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
+        try {
+            voiceFallbackPending = true;
+            startActivityForResult(intent, REQUEST_SYSTEM_VOICE_INPUT);
+        } catch (ActivityNotFoundException | SecurityException error) {
+            voiceFallbackPending = false;
+            dispatchVoiceEvent("eduturnos-native-voice-error", "error", "unavailable");
+            dispatchVoiceEvent("eduturnos-native-voice-end", null, null);
+        }
+    }
+
     private void stopVoiceRecognition() {
         voiceStartPending = false;
         voiceCancellationRequested = true;
@@ -188,6 +262,109 @@ public class MainActivity extends BridgeActivity {
         runOnUiThread(() -> getBridge().getWebView().evaluateJavascript(script, null));
     }
 
+    private void initializeSpeechSynthesizer() {
+        speechSynthesizer = new TextToSpeech(this, status -> {
+            if (status != TextToSpeech.SUCCESS) {
+                speechSynthesizerInitializationComplete = true;
+                dispatchVoiceEvent("eduturnos-native-tts-error", "error", "initialization");
+                return;
+            }
+
+            configureSpanishVoice();
+            speechSynthesizer.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {
+                    dispatchVoiceEvent("eduturnos-native-tts-start", null, null);
+                }
+
+                @Override
+                public void onDone(String utteranceId) {
+                    dispatchVoiceEvent("eduturnos-native-tts-end", null, null);
+                }
+
+                @Override
+                public void onError(String utteranceId) {
+                    dispatchVoiceEvent("eduturnos-native-tts-error", "error", "synthesis");
+                }
+
+                @Override
+                public void onStop(String utteranceId, boolean interrupted) {
+                    dispatchVoiceEvent("eduturnos-native-tts-end", null, null);
+                }
+            });
+            speechSynthesizerReady = true;
+            speechSynthesizerInitializationComplete = true;
+            if (pendingSpeechText != null) {
+                String text = pendingSpeechText;
+                pendingSpeechText = null;
+                speakText(text);
+            }
+        });
+    }
+
+    private void configureSpanishVoice() {
+        Locale colombianSpanish = new Locale("es", "CO");
+        int languageResult = speechSynthesizer.setLanguage(colombianSpanish);
+        if (languageResult == TextToSpeech.LANG_MISSING_DATA
+                || languageResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+            languageResult = speechSynthesizer.setLanguage(new Locale("es", "ES"));
+        }
+        if (languageResult == TextToSpeech.LANG_MISSING_DATA
+                || languageResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+            speechSynthesizer.setLanguage(new Locale("es"));
+        }
+        speechSynthesizer.setSpeechRate(1.0f);
+
+        Set<Voice> availableVoices = speechSynthesizer.getVoices();
+        List<Voice> voices = new ArrayList<>();
+        if (availableVoices != null) {
+            for (Voice voice : availableVoices) {
+                if ("es".equalsIgnoreCase(voice.getLocale().getLanguage())) voices.add(voice);
+            }
+        }
+        Collections.sort(voices, new Comparator<Voice>() {
+            @Override
+            public int compare(Voice first, Voice second) {
+                return Integer.compare(
+                        voicePreference(first, colombianSpanish),
+                        voicePreference(second, colombianSpanish)
+                );
+            }
+        });
+        if (!voices.isEmpty()) speechSynthesizer.setVoice(voices.get(0));
+    }
+
+    private int voicePreference(Voice voice, Locale preferredLocale) {
+        String name = voice.getName();
+        int preference = FEMALE_VOICE_NAME.matcher(name).find() ? 0 : 10;
+        Locale locale = voice.getLocale();
+        if (preferredLocale.equals(locale)) {
+            preference += 0;
+        } else if ("ES".equalsIgnoreCase(locale.getCountry())) {
+            preference += 1;
+        } else {
+            preference += 2;
+        }
+        if (voice.isNetworkConnectionRequired()) preference += 1;
+        return preference;
+    }
+
+    private void speakText(String text) {
+        if (speechSynthesizerInitializationComplete && !speechSynthesizerReady) {
+            dispatchVoiceEvent("eduturnos-native-tts-error", "error", "unavailable");
+            return;
+        }
+        if (speechSynthesizer == null || !speechSynthesizerReady) {
+            pendingSpeechText = text;
+            return;
+        }
+        String utteranceId = "eduturnos-" + (++speechUtteranceSequence);
+        int result = speechSynthesizer.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+        if (result == TextToSpeech.ERROR) {
+            dispatchVoiceEvent("eduturnos-native-tts-error", "error", "synthesis");
+        }
+    }
+
     private final class VoiceLauncher {
         @JavascriptInterface
         public void startListening() {
@@ -197,6 +374,24 @@ public class MainActivity extends BridgeActivity {
         @JavascriptInterface
         public void stopListening() {
             runOnUiThread(MainActivity.this::stopVoiceRecognition);
+        }
+
+        @JavascriptInterface
+        public void speak(String text) {
+            if (text == null || text.trim().isEmpty()) {
+                dispatchVoiceEvent("eduturnos-native-tts-error", "error", "empty-text");
+                return;
+            }
+            String speech = text.trim();
+            runOnUiThread(() -> speakText(speech));
+        }
+
+        @JavascriptInterface
+        public void stopSpeaking() {
+            runOnUiThread(() -> {
+                pendingSpeechText = null;
+                if (speechSynthesizer != null) speechSynthesizer.stop();
+            });
         }
     }
 

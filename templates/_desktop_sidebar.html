@@ -14,6 +14,7 @@
   <nav aria-label="Funciones de {{ rol }}">
     {% set iconos_nav = {
       'auth.dashboard': 'home',
+      'compartir_eduturnos': 'share',
       'citas.nueva': 'calendar-plus',
       'citas.index': 'list',
       'calendario.index': 'calendar-days',
@@ -36,6 +37,7 @@
     {% if gestion %}{% set enlaces = enlaces + [('configuracion.index', 'Administración')] %}{% endif %}
     {% if visitante %}{% set enlaces = enlaces + [('justificaciones.index', 'Justificaciones')] %}{% endif %}
     {% set enlaces = enlaces + [('soporte.index', 'Ayuda y soporte')] %}
+    {% set enlaces = enlaces + [('compartir_eduturnos', 'Compartir EDUTURNOS')] %}
     {% for destino, nombre in enlaces %}
     {% if destino == 'citas.nueva' %}
     {% set activo = endpoint == destino %}

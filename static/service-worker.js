@@ -1,12 +1,12 @@
 // Preloads essential app resources and a generic offline fallback without
 // storing authenticated pages or user data.
-const CACHE_VERSION = "eduturnos-v17-voice-icon-cache";
+const CACHE_VERSION = "eduturnos-v18-release24-cache";
 const OFFLINE_URL = "/static/offline.html";
 const APP_SHELL = [
   OFFLINE_URL,
-  "/static/manifest.webmanifest",
-  "/static/icons/eduturnos-192.png",
-  "/static/icons/eduturnos-512.png",
+  "/static/manifest.webmanifest?v=20261109_release24_cache_v1",
+  "/static/icons/eduturnos-192.png?v=20261109_release24_cache_v1",
+  "/static/icons/eduturnos-512.png?v=20261109_release24_cache_v1",
   "/static/icons/eduturnos-192.svg",
   "/static/icons/eduturnos-512.svg",
 ];

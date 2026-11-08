@@ -9,11 +9,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="EDUTURNOS">
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
-    <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}" type="image/png" sizes="192x192">
-    <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261107_voice_input_feedback_v2">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}?v=20261109_release24_cache_v1">
+    <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}?v=20261109_release24_cache_v1" type="image/png" sizes="192x192">
+    <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}?v=20261109_release24_cache_v1" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}?v=20261109_release24_cache_v1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261109_release24_cache_v1">
 
     <title>EDUTURNOS | Comunidad educativa</title>
 
@@ -703,7 +703,7 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
 </style>
 
 {% if beepy_inicio %}<script src="{{ url_for('static', filename='js/beepy.js') }}" defer></script>{% endif %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_mascot_everywhere_v1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261109_release24_cache_v1">
 </head>
 
 <body class="public-home-page">
@@ -730,6 +730,7 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
                     <a href="{{ url_for('institucion') }}">Instituci&oacute;n</a>
                     <a href="{{ url_for('privacidad') }}">Privacidad</a>
                     <a href="{{ url_for('terminos') }}">Condiciones</a>
+                    <a href="{{ url_for('compartir_eduturnos') }}">Compartir EDUTURNOS</a>
                 </div>
                 <details class="nav-menu">
                     <summary class="nav-menu-toggle">
@@ -743,6 +744,7 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
                         <a href="{{ url_for('institucion') }}">Instituci&oacute;n</a>
                         <a href="{{ url_for('privacidad') }}">Privacidad</a>
                         <a href="{{ url_for('terminos') }}">Condiciones</a>
+                        <a href="{{ url_for('compartir_eduturnos') }}">Compartir EDUTURNOS</a>
                     </div>
                 </details>
             </nav>
@@ -910,8 +912,8 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
 {% if request.args.get('mobile') == '1' or session.get('mobile_mode') or 'Android' in request.user_agent.string or 'iPhone' in request.user_agent.string or 'iPad' in request.user_agent.string %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_mobile_recovery_v64">
 {% endif %}
-<script src="{{ url_for('static', filename='js/pwa.js') }}?v=5" defer></script>
-<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261107_voice_input_feedback_v3" defer></script>
+<script src="{{ url_for('static', filename='js/pwa.js') }}?v=6" defer></script>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261109_release24_cache_v1" defer></script>
 {% include '_page_mascot.html' %}
 </body>
 </html>

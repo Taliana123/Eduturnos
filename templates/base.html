@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#172942"><meta name="description" content="EDUTURNOS: gesti�n institucional de citaciones escolares">
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="EDUTURNOS">
-<link rel="manifest" href="{{ url_for('static',filename='manifest.webmanifest') }}"><link rel="icon" href="{{ url_for('static',filename='icons/eduturnos-192.png') }}" type="image/png" sizes="192x192"><link rel="icon" href="{{ url_for('static',filename='icons/eduturnos-192.svg') }}" type="image/svg+xml"><link rel="apple-touch-icon" href="{{ url_for('static',filename='icons/eduturnos-192.png') }}"><title>{% block title %}EDUTURNOS{% endblock %}</title>
+<link rel="manifest" href="{{ url_for('static',filename='manifest.webmanifest') }}?v=20261109_release24_cache_v1"><link rel="icon" href="{{ url_for('static',filename='icons/eduturnos-192.png') }}?v=20261109_release24_cache_v1" type="image/png" sizes="192x192"><link rel="icon" href="{{ url_for('static',filename='icons/eduturnos-192.svg') }}?v=20261109_release24_cache_v1" type="image/svg+xml"><link rel="apple-touch-icon" href="{{ url_for('static',filename='icons/eduturnos-192.png') }}?v=20261109_release24_cache_v1"><title>{% block title %}EDUTURNOS{% endblock %}</title>
 <link rel="stylesheet" href="{{ url_for('static',filename='css/estilos.css') }}?v=20261006_calendar_ampm">
 <!-- EDUTURNOS_ESTILO_FIJO -->
 
@@ -1705,8 +1705,8 @@ header.eduturnos-header .eduturnos-logo span {
     }
 </style>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/role-forms.css') }}?v=20261012_assignment_compact_v4">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261107_voice_input_feedback_v2">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261107_mascot_everywhere_v1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261109_release24_cache_v1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261109_release24_cache_v1">
 {% block page_styles %}{% endblock %}
 </head>
 <body class="{% if request.endpoint and (request.endpoint.startswith('auth.') or request.endpoint == 'passwords.recuperar' or request.endpoint == 'passwords.restablecer') %}auth-page{% endif %}{% if usuario_navegacion %} has-desktop-sidebar{% endif %}">
@@ -1729,11 +1729,11 @@ header.eduturnos-header .eduturnos-logo span {
 {% include '_desktop_sidebar.html' %}
 {% include '_page_mascot.html' %}
 {% if usuario_navegacion %}<button class="mobile-nav-backdrop" type="button" data-mobile-nav-backdrop aria-label="Cerrar men�" hidden></button>{% endif %}
-<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261107_voice_input_feedback_v3" defer></script>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261109_release24_cache_v1" defer></script>
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20261107_service_worker_register_v2" defer></script>
 <script src="{{ url_for('static', filename='js/public-back.js') }}?v=20261021_public_back_v3" defer></script>
 <script src="{{ url_for('static',filename='js/form-preserve.js') }}?v=20261018_form_recovery_v1" defer></script>
-<script src="{{ url_for('static',filename='js/pwa.js') }}?v=5" defer></script>
+<script src="{{ url_for('static',filename='js/pwa.js') }}?v=6" defer></script>
 
 <!-- EDUTURNOS_VISUAL_FINAL_REAL -->
 

@@ -184,6 +184,27 @@
     text-decoration: none;
 }
 
+.dashboard-help-chat .assistant-action-confirm {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 8px;
+    padding: 9px 12px;
+    color: #8a2331;
+    background: #fff3f4;
+    border: 1px solid #e8b9bf;
+    border-radius: 9px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.dashboard-help-chat .assistant-action-confirm:hover,
+.dashboard-help-chat .assistant-action-confirm:focus-visible {
+    background: #ffe5e8;
+    border-color: #d98d97;
+}
+
 .dashboard-help-chat .assistant-action-link:hover,
 .dashboard-help-chat .assistant-action-link:focus-visible {
     background: #e2ecff;
@@ -748,8 +769,8 @@
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
     width: min(370px, calc(100vw - 24px));
-    height: min(590px, calc(100dvh - 24px));
-    min-height: 420px;
+    height: min(500px, calc(100dvh - 24px));
+    min-height: min(420px, calc(100dvh - 24px));
     overflow: hidden;
     color: #f8f6ff;
     background:
@@ -773,6 +794,98 @@
     align-items: flex-start;
     justify-content: space-between;
     padding: 22px 22px 8px;
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
+}
+
+.assistant-voice-call.is-dragging .assistant-voice-call__header {
+    cursor: grabbing;
+}
+
+.assistant-voice-call.is-dragging,
+.assistant-voice-call.is-resizing {
+    user-select: none;
+}
+
+.assistant-voice-call__resize {
+    position: absolute;
+    z-index: 2;
+    display: block !important;
+    width: 26px !important;
+    min-width: 26px !important;
+    height: 26px !important;
+    min-height: 26px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    appearance: none;
+    touch-action: none;
+}
+
+.assistant-voice-call__resize::after {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    content: "";
+    border-color: rgba(215, 205, 238, .62);
+    border-style: solid;
+}
+
+.assistant-voice-call__resize:focus-visible {
+    outline: 2px solid #b4a8d1 !important;
+    outline-offset: -3px;
+}
+
+.assistant-voice-call__resize-nw {
+    top: 0;
+    left: 0;
+    cursor: nwse-resize;
+}
+
+.assistant-voice-call__resize-nw::after {
+    top: 5px;
+    left: 5px;
+    border-width: 1px 0 0 1px;
+}
+
+.assistant-voice-call__resize-ne {
+    top: 0;
+    right: 0;
+    cursor: nesw-resize;
+}
+
+.assistant-voice-call__resize-ne::after {
+    top: 5px;
+    right: 5px;
+    border-width: 1px 1px 0 0;
+}
+
+.assistant-voice-call__resize-sw {
+    bottom: 0;
+    left: 0;
+    cursor: nesw-resize;
+}
+
+.assistant-voice-call__resize-sw::after {
+    bottom: 5px;
+    left: 5px;
+    border-width: 0 0 1px 1px;
+}
+
+.assistant-voice-call__resize-se {
+    right: 0;
+    bottom: 0;
+    cursor: nwse-resize;
+}
+
+.assistant-voice-call__resize-se::after {
+    right: 5px;
+    bottom: 5px;
+    border-width: 0 1px 1px 0;
 }
 
 .assistant-voice-call__header small {
@@ -941,6 +1054,47 @@
     font-weight: 700;
 }
 
+.assistant-voice-call__action-link,
+.assistant-voice-call__confirm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    margin-top: 10px;
+    padding: 9px 12px;
+    color: #f8f6ff;
+    background: rgba(156, 135, 214, .18);
+    border: 1px solid rgba(215, 205, 238, .38);
+    border-radius: 10px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.35;
+    text-align: center;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+
+.assistant-voice-call__action-link:hover,
+.assistant-voice-call__action-link:focus-visible,
+.assistant-voice-call__confirm:hover,
+.assistant-voice-call__confirm:focus-visible {
+    background: rgba(156, 135, 214, .32);
+    border-color: rgba(215, 205, 238, .7);
+}
+
+.assistant-voice-call__action-link[hidden],
+.assistant-voice-call__confirm[hidden] {
+    display: none !important;
+}
+
+.assistant-voice-call__confirm {
+    color: #fff;
+    background: #8a3445;
+    border-color: rgba(255, 220, 226, .5);
+}
+
 .assistant-voice-call__privacy {
     margin: 0;
     padding: 12px 20px 17px;
@@ -953,14 +1107,14 @@
 @media (max-width: 480px) {
     .assistant-voice-call {
         width: min(350px, calc(100vw - 20px));
-        height: min(560px, calc(100dvh - 20px));
+        height: min(480px, calc(100dvh - 20px));
         min-height: min(420px, calc(100dvh - 20px));
         border-radius: 22px;
     }
 
     .assistant-voice-call__avatar {
-        width: min(190px, 50vw);
-        height: min(190px, 50vw);
+        width: min(160px, 46vw);
+        height: min(160px, 46vw);
     }
 }
 
