@@ -11,7 +11,7 @@
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}?v=20261109_release24_cache_v1" type="image/png" sizes="192x192">
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}?v=20261109_release24_cache_v1" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}?v=20261109_release24_cache_v1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261109_voice_avatar_v2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261118_voice_avatar_v3">
     <title>EDUTURNOS · {{ titulo }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_public_menu_title_v65" media="(max-width: 900px)">
 
@@ -88,6 +88,18 @@
 
         .menu .activo {
             color: #2563eb;
+        }
+
+        .menu > a.login:hover,
+        .menu > a.login:focus-visible,
+        .menu > a.login:active {
+            background: #102a56;
+            color: #fff !important;
+        }
+
+        .menu a:focus-visible {
+            outline: 3px solid #f2c14e;
+            outline-offset: 3px;
         }
 
         .menu-dropdown {
@@ -184,7 +196,6 @@
         .menu-dropdown-links a:hover,
         .menu-dropdown-links a:focus-visible {
             background: #edf6fc;
-            outline: none;
         }
 
         @media (min-width: 901px) {

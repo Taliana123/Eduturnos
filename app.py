@@ -36,6 +36,7 @@ from roles import SEDES_INSTITUCIONALES
 from security import csrf_token, require_configured_secret, validar_csrf
 from servicios.mail import mail
 from servicios.reuniones import HORARIOS_CITAS, formatear_hora
+from servicios.avatar import AVATAR_CHOICES, avatar_inicial, obtener_o_crear_avatar
 
 
 class EduturnosSvgPathImage(SvgPathImage):
@@ -121,7 +122,21 @@ def create_app():
         endpoint = request.endpoint or ""
         publica = endpoint.startswith("auth.") and endpoint != "auth.dashboard"
         usuario = usuario_actual() if session.get("usuario_id") and not publica else None
-        return {"usuario_navegacion": usuario}
+        avatar_config = None
+        if usuario:
+            try:
+                avatar_config = obtener_o_crear_avatar(usuario["id_usuario"])
+            except MySQLError:
+                app.logger.exception(
+                    "No se pudo cargar el personaje del usuario %s",
+                    usuario["id_usuario"],
+                )
+                avatar_config = avatar_inicial(usuario["id_usuario"])
+        return {
+            "usuario_navegacion": usuario,
+            "avatar_config": avatar_config,
+            "avatar_choices": AVATAR_CHOICES,
+        }
 
     # Blueprint de autenticaciÃ³n
     app.register_blueprint(auth_bp, url_prefix="/auth")

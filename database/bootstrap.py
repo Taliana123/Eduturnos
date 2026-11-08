@@ -31,6 +31,9 @@ def ensure_database(config=None):
         cursor.execute("SELECT 1")
         cursor.fetchone()
 
+        migracion_avatar = Path(__file__).resolve().parents[1] / "sql" / "user_avatars.sql"
+        cursor.execute(migracion_avatar.read_text(encoding="utf-8"))
+
         # Aislamiento institucional incremental: asigna lo ya existente a
         # JJFH y habilita instituciones independientes sin tocar sus datos.
         cursor.execute("SHOW COLUMNS FROM instituciones LIKE 'requiere_codigo_institucional'")

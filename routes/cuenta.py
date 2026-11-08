@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, jsonify, render_template, request
 
 from database.db import consultar
 from routes.helpers import login_requerido, usuario_actual
+from servicios.avatar import guardar_avatar
 
 cuenta_bp = Blueprint("cuenta", __name__, url_prefix="/cuenta")
 
@@ -43,3 +44,19 @@ def index():
         perfil=perfil,
         puede_configurar=rol in ("Super Admin", "Rector", "Administrador / Coordinador"),
     )
+
+
+@cuenta_bp.post("/avatar")
+@login_requerido
+def actualizar_avatar():
+    usuario = usuario_actual()
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({"ok": False, "error": "Envía una configuración de personaje válida."}), 400
+
+    try:
+        avatar = guardar_avatar(usuario["id_usuario"], payload)
+    except ValueError as exc:
+        return jsonify({"ok": False, "error": str(exc)}), 400
+
+    return jsonify({"ok": True, "avatar": avatar})

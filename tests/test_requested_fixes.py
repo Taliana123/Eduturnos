@@ -223,8 +223,8 @@ def test_llamada_de_voz_usa_sintesis_nativa_con_respaldo_web():
     assert 'eduturnos-native-tts-end' in activity
     assert "TextToSpeech.QUEUE_FLUSH" in activity
     assert "FEMALE_VOICE_NAME" in activity
-    assert 'versionName "2.7"' in android_build
-    assert "versionCode 17" in android_build
+    assert 'versionName "2.8"' in android_build
+    assert "versionCode 18" in android_build
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
@@ -800,7 +800,7 @@ def test_configuration_catalog_forms_follow_motives_layout_without_changing_inst
     assert 'class="motivo-edit-form config-record-form"' in template
     assert 'class="state-form state-form-row config-record-form"' in template
     assert "config-record-actions" in template
-    assert "20261109_address_field_v2" in template
+    assert "20261118_vertical_institution_v3" in template
     assert 'class="full-field institution-address"' in template
     assert 'class="institution-identity"' in template
     assert "minmax(300px, 1.8fr)" in css

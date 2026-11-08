@@ -13,7 +13,7 @@
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}?v=20261109_release24_cache_v1" type="image/png" sizes="192x192">
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}?v=20261109_release24_cache_v1" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}?v=20261109_release24_cache_v1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261109_voice_avatar_v2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261118_voice_avatar_v3">
 
     <title>EDUTURNOS | Comunidad educativa</title>
 
@@ -284,6 +284,16 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%) !important;
             transform: translateY(-1px);
         }
 
+        .nav .nav-login:visited,
+        .nav .nav-login:focus-visible,
+        .nav .nav-login:active {
+            color: #fff !important;
+        }
+
+        .nav .nav-login:focus-visible {
+            background: #12568d;
+        }
+
         .nav a {
             user-select: none;
             transition: color .16s ease, background-color .16s ease, transform .16s ease, box-shadow .16s ease;
@@ -300,6 +310,23 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%) !important;
 
         .nav a:active {
             transform: translateY(0) scale(.98);
+        }
+
+        .acciones .boton-principal:visited,
+        .acciones .boton-principal:focus-visible,
+        .acciones .boton-principal:active {
+            color: #fff !important;
+        }
+
+        .acciones .boton-secundario:visited,
+        .acciones .boton-secundario:focus-visible,
+        .acciones .boton-secundario:active {
+            color: #174a73;
+        }
+
+        .acciones .boton:focus-visible {
+            outline: 3px solid #f2c14e;
+            outline-offset: 3px;
         }
 
         /* =================================================
