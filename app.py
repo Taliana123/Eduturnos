@@ -37,7 +37,7 @@ from roles import SEDES_INSTITUCIONALES
 from security import csrf_token, require_configured_secret, validar_csrf
 from servicios.mail import mail
 from servicios.reuniones import HORARIOS_CITAS, formatear_hora
-from servicios.avatar import AVATAR_CHOICES, avatar_inicial, obtener_o_crear_avatar
+from servicios.avatar import avatar_inicial, obtener_o_crear_avatar
 
 
 class EduturnosSvgPathImage(SvgPathImage):
@@ -136,7 +136,6 @@ def create_app():
         return {
             "usuario_navegacion": usuario,
             "avatar_config": avatar_config,
-            "avatar_choices": AVATAR_CHOICES,
         }
 
     # Blueprint de autenticaciÃ³n

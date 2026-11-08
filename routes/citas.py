@@ -5,7 +5,7 @@ from io import BytesIO
 from flask import Blueprint, Response, render_template, request, redirect, url_for, flash, abort, jsonify
 
 from database.db import consultar, ejecutar, transaccion
-from servicios.reuniones import PERSONAL, bloquear_agenda, comprobar_hueco, datos_escolares, formatear_hora, reservar_cita, validar_compromiso, validar_disponibilidad, validar_franja
+from servicios.reuniones import PERSONAL, bloquear_agenda, comprobar_hueco, datos_escolares, formatear_hora, procesar_sincronizacion_inmediata, reservar_cita, validar_compromiso, validar_disponibilidad, validar_franja
 from routes.helpers import (
     usuario_actual,
     login_requerido,
@@ -1460,6 +1460,7 @@ def cambiar_estado(cita_id):
     # ACTUALIZAR ESTADO
     # ---------------------------------------------
 
+    tareas_google = 0
     with transaccion() as cnx:
         cursor = cnx.cursor(dictionary=True)
         try:
@@ -1475,7 +1476,7 @@ def cambiar_estado(cita_id):
                 return redirect(url_for("citas.index"))
             from servicios.google_calendar import encolar_cita_cursor
 
-            encolar_cita_cursor(
+            tareas_google = encolar_cita_cursor(
                 cursor,
                 cita_id,
                 cita.get("creado_por") or usuario["id_usuario"],
@@ -1483,6 +1484,9 @@ def cambiar_estado(cita_id):
             )
         finally:
             cursor.close()
+
+    if tareas_google:
+        procesar_sincronizacion_inmediata(cita_id)
 
     # ---------------------------------------------
     # NOTIFICAR CAMBIO
@@ -1593,6 +1597,7 @@ def reprogramar_cita(cita_id):
         if not motivo or len(motivo) > 2000:
             raise ValueError("Indica el motivo del cambio de fecha, hasta 2000 caracteres.")
         validar_disponibilidad(cita["id_docente"], fecha, hora)
+        tareas_google = 0
         with transaccion() as cnx:
             cursor = cnx.cursor(dictionary=True)
             try:
@@ -1615,12 +1620,14 @@ def reprogramar_cita(cita_id):
                 cursor.execute("INSERT INTO reprogramaciones_cita(id_cita,fecha_anterior,hora_anterior,fecha_nueva,hora_nueva,motivo,realizado_por) VALUES(%s,%s,%s,%s,%s,%s,%s)", (nueva_cita_id, actual["fecha"], actual["hora"], fecha, hora, motivo, usuario["id_usuario"]))
                 from servicios.google_calendar import encolar_cita_cursor
 
-                encolar_cita_cursor(cursor, nueva_cita_id, usuario["id_usuario"])
+                tareas_google = encolar_cita_cursor(cursor, nueva_cita_id, usuario["id_usuario"])
             finally:
                 cursor.close()
     except ValueError as exc:
         flash(str(exc), "error")
         return redirect(url_for("citas.index", _anchor=f"cita-dialog-{cita_id}"))
+    if tareas_google:
+        procesar_sincronizacion_inmediata(nueva_cita_id)
     auditoria("REPROGRAMAR", "Citas", nueva_cita_id, f"Cita anterior: {cita_id}. Nueva fecha: {fecha} {formatear_hora(hora)}")
     _notificar(nueva_cita_id, "Citación reprogramada", f"La nueva fecha de tu citación es {fecha} a las {formatear_hora(hora)}.")
     flash("Cita reprogramada y participantes notificados.", "success")
@@ -1763,6 +1770,7 @@ def resolver_solicitud_reprogramacion(solicitud_id):
 
     solicitud = None
     aceptada = accion == "aceptar"
+    tareas_google = 0
     try:
         with transaccion() as conexion:
             cursor = conexion.cursor(dictionary=True)
@@ -1894,7 +1902,7 @@ def resolver_solicitud_reprogramacion(solicitud_id):
                     )
                     from servicios.google_calendar import encolar_cita_cursor
 
-                    encolar_cita_cursor(
+                    tareas_google = encolar_cita_cursor(
                         cursor,
                         solicitud["id_cita"],
                         usuario["id_usuario"],
@@ -1921,6 +1929,8 @@ def resolver_solicitud_reprogramacion(solicitud_id):
         return redirect(url_for("solicitudes.index"))
 
     if aceptada:
+        if tareas_google:
+            procesar_sincronizacion_inmediata(solicitud["id_cita"])
         auditoria(
             "ACEPTAR_REPROGRAMACION",
             "Citas",

@@ -1,0 +1,356 @@
+{
+  "head": [
+    {
+      "id": "hm1-p-000001",
+      "name": "fluffy-bob"
+    },
+    {
+      "id": "hm1-p-000002",
+      "name": "round-bob"
+    },
+    {
+      "id": "hm1-p-000003",
+      "name": "short"
+    },
+    {
+      "id": "hm1-p-000004",
+      "name": "curly-short"
+    },
+    {
+      "id": "hm1-p-000005",
+      "name": "short-bangs"
+    },
+    {
+      "id": "hm1-p-000006",
+      "name": "side-swept-short"
+    },
+    {
+      "id": "hm1-p-000007",
+      "name": "messy-short"
+    },
+    {
+      "id": "hm1-p-000008",
+      "name": "wavy-medium"
+    },
+    {
+      "id": "hm1-p-000009",
+      "name": "flipped-long"
+    },
+    {
+      "id": "hm1-p-000010",
+      "name": "lob"
+    },
+    {
+      "id": "hm1-p-000011",
+      "name": "long-straight"
+    },
+    {
+      "id": "hm1-p-000012",
+      "name": "side-swept-lob"
+    },
+    {
+      "id": "hm1-p-000013",
+      "name": "blunt-bob"
+    },
+    {
+      "id": "hm1-p-000014",
+      "name": "bun"
+    },
+    {
+      "id": "hm1-p-000015",
+      "name": "low-side-bun"
+    },
+    {
+      "id": "hm1-p-000016",
+      "name": "low-twin-buns"
+    },
+    {
+      "id": "hm1-p-000017",
+      "name": "ponytail"
+    },
+    {
+      "id": "hm1-p-000018",
+      "name": "low-ponytail"
+    },
+    {
+      "id": "hm1-p-000019",
+      "name": "low-twin-tails"
+    },
+    {
+      "id": "hm1-p-000020",
+      "name": "braids"
+    },
+    {
+      "id": "hm1-p-000021",
+      "name": "blunt-long"
+    },
+    {
+      "id": "hm1-p-000022",
+      "name": "side-swept-long"
+    },
+    {
+      "id": "hm1-p-000023",
+      "name": "wavy-long"
+    },
+    {
+      "id": "hm1-p-000024",
+      "name": "curly-long"
+    }
+  ],
+  "body": [
+    {
+      "id": "hm1-p-000025",
+      "name": "cropped-shirt"
+    },
+    {
+      "id": "hm1-p-000026",
+      "name": "tank-top"
+    },
+    {
+      "id": "hm1-p-000027",
+      "name": "drape-tee"
+    },
+    {
+      "id": "hm1-p-000028",
+      "name": "polo"
+    },
+    {
+      "id": "hm1-p-000029",
+      "name": "tee"
+    },
+    {
+      "id": "hm1-p-000030",
+      "name": "shirt"
+    },
+    {
+      "id": "hm1-p-000031",
+      "name": "jacket"
+    },
+    {
+      "id": "hm1-p-000032",
+      "name": "hoodie"
+    }
+  ],
+  "bottom": [
+    {
+      "id": "hm1-p-000033",
+      "name": "wide-pants"
+    },
+    {
+      "id": "hm1-p-000034",
+      "name": "tapered-pants"
+    },
+    {
+      "id": "hm1-p-000035",
+      "name": "culottes"
+    },
+    {
+      "id": "hm1-p-000036",
+      "name": "long-skirt"
+    },
+    {
+      "id": "hm1-p-000037",
+      "name": "mini-skirt"
+    },
+    {
+      "id": "hm1-p-000038",
+      "name": "midi-skirt"
+    },
+    {
+      "id": "hm1-p-000039",
+      "name": "flared-skirt"
+    },
+    {
+      "id": "hm1-p-000040",
+      "name": "cropped-pants"
+    }
+  ],
+  "item": [
+    {
+      "id": "hm1-p-000041",
+      "name": "none"
+    },
+    {
+      "id": "hm1-p-000054",
+      "name": "santa-hat"
+    },
+    {
+      "id": "hm1-p-000059",
+      "name": "tabby-cat"
+    },
+    {
+      "id": "hm1-p-000053",
+      "name": "duck"
+    },
+    {
+      "id": "hm1-p-000060",
+      "name": "cream-cat"
+    },
+    {
+      "id": "hm1-p-000052",
+      "name": "ice-cream"
+    },
+    {
+      "id": "hm1-p-000061",
+      "name": "ginger-cat"
+    },
+    {
+      "id": "hm1-p-000051",
+      "name": "flower"
+    },
+    {
+      "id": "hm1-p-000062",
+      "name": "white-cat"
+    },
+    {
+      "id": "hm1-p-000050",
+      "name": "crown"
+    },
+    {
+      "id": "hm1-p-000063",
+      "name": "black-cat"
+    },
+    {
+      "id": "hm1-p-000049",
+      "name": "halo"
+    },
+    {
+      "id": "hm1-p-000065",
+      "name": "siamese-cat"
+    },
+    {
+      "id": "hm1-p-000048",
+      "name": "bunny-ears"
+    },
+    {
+      "id": "hm1-p-000066",
+      "name": "gray-cat"
+    },
+    {
+      "id": "hm1-p-000047",
+      "name": "antennae"
+    },
+    {
+      "id": "hm1-p-000067",
+      "name": "tabby-tuxedo-cat"
+    },
+    {
+      "id": "hm1-p-000042",
+      "name": "crab-headband"
+    },
+    {
+      "id": "hm1-p-000068",
+      "name": "calico-cat"
+    },
+    {
+      "id": "hm1-p-000043",
+      "name": "tuna-sushi"
+    },
+    {
+      "id": "hm1-p-000069",
+      "name": "brown-tabby-cat"
+    },
+    {
+      "id": "hm1-p-000045",
+      "name": "sprout"
+    },
+    {
+      "id": "hm1-p-000064",
+      "name": "tuxedo-cat"
+    },
+    {
+      "id": "hm1-p-000046",
+      "name": "beer"
+    },
+    {
+      "id": "hm1-p-000055",
+      "name": "camera"
+    },
+    {
+      "id": "hm1-p-000044",
+      "name": "shrimp-sushi"
+    },
+    {
+      "id": "hm1-p-000070",
+      "name": "wind-chime"
+    },
+    {
+      "id": "hm1-p-000071",
+      "name": "frog-alt"
+    },
+    {
+      "id": "hm1-p-000072",
+      "name": "ramune"
+    },
+    {
+      "id": "hm1-p-000073",
+      "name": "takoyaki"
+    },
+    {
+      "id": "hm1-p-000074",
+      "name": "chocolate-banana"
+    },
+    {
+      "id": "hm1-p-000075",
+      "name": "yoyo"
+    },
+    {
+      "id": "hm1-p-000076",
+      "name": "beach-ball"
+    },
+    {
+      "id": "hm1-p-000077",
+      "name": "sunflower"
+    },
+    {
+      "id": "hm1-p-000078",
+      "name": "eggplant"
+    },
+    {
+      "id": "hm1-p-000079",
+      "name": "shark"
+    },
+    {
+      "id": "hm1-p-000080",
+      "name": "fox-mask"
+    },
+    {
+      "id": "hm1-p-000081",
+      "name": "banana"
+    },
+    {
+      "id": "hm1-p-000082",
+      "name": "watermelon"
+    },
+    {
+      "id": "hm1-p-000083",
+      "name": "pineapple"
+    },
+    {
+      "id": "hm1-p-000084",
+      "name": "candied-apple"
+    },
+    {
+      "id": "hm1-p-000085",
+      "name": "sunglasses"
+    },
+    {
+      "id": "hm1-p-000086",
+      "name": "goggles"
+    }
+  ],
+  "glasses": [
+    {
+      "id": "hm1-p-000056",
+      "name": "none"
+    },
+    {
+      "id": "hm1-p-000057",
+      "name": "round"
+    },
+    {
+      "id": "hm1-p-000058",
+      "name": "tiny"
+    }
+  ]
+}

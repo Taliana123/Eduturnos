@@ -895,7 +895,8 @@
 </style>
 
 
-<div class="edc-page">
+<div class="edc-page" data-calendar-api-url="{{ url_for('calendario.api_citas') }}" data-calendar-snapshot="{{ calendar_snapshot|tojson|forceescape }}">
+    <p class="edc-live-status" data-calendar-live-status role="status" aria-live="polite" hidden></p>
 
 
     <!-- ======================================================
@@ -1746,7 +1747,60 @@
 
     {% endif %}
 
+    <script>
+    (() => {
+        const page = document.querySelector(".edc-page[data-calendar-api-url]");
+        const status = page?.querySelector("[data-calendar-live-status]");
+        if (!page || !status) return;
 
+        const normalize = (entries) => entries
+            .map((entry) => ({
+                id: Number(entry.id),
+                fecha: String(entry.fecha || ""),
+                hora: String(entry.hora || "").slice(0, 8),
+                estado: String(entry.estado || ""),
+            }))
+            .sort((left, right) => left.id - right.id);
+        const original = JSON.stringify(normalize(JSON.parse(page.dataset.calendarSnapshot || "[]")));
+        let updating = false;
+
+        const refreshIfChanged = async () => {
+            if (updating || document.visibilityState === "hidden") return;
+            try {
+                const endpoint = new URL(page.dataset.calendarApiUrl, window.location.origin);
+                endpoint.search = window.location.search;
+                const response = await fetch(endpoint, {
+                    credentials: "same-origin",
+                    cache: "no-store",
+                    headers: { Accept: "application/json" },
+                });
+                if (!response.ok) throw new Error(`El calendario respondió HTTP ${response.status}.`);
+                const result = await response.json();
+                if (!result.ok || !Array.isArray(result.snapshot)) {
+                    throw new Error("La respuesta de actualización del calendario no es válida.");
+                }
+                if (JSON.stringify(normalize(result.snapshot)) !== original) {
+                    updating = true;
+                    status.hidden = false;
+                    status.textContent = "La agenda cambió. Actualizando las citas…";
+                    window.location.reload();
+                } else {
+                    status.hidden = true;
+                    status.textContent = "";
+                }
+            } catch (error) {
+                status.hidden = false;
+                status.textContent = "No se pudo actualizar la agenda. Recarga la página para volver a intentarlo.";
+                console.error("No se pudieron comprobar las citas nuevas del calendario.", error);
+            }
+        };
+
+        window.setInterval(refreshIfChanged, 10000);
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") refreshIfChanged();
+        });
+    })();
+    </script>
 </div>
 
 

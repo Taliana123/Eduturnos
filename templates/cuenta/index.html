@@ -14,7 +14,7 @@
 
     <section class="cuenta-avatar-card" aria-label="Tu personaje">
         <button class="cuenta-avatar-preview" type="button" data-avatar-open data-avatar-user="{{ usuario.id_usuario }}" data-avatar-config="{{ avatar_config|tojson|forceescape }}" aria-haspopup="dialog" aria-controls="avatar-customizer" aria-label="Personalizar mi personaje">
-            {{ avatar_art(avatar_config) }}
+            {{ avatar_art(avatar_config, usuario.id_usuario) }}
         </button>
         <div>
             <h2>Tu personaje</h2>
@@ -89,6 +89,7 @@
 .cuenta-avatar-card p{margin:0;}
 .cuenta-avatar-edit{margin-left:auto;white-space:nowrap;}
 .cuenta-section{padding:18px 0;margin:0 0 14px;border:0;background:transparent;}
+.cuenta-section[aria-labelledby="cuenta-personal-title"]{padding-top:6px;}
 .cuenta-section:last-child{margin-bottom:0;}
 .cuenta-section-title{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .cuenta-section-title h2{margin:0;color:#172942;font-size:18px;}

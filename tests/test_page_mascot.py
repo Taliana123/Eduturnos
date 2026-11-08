@@ -50,7 +50,7 @@ def test_drone_sprite_sheets_are_served_by_flask():
     assert b"/static/mascots/drone-directions.webp" in login.data
     assert b"/static/mascots/drone-reactions.webp" in login.data
     assert b"data-assistant-public-call" in login.data
-    assert b"/static/js/asistente.js?v=20261109_voice_avatar_v2" in login.data
+    assert b"/static/js/asistente.js?v=20261109_markdown_lists_v3" in login.data
     assert b"page-mascot--login" not in login.data
     assert login.data.index(b"page-mascot--floating") > login.data.index(b"</main>")
 
@@ -64,7 +64,7 @@ def test_drone_sprite_sheets_are_served_by_flask():
     home = client.get("/")
     assert home.status_code == 200
     assert b"data-assistant-public-call" in home.data
-    assert b"/static/js/asistente.js?v=20261109_voice_avatar_v2" in home.data
+    assert b"/static/js/asistente.js?v=20261109_markdown_lists_v3" in home.data
 
 
 def test_legacy_floating_robot_widget_is_removed_without_removing_chat_avatar():

@@ -1405,9 +1405,23 @@ html body.has-desktop-sidebar #contenido .administracion-page .configuracion-pag
     margin: 0 0 14px;
 }
 
-.configuracion-page .cuentas-inscritas-search input {
-    width: 100%;
+.configuracion-page .cuentas-inscritas-search-controls {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
     margin-top: 6px;
+}
+
+.configuracion-page .cuentas-inscritas-search input {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+}
+
+.configuracion-page .cuentas-inscritas-search-controls button {
+    flex: 0 0 auto;
+    min-height: 40px;
+    white-space: nowrap;
 }
 
 .configuracion-page .cuentas-inscritas-table {

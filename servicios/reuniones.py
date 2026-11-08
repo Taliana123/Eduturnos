@@ -1,6 +1,7 @@
 from datetime import date, datetime, time, timedelta
 
 from database.db import consultar, transaccion
+from flask import current_app
 
 PERSONAL = ("Super Admin", "Rector", "Administrador / Coordinador", "Docente")
 HORARIOS_CITAS = tuple(range(7 * 60, 11 * 60 + 31, 30)) + tuple(range(13 * 60, 17 * 60 + 31, 30))
@@ -101,8 +102,27 @@ def comprobar_hueco(cursor, docente_id, estudiante_id, acudiente_id, fecha, hora
         raise ValueError("Ese horario se cruza con otra reunión del docente, estudiante o acudiente.")
 
 
+def procesar_sincronizacion_inmediata(cita_id):
+    try:
+        from servicios.google_calendar import procesar_cola_google
+
+        resultado = procesar_cola_google(limite=20, cita_id=cita_id)
+        if resultado["fallidas"]:
+            current_app.logger.warning(
+                "La cita %s se guardó, pero %s tareas de Google Calendar requieren reintento.",
+                cita_id,
+                resultado["fallidas"],
+            )
+    except Exception:
+        current_app.logger.exception(
+            "La cita %s se guardó, pero no se pudo iniciar su sincronización inmediata con Google Calendar.",
+            cita_id,
+        )
+
+
 def reservar_cita(sql, params):
     validar_disponibilidad(params[2], params[6], params[7])
+    tareas_google = 0
     with transaccion() as cnx:
         cursor = cnx.cursor(dictionary=True)
         try:
@@ -112,7 +132,9 @@ def reservar_cita(sql, params):
             cita_id = cursor.lastrowid
             from servicios.google_calendar import encolar_cita_cursor
 
-            encolar_cita_cursor(cursor, cita_id, params[10])
+            tareas_google = encolar_cita_cursor(cursor, cita_id, params[10])
         finally:
             cursor.close()
+    if tareas_google:
+        procesar_sincronizacion_inmediata(cita_id)
     return cita_id

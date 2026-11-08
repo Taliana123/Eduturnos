@@ -220,6 +220,21 @@ const initializeEduturnosAssistant = () => {
         const isTableRow = (line) => line.includes("|");
         const isTableSeparator = (line) => line.includes("-") && /^[\s|:-]+$/.test(line);
         const tableCells = (line) => line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim());
+        const parseListItem = (line) => {
+            const ordered = line.match(/^(\d+[.)])\s+(.+)$/);
+            if (ordered) {
+                return {
+                    ordered: true,
+                    text: ordered[2].replace(/^(?:[-*+]\s+)+/, ""),
+                };
+            }
+            const unordered = line.match(/^[-*+]\s+(.+)$/);
+            if (!unordered) return null;
+            return {
+                ordered: false,
+                text: unordered[1].replace(/^(?:[-*+]\s+)+/, ""),
+            };
+        };
         let index = 0;
 
         while (index < lines.length) {
@@ -269,15 +284,14 @@ const initializeEduturnosAssistant = () => {
                 continue;
             }
 
-            const listItem = line.match(/^(\s*)([-*+]|\d+[.)])\s+(.+)$/);
+            const listItem = parseListItem(line);
             if (listItem) {
-                const ordered = /^\d/.test(listItem[2]);
-                const list = document.createElement(ordered ? "ol" : "ul");
+                const list = document.createElement(listItem.ordered ? "ol" : "ul");
                 while (index < lines.length) {
-                    const item = lines[index].trim().match(/^([-*+]|\d+[.)])\s+(.+)$/);
-                    if (!item || /^\d/.test(item[1]) !== ordered) break;
+                    const item = parseListItem(lines[index].trim());
+                    if (!item || item.ordered !== listItem.ordered) break;
                     const element = document.createElement("li");
-                    appendInlineMarkdown(element, item[2]);
+                    appendInlineMarkdown(element, item.text);
                     list.append(element);
                     index += 1;
                 }

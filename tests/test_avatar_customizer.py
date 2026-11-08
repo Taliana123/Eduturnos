@@ -1,6 +1,4 @@
 import json
-import re
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
@@ -9,34 +7,36 @@ from app import app
 from servicios import avatar
 
 
+ROOT = Path(__file__).resolve().parents[1]
+
+
 def test_avatar_inicial_es_estable_y_variado_por_usuario():
     first = avatar.avatar_inicial(1)
 
     assert first == avatar.avatar_inicial(1)
     assert first != avatar.avatar_inicial(2)
-    assert set(first) == set(avatar.DEFAULT_AVATAR)
+    assert set(first) == avatar.AVATAR_FIELDS
+    assert first["seed"] == "eduturnos-1"
+    assert first["selections"] == {}
+    assert first["background"] == "transparent"
 
 
-def test_normalizar_avatar_rechaza_opciones_no_permitidas():
-    invalid = dict(avatar.DEFAULT_AVATAR, hairColor="url(https://example.invalid/evil.svg)")
+def test_normalizar_avatar_acepta_solo_partes_y_colores_humation():
+    catalog = json.loads((ROOT / "static" / "vendor" / "humation-parts.json").read_text(encoding="utf-8"))
+    valid = avatar.avatar_inicial(5)
+    valid["selections"] = {"head": catalog["head"][0]["id"], "glasses": catalog["glasses"][0]["id"]}
+    assert avatar.normalizar_avatar(valid) == valid
 
-    with pytest.raises(ValueError):
-        avatar.normalizar_avatar(invalid)
+    invalid_part = {**valid, "selections": {"head": "not-an-official-part"}}
+    with pytest.raises(ValueError, match="catálogo oficial"):
+        avatar.normalizar_avatar(invalid_part)
 
-    with pytest.raises(ValueError):
-        avatar.normalizar_avatar({**avatar.DEFAULT_AVATAR, "extra": "value"})
+    invalid_color = {**valid, "colors": {"hair": "url(https://example.invalid/avatar.svg)"}}
+    with pytest.raises(ValueError, match="color"):
+        avatar.normalizar_avatar(invalid_color)
 
-
-def test_avatar_ofrece_mas_peinados_y_acepta_sus_capas():
-    hairstyles = {
-        option["value"] for option in avatar.AVATAR_CHOICES["hairstyle"]["options"]
-    }
-
-    assert {"afro", "braids", "bob", "side-swept"} <= hairstyles
-    for hairstyle in hairstyles:
-        assert avatar.normalizar_avatar(
-            {**avatar.DEFAULT_AVATAR, "hairstyle": hairstyle}
-        )["hairstyle"] == hairstyle
+    with pytest.raises(ValueError, match="formato esperado"):
+        avatar.normalizar_avatar({**valid, "unexpected": True})
 
 
 def test_obtener_avatar_persiste_una_combinacion_inicial(monkeypatch):
@@ -64,10 +64,44 @@ def test_obtener_avatar_persiste_una_combinacion_inicial(monkeypatch):
     assert json.loads(writes[0][1]) == first
 
 
+def test_obtener_avatar_migra_configuracion_anterior_sin_perder_colores(monkeypatch):
+    legacy = {
+        "character": "neutral",
+        "ageStyle": "teen",
+        "hairstyle": "curly",
+        "hairColor": "#69432f",
+        "skinColor": "#efc19a",
+        "eyeColor": "#493124",
+        "outfit": "hoodie",
+        "shirtColor": "#2875c7",
+        "accessory": "glasses",
+    }
+    stored = {"avatar_json": json.dumps(legacy)}
+    writes = []
+
+    def fake_consultar(_sql, _params, uno=False):
+        assert uno is True
+        return stored
+
+    def fake_ejecutar(_sql, params):
+        writes.append(params)
+        stored["avatar_json"] = params[0]
+
+    monkeypatch.setattr(avatar, "consultar", fake_consultar)
+    monkeypatch.setattr(avatar, "ejecutar", fake_ejecutar)
+    migrated = avatar.obtener_o_crear_avatar(24)
+
+    assert migrated["seed"] == "eduturnos-24"
+    assert migrated["colors"]["hair"] == "#69432F"
+    assert migrated["colors"]["skin"] == "#EFC19A"
+    assert migrated["colors"]["clothes"] == "#2875C7"
+    assert len(writes) == 1
+
+
 def test_endpoint_guarda_solo_el_avatar_de_la_cuenta_autenticada(monkeypatch):
+    import app as app_module
     import routes.cuenta as cuenta
     import routes.helpers as helpers
-    import app as app_module
 
     user = {"id_usuario": 57, "rol_nombre": "Docente"}
     saved = []
@@ -99,35 +133,28 @@ def test_endpoint_guarda_solo_el_avatar_de_la_cuenta_autenticada(monkeypatch):
     assert saved == [(user["id_usuario"], payload)]
 
 
-def test_personalizador_usa_piezas_vectoriales_y_persistencia_de_cuenta():
-    sidebar = Path("templates/_desktop_sidebar.html").read_text(encoding="utf-8")
-    account = Path("templates/cuenta/index.html").read_text(encoding="utf-8")
-    art = Path("templates/_avatar_art.html").read_text(encoding="utf-8")
-    script = Path("static/js/avatar-customizer.js").read_text(encoding="utf-8")
-    stylesheet = Path("static/css/desktop-sidebar.css").read_text(encoding="utf-8")
-    schema = Path("sql/user_avatars.sql").read_text(encoding="utf-8")
+def test_personalizador_usa_renderizador_y_catalogo_oficiales():
+    sidebar = (ROOT / "templates" / "_desktop_sidebar.html").read_text(encoding="utf-8")
+    account = (ROOT / "templates" / "cuenta" / "index.html").read_text(encoding="utf-8")
+    art = (ROOT / "templates" / "_avatar_art.html").read_text(encoding="utf-8")
+    source = (ROOT / "tools" / "humation" / "src.js").read_text(encoding="utf-8")
+    base = (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
+    license_text = (ROOT / "static" / "vendor" / "HUMATION-LICENSE.md").read_text(encoding="utf-8")
 
-    assert 'data-avatar-save-url="{{ url_for(\'cuenta.actualizar_avatar\') }}"' in sidebar
-    assert 'data-avatar-choice data-field="{{ field }}"' in sidebar
+    assert "@humation/core" in source
+    assert "@humation/assets-humation-1" in source
+    assert "getPartsForSlot(humation1, slot)" in source
+    assert "createAvatar(humation1" in source
+    assert 'filename=\'js/humation-avatar.js\'' in base
+    assert "data-avatar-image" in art
+    assert "data-avatar-user" in sidebar
     assert 'data-avatar-open' in account
-    assert "data-avatar-hair" in art
-    assert "data-avatar-outfit" in art
-    assert "data-avatar-choice" in script
-    assert 'method: "POST"' in script
-    assert "X-CSRFToken" in script
-    assert "avatares_usuario" in schema
-    assert "FOREIGN KEY (id_usuario)" in schema
-    assert "[data-hairstyle=" in stylesheet
-    assert "background-image:url(" not in art
-    assert 'data-hairstyle="{{ avatar.hairstyle }}"' in art
-    assert 'data-avatar-hair="afro"' in art
-    assert 'data-avatar-hair="braids"' in art
-    assert 'data-avatar-hair="bob"' in art
-    assert 'data-avatar-hair="side-swept"' in art
-    assert ".user-avatar-drawing[data-hairstyle=\"afro\"]" in stylesheet
+    assert "data-avatar-randomize" in sidebar
+    assert "Copyright (c) 2026 Humation contributors" in license_text
+    assert not (ROOT / "static" / "js" / "avatar-customizer.js").exists()
 
 
-def test_menu_y_mi_cuenta_renderizan_el_avatar_con_sus_opciones():
+def test_menu_y_mi_cuenta_renderizan_las_imagenes_de_avatar():
     from flask import render_template
 
     user = {
@@ -144,25 +171,17 @@ def test_menu_y_mi_cuenta_renderizan_el_avatar_con_sus_opciones():
             "_desktop_sidebar.html",
             usuario_navegacion=user,
             avatar_config=initial,
-            avatar_choices=avatar.AVATAR_CHOICES,
         )
         account = render_template(
             "cuenta/index.html",
             usuario=user,
             perfil={},
             avatar_config=initial,
-            avatar_choices=avatar.AVATAR_CHOICES,
             puede_configurar=False,
         )
 
     assert 'data-avatar-save-url="/cuenta/avatar"' in sidebar
-    assert sidebar.count("data-avatar-choice") == sum(
-        len(group["options"]) for group in avatar.AVATAR_CHOICES.values()
-    )
-    svg = re.search(r'<svg viewBox="0 0 120 144".*?</svg>', sidebar, re.DOTALL)
-    assert svg is not None
-    ET.fromstring(svg.group(0))
-    assert 'data-avatar-open' in account
-    assert 'class="cuenta-avatar-preview"' in account
-    assert 'data-hairstyle="short"' in sidebar
-    assert f'style="--avatar-hair:{initial["hairColor"]};' in sidebar
+    assert sidebar.count("data-avatar-image") == 1
+    assert 'data-avatar-preview-image' in sidebar
+    assert 'data-avatar-image' in account
+    assert "eduturnos-81" in json.dumps(initial)

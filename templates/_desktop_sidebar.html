@@ -60,7 +60,7 @@
   <a class="desktop-sidebar-account-link" href="{{ url_for('cuenta.index') }}" {% if endpoint.startswith('cuenta.') %}aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#user-circle"></use></svg></span><span class="nav-label">Mi cuenta</span></a>
   <div class="desktop-sidebar-account">
     <button class="desktop-sidebar-account-avatar" type="button" data-avatar-open data-avatar-user="{{ usuario_navegacion.id_usuario }}" data-avatar-config="{{ avatar_config|tojson|forceescape }}" aria-haspopup="dialog" aria-controls="avatar-customizer" aria-label="Personalizar mi personaje">
-      {{ avatar_art(avatar_config) }}
+      {{ avatar_art(avatar_config, usuario_navegacion.id_usuario) }}
     </button>
     <div class="desktop-sidebar-account-info"><strong>Acceso institucional</strong><small>{{ usuario_navegacion.nombres }} {{ usuario_navegacion.apellidos }}</small></div>
     <form class="desktop-sidebar-logout-form" method="post" action="{{ url_for('auth.logout') }}">{{ csrf_field()|safe }}<button class="desktop-sidebar-logout-button" type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><img src="{{ url_for('static', filename='icons/lucide-log-out.svg') }}" alt=""></button></form>
@@ -73,26 +73,13 @@
       <button type="button" data-avatar-close aria-label="Cerrar personalización">×</button>
     </header>
     <div class="avatar-customizer-preview" data-avatar-user="{{ usuario_navegacion.id_usuario }}">
-      {{ avatar_art(avatar_config) }}
+      <img class="user-avatar-drawing" data-avatar-preview-image data-avatar-user="{{ usuario_navegacion.id_usuario }}" alt="" aria-hidden="true" decoding="async">
     </div>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="avatar-customizer-fields" data-avatar-fields>
-      {% for field, group in avatar_choices.items() %}
-      <fieldset class="avatar-option-group">
-        <legend>{{ group.title }}</legend>
-        <div class="avatar-choice-grid">
-          {% for option in group.options %}
-          <button type="button" class="avatar-choice" data-avatar-choice data-field="{{ field }}" data-value="{{ option.value }}" aria-pressed="false" aria-label="{{ group.title }}: {{ option.label }}" title="{{ option.label }}">
-            <span class="avatar-choice-swatch" data-choice-field="{{ field }}" data-choice-value="{{ option.value }}" style="--avatar-choice:{{ option.swatch }}" aria-hidden="true"></span>
-            <span>{{ option.label }}</span>
-          </button>
-          {% endfor %}
-        </div>
-      </fieldset>
-      {% endfor %}
-    </div>
+    <div class="avatar-customizer-fields" data-avatar-fields></div>
     <footer class="avatar-customizer-actions">
       <button type="button" data-avatar-reset>Restablecer</button>
+      <button type="button" data-avatar-randomize>Generar otro</button>
       <button type="button" data-avatar-save>Guardar avatar</button>
     </footer>
     <p class="avatar-customizer-status" data-avatar-status role="status" aria-live="polite"></p>

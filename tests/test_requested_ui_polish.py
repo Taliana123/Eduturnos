@@ -85,10 +85,31 @@ def test_modal_avatar_movil_tiene_cierre_de_tamano_limitado():
     assert "grid-template-columns:repeat(2,minmax(0,1fr))!important;" in styles
 
 
+def test_busqueda_institucional_y_actualizaciones_de_calendario_y_solicitudes():
+    accounts = (ROOT / "templates" / "configuracion" / "index.html").read_text(
+        encoding="utf-8"
+    )
+    calendar = (ROOT / "templates" / "calendario" / "index.html").read_text(
+        encoding="utf-8"
+    )
+    requests = (ROOT / "templates" / "solicitudes" / "index.html").read_text(
+        encoding="utf-8"
+    )
+    assistant = (ROOT / "static" / "js" / "asistente.js").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'data-cuentas-search-button>Buscar</button>' in accounts
+    assert "window.setInterval(refreshIfChanged, 10000)" in calendar
+    assert 'border-bottom:0 !important;' in requests
+    assert "const parseListItem = (line)" in assistant
+    assert 'unordered[1].replace(/^(?:[-*+]\\s+)+/, "")' in assistant
+
+
 def test_android_incrementa_la_version_de_la_app():
     gradle = (ROOT / "mobile-app" / "android" / "app" / "build.gradle").read_text(
         encoding="utf-8"
     )
 
-    assert "versionCode 20" in gradle
-    assert 'versionName "3.0"' in gradle
+    assert "versionCode 21" in gradle
+    assert 'versionName "3.0.1"' in gradle

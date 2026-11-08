@@ -17,6 +17,7 @@ backups/
 data/private/
 _BACKUP_MOBILE_20261004/
 mobile-app/node_modules/
+tools/humation/node_modules/
 mobile-app/jdk17/
 mobile-app/temurin17.zip
 mobile-app/android/.gradle/

@@ -1,142 +1,136 @@
 import json
+import re
+from functools import lru_cache
+from pathlib import Path
 
 from database.db import consultar, ejecutar
 
 
-AVATAR_CHOICES = {
-    "character": {
-        "title": "Personaje",
-        "options": [
-            {"value": "feminine", "label": "Femenino", "swatch": "#ad6c94"},
-            {"value": "masculine", "label": "Masculino", "swatch": "#4777b7"},
-            {"value": "neutral", "label": "Neutro", "swatch": "#68866f"},
-        ],
-    },
-    "ageStyle": {
-        "title": "Edad",
-        "options": [
-            {"value": "child", "label": "Infantil", "swatch": "#80a8d7"},
-            {"value": "teen", "label": "Joven", "swatch": "#709b84"},
-            {"value": "adult", "label": "Adulto", "swatch": "#b18b67"},
-        ],
-    },
-    "hairstyle": {
-        "title": "Peinado",
-        "options": [
-            {"value": "short", "label": "Corto", "swatch": "#30384d"},
-            {"value": "long", "label": "Largo", "swatch": "#30384d"},
-            {"value": "wavy", "label": "Ondulado", "swatch": "#30384d"},
-            {"value": "curly", "label": "Rizado", "swatch": "#30384d"},
-            {"value": "bun", "label": "Recogido", "swatch": "#30384d"},
-            {"value": "straight", "label": "Liso", "swatch": "#30384d"},
-            {"value": "bob", "label": "Bob", "swatch": "#30384d"},
-            {"value": "afro", "label": "Afro", "swatch": "#30384d"},
-            {"value": "braids", "label": "Trenzas", "swatch": "#30384d"},
-            {"value": "side-swept", "label": "De lado", "swatch": "#30384d"},
-        ],
-    },
-    "hairColor": {
-        "title": "Color de cabello",
-        "options": [
-            {"value": "#282331", "label": "Negro", "swatch": "#282331"},
-            {"value": "#69432f", "label": "Castaño", "swatch": "#69432f"},
-            {"value": "#c99537", "label": "Rubio", "swatch": "#c99537"},
-            {"value": "#a84d35", "label": "Pelirrojo", "swatch": "#a84d35"},
-            {"value": "#858795", "label": "Gris", "swatch": "#858795"},
-            {"value": "#4c6a9c", "label": "Azul", "swatch": "#4c6a9c"},
-        ],
-    },
-    "skinColor": {
-        "title": "Tono de piel",
-        "options": [
-            {"value": "#f5d6bd", "label": "Claro", "swatch": "#f5d6bd"},
-            {"value": "#efc19a", "label": "Cálido", "swatch": "#efc19a"},
-            {"value": "#d99c72", "label": "Canela", "swatch": "#d99c72"},
-            {"value": "#b87855", "label": "Bronce", "swatch": "#b87855"},
-            {"value": "#89583f", "label": "Moreno", "swatch": "#89583f"},
-            {"value": "#603f35", "label": "Oscuro", "swatch": "#603f35"},
-        ],
-    },
-    "eyeColor": {
-        "title": "Color de ojos",
-        "options": [
-            {"value": "#493124", "label": "Café", "swatch": "#493124"},
-            {"value": "#497454", "label": "Verde", "swatch": "#497454"},
-            {"value": "#4b78a5", "label": "Azul", "swatch": "#4b78a5"},
-            {"value": "#9a7040", "label": "Miel", "swatch": "#9a7040"},
-        ],
-    },
-    "outfit": {
-        "title": "Vestimenta",
-        "options": [
-            {"value": "shirt", "label": "Camiseta", "swatch": "#2875c7"},
-            {"value": "hoodie", "label": "Sudadera", "swatch": "#3d8b72"},
-            {"value": "uniform", "label": "Uniforme", "swatch": "#794f9c"},
-            {"value": "jacket", "label": "Chaqueta", "swatch": "#34445d"},
-            {"value": "sweater", "label": "Suéter", "swatch": "#c77a46"},
-        ],
-    },
-    "shirtColor": {
-        "title": "Color de ropa",
-        "options": [
-            {"value": "#2875c7", "label": "Azul", "swatch": "#2875c7"},
-            {"value": "#3d8b72", "label": "Verde", "swatch": "#3d8b72"},
-            {"value": "#794f9c", "label": "Violeta", "swatch": "#794f9c"},
-            {"value": "#e2a53a", "label": "Dorado", "swatch": "#e2a53a"},
-            {"value": "#c45252", "label": "Coral", "swatch": "#c45252"},
-            {"value": "#34445d", "label": "Marino", "swatch": "#34445d"},
-        ],
-    },
-    "accessory": {
-        "title": "Accesorios",
-        "options": [
-            {"value": "none", "label": "Ninguno", "swatch": "#e7edf5"},
-            {"value": "glasses", "label": "Gafas", "swatch": "#53708e"},
-            {"value": "cap", "label": "Gorra", "swatch": "#d74c46"},
-            {"value": "headband", "label": "Diadema", "swatch": "#b85d83"},
-        ],
-    },
-}
+HUMATION_SLOTS = ("head", "body", "bottom", "item", "glasses")
+HUMATION_COLORS = ("hair", "clothes", "bottom", "skin", "stroke")
+AVATAR_FIELDS = {"seed", "selections", "colors", "background"}
+_HEX_COLOR = re.compile(r"#[0-9a-fA-F]{6}\Z")
+_SEED = re.compile(r"[A-Za-z0-9._:-]{1,128}\Z")
 
-DEFAULT_AVATAR = {
-    "character": "neutral",
-    "ageStyle": "teen",
-    "hairstyle": "short",
-    "hairColor": "#282331",
-    "skinColor": "#efc19a",
-    "eyeColor": "#493124",
-    "outfit": "hoodie",
-    "shirtColor": "#2875c7",
-    "accessory": "none",
-}
+_HAIR_COLORS = ("#4A3728", "#282331", "#6B4934", "#A84D35", "#858795")
+_SKIN_COLORS = ("#F4C9A8", "#E9B889", "#CF9368", "#AD7655", "#81573F", "#603F35")
+_CLOTHES_COLORS = ("#6C91C2", "#4D806D", "#98688D", "#C18C49", "#52758A")
 
 
-def avatar_inicial(id_usuario):
-    """Genera una combinación estable y variada para una cuenta nueva."""
+@lru_cache(maxsize=1)
+def _official_parts():
+    path = Path(__file__).resolve().parents[1] / "static" / "vendor" / "humation-parts.json"
+    try:
+        catalog = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError("No está disponible el catálogo local de piezas oficiales de Humation.") from exc
+
+    if not isinstance(catalog, dict) or set(catalog) != set(HUMATION_SLOTS):
+        raise RuntimeError("El catálogo local de piezas de Humation no tiene el formato esperado.")
+
+    parts = {}
+    for slot in HUMATION_SLOTS:
+        entries = catalog[slot]
+        if not isinstance(entries, list):
+            raise RuntimeError(f"El catálogo de Humation para {slot} no es válido.")
+        ids = {
+            entry.get("id")
+            for entry in entries
+            if isinstance(entry, dict) and isinstance(entry.get("id"), str)
+        }
+        if not ids:
+            raise RuntimeError(f"El catálogo de Humation no contiene piezas para {slot}.")
+        parts[slot] = ids
+    return parts
+
+
+def _valid_user_id(id_usuario):
     user_id = int(id_usuario)
     if user_id < 1:
         raise ValueError("El usuario debe tener un identificador válido.")
+    return user_id
 
-    avatar = dict(DEFAULT_AVATAR)
-    fields = ("character", "ageStyle", "hairstyle", "hairColor", "skinColor", "eyeColor", "outfit", "shirtColor", "accessory")
-    for offset, field in enumerate(fields, start=1):
-        options = AVATAR_CHOICES[field]["options"]
-        avatar[field] = options[(user_id * (offset * 2 + 1) + offset) % len(options)]["value"]
-    return avatar
+
+def avatar_inicial(id_usuario):
+    user_id = _valid_user_id(id_usuario)
+    return {
+        "seed": f"eduturnos-{user_id}",
+        "selections": {},
+        "colors": {
+            "hair": _HAIR_COLORS[user_id % len(_HAIR_COLORS)],
+            "skin": _SKIN_COLORS[user_id % len(_SKIN_COLORS)],
+            "clothes": _CLOTHES_COLORS[user_id % len(_CLOTHES_COLORS)],
+        },
+        "background": "transparent",
+    }
 
 
 def normalizar_avatar(value):
-    if not isinstance(value, dict) or set(value) != set(DEFAULT_AVATAR):
+    if not isinstance(value, dict) or set(value) != AVATAR_FIELDS:
         raise ValueError("La configuración del personaje no tiene el formato esperado.")
 
-    normalized = {}
-    for field, default in DEFAULT_AVATAR.items():
-        allowed = {option["value"] for option in AVATAR_CHOICES[field]["options"]}
-        choice = value.get(field)
-        if not isinstance(choice, str) or choice not in allowed:
-            raise ValueError("Una de las opciones del personaje no es válida.")
-        normalized[field] = choice
-    return normalized
+    seed = value.get("seed")
+    if not isinstance(seed, str) or not _SEED.fullmatch(seed):
+        raise ValueError("La semilla del personaje no es válida.")
+
+    selections = value.get("selections")
+    if not isinstance(selections, dict) or not set(selections).issubset(HUMATION_SLOTS):
+        raise ValueError("Las piezas del personaje no son válidas.")
+    allowed_parts = _official_parts()
+    normalized_selections = {}
+    for slot, part_id in selections.items():
+        if not isinstance(part_id, str) or part_id not in allowed_parts[slot]:
+            raise ValueError("Una de las piezas no pertenece al catálogo oficial de Humation.")
+        normalized_selections[slot] = part_id
+
+    colors = value.get("colors")
+    if not isinstance(colors, dict) or not set(colors).issubset(HUMATION_COLORS):
+        raise ValueError("Los colores del personaje no son válidos.")
+    normalized_colors = {}
+    for slot, color in colors.items():
+        if not isinstance(color, str) or not _HEX_COLOR.fullmatch(color):
+            raise ValueError("Uno de los colores del personaje no es válido.")
+        normalized_colors[slot] = color.upper()
+
+    background = value.get("background")
+    if background != "transparent" and (
+        not isinstance(background, str) or not _HEX_COLOR.fullmatch(background)
+    ):
+        raise ValueError("El fondo del personaje no es válido.")
+
+    return {
+        "seed": seed,
+        "selections": normalized_selections,
+        "colors": normalized_colors,
+        "background": background.upper() if isinstance(background, str) and background != "transparent" else "transparent",
+    }
+
+
+def _convertir_avatar_anterior(value, id_usuario):
+    legacy_fields = {
+        "character",
+        "ageStyle",
+        "hairstyle",
+        "hairColor",
+        "skinColor",
+        "eyeColor",
+        "outfit",
+        "shirtColor",
+        "accessory",
+    }
+    if not isinstance(value, dict) or set(value) != legacy_fields:
+        return None
+
+    migrated = avatar_inicial(id_usuario)
+    color_map = {
+        "hair": value.get("hairColor"),
+        "skin": value.get("skinColor"),
+        "clothes": value.get("shirtColor"),
+    }
+    for slot, color in color_map.items():
+        if isinstance(color, str) and _HEX_COLOR.fullmatch(color):
+            migrated["colors"][slot] = color.upper()
+    return migrated
 
 
 def _leer_avatar(id_usuario):
@@ -151,11 +145,21 @@ def _leer_avatar(id_usuario):
     stored = row["avatar_json"]
     if isinstance(stored, str):
         stored = json.loads(stored)
-    return normalizar_avatar(stored)
+    try:
+        return normalizar_avatar(stored)
+    except ValueError:
+        migrated = _convertir_avatar_anterior(stored, id_usuario)
+        if migrated is None:
+            raise
+        ejecutar(
+            "UPDATE avatares_usuario SET avatar_json=%s WHERE id_usuario=%s",
+            (json.dumps(migrated, separators=(",", ":")), id_usuario),
+        )
+        return migrated
 
 
 def obtener_o_crear_avatar(id_usuario):
-    user_id = int(id_usuario)
+    user_id = _valid_user_id(id_usuario)
     avatar = _leer_avatar(user_id)
     if avatar is not None:
         return avatar
@@ -172,7 +176,7 @@ def obtener_o_crear_avatar(id_usuario):
 
 
 def guardar_avatar(id_usuario, value):
-    user_id = int(id_usuario)
+    user_id = _valid_user_id(id_usuario)
     avatar = normalizar_avatar(value)
     ejecutar(
         "INSERT INTO avatares_usuario (id_usuario, avatar_json) VALUES (%s, %s) "
