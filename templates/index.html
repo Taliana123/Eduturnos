@@ -13,7 +13,7 @@
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}?v=20261109_release24_cache_v1" type="image/png" sizes="192x192">
     <link rel="icon" href="{{ url_for('static', filename='icons/eduturnos-192.svg') }}?v=20261109_release24_cache_v1" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/eduturnos-192.png') }}?v=20261109_release24_cache_v1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261109_release24_cache_v1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261109_voice_avatar_v2">
 
     <title>EDUTURNOS | Comunidad educativa</title>
 
@@ -282,6 +282,24 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%) !important;
         .nav-login:hover {
             background: #12568d;
             transform: translateY(-1px);
+        }
+
+        .nav a {
+            user-select: none;
+            transition: color .16s ease, background-color .16s ease, transform .16s ease, box-shadow .16s ease;
+        }
+
+        .nav a:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .nav a:focus-visible {
+            outline: 3px solid #f2c14e;
+            outline-offset: 3px;
+        }
+
+        .nav a:active {
+            transform: translateY(0) scale(.98);
         }
 
         /* =================================================
@@ -912,7 +930,7 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_mobile_recovery_v64">
 {% endif %}
 <script src="{{ url_for('static', filename='js/pwa.js') }}?v=7" defer></script>
-<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261108_ui_refresh_v1" defer></script>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261109_voice_avatar_v2" defer></script>
 {% include '_page_mascot.html' %}
 </body>
 </html>
@@ -1742,15 +1760,15 @@ body {
     @media (min-width: 901px) {
         html body.public-home-page .hero-message-row {
             margin-bottom: 8px !important;
-            transform: translateY(-18px) !important;
+            transform: translateY(8px) !important;
         }
 
         html body.public-home-page .hero-message-row > .hero-illustration {
-            transform: translateY(-7px) !important;
+            transform: translateY(1px) !important;
         }
 
         html body.public-home-page .hero-texto {
-            transform: translateY(-16px) !important;
+            transform: translateY(8px) !important;
         }
     }
 
@@ -1762,12 +1780,12 @@ body {
 
         html body.public-home-page .hero-message-row {
             margin-bottom: 6px !important;
-            transform: translateY(-4px) !important;
+            transform: translateY(4px) !important;
         }
 
         html body.public-home-page .hero-message-row > .hero-illustration,
         html body.public-home-page .hero-texto {
-            transform: translateY(-4px) !important;
+            transform: translateY(4px) !important;
         }
     }
 </style>

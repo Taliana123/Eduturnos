@@ -42,7 +42,7 @@ class EduturnosSvgPathImage(SvgPathImage):
     QR_PATH_STYLE = {**SvgPathImage.QR_PATH_STYLE, "fill": "#1468E8"}
 
 
-class EduturnosDragonSvgPathImage(SvgPathImage):
+class EduturnosNavySvgPathImage(SvgPathImage):
     QR_PATH_STYLE = {**SvgPathImage.QR_PATH_STYLE, "fill": "#17365D"}
 
 
@@ -252,11 +252,7 @@ def create_app():
         )
         qr.add_data(destination)
         qr.make(fit=True)
-        image_factory = (
-            EduturnosDragonSvgPathImage
-            if request.args.get("estilo") == "dragon"
-            else EduturnosSvgPathImage
-        )
+        image_factory = EduturnosNavySvgPathImage if request.args.get("estilo") == "navy" else EduturnosSvgPathImage
         image = qr.make_image(image_factory=image_factory)
         output = BytesIO()
         image.save(output)

@@ -50,7 +50,7 @@ def test_drone_sprite_sheets_are_served_by_flask():
     assert b"/static/mascots/drone-directions.webp" in login.data
     assert b"/static/mascots/drone-reactions.webp" in login.data
     assert b"data-assistant-public-call" in login.data
-    assert b"/static/js/asistente.js?v=20261109_release24_cache_v1" in login.data
+    assert b"/static/js/asistente.js?v=20261109_voice_avatar_v2" in login.data
     assert b"page-mascot--login" not in login.data
     assert login.data.index(b"page-mascot--floating") > login.data.index(b"</main>")
 
@@ -64,7 +64,7 @@ def test_drone_sprite_sheets_are_served_by_flask():
     home = client.get("/")
     assert home.status_code == 200
     assert b"data-assistant-public-call" in home.data
-    assert b"/static/js/asistente.js?v=20261109_release24_cache_v1" in home.data
+    assert b"/static/js/asistente.js?v=20261109_voice_avatar_v2" in home.data
 
 
 def test_legacy_floating_robot_widget_is_removed_without_removing_chat_avatar():
@@ -144,7 +144,7 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     assert "actionForm.action = actionUrl" in assistant_script
     assert "data-assistant-call-resize=\"nw\"" in mascot
     assert "data-assistant-call-resize=\"se\"" in mascot
-    assert "handle.setPointerCapture(event.pointerId)" in assistant_script
+    assert "panel.setPointerCapture(event.pointerId)" in assistant_script
     assert "initialSize.width" in assistant_script
     assert "assistant-voice-call.is-dragging" in assistant_styles
     assert ".assistant-voice-call__resize-se" in assistant_styles
@@ -175,8 +175,8 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     assert 'android:name="android.permission.RECORD_AUDIO"' in manifest
     assert 'android.speech.RecognitionService' in manifest
     assert 'android.speech.action.RECOGNIZE_SPEECH' in manifest
-    assert 'versionName "2.4"' in android_build
-    assert 'versionCode 15' in android_build
+    assert 'versionName "2.7"' in android_build
+    assert 'versionCode 17' in android_build
     assert "data-calendar-event-url=\"{{ calendar_open_event_url or '' }}\"" in calendar_template
     assert "calendar_open_event_url=calendar_open_event_url" in calendar_route
     assert "icons/edubot.png" not in Path("templates/_asistente_widget.html").read_text(encoding="utf-8")

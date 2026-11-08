@@ -534,8 +534,8 @@ def test_catalogos_orden_numerico_y_campos_compactos():
     assert 'name="nombre" maxlength="180"' in plantilla
     assert '.institucion-form .institution-name input' in estilos_configuracion
     assert 'name="nombre" maxlength="80" required placeholder="Periodo académico 2027"' in plantilla
-    assert 'institution-phone' not in plantilla
-    assert 'institution-address' not in plantilla
+    assert 'class="institution-phone"' in plantilla
+    assert 'class="full-field institution-address"' in plantilla
     assert 'institution-status' not in plantilla
     assert '<details class="catalogos-avanzados">' not in plantilla
     assert 'name="descripcion"' not in plantilla
@@ -651,8 +651,8 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
     assert "request.endpoint != 'soporte.index'" not in base
-    assert "css/edubot.css') }}?v=20261109_release24_cache_v1" in base
-    assert "js/asistente.js') }}?v=20261109_release24_cache_v1" in base
+    assert "css/edubot.css') }}?v=20261109_voice_avatar_v2" in base
+    assert "js/asistente.js') }}?v=20261109_voice_avatar_v2" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
     assert 'if (isOpen) {\n            clearChatPosition();\n            const defaultBounds = root.getBoundingClientRect();' in assistant_script
     assert 'assistantWidget' not in app_js

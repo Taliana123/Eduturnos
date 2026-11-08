@@ -35,9 +35,10 @@
     width: 60px;
     height: 60px;
     object-fit: cover;
-    background: transparent;
-    border: 0;
-    border-radius: 0;
+    padding: 3px;
+    background: #fff;
+    border: 1px solid #dce8f8;
+    border-radius: 12px;
 }
 
 .dashboard-help-chat .assistant-drone-avatar {
@@ -471,9 +472,10 @@
     width: 40px;
     height: 40px;
     object-fit: cover;
-    background: transparent;
-    border: 0;
-    border-radius: 0;
+    padding: 2px;
+    background: #fff;
+    border: 1px solid #dce8f8;
+    border-radius: 9px;
 }
 
 .eduturnos-desktop-sidebar .assistant-sidebar-avatar.assistant-drone-avatar {
@@ -625,7 +627,7 @@
     flex-basis: 60px;
     width: 60px;
     height: 60px;
-    background-color: transparent !important;
+    background-color: #fff !important;
     border: 0 !important;
     border-radius: 0;
 }
@@ -791,7 +793,7 @@
 
 .assistant-voice-call__header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     padding: 22px 22px 8px;
     touch-action: none;
@@ -824,15 +826,11 @@
     box-shadow: none !important;
     appearance: none;
     touch-action: none;
+    opacity: 0;
 }
 
 .assistant-voice-call__resize::after {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    content: "";
-    border-color: rgba(215, 205, 238, .62);
-    border-style: solid;
+    display: none;
 }
 
 .assistant-voice-call__resize:focus-visible {
@@ -909,6 +907,9 @@
     height: 38px !important;
     min-height: 38px !important;
     place-items: center;
+    align-self: center;
+    justify-self: center;
+    margin: 0 !important;
     padding: 0 !important;
     color: #e4dff0 !important;
     background: rgba(255, 255, 255, .08) !important;

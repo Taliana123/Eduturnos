@@ -7,10 +7,23 @@
     const userId = trigger.dataset.avatarUser || "current";
     const storageKey = `eduturnos.avatar.v1:${userId}`;
     const defaultAvatar = {
+        portrait: "classic",
+        direction: "center",
         hairstyle: "short",
         hairColor: "#202b3c",
         skinColor: "#f2c7a5",
         shirtColor: "#2875c7",
+    };
+    const directions = {
+        "top-left": "0% 0%",
+        top: "50% 0%",
+        "top-right": "100% 0%",
+        left: "0% 50%",
+        center: "50% 50%",
+        right: "100% 50%",
+        "bottom-left": "0% 100%",
+        bottom: "50% 100%",
+        "bottom-right": "100% 100%",
     };
     const hairstyles = {
         short: {
@@ -29,6 +42,10 @@
     const controls = Object.fromEntries(
         [...form.querySelectorAll("select")].map((control) => [control.name, control]),
     );
+    const portraitSources = {
+        cap: trigger.dataset.avatarCapSrc,
+        glasses: trigger.dataset.avatarGlassesSrc,
+    };
     const readAvatar = () => {
         try {
             const stored = JSON.parse(window.localStorage.getItem(storageKey) || "null");
@@ -38,7 +55,6 @@
                     avatar[name] = defaultAvatar[name];
                 }
             });
-            if (!hairstyles[avatar.hairstyle]) avatar.hairstyle = defaultAvatar.hairstyle;
             return avatar;
         } catch {
             return { ...defaultAvatar };
@@ -48,6 +64,18 @@
     const applyAvatar = (avatar) => {
         document.querySelectorAll("[data-avatar-user]").forEach((container) => {
             if (container.dataset.avatarUser !== userId) return;
+            const illustrated = avatar.portrait !== "classic";
+            const drawing = container.querySelector(".user-avatar-drawing");
+            const portrait = container.querySelector("[data-avatar-portrait]");
+            if (drawing) drawing.hidden = illustrated;
+            if (portrait) {
+                portrait.hidden = !illustrated;
+                portrait.style.backgroundImage = `url("${portraitSources[avatar.portrait] || portraitSources.cap}")`;
+                portrait.style.backgroundPosition = directions[avatar.direction] || directions.center;
+            }
+            container.querySelectorAll("[data-avatar-custom-option] select").forEach((control) => {
+                control.disabled = illustrated;
+            });
             container.dataset.hairstyle = avatar.hairstyle;
             container.style.setProperty("--avatar-hair", avatar.hairColor);
             container.style.setProperty("--avatar-skin", avatar.skinColor);
