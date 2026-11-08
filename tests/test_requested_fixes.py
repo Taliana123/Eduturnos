@@ -145,6 +145,49 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
     )
 
 
+def test_compartir_eduturnos_sin_pasos_numerados_y_con_flecha_solo_publica():
+    template = Path("templates/publico/compartir_eduturnos.html").read_text(encoding="utf-8")
+    public_base = Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
+    home = Path("templates/index.html").read_text(encoding="utf-8")
+
+    assert "01 · ESCANEA" not in template
+    assert "02 · COMPARTE" not in template
+    assert "{% if not usuario_navegacion %}" in template
+    assert public_base.index("url_for('terminos')") < public_base.index("url_for('compartir_eduturnos')")
+    assert home.index("url_for('terminos')") < home.index("url_for('compartir_eduturnos')")
+
+
+def test_paginas_legales_reducen_espacio_y_solicitudes_ocultan_ver_en_escritorio():
+    privacy = Path("templates/publico/privacidad.html").read_text(encoding="utf-8")
+    terms = Path("templates/publico/terminos.html").read_text(encoding="utf-8")
+    public_base = Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
+    requests = Path("templates/solicitudes/index.html").read_text(encoding="utf-8")
+
+    assert 'class="intro legal-intro"' in privacy
+    assert 'class="intro legal-intro"' in terms
+    assert ".intro.legal-intro" in public_base
+    assert "@media(min-width:761px)" in requests
+    assert "#contenido .solicitudes-table .solicitud-mobile-toggle { display:none !important; }" in requests
+
+
+def test_llamada_de_voz_usa_sintesis_nativa_con_respaldo_web():
+    assistant = Path("static/js/asistente.js").read_text(encoding="utf-8")
+    activity = Path(
+        "mobile-app/android/app/src/main/java/co/eduturnos/app/MainActivity.java"
+    ).read_text(encoding="utf-8")
+    android_build = Path("mobile-app/android/app/build.gradle").read_text(encoding="utf-8")
+
+    assert "speakWithNativeVoice" in assistant
+    assert 'nativeVoice?.speak' in assistant
+    assert "window.speechSynthesis.speak(utterance)" in assistant
+    assert 'eduturnos-native-tts-start' in activity
+    assert 'eduturnos-native-tts-end' in activity
+    assert "TextToSpeech.QUEUE_FLUSH" in activity
+    assert "FEMALE_VOICE_NAME" in activity
+    assert 'versionName "2.1"' in android_build
+    assert "versionCode 12" in android_build
+
+
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
     acudientes = Path("templates/acudientes/form.html").read_text(encoding="utf-8")
     docentes = Path("templates/docentes/form.html").read_text(encoding="utf-8")
@@ -576,7 +619,7 @@ def test_voice_transcripts_are_submitted_and_responses_are_visible():
     assert "button.disabled && !voiceCallActive" in assistant_script
     assert 'showVoiceMessage("EDUBOT", replyText)' in assistant_script
     assert "showVoiceMessage(\"EDUBOT\", errorMessage)" in assistant_script
-    assert all("20261107_voice_input_fallback_v1" in template for template in templates)
+    assert all("20261108_native_speech_v1" in template for template in templates)
 
 
 def test_student_name_and_mobile_directory_icons_match_shared_directory_style():

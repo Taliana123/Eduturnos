@@ -3,9 +3,11 @@
 <span class="etiqueta">Comparte la plataforma</span>
 
 <div class="public-title-row">
+    {% if not usuario_navegacion %}
     <a class="public-back-button" href="{{ url_for('inicio') }}" aria-label="Volver al inicio" title="Volver al inicio">
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
     </a>
+    {% endif %}
     <h1>EDUTURNOS, a un escaneo de distancia.</h1>
 </div>
 
@@ -15,19 +17,6 @@
 </p>
 
 {% include "_qr_compartir.html" %}
-
-<section class="grid eduturnos-share-steps" aria-label="Cómo compartir EDUTURNOS">
-    <article class="card">
-        <span class="numero">01 · ESCANEA</span>
-        <h2>Abre la cámara</h2>
-        <p>Apunta la cámara del celular al código QR para abrir EDUTURNOS.</p>
-    </article>
-    <article class="card">
-        <span class="numero">02 · COMPARTE</span>
-        <h2>Envía una invitación</h2>
-        <p>Usa el botón para compartir el enlace con familiares y otras personas de la comunidad.</p>
-    </article>
-</section>
 
 <script src="{{ url_for('static', filename='js/share-eduturnos.js') }}?v=1" defer></script>
 {% endset %}

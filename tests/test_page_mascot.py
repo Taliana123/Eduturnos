@@ -48,7 +48,7 @@ def test_drone_sprite_sheets_are_served_by_flask():
     assert b"/static/mascots/drone-directions.webp" in login.data
     assert b"/static/mascots/drone-reactions.webp" in login.data
     assert b"data-assistant-public-call" in login.data
-    assert b"/static/js/asistente.js?v=20261107_voice_input_fallback_v1" in login.data
+    assert b"/static/js/asistente.js?v=20261108_native_speech_v1" in login.data
     assert b"page-mascot--login" not in login.data
     assert login.data.index(b"page-mascot--floating") > login.data.index(b"</main>")
 
@@ -62,7 +62,7 @@ def test_drone_sprite_sheets_are_served_by_flask():
     home = client.get("/")
     assert home.status_code == 200
     assert b"data-assistant-public-call" in home.data
-    assert b"/static/js/asistente.js?v=20261107_voice_input_fallback_v1" in home.data
+    assert b"/static/js/asistente.js?v=20261108_native_speech_v1" in home.data
 
 
 def test_legacy_floating_robot_widget_is_removed_without_removing_chat_avatar():
@@ -124,6 +124,10 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     assert "RecognizerIntent.ACTION_RECOGNIZE_SPEECH" in native_activity
     assert "spanishFemaleVoicePattern" in assistant_script
     assert "selectSpanishVoice()" in assistant_script
+    assert "speakWithNativeVoice" in assistant_script
+    assert "TextToSpeech" in native_activity
+    assert "FEMALE_VOICE_NAME" in native_activity
+    assert "stopSpeaking" in native_activity
     assert assistant_script.count("utterance.voice = selectSpanishVoice();") == 2
     assert "Manifest.permission.RECORD_AUDIO" in native_activity
     assert "callPanel.hidden = false" in assistant_script
@@ -155,8 +159,8 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     assert 'android:name="android.permission.RECORD_AUDIO"' in manifest
     assert 'android.speech.RecognitionService' in manifest
     assert 'android.speech.action.RECOGNIZE_SPEECH' in manifest
-    assert 'versionName "2.0"' in android_build
-    assert 'versionCode 11' in android_build
+    assert 'versionName "2.1"' in android_build
+    assert 'versionCode 12' in android_build
     assert "data-calendar-event-url=\"{{ calendar_open_event_url or '' }}\"" in calendar_template
     assert "calendar_open_event_url=calendar_open_event_url" in calendar_route
     assert "icons/edubot.png" not in Path("templates/_asistente_widget.html").read_text(encoding="utf-8")

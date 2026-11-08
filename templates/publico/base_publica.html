@@ -240,6 +240,10 @@
             line-height: 1.8;
         }
 
+        .intro.legal-intro {
+            margin-bottom: 18px;
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0,1fr));
@@ -360,12 +364,12 @@
     <nav class="menu" aria-label="Navegaci&oacute;n principal">
         <div class="menu-desktop-links">
             <a href="{{ url_for('como_funciona') }}" class="{% if request.endpoint == 'como_funciona' %}activo{% endif %}">C&oacute;mo funciona</a>
-            <a href="{{ url_for('compartir_eduturnos') }}" class="{% if request.endpoint == 'compartir_eduturnos' %}activo{% endif %}">Compartir EDUTURNOS</a>
             <a href="{{ url_for('creadores') }}" class="{% if request.endpoint == 'creadores' %}activo{% endif %}">Creadores</a>
             <a href="{{ url_for('beneficios') }}" class="{% if request.endpoint == 'beneficios' %}activo{% endif %}">Beneficios</a>
             <a href="{{ url_for('institucion') }}" class="{% if request.endpoint == 'institucion' %}activo{% endif %}">Instituci&oacute;n</a>
             <a href="{{ url_for('privacidad') }}" class="{% if request.endpoint == 'privacidad' %}activo{% endif %}">Privacidad</a>
             <a href="{{ url_for('terminos') }}" class="{% if request.endpoint == 'terminos' %}activo{% endif %}">Condiciones</a>
+            <a href="{{ url_for('compartir_eduturnos') }}" class="{% if request.endpoint == 'compartir_eduturnos' %}activo{% endif %}">Compartir EDUTURNOS</a>
         </div>
         <details class="menu-dropdown">
             <summary class="menu-dropdown-toggle">
@@ -374,12 +378,12 @@
             </summary>
             <div class="menu-dropdown-links">
                 <a href="{{ url_for('como_funciona') }}" class="{% if request.endpoint == 'como_funciona' %}activo{% endif %}">C&oacute;mo funciona</a>
-                <a href="{{ url_for('compartir_eduturnos') }}" class="{% if request.endpoint == 'compartir_eduturnos' %}activo{% endif %}">Compartir EDUTURNOS</a>
                 <a href="{{ url_for('creadores') }}" class="{% if request.endpoint == 'creadores' %}activo{% endif %}">Creadores</a>
                 <a href="{{ url_for('beneficios') }}" class="{% if request.endpoint == 'beneficios' %}activo{% endif %}">Beneficios</a>
                 <a href="{{ url_for('institucion') }}" class="{% if request.endpoint == 'institucion' %}activo{% endif %}">Instituci&oacute;n</a>
                 <a href="{{ url_for('privacidad') }}" class="{% if request.endpoint == 'privacidad' %}activo{% endif %}">Privacidad</a>
                 <a href="{{ url_for('terminos') }}" class="{% if request.endpoint == 'terminos' %}activo{% endif %}">Condiciones</a>
+                <a href="{{ url_for('compartir_eduturnos') }}" class="{% if request.endpoint == 'compartir_eduturnos' %}activo{% endif %}">Compartir EDUTURNOS</a>
             </div>
         </details>
         <a href="{{ url_for('auth.login') }}" class="login">
@@ -413,7 +417,7 @@
         .public-info-page h1, .public-info-page h2 { scroll-margin-top: 90px; }
     }
 </style>
-<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261107_voice_input_fallback_v1" defer></script>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261108_native_speech_v1" defer></script>
 {% include '_page_mascot.html' %}
 </body>
 </html>

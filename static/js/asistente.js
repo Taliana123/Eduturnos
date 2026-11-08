@@ -9,6 +9,41 @@ const initializeEduturnosAssistant = () => {
             || spanishVoices.find((voice) => /^es[-_]CO$/i.test(voice.lang))
             || spanishVoices[0];
     };
+    const speakWithNativeVoice = (nativeVoice, text, onStart) => new Promise((resolve) => {
+        if (!nativeVoice?.speak) {
+            resolve(false);
+            return;
+        }
+
+        let settled = false;
+        let timeout = 0;
+        const cleanup = () => {
+            window.clearTimeout(timeout);
+            window.removeEventListener("eduturnos-native-tts-start", handleStart);
+            window.removeEventListener("eduturnos-native-tts-end", handleEnd);
+            window.removeEventListener("eduturnos-native-tts-error", handleError);
+        };
+        const finish = (spoken) => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            resolve(spoken);
+        };
+        const handleStart = () => onStart?.();
+        const handleEnd = () => finish(true);
+        const handleError = () => finish(false);
+
+        window.addEventListener("eduturnos-native-tts-start", handleStart);
+        window.addEventListener("eduturnos-native-tts-end", handleEnd);
+        window.addEventListener("eduturnos-native-tts-error", handleError);
+        timeout = window.setTimeout(() => finish(false), 120000);
+        try {
+            nativeVoice.speak(text);
+        } catch (error) {
+            console.warn("No se pudo iniciar la voz nativa de EDUBOT.", error);
+            finish(false);
+        }
+    });
 
     const appendInlineMarkdown = (container, text) => {
         const tokenPattern = /(\*\*.+?\*\*|__.+?__|`[^`]+`|\*[^*\n]+\*)/g;
@@ -165,26 +200,36 @@ const initializeEduturnosAssistant = () => {
             transcript.textContent = `Te escuché: ${question}`;
             const answer = publicAnswer(question);
             setState(answer);
-            if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+            const finishSpeech = (message = "Escuchando…") => {
+                if (!active) return;
                 busy = false;
                 speaker.textContent = "Tú";
-                setState("Respuesta mostrada. Inicia sesión para recibir ayuda personalizada.");
-                if (active) restartTimer = window.setTimeout(startRecognition, 250);
+                setState(message);
+                restartTimer = window.setTimeout(startRecognition, 250);
+            };
+            const speakInBrowser = () => {
+                if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+                    finishSpeech("La respuesta está en pantalla, pero no hay una voz disponible en este dispositivo.");
+                    return;
+                }
+                const utterance = new SpeechSynthesisUtterance(answer);
+                utterance.lang = "es-CO";
+                utterance.voice = selectSpanishVoice();
+                utterance.onend = utterance.onerror = () => finishSpeech();
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
+            };
+            if (NativeVoice?.speak) {
+                speakWithNativeVoice(NativeVoice, answer, () => {
+                    if (active) setState("EDUBOT está hablando…");
+                }).then((spoken) => {
+                    if (!active) return;
+                    if (spoken) finishSpeech();
+                    else speakInBrowser();
+                });
                 return;
             }
-            const utterance = new SpeechSynthesisUtterance(answer);
-            utterance.lang = "es-CO";
-            utterance.voice = selectSpanishVoice();
-            utterance.onend = utterance.onerror = () => {
-                busy = false;
-                speaker.textContent = "Tú";
-                if (active) {
-                    setState("Escuchando…");
-                    restartTimer = window.setTimeout(startRecognition, 250);
-                }
-            };
-            window.speechSynthesis.cancel();
-            window.speechSynthesis.speak(utterance);
+            speakInBrowser();
         };
         const startWebRecognition = () => {
             if (!active || !SpeechRecognition) return;
@@ -261,6 +306,7 @@ const initializeEduturnosAssistant = () => {
             busy = false;
             window.clearTimeout(restartTimer);
             if (NativeVoice?.stopListening) NativeVoice.stopListening();
+            if (NativeVoice?.stopSpeaking) NativeVoice.stopSpeaking();
             if (recognition) {
                 try {
                     recognition.stop();
@@ -441,6 +487,7 @@ const initializeEduturnosAssistant = () => {
         voiceCallBusy = false;
         window.clearTimeout(voiceCallRestartTimer);
         if (wasActive && nativeVoice?.stopListening) nativeVoice.stopListening();
+        if (nativeVoice?.stopSpeaking) nativeVoice.stopSpeaking();
         if (voiceRecognition) {
             try {
                 voiceRecognition.stop();
@@ -456,32 +503,43 @@ const initializeEduturnosAssistant = () => {
         else setStatus("");
     };
 
-    const speakResponse = (text) => new Promise((resolve) => {
-        if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
-            resolve();
-            return;
-        }
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "es-CO";
-        utterance.voice = selectSpanishVoice();
-        utterance.onstart = () => {
+    const speakResponse = async (text) => {
+        const onStart = () => {
             voiceCallBusy = true;
             callSpeaker.textContent = "EDUBOT";
             setStatus("EDUBOT está respondiendo…");
         };
-        utterance.onend = () => {
+        const onEnd = () => {
             voiceCallBusy = false;
             callSpeaker.textContent = "Tú";
-            resolve();
         };
-        utterance.onerror = () => {
-            voiceCallBusy = false;
-            callSpeaker.textContent = "Tú";
-            resolve();
-        };
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(utterance);
-    });
+
+        if (nativeVoice?.speak) {
+            const spoken = await speakWithNativeVoice(nativeVoice, text, onStart);
+            if (spoken || !voiceCallActive) {
+                onEnd();
+                return;
+            }
+        }
+        if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+            onEnd();
+            if (voiceCallActive) setStatus("EDUBOT respondió, pero no hay una voz disponible en este dispositivo.");
+            return;
+        }
+
+        await new Promise((resolve) => {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = "es-CO";
+            utterance.voice = selectSpanishVoice();
+            utterance.onstart = onStart;
+            utterance.onend = utterance.onerror = () => {
+                onEnd();
+                resolve();
+            };
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        });
+    };
 
     const startVoiceRecognition = (conversation = false) => {
         if (nativeVoice?.startListening) {

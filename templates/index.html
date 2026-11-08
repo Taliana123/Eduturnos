@@ -725,12 +725,12 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
             <nav class="nav" aria-label="Navegaci&oacute;n principal">
                 <div class="nav-desktop-links">
                     <a href="{{ url_for('como_funciona') }}">C&oacute;mo funciona</a>
-                    <a href="{{ url_for('compartir_eduturnos') }}">Compartir EDUTURNOS</a>
                     <a href="{{ url_for('creadores') }}">Creadores</a>
                     <a href="{{ url_for('beneficios') }}">Beneficios</a>
                     <a href="{{ url_for('institucion') }}">Instituci&oacute;n</a>
                     <a href="{{ url_for('privacidad') }}">Privacidad</a>
                     <a href="{{ url_for('terminos') }}">Condiciones</a>
+                    <a href="{{ url_for('compartir_eduturnos') }}">Compartir EDUTURNOS</a>
                 </div>
                 <details class="nav-menu">
                     <summary class="nav-menu-toggle">
@@ -739,12 +739,12 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
                     </summary>
                     <div class="nav-menu-links">
                         <a href="{{ url_for('como_funciona') }}">C&oacute;mo funciona</a>
-                        <a href="{{ url_for('compartir_eduturnos') }}">Compartir EDUTURNOS</a>
                         <a href="{{ url_for('creadores') }}">Creadores</a>
                         <a href="{{ url_for('beneficios') }}">Beneficios</a>
                         <a href="{{ url_for('institucion') }}">Instituci&oacute;n</a>
                         <a href="{{ url_for('privacidad') }}">Privacidad</a>
                         <a href="{{ url_for('terminos') }}">Condiciones</a>
+                        <a href="{{ url_for('compartir_eduturnos') }}">Compartir EDUTURNOS</a>
                     </div>
                 </details>
             </nav>
@@ -913,7 +913,7 @@ linear-gradient(135deg, #dceeff 0%, #b9dcf7 48%, #91c7ee 100%);}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261026_mobile_recovery_v64">
 {% endif %}
 <script src="{{ url_for('static', filename='js/pwa.js') }}?v=5" defer></script>
-<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261107_voice_input_fallback_v1" defer></script>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261108_native_speech_v1" defer></script>
 {% include '_page_mascot.html' %}
 </body>
 </html>
