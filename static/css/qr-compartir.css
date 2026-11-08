@@ -108,7 +108,6 @@
 }
 
 .eduturnos-share-qr-frame.is-dragon .eduturnos-qr-dragon-art {
-    animation: eduturnos-qr-dragon-float 7s ease-in-out infinite;
     opacity: 1;
 }
 
@@ -127,17 +126,6 @@
     border: 0.25rem solid #fff;
     border-radius: 0.5rem;
     box-shadow: 0 0.4rem 1.5rem rgb(0 13 40 / 48%);
-}
-
-@keyframes eduturnos-qr-dragon-float {
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.025);
-    }
 }
 
 .eduturnos-share-qr-frame.is-institutional {
@@ -240,12 +228,6 @@
 
 .eduturnos-share-qr-frame.is-institutional .eduturnos-qr-corner {
     border-color: #f6d85b;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .eduturnos-share-qr-frame.is-dragon .eduturnos-qr-dragon-art {
-        animation: none;
-    }
 }
 
 .eduturnos-share-description {

@@ -139,7 +139,7 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
     assert b"Comparte el acceso a EDUTURNOS con la comunidad educativa" in share.data
     assert b'data-share-eduturnos' in share.data
     assert b"QR EDUTURNOS" in share.data
-    assert b"Animada (drag\xc3\xb3n)" in share.data
+    assert b"Imagen del drag\xc3\xb3n" in share.data
     assert b"Normal (azul institucional)" in share.data
     assert b'data-qr-dragon="/compartir/eduturnos.svg?v=5"' in share.data
     assert b'data-qr-institutional="/compartir/eduturnos.svg?estilo=navy&amp;v=2"' in share.data
@@ -150,12 +150,13 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
     qr_styles = Path("static/css/qr-compartir.css").read_text(encoding="utf-8")
     assert 'document.querySelector(".eduturnos-qr-code-image")' in qr_script
     assert "is-dragon" in qr_script
-    assert "@keyframes eduturnos-qr-dragon-float" in qr_styles
+    assert "animation:" not in qr_styles
+    assert "@keyframes eduturnos-qr-dragon-float" not in qr_styles
     assert "aspect-ratio: 1;" in qr_styles
     assert "top: 34%;" in qr_styles
     assert "left: 30%;" in qr_styles
     assert ".eduturnos-share-qr-frame.is-dragon .eduturnos-qr-frame-label" in qr_styles
-    assert "@media (prefers-reduced-motion: reduce)" in qr_styles
+    assert "@media (prefers-reduced-motion: reduce)" not in qr_styles
     assert b"Descargar c\xc3\xb3digo QR" not in share.data
     assert b"https://eduturnos.example/" not in share.data
 

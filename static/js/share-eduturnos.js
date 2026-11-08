@@ -8,7 +8,7 @@
             const dragon = qrPicker.value === "dragon";
             qrImage.src = dragon ? qrImage.dataset.qrDragon : qrImage.dataset.qrInstitutional;
             qrImage.alt = dragon
-                ? "Código QR azul de EDUTURNOS sobre el diseño animado del dragón para abrir el sitio oficial"
+                ? "Código QR azul de EDUTURNOS sobre la imagen del dragón para abrir el sitio oficial"
                 : "Código QR azul institucional de EDUTURNOS para abrir el sitio oficial";
             qrFrame.classList.toggle("is-dragon", dragon);
             qrFrame.classList.toggle("is-institutional", !dragon);
