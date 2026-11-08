@@ -143,7 +143,7 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
     assert b"Normal (azul institucional)" in share.data
     assert b'data-qr-dragon="/compartir/eduturnos.svg?v=5"' in share.data
     assert b'data-qr-institutional="/compartir/eduturnos.svg?estilo=navy&amp;v=2"' in share.data
-    assert b"mascots/qr-dragon-eduturnos.png" in share.data
+    assert b"mascots/qr-dragon-eduturnos.png?v=2" in share.data
     assert b'value="institutional" selected' in share.data
     assert Path("static/mascots/qr-dragon-eduturnos.png").is_file()
     qr_script = Path("static/js/share-eduturnos.js").read_text(encoding="utf-8")
@@ -151,6 +151,10 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
     assert 'document.querySelector(".eduturnos-qr-code-image")' in qr_script
     assert "is-dragon" in qr_script
     assert "@keyframes eduturnos-qr-dragon-float" in qr_styles
+    assert "aspect-ratio: 1;" in qr_styles
+    assert "top: 34%;" in qr_styles
+    assert "left: 30%;" in qr_styles
+    assert ".eduturnos-share-qr-frame.is-dragon .eduturnos-qr-frame-label" in qr_styles
     assert "@media (prefers-reduced-motion: reduce)" in qr_styles
     assert b"Descargar c\xc3\xb3digo QR" not in share.data
     assert b"https://eduturnos.example/" not in share.data

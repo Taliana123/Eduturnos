@@ -100,8 +100,9 @@
 }
 
 .eduturnos-share-qr-frame.is-dragon {
-    aspect-ratio: 691 / 699;
-    padding: 1rem;
+    aspect-ratio: 1;
+    padding: 0;
+    overflow: hidden;
     border-color: #12355f;
     background: #071b37;
 }
@@ -111,19 +112,17 @@
     opacity: 1;
 }
 
+.eduturnos-share-qr-frame.is-dragon .eduturnos-qr-corner,
 .eduturnos-share-qr-frame.is-dragon .eduturnos-qr-frame-label {
-    border-color: #73e5ff;
-    background: rgb(5 26 54 / 92%);
-    box-shadow: 0 0 0.8rem rgb(70 218 255 / 55%);
-    color: #e7fbff;
-}
-
-.eduturnos-share-qr-frame.is-dragon .eduturnos-qr-corner {
-    border-color: #73e5ff;
+    display: none;
 }
 
 .eduturnos-share-qr-frame.is-dragon .eduturnos-qr-code {
-    width: min(60%, 14rem);
+    position: absolute;
+    z-index: 1;
+    top: 34%;
+    left: 30%;
+    width: 40%;
     padding: 0.4rem;
     border: 0.25rem solid #fff;
     border-radius: 0.5rem;
