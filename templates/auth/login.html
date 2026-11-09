@@ -1411,8 +1411,15 @@ html body.login-page .personal-login .personal-field-jornada select {
 <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261109_composer_surface_v1">
 <style>
     html body main.login-page .login-card > .section-heading > h1 {
+        margin-left: -33px !important;
         justify-self: start !important;
         text-align: left !important;
+    }
+
+    @media (max-width: 900px) {
+        html body main.login-page .login-card > .section-heading > h1 {
+            margin-left: -13px !important;
+        }
     }
 
     html body header.eduturnos-header > .mobile-back-link,
