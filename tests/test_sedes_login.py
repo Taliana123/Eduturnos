@@ -7,20 +7,19 @@ def test_login_template_has_personal_fields():
     assert 'codigo_institucional' in text
     assert 'pattern="[0-9]{6}"' in text
     assert 'placeholder="6 dígitos"' in text
-    assert 'data-staff-code-field hidden' in text
-    assert 'v=20261109_staff_code_by_email_v1' in text
+    assert 'class="personal-field personal-field-code">' in text
+    assert 'v=20261109_staff_code_always_visible_v1' in text
     assert 'right: 18px !important;' in text
     assert 'right: 12px !important;' in text
     assert 'background: #1769aa !important;' in text
     assert 'color: #fff !important;' in text
 
 
-def test_login_muestra_codigo_solo_para_correo_institucional_del_personal():
+def test_login_mantiene_codigo_visible_para_acceso_jjfh_y_oculto_en_otras_instituciones():
     script = Path('static/js/institution-login.js').read_text(encoding='utf-8')
-    assert "const isInstitutionalStaffEmail = /@jjfh\\.edu\\.co$/i.test" in script
-    assert "staffCodeField.hidden = !isJjfh || !isInstitutionalStaffEmail" in script
-    assert "identifier?.addEventListener('input', update)" in script
-    assert "field === staffCodeInput && !isInstitutionalStaffEmail" in script
+    assert "legacy.hidden = !isJjfh" in script
+    assert "field.disabled = !isJjfh" in script
+    assert "if (!isJjfh) field.value = ''" in script
 
 
 def test_roles_define_the_institutional_sedes():
