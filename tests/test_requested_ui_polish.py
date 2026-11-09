@@ -113,6 +113,8 @@ def test_registro_conserva_ilustracion_y_enlace_completo_de_regreso():
     assert 'class="registro-dibujo"' in template
     assert 'class="link-back registro-back-button"' in template
     assert 'class="link-back registro-back-button account-settings-back"' not in template
+    assert "background: #fff !important;" in template
+    assert "min-height: 40px !important;" in template
 
 
 def test_chat_de_ayuda_no_muestra_aviso_de_voz_y_conserva_el_del_agente():
@@ -155,6 +157,7 @@ def test_sedes_calendario_y_seguimiento_muestran_campos_coherentes():
     assert "CASE WHEN c.destinatario_usuario_id IS NOT NULL" in followup_route
     assert "max-width: 1140px !important;" in config_styles
     assert "max-width: 560px !important;" in config_styles
+    assert "grid-template-columns: minmax(0, calc((100% - 14px) / 2 + 20px))" in config_styles
 
 
 def test_botones_de_regreso_tienen_estilo_unificado():

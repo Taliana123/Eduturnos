@@ -1665,6 +1665,7 @@ html body.has-desktop-sidebar #contenido .administracion-page .configuracion-pag
 
     html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form > .institution-identity {
         gap: 14px !important;
+        grid-template-columns: minmax(0, calc((100% - 14px) / 2 + 20px)) minmax(0, calc((100% - 14px) / 2 - 20px)) !important;
     }
 
     html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form > .institution-address {

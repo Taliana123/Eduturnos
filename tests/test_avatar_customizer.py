@@ -158,6 +158,11 @@ def test_personalizador_usa_renderizador_y_catalogo_oficiales():
     assert "data-avatar-cancel" in sidebar
     assert "data-avatar-randomize" not in sidebar
     assert "data-avatar-randomize" not in source
+    assert 'mujer: { head: "hm1-p-000024", body: "hm1-p-000030", bottom: "hm1-p-000036" }' in source
+    assert 'hombre: { head: "hm1-p-000003", body: "hm1-p-000028", bottom: "hm1-p-000034" }' in source
+    assert 'nina: { head: "hm1-p-000016", body: "hm1-p-000025", bottom: "hm1-p-000037" }' in source
+    assert 'nino: { head: "hm1-p-000007", body: "hm1-p-000032", bottom: "hm1-p-000033" }' in source
+    assert "selections: { ...currentState.selections, ...genderPresets[gender] }" in source
     assert '["nina", "Niña"]' in source
     assert "Copyright (c) 2026 Humation contributors" in license_text
     assert not (ROOT / "static" / "js" / "avatar-customizer.js").exists()

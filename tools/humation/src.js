@@ -21,6 +21,12 @@ const genders = [
   ["nina", "Niña"],
   ["nino", "Niño"],
 ];
+const genderPresets = {
+  mujer: { head: "hm1-p-000024", body: "hm1-p-000030", bottom: "hm1-p-000036" },
+  hombre: { head: "hm1-p-000003", body: "hm1-p-000028", bottom: "hm1-p-000034" },
+  nina: { head: "hm1-p-000016", body: "hm1-p-000025", bottom: "hm1-p-000037" },
+  nino: { head: "hm1-p-000007", body: "hm1-p-000032", bottom: "hm1-p-000033" },
+};
 const fallbackColors = {
   hair: "#4A3728",
   skin: "#F4C9A8",
@@ -125,7 +131,7 @@ const initialize = () => {
       genderOptions.append(option);
     }
     const genderHint = document.createElement("small");
-    genderHint.textContent = "El género se guarda como preferencia; cabello, ropa y rasgos se personalizan por separado.";
+    genderHint.textContent = "Al elegir un género se aplica un estilo inicial; después puedes personalizar cada rasgo.";
     genderGroup.append(genderOptions, genderHint);
     fields.append(genderGroup);
 
@@ -228,7 +234,12 @@ const initialize = () => {
   fields.addEventListener("click", (event) => {
     const genderChoice = event.target.closest("[data-avatar-gender-choice]");
     if (genderChoice) {
-      render({ ...currentState, gender: genderChoice.dataset.avatarGenderChoice });
+      const gender = genderChoice.dataset.avatarGenderChoice;
+      render({
+        ...currentState,
+        gender,
+        selections: { ...currentState.selections, ...genderPresets[gender] },
+      });
       return;
     }
     const choice = event.target.closest("[data-avatar-choice]");
