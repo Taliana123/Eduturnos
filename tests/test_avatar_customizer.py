@@ -153,10 +153,11 @@ def test_personalizador_usa_renderizador_y_catalogo_oficiales():
     assert "createAvatar(humation1" in source
     assert 'filename=\'js/humation-avatar.js\'' in base
     assert "data-avatar-image" in art
-    assert "data-avatar-user" not in sidebar
-    assert "avatar-customizer" not in sidebar
+    assert 'data-avatar-user="{{ usuario_navegacion.id_usuario }}"' in sidebar
+    assert 'data-avatar-open' in sidebar
+    assert sidebar.count('<dialog id="avatar-customizer"') == 1
     assert 'data-avatar-open' in account
-    assert "data-avatar-cancel" in account
+    assert "data-avatar-cancel" in sidebar
     assert "avatar-category-list" in source
     assert "avatar-category-panel" in source
     assert "discardChanges();" in source
@@ -198,12 +199,13 @@ def test_menu_y_mi_cuenta_renderizan_las_imagenes_de_avatar():
             puede_configurar=False,
         )
 
-    assert 'data-avatar-save-url="/cuenta/avatar"' in account
+    assert 'data-avatar-save-url="/cuenta/avatar"' in sidebar
     assert sidebar.count("data-avatar-image") == 1
-    assert 'data-avatar-preview-image' in account
-    assert 'class="desktop-sidebar-account-avatar" aria-hidden="true"' in sidebar
+    assert 'data-avatar-preview-image' in sidebar
+    assert 'class="desktop-sidebar-account-avatar" type="button" data-avatar-open' in sidebar
+    assert 'aria-label="Cambiar foto de perfil"' in sidebar
     assert 'data-avatar-user="81"' in sidebar
-    assert 'data-avatar-open' not in sidebar
-    assert "avatar-customizer" not in sidebar
+    assert sidebar.count('<dialog id="avatar-customizer"') == 1
+    assert 'data-avatar-open' in account
     assert 'data-avatar-image' in account
     assert "eduturnos-81" in json.dumps(initial)

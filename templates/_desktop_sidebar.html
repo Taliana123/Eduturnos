@@ -60,9 +60,30 @@
   {% include '_asistente_widget.html' %}
   <a class="desktop-sidebar-account-link" href="{{ url_for('cuenta.index') }}" {% if endpoint.startswith('cuenta.') %}aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#user-circle"></use></svg></span><span class="nav-label">Mi cuenta</span></a>
   <div class="desktop-sidebar-account">
-    <div class="desktop-sidebar-account-avatar" aria-hidden="true">{{ avatar_art(avatar_config, usuario_navegacion.id_usuario) }}</div>
+    <button class="desktop-sidebar-account-avatar" type="button" data-avatar-open data-avatar-user="{{ usuario_navegacion.id_usuario }}" data-avatar-config="{{ avatar_config|tojson|forceescape }}" aria-haspopup="dialog" aria-controls="avatar-customizer" aria-label="Cambiar foto de perfil" title="Cambiar foto de perfil">{{ avatar_art(avatar_config, usuario_navegacion.id_usuario) }}</button>
     <div class="desktop-sidebar-account-info"><strong>Acceso institucional</strong><small>{{ usuario_navegacion.nombres }} {{ usuario_navegacion.apellidos }}</small></div>
     <form class="desktop-sidebar-logout-form" method="post" action="{{ url_for('auth.logout') }}">{{ csrf_field()|safe }}<button class="desktop-sidebar-logout-button" type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><img src="{{ url_for('static', filename='icons/lucide-log-out.svg') }}" alt=""></button></form>
   </div>
 </aside>
+<dialog id="avatar-customizer" class="avatar-customizer" aria-labelledby="avatar-customizer-title">
+  <form method="dialog" data-avatar-form data-avatar-save-url="{{ url_for('cuenta.actualizar_avatar') }}">
+    <header class="avatar-customizer-header">
+      <button class="avatar-customizer-back" type="button" data-avatar-cancel aria-label="Volver a Mi cuenta" title="Volver a Mi cuenta">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
+      </button>
+      <div><h2 id="avatar-customizer-title">Realiza tu personaje</h2><p>Elige sus piezas, colores y género. Puedes cambiar cada detalle a tu gusto.</p></div>
+    </header>
+    <div class="avatar-customizer-preview" data-avatar-user="{{ usuario_navegacion.id_usuario }}">
+      <img class="user-avatar-drawing" data-avatar-preview-image data-avatar-user="{{ usuario_navegacion.id_usuario }}" alt="" aria-hidden="true" decoding="async">
+    </div>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="avatar-customizer-fields" data-avatar-fields></div>
+    <footer class="avatar-customizer-actions">
+      <button type="button" data-avatar-reset>Restablecer</button>
+      <button type="button" data-avatar-save>Guardar avatar</button>
+      <button type="button" data-avatar-cancel>Cancelar</button>
+    </footer>
+    <p class="avatar-customizer-status" data-avatar-status role="status" aria-live="polite"></p>
+  </form>
+</dialog>
 {% endif %}
