@@ -6,7 +6,10 @@ def test_login_template_has_personal_fields():
     assert 'Sede' in text
     assert 'codigo_institucional' in text
     assert 'pattern="[0-9]{6}"' in text
-    assert 'placeholder="6 dígitos"' in text
+    assert 'placeholder="6 dígitos"' not in text
+    code_field = text.split('name="codigo_institucional"', 1)[1].split('>', 1)[0]
+    assert 'placeholder=' not in code_field
+    assert 'value=' not in code_field
     assert 'class="personal-field personal-field-code">' in text
     assert 'v=20261109_staff_code_always_visible_v1' in text
     assert 'right: 18px !important;' in text
