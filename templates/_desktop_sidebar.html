@@ -6,6 +6,7 @@
 {% set personal = rectoria or coordinacion or rol == 'Docente' %}
 {% set gestion = rectoria or coordinacion %}
 {% set endpoint = request.endpoint or '' %}
+{% from "_avatar_art.html" import avatar_art %}
 <aside id="eduturnos-mobile-nav" class="eduturnos-desktop-sidebar" aria-label="Navegación institucional">
   <div class="desktop-sidebar-institution">
     <img src="{{ url_for('static', filename='icons/colegio-logo.png') }}" alt="Escudo institucional" width="40" height="40">
@@ -39,6 +40,7 @@
     {% if gestion %}{% set enlaces = enlaces + [('configuracion.index', 'Administración')] %}{% endif %}
     {% if rol in ['Rector', 'Administrador / Coordinador'] %}{% set enlaces = enlaces + [('retroalimentacion.administrar', 'Opiniones de usuarios')] %}{% endif %}
     {% if visitante %}{% set enlaces = enlaces + [('justificaciones.index', 'Justificaciones')] %}{% endif %}
+    {% if rol in ['Estudiante', 'Acudiente'] %}{% set enlaces = enlaces + [('solicitudes.index', 'Solicitudes de cita')] %}{% endif %}
     {% set enlaces = enlaces + [('soporte.index', 'Ayuda y soporte')] %}
     {% set enlaces = enlaces + [('compartir_eduturnos', 'Compartir EDUTURNOS')] %}
     {% if rol in ['Docente', 'Estudiante', 'Acudiente'] %}{% set enlaces = enlaces + [('retroalimentacion.enviar', 'Quejas, reseñas y mejoras')] %}{% endif %}
@@ -58,6 +60,7 @@
   {% include '_asistente_widget.html' %}
   <a class="desktop-sidebar-account-link" href="{{ url_for('cuenta.index') }}" {% if endpoint.startswith('cuenta.') %}aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#user-circle"></use></svg></span><span class="nav-label">Mi cuenta</span></a>
   <div class="desktop-sidebar-account">
+    <div class="desktop-sidebar-account-avatar" aria-hidden="true">{{ avatar_art(avatar_config, usuario_navegacion.id_usuario) }}</div>
     <div class="desktop-sidebar-account-info"><strong>Acceso institucional</strong><small>{{ usuario_navegacion.nombres }} {{ usuario_navegacion.apellidos }}</small></div>
     <form class="desktop-sidebar-logout-form" method="post" action="{{ url_for('auth.logout') }}">{{ csrf_field()|safe }}<button class="desktop-sidebar-logout-button" type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><img src="{{ url_for('static', filename='icons/lucide-log-out.svg') }}" alt=""></button></form>
   </div>

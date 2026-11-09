@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% from '_hora_cita.html' import selector_hora %}
+
+{% block title %}Solicitar cita · EDUTURNOS{% endblock %}
+{% block content %}
+<section class="page-head">
+    <div>
+        <h1>Solicitar una cita</h1>
+        <p>Elige si deseas reunirte con Rectoría, Coordinación o un Docente. Rectoría y Coordinación revisarán la solicitud.</p>
+    </div>
+</section>
+
+<section class="tarjeta">
+    <form method="post" action="{{ url_for('solicitudes.nueva_estudiante') }}">
+        {{ csrf_field()|safe }}
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="destinatario_usuario_id">Persona o equipo</label>
+                <select id="destinatario_usuario_id" name="destinatario_usuario_id" required>
+                    <option value="" selected disabled>Selecciona un destinatario</option>
+                    {% for destinatario in destinatarios %}
+                    <option value="{{ destinatario.id_usuario }}">
+                        {{ destinatario.rol_nombre }} · {{ destinatario.nombres }} {{ destinatario.apellidos }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if not destinatarios %}<small>No hay destinatarios disponibles en tu institución.</small>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_motivo">Motivo</label>
+                <select id="id_motivo" name="id_motivo" required>
+                    <option value="" selected disabled>Selecciona el motivo</option>
+                    {% for motivo in motivos %}
+                    <option value="{{ motivo.id }}">{{ motivo.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="fecha_solicitada">Fecha solicitada</label>
+                <input type="date" id="fecha_solicitada" name="fecha_solicitada" min="{{ fecha_minima }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="hora_solicitada">Hora solicitada</label>
+                {{ selector_hora('hora_solicitada', 'hora_solicitada') }}
+            </div>
+
+            <div class="form-group full-field">
+                <label for="observaciones">Información adicional (opcional)</label>
+                <textarea id="observaciones" name="observaciones" maxlength="2000" rows="4"></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a class="boton boton-secondary" href="{{ url_for('solicitudes.index') }}">Cancelar</a>
+            <button type="submit" class="boton" {% if not destinatarios or not motivos or not periodo_disponible %}disabled{% endif %}>Enviar solicitud</button>
+        </div>
+        {% if not periodo_disponible %}<p role="status">No hay un periodo académico activo. Solicita a Rectoría que lo active antes de enviar la solicitud.</p>{% endif %}
+    </form>
+</section>
+{% endblock %}

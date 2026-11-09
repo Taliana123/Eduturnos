@@ -32,7 +32,7 @@ def test_service_worker_version_invalidates_stale_app_assets():
     service_worker = (ROOT / "static" / "service-worker.js").read_text(encoding="utf-8")
     manifest = json.loads((ROOT / "static" / "manifest.webmanifest").read_text(encoding="utf-8"))
 
-    assert 'const CACHE_VERSION = "eduturnos-v25-account-profile-only";' in service_worker
+    assert 'const CACHE_VERSION = "eduturnos-v26-dashboard-requests-profile";' in service_worker
     assert "keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key))" in service_worker
     assert "/static/icons/eduturnos-192.png?v=20261109_release24_cache_v1" in service_worker
     assert "/static/icons/eduturnos-512.png?v=20261109_release24_cache_v1" in service_worker

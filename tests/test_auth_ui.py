@@ -299,7 +299,7 @@ def test_solicitudes_docente_no_duplica_solicitar_y_acudiente_conserva_acceso():
     assert docente.count("+ Solicitar cita") == 1
     assert 'class="btn btn-primary solicitudes-final-seguimiento"' not in docente
     assert acudiente.count("+ Solicitar cita") == 1
-    assert 'class="btn btn-primary solicitudes-final-seguimiento"' in acudiente
+    assert 'href="/solicitudes/nueva/acudiente"' in acudiente
     assert ".solicitudes-header-actions { margin-top:-8px !important; }" in docente
 
 
@@ -437,7 +437,7 @@ def test_resumen_muestra_seguimiento_en_acceso_rapido():
     assert 'dashboard-quick-links {\n        display: grid !important;' in mobile_styles
     assert 'class="dashboard-head-action"' not in dashboard
     assert 'class="desktop-sidebar-logout-form"' in sidebar
-    assert 'class="desktop-sidebar-account-avatar"' not in sidebar
+    assert 'class="desktop-sidebar-account-avatar"' in sidebar
     assert "dar continuidad al acompañamiento de los estudiantes" in seguimiento
     assert 'class="table-wrap seguimiento-historial"' in seguimiento
 
@@ -505,6 +505,9 @@ def test_barra_lateral_respeta_roles_y_seccion_activa():
         assert 'mail.google.com/mail/' not in html
         assert ('/configuracion/' in html) == (rol in ('Rector', 'Super Admin'))
         assert ('/justificaciones/' in html) == (rol in ('Estudiante', 'Acudiente'))
+        assert ('/solicitudes/' in html) == (rol in ('Rector', 'Administrador / Coordinador', 'Super Admin', 'Docente', 'Estudiante', 'Acudiente'))
+        assert 'class="desktop-sidebar-account-avatar" aria-hidden="true"' in html
+        assert 'class="desktop-sidebar-account-info"' in html
     with app.test_request_context('/auth/login'):
         assert not render_template('_desktop_sidebar.html', usuario_navegacion=None).strip()
 
@@ -621,7 +624,7 @@ def test_cierre_sesion_en_fila_de_identidad():
     lateral = Path('templates/_desktop_sidebar.html').read_text(encoding='utf-8')
     assert 'desktop-header-session' not in base
     assert 'desktop-sidebar-logout-form' in lateral
-    assert 'desktop-sidebar-account-avatar' not in lateral
+    assert 'desktop-sidebar-account-avatar' in lateral
     assert 'Acceso institucional' in lateral
     assert 'aria-label="Cerrar sesión"' in lateral
     assert 'Mi cuenta' in lateral
