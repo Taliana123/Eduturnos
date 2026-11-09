@@ -64,7 +64,7 @@ def test_sugerencias_de_estudiantes_son_compactas_y_la_ficha_se_muestra_al_selec
         "renderSuggestions(studentSuggestions, matches,", 1
     )[1].split("status.textContent", 1)[0]
 
-    assert "nueva-citacion.js') }}?v=20261109_document_suggestions_v2" in template
+    assert "nueva-citacion.js') }}?v=20261109_document_suggestions_v3" in template
     assert "#coincidencias-estudiante .citation-suggestion" in template
     assert "background:#f1f7fc!important" in template
     assert "min-height:0!important" in template
@@ -127,7 +127,7 @@ def test_configuracion_institucional_refresca_estilos_y_conserva_anchos_solicita
         encoding="utf-8"
     )
 
-    assert "v=20261109_institution_fields_v4" in template
+    assert "v=20261109_institution_fields_v5" in template
     assert "calc((100% - 14px) / 2 + 20px)" in config_styles
     assert "max-width: 560px !important;" in config_styles
 

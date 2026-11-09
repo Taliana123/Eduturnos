@@ -807,7 +807,7 @@ def test_configuration_catalog_forms_follow_motives_layout_without_changing_inst
     assert 'class="motivo-edit-form config-record-form"' in template
     assert 'class="state-form state-form-row config-record-form"' in template
     assert "config-record-actions" in template
-    assert "20261109_institution_fields_v4" in template
+    assert "20261109_institution_fields_v5" in template
     assert 'class="full-field institution-address"' in template
     assert 'class="institution-identity"' in template
     assert "minmax(340px, 1.9fr)" in css
