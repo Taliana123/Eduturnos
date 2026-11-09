@@ -1,6 +1,6 @@
 ﻿{% extends 'base.html' %}
 {% from '_hora_cita.html' import selector_hora %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva-cita.css') }}?v=20261102_recipient_panels_v5"><link rel="stylesheet" href="{{ url_for('static', filename='css/citas-form-visibility.css') }}?v=20261102_recipient_panels_v5">{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva-cita.css') }}?v=20261109_document_suggestions_v1"><link rel="stylesheet" href="{{ url_for('static', filename='css/citas-form-visibility.css') }}?v=20261102_recipient_panels_v5">{% endblock %}
 {% block content %}
 <div class="page-head nueva-cita-heading"><div class="menu-page-heading"><div class="menu-page-heading-copy"><h1>Nueva citación</h1><p>Completa los datos del destinatario y agenda la fecha, hora y motivo del encuentro.</p></div></div></div>
 {% set motivo_otro_id = namespace(value='') %}{% for motivo in motivos %}{% if motivo.nombre|lower == 'otro' %}{% set motivo_otro_id.value = motivo.id %}{% endif %}{% endfor %}
@@ -23,7 +23,8 @@
       <input type="search" id="buscar-documento-estudiante" inputmode="numeric" autocomplete="off" maxlength="30" placeholder="Escribe el documento del estudiante">
       <button class="boton secundario" type="button" id="buscar-estudiante-boton">Buscar</button>
     </div>
-    <p class="citation-lookup-status" id="estado-busqueda-estudiante" role="status" aria-live="polite">Ingresa el documento y pulsa Buscar.</p>
+    <div class="citation-suggestions" id="coincidencias-estudiante" role="listbox" aria-label="Estudiantes que coinciden" hidden></div>
+    <p class="citation-lookup-status" id="estado-busqueda-estudiante" role="status" aria-live="polite">Escribe el documento para ver coincidencias.</p>
     <div class="citation-person-card" data-student-field id="datos-estudiante" hidden>
       <strong>Estudiante</strong><span id="nombre-estudiante"></span><small id="contexto-estudiante"></small>
     </div>
@@ -39,6 +40,7 @@
     <div class="citation-document-control full-field personal-document-control">
       <input type="search" id="buscar-documento-personal" inputmode="numeric" autocomplete="off" maxlength="30" placeholder="Escribe el documento del destinatario" disabled>
     </div>
+    <div class="citation-suggestions full-field" id="coincidencias-personal" role="listbox" aria-label="Destinatarios que coinciden" hidden></div>
     <p class="citation-lookup-status full-field" id="estado-busqueda-personal" role="status" aria-live="polite">Escribe el documento para seleccionar automáticamente el destinatario.</p>
     <div class="citation-person-card full-field" data-personal-card id="datos-destinatario-personal" hidden>
       <strong data-personal-role-label>Destinatario</strong><span id="nombre-destinatario-personal"></span><small id="documento-destinatario-personal"></small>
@@ -58,12 +60,12 @@
     </label>
     <input type="hidden" name="id_motivo" id="id-motivo" value="{{ motivo_otro_id.value }}">
     <label>Fecha<input type="date" name="fecha" min="{{ fecha_minima }}" required></label>
-    <label>Hora{{ selector_hora('hora') }}</label>
+    <label>Hora{{ selector_hora('hora', 'hora-cita') }}</label>
     {% if not periodos %}<p class="full-field citation-period-warning" role="alert">No hay un periodo académico activo. Rectoría debe activar uno en Configuración institucional para poder registrar la cita.</p>{% endif %}
   </section>
   <div class="full-field mobile-command-group citation-form-actions"><button class="boton" type="submit">Crear citación</button><button class="boton secundario" type="reset">Cancelar</button></div>
 </form>
-<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261102_personal_reason_text_v4" defer></script>
+<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261109_document_suggestions_v1" defer></script>
 <style>
 .nueva-cita-form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;width:min(100%,820px);margin:0 auto;padding:18px}
 .citation-mode-field,.citation-mode-panel{grid-column:1/-1;min-width:0}
@@ -86,6 +88,11 @@
 .personal-document-control{grid-template-columns:minmax(0,1fr)!important}
 .personal-document-control input[type=search]{min-height:48px;padding:10px 14px}
 .citation-lookup-status{margin:0;color:#52677c;font-size:14px}
+.citation-suggestions{display:grid;gap:6px;max-height:220px;overflow:auto}
+.citation-suggestions[hidden]{display:none!important}
+.citation-suggestion{display:grid;width:100%;gap:3px;padding:10px 12px;border:1px solid #dce5ef;border-radius:9px;background:#f7faff;color:#17365d;text-align:left;cursor:pointer}
+.citation-suggestion:hover,.citation-suggestion:focus-visible{border-color:#6a91ec;background:#edf3ff;outline:2px solid #6a91ec;outline-offset:1px}
+.citation-suggestion small{color:#60758a}
 .citation-person-card{display:grid;gap:4px;padding:12px;border-radius:10px;background:#f1f7fc;color:#17365d}
 .citation-person-card small{color:#60758a}
 .citation-person-card[hidden]{display:none!important}

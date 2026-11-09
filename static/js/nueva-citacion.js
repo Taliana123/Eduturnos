@@ -9,12 +9,14 @@
   const personalPanel = form.querySelector('[data-personal-panel]');
   const search = form.querySelector('#buscar-documento-estudiante');
   const searchButton = form.querySelector('#buscar-estudiante-boton');
+  const studentSuggestions = form.querySelector('#coincidencias-estudiante');
   const studentId = form.querySelector('#id-estudiante');
   const studentCard = form.querySelector('#datos-estudiante');
   const guardian = form.querySelector('#acudiente-select');
   const status = form.querySelector('#estado-busqueda-estudiante');
   const personalId = form.querySelector('#destinatario-personal');
   const personalSearch = form.querySelector('#buscar-documento-personal');
+  const personalSuggestions = form.querySelector('#coincidencias-personal');
   const personalStatus = form.querySelector('#estado-busqueda-personal');
   const personalCard = form.querySelector('#datos-destinatario-personal');
   const studentReasonField = form.querySelector('[data-student-reason-field]');
@@ -22,24 +24,113 @@
   const studentReason = form.querySelector('#motivo-estudiante');
   const reasonId = form.querySelector('#id-motivo');
   const personalReason = form.querySelector('#motivo-personal');
+  const appointmentTime = form.querySelector('#hora-cita');
   let requestSerial = 0;
+  let studentSuggestionSerial = 0;
   let personalRequestSerial = 0;
+  let personalSuggestionSerial = 0;
   let personalTimer = 0;
+  let studentTimer = 0;
 
   function clearStudent(message) {
     studentId.value = '';
     studentCard.hidden = true;
+    studentSuggestions.replaceChildren();
+    studentSuggestions.hidden = true;
     guardian.replaceChildren(new Option('Primero busca al estudiante por documento', ''));
     guardian.disabled = true;
     guardian.required = false;
     status.textContent = message;
   }
 
+  function filterTimesByJourney(journey) {
+    const normalizedJourney = String(journey || '').trim().toLocaleLowerCase('es');
+    const restrictedShift = normalizedJourney === 'mañana' || normalizedJourney === 'tarde';
+    const selectedTime = appointmentTime.value;
+
+    Array.from(appointmentTime.querySelectorAll('optgroup')).forEach((group) => {
+      const shift = group.label.trim().toLocaleLowerCase('es');
+      group.hidden = restrictedShift && shift !== normalizedJourney;
+    });
+
+    if (selectedTime) {
+      const selectedOption = Array.from(appointmentTime.options)
+        .find((option) => option.value === selectedTime);
+      if (selectedOption?.parentElement?.hidden) appointmentTime.value = '';
+    }
+  }
+
+  function renderSuggestions(container, matches, chooseMatch, getDetails) {
+    container.replaceChildren();
+    matches.forEach((match) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'citation-suggestion';
+      button.setAttribute('role', 'option');
+      const name = document.createElement('span');
+      name.textContent = match.nombre
+        || `${match.nombres || ''} ${match.apellidos || ''}`.trim();
+      const details = document.createElement('small');
+      details.textContent = getDetails(match);
+      button.append(name, details);
+      button.addEventListener('click', () => chooseMatch(match));
+      container.append(button);
+    });
+    container.hidden = matches.length === 0;
+  }
+
+  async function suggestStudents() {
+    const documentNumber = search.value.trim();
+    const serial = ++studentSuggestionSerial;
+    if (documentNumber.length < 2) {
+      studentSuggestions.replaceChildren();
+      studentSuggestions.hidden = true;
+      return;
+    }
+
+    try {
+      const url = new URL(form.dataset.studentLookupUrl, window.location.origin);
+      url.searchParams.set('documento', documentNumber);
+      url.searchParams.set('coincidencias', '1');
+      const response = await fetch(url, {
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+      });
+      const data = await response.json();
+      if (serial !== studentSuggestionSerial || search.value.trim() !== documentNumber) return;
+      const matches = response.ok && data.ok ? (data.estudiantes || []) : [];
+      renderSuggestions(studentSuggestions, matches, (student) => {
+        window.clearTimeout(studentTimer);
+        search.value = student.documento;
+        studentSuggestions.replaceChildren();
+        studentSuggestions.hidden = true;
+        searchStudent();
+      }, (student) => [
+        `Documento ${student.documento}`,
+        student.grado && `Grado ${student.grado}`,
+        student.jornada,
+      ].filter(Boolean).join(' · '));
+      status.textContent = matches.length
+        ? 'Selecciona al estudiante que coincide con el documento.'
+        : 'No hay estudiantes activos que coincidan con ese documento.';
+    } catch (_) {
+      if (serial === studentSuggestionSerial) {
+        studentSuggestions.replaceChildren();
+        studentSuggestions.hidden = true;
+        status.textContent = 'No se pudieron cargar las coincidencias. Puedes pulsar Buscar.';
+      }
+    }
+  }
+
   async function searchStudent() {
     const documentNumber = search.value.trim();
     const serial = ++requestSerial;
+    studentSuggestionSerial += 1;
+    window.clearTimeout(studentTimer);
+    studentSuggestions.replaceChildren();
+    studentSuggestions.hidden = true;
     if (!documentNumber) {
-      clearStudent('Ingresa el documento y pulsa Buscar.');
+      clearStudent('Escribe el documento para ver coincidencias.');
       search.focus();
       return;
     }
@@ -65,6 +156,7 @@
         `${data.estudiante.nombre} · Documento ${data.estudiante.documento}`;
       form.querySelector('#contexto-estudiante').textContent =
         [data.estudiante.grado, data.estudiante.jornada].filter(Boolean).join(' · ');
+      filterTimesByJourney(data.estudiante.jornada);
       studentCard.hidden = false;
       guardian.replaceChildren();
       const acudientes = data.acudientes || [];
@@ -97,12 +189,58 @@
   function clearPersonal(message) {
     personalId.value = '';
     personalCard.hidden = true;
+    personalSuggestions.replaceChildren();
+    personalSuggestions.hidden = true;
     personalStatus.textContent = message;
+  }
+
+  async function suggestPersonalRecipients() {
+    const documentNumber = personalSearch.value.trim();
+    const serial = ++personalSuggestionSerial;
+    if (documentNumber.length < 2) {
+      personalSuggestions.replaceChildren();
+      personalSuggestions.hidden = true;
+      return;
+    }
+
+    try {
+      const url = new URL(form.dataset.personalLookupUrl, window.location.origin);
+      url.searchParams.set('documento', documentNumber);
+      url.searchParams.set('tipo', type.value);
+      url.searchParams.set('coincidencias', '1');
+      const response = await fetch(url, {
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+      });
+      const data = await response.json();
+      if (serial !== personalSuggestionSerial || personalSearch.value.trim() !== documentNumber) return;
+      const matches = response.ok && data.ok ? (data.destinatarios || []) : [];
+      renderSuggestions(personalSuggestions, matches, (recipient) => {
+        window.clearTimeout(personalTimer);
+        personalSearch.value = recipient.documento;
+        personalSuggestions.replaceChildren();
+        personalSuggestions.hidden = true;
+        resolvePersonalRecipient();
+      }, (recipient) => `Documento ${recipient.documento} · ${recipient.rol_nombre}`);
+      personalStatus.textContent = matches.length
+        ? 'Selecciona el destinatario que coincide con el documento.'
+        : 'No hay cuentas activas que coincidan con ese documento.';
+    } catch (_) {
+      if (serial === personalSuggestionSerial) {
+        personalSuggestions.replaceChildren();
+        personalSuggestions.hidden = true;
+        personalStatus.textContent = 'No se pudieron cargar las coincidencias.';
+      }
+    }
   }
 
   async function resolvePersonalRecipient() {
     const documentNumber = personalSearch.value.trim();
     const serial = ++personalRequestSerial;
+    personalSuggestionSerial += 1;
+    window.clearTimeout(personalTimer);
+    personalSuggestions.replaceChildren();
+    personalSuggestions.hidden = true;
     if (!documentNumber) {
       clearPersonal('Escribe el documento para seleccionar automáticamente el destinatario.');
       return;
@@ -170,11 +308,17 @@
 
     if (isStudent) {
       window.clearTimeout(personalTimer);
+      window.clearTimeout(studentTimer);
       personalRequestSerial += 1;
+      personalSuggestionSerial += 1;
+      studentSuggestionSerial += 1;
       personalSearch.value = '';
       clearPersonal('Selecciona Estudiante en el tipo de destinatario.');
+      filterTimesByJourney('');
     } else {
       requestSerial += 1;
+      studentSuggestionSerial += 1;
+      window.clearTimeout(studentTimer);
       search.value = '';
       clearStudent('Elige el destinatario institucional correspondiente a este tipo.');
       personalSearch.value = '';
@@ -205,8 +349,14 @@
   });
   search.addEventListener('input', () => {
     requestSerial += 1;
+    studentSuggestionSerial += 1;
+    window.clearTimeout(studentTimer);
     search.setCustomValidity('');
-    clearStudent('Documento modificado. Pulsa Buscar para cargar los datos.');
+    filterTimesByJourney('');
+    clearStudent('Escribe el documento para ver coincidencias.');
+    if (search.value.trim().length >= 2) {
+      studentTimer = window.setTimeout(suggestStudents, 200);
+    }
   });
   type.addEventListener('change', applyType);
   type.addEventListener('input', applyType);
@@ -216,11 +366,14 @@
   });
   personalSearch.addEventListener('input', () => {
     personalRequestSerial += 1;
+    personalSuggestionSerial += 1;
     personalSearch.setCustomValidity('');
-    clearPersonal(personalSearch.value.trim() ? 'Consultando el documento…' : 'Escribe el documento para seleccionar automáticamente el destinatario.');
+    clearPersonal(personalSearch.value.trim()
+      ? 'Buscando coincidencias…'
+      : 'Escribe el documento para ver coincidencias.');
     window.clearTimeout(personalTimer);
-    if (personalSearch.value.trim().length >= 4) {
-      personalTimer = window.setTimeout(resolvePersonalRecipient, 350);
+    if (personalSearch.value.trim().length >= 2) {
+      personalTimer = window.setTimeout(suggestPersonalRecipients, 200);
     }
   });
   personalReason.addEventListener('input', () => {
@@ -230,7 +383,11 @@
     if (event.key === 'Enter') {
       event.preventDefault();
       window.clearTimeout(personalTimer);
-      resolvePersonalRecipient();
+      if (!personalSuggestions.hidden) {
+        personalSuggestions.querySelector('button')?.focus();
+      } else {
+        resolvePersonalRecipient();
+      }
     }
   });
   form.addEventListener('submit', (event) => {
@@ -261,7 +418,7 @@
   form.addEventListener('reset', () => {
     window.setTimeout(() => {
       search.value = '';
-      clearStudent('Ingresa el documento y pulsa Buscar.');
+      clearStudent('Escribe el documento para ver coincidencias.');
       personalSearch.value = '';
       clearPersonal('Escribe el documento para seleccionar automáticamente el destinatario.');
       applyType();

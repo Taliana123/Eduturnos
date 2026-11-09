@@ -1,6 +1,9 @@
 from pathlib import Path
 
+import pytest
+
 from app import app
+from routes import citas as citas_routes
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -93,6 +96,99 @@ def test_configuracion_institucional_refresca_estilos_y_conserva_anchos_solicita
     assert "v=20261109_institution_fields_v3" in template
     assert "calc((100% - 14px) / 2 + 20px)" in config_styles
     assert "max-width: 560px !important;" in config_styles
+
+
+def test_documento_en_nueva_cita_muestra_coincidencias_y_respeta_jornada(monkeypatch):
+    template = (ROOT / "templates" / "citas" / "nueva.html").read_text(
+        encoding="utf-8"
+    )
+    script = (ROOT / "static" / "js" / "nueva-citacion.js").read_text(
+        encoding="utf-8"
+    )
+    assert 'id="coincidencias-estudiante" role="listbox"' in template
+    assert 'id="coincidencias-personal" role="listbox"' in template
+    assert "selector_hora('hora', 'hora-cita')" in template
+    assert "suggestStudents" in script and "suggestPersonalRecipients" in script
+    assert "filterTimesByJourney(data.estudiante.jornada)" in script
+
+    consultas = []
+    estudiante = {
+        "id_estudiante": 12,
+        "documento": "123456",
+        "nombre": "Ana Pérez",
+        "grado": "9",
+        "jornada": "Mañana",
+    }
+    monkeypatch.setattr(
+        citas_routes,
+        "usuario_actual",
+        lambda: {"id_usuario": 4, "rol_nombre": "Docente", "id_institucion": 2},
+    )
+    monkeypatch.setattr(
+        citas_routes,
+        "consultar",
+        lambda sql, params=None, **kwargs: (
+            consultas.append((sql, params, kwargs)),
+            [estudiante],
+        )[1],
+    )
+    with app.test_request_context(
+        "/citas/buscar-estudiante-documento?documento=123&coincidencias=1"
+    ):
+        response = citas_routes.buscar_estudiante_documento.__wrapped__()
+
+    assert response.get_json() == {"ok": True, "estudiantes": [estudiante]}
+    sql, params, _ = consultas[0]
+    assert "e.documento LIKE %s" in sql
+    assert params[0] == "123%"
+    assert "asignaciones_docentes" in sql
+    assert "LIMIT 8" in sql
+
+
+def test_coincidencias_de_personal_se_limitan_al_tipo_y_a_la_institucion(monkeypatch):
+    consultas = []
+    monkeypatch.setattr(
+        citas_routes,
+        "usuario_actual",
+        lambda: {"id_usuario": 4, "rol_nombre": "Rector", "id_institucion": 2},
+    )
+    monkeypatch.setattr(
+        citas_routes,
+        "consultar",
+        lambda sql, params=None, **kwargs: (
+            consultas.append((sql, params)),
+            [],
+        )[1],
+    )
+    with app.test_request_context(
+        "/citas/buscar-destinatario-documento?documento=56&tipo=Docente&coincidencias=1"
+    ):
+        response = citas_routes.buscar_destinatario_documento.__wrapped__()
+
+    assert response.get_json() == {"ok": True, "destinatarios": []}
+    sql, params = consultas[0]
+    assert "r.nombre=%s" in sql
+    assert "LIKE %s" in sql and params[1] == "56%"
+    assert "u.id_institucion=%s" in sql
+    assert "LIMIT 8" in sql
+
+
+@pytest.mark.parametrize(
+    "hora,jornada,valid",
+    [
+        ("10:30", "Mañana", True),
+        ("13:00", "Mañana", False),
+        ("13:00", "Tarde", True),
+        ("10:30", "Tarde", False),
+        ("10:30", "Completa", True),
+    ],
+)
+def test_hora_de_cita_se_valida_contra_la_jornada(hora, jornada, valid):
+    if valid:
+        citas_routes._validar_hora_jornada(hora, jornada)
+    else:
+        with pytest.raises(ValueError, match="jornada"):
+            citas_routes._validar_hora_jornada(hora, jornada)
 
 
 def test_mascota_cerrada_sin_fondo_y_chat_conserva_su_avatar():
@@ -301,5 +397,5 @@ def test_android_incrementa_la_version_de_la_app():
         encoding="utf-8"
     )
 
-    assert "versionCode 26" in gradle
-    assert 'versionName "3.0.6"' in gradle
+    assert "versionCode 27" in gradle
+    assert 'versionName "3.0.7"' in gradle
