@@ -1,8 +1,52 @@
-from flask import Blueprint, redirect, url_for, flash, render_template
+from datetime import date, datetime, time, timedelta, timezone
+
+from flask import Blueprint, jsonify, redirect, url_for, flash, render_template
 from database.db import consultar, ejecutar
 from routes.helpers import usuario_actual, login_requerido
 
 notificaciones_bp=Blueprint("notificaciones",__name__,url_prefix="/notificaciones")
+
+
+@notificaciones_bp.get("/api/citas-futuras")
+def citas_futuras_api():
+    usuario = usuario_actual()
+    if not usuario:
+        return jsonify({"error": "authentication_required"}), 401
+
+    from routes.calendario import citas_visibles
+
+    bogota = timezone(timedelta(hours=-5))
+    ahora = datetime.now(bogota)
+    citas_recordatorio = []
+    for cita in citas_visibles(usuario):
+        estado = str(cita.get("estado_nombre") or "").strip().lower()
+        if estado not in {"pendiente", "confirmada", "reprogramada"}:
+            continue
+        try:
+            fecha_valor = cita.get("fecha")
+            hora_valor = cita.get("hora")
+            fecha = (
+                fecha_valor
+                if isinstance(fecha_valor, date)
+                else date.fromisoformat(str(fecha_valor)[:10])
+            )
+            hora = (
+                hora_valor
+                if isinstance(hora_valor, time)
+                else time.fromisoformat(str(hora_valor))
+            )
+            inicio = datetime.combine(fecha, hora, tzinfo=bogota)
+            cita_id = int(cita["id"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if inicio <= ahora:
+            continue
+        citas_recordatorio.append({
+            "id": cita_id,
+            "startAt": int(inicio.timestamp() * 1000),
+        })
+    return jsonify({"appointments": citas_recordatorio})
+
 
 @notificaciones_bp.app_context_processor
 def contador():

@@ -15,8 +15,25 @@ def test_mi_cuenta_muestra_flechas_en_seguridad_y_calendarios():
     assert 'aria-label="Ir a Seguridad"' in template
     assert 'aria-label="Ir a Calendarios conectados"' in template
     assert 'class="account-back-button"' not in template
-    assert ".cuenta-page .cuenta-section-back{display:none;}" in template
+    assert ".cuenta-page .cuenta-section-back{display:none;}" not in template
     assert '.cuenta-section[aria-labelledby="cuenta-personal-title"]{padding-top:0;}' in template
+
+
+def test_cancelar_citacion_limpia_datos_y_cierra_dialogos():
+    citation_form = (ROOT / "templates" / "citas" / "nueva.html").read_text(
+        encoding="utf-8"
+    )
+    citation_script = (ROOT / "static" / "js" / "nueva-citacion.js").read_text(
+        encoding="utf-8"
+    )
+    app_script = (ROOT / "static" / "js" / "app.js").read_text(encoding="utf-8")
+
+    assert '<button class="boton secundario" type="reset">Cancelar</button>' in citation_form
+    assert 'form.addEventListener(\'reset\'' in citation_script
+    assert "clearStudent(" in citation_script
+    assert "clearPersonal(" in citation_script
+    assert 'event.target.closest("[data-mobile-dialog-close]")' in app_script
+    assert 'dialog.close()' in app_script
 
 
 def test_portada_conserva_legibilidad_de_los_botones_al_enfocar():
@@ -28,6 +45,9 @@ def test_portada_conserva_legibilidad_de_los_botones_al_enfocar():
     assert b"Crear cuenta" in response.data
     assert ".acciones .boton-principal:focus-visible" in template
     assert ".acciones .boton-secundario:focus-visible" in template
+    assert "nav a:hover" in (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
+    institution = (ROOT / "templates" / "institucion.html").read_text(encoding="utf-8")
+    assert ".contenedor:has(>.institucion-page){margin-top:20px!important;}" in institution
 
 
 def test_ajustes_visuales_de_edubot_y_administracion():
@@ -117,13 +137,19 @@ def test_registro_conserva_ilustracion_y_enlace_completo_de_regreso():
     assert "min-height: 40px !important;" in template
 
 
-def test_chat_de_ayuda_no_muestra_aviso_de_voz_y_conserva_el_del_agente():
+def test_chat_es_solo_texto_y_muestra_aviso_de_privacidad():
     widget = (ROOT / "templates" / "_asistente_widget.html").read_text(
         encoding="utf-8"
     )
+    assistant_script = (ROOT / "static" / "js" / "asistente.js").read_text(
+        encoding="utf-8"
+    )
 
-    assert 'class="assistant-privacy"' not in widget
+    assert 'class="assistant-voice-toggle"' not in widget
+    assert 'class="assistant-privacy"' in widget
+    assert "No compartas información personal ni documentos" in widget
     assert 'class="assistant-voice-call__privacy"' in widget
+    assert "voiceToggle" not in assistant_script
 
 
 def test_sedes_calendario_y_seguimiento_muestran_campos_coherentes():
@@ -151,6 +177,8 @@ def test_sedes_calendario_y_seguimiento_muestran_campos_coherentes():
     assert ".config-entry-sede > .config-field-status" in config_styles
     assert "{{ cita.estudiante }}" in calendar
     assert "{{ cita.estudiante_n }}" not in calendar
+    day_event = calendar.split("{% for cita in dia.citas[:3] %}", 1)[1].split("{% endfor %}", 1)[0]
+    assert day_event.count("{{ cita.estudiante }}") == 1
     assert "LEFT JOIN usuarios dest" in calendar_route
     assert "AS estudiante" in calendar_route
     assert "{{ descripcion }}" in followup
@@ -158,6 +186,16 @@ def test_sedes_calendario_y_seguimiento_muestran_campos_coherentes():
     assert "max-width: 1140px !important;" in config_styles
     assert "max-width: 560px !important;" in config_styles
     assert "grid-template-columns: minmax(0, calc((100% - 14px) / 2 + 20px))" in config_styles
+
+
+def test_acciones_de_solicitud_tienen_el_mismo_tamano():
+    template = (ROOT / "templates" / "solicitudes" / "index.html").read_text(
+        encoding="utf-8"
+    )
+
+    assert ".solicitudes-table .acciones-tabla button" in template
+    assert "min-height: 40px;" in template
+    assert "width: 100%;" in template
 
 
 def test_botones_de_regreso_tienen_estilo_unificado():
@@ -234,5 +272,5 @@ def test_android_incrementa_la_version_de_la_app():
         encoding="utf-8"
     )
 
-    assert "versionCode 23" in gradle
-    assert 'versionName "3.0.3"' in gradle
+    assert "versionCode 25" in gradle
+    assert 'versionName "3.0.5"' in gradle

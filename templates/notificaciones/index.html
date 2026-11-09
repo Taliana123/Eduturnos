@@ -26,6 +26,15 @@
     {% endif %}
 </section>
 
+<section class="content-card appointment-notification-settings" aria-labelledby="appointment-notifications-title" data-appointment-notification-settings hidden>
+    <h2 id="appointment-notifications-title">Recordatorios de citas en este dispositivo</h2>
+    <p>Recibe avisos locales un día y dos horas antes. Se programarán las citas futuras visibles para tu cuenta y se actualizarán al abrir EDUTURNOS.</p>
+    <button class="btn btn-secondary" type="button" data-appointment-notifications-enable hidden>
+        Activar notificaciones de citas
+    </button>
+    <p data-appointment-notifications-status role="status" aria-live="polite" hidden></p>
+</section>
+
 <section class="content-card notificaciones-card">
 
     {% if avisos %}

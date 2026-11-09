@@ -587,7 +587,6 @@ const initializeEduturnosAssistant = () => {
     const button = form?.querySelector("button[type='submit']");
     const status = root.querySelector("[data-assistant-status]");
     const body = root.querySelector("[data-assistant-body]");
-    const voiceToggle = root.querySelector("[data-assistant-voice-toggle]");
     const callPanel = section?.querySelector("[data-assistant-call]");
     const callState = callPanel?.querySelector("[data-assistant-call-state]");
     const callTranscript = callPanel?.querySelector("[data-assistant-call-transcript]");
@@ -601,7 +600,7 @@ const initializeEduturnosAssistant = () => {
     const sidebarToggles = [...(section?.querySelectorAll("[data-assistant-toggle]") || [])];
     const voiceLaunchers = [...document.querySelectorAll("[data-assistant-voice-launch]")];
     const openButton = sidebarToggles.find((toggle) => toggle.hasAttribute("data-assistant-open"));
-    if (!form || !input || !output || !button || !status || !body || !voiceToggle || !openButton
+    if (!form || !input || !output || !button || !status || !body || !openButton
         || !callPanel || !callState || !callTranscript || !callSpeaker || !callToggle || !callWave || !callClose
         || !callAction || !callActionLink || !callConfirmAction) return false;
 
@@ -678,11 +677,6 @@ const initializeEduturnosAssistant = () => {
     };
     const refreshSend = () => {
         button.disabled = input.disabled || !input.value.trim();
-        voiceToggle.disabled = !canRecognizeVoice;
-        voiceToggle.setAttribute("aria-pressed", String(voiceCallActive));
-        const label = voiceCallActive ? "Finalizar conversación por voz" : "Iniciar conversación por voz";
-        voiceToggle.setAttribute("aria-label", label);
-        voiceToggle.title = label;
     };
 
     const stopVoiceConversation = (message = "") => {
@@ -887,8 +881,6 @@ const initializeEduturnosAssistant = () => {
         setStatus("Solicitando acceso al micrófono…");
         startVoiceRecognition(true);
     };
-    voiceToggle.disabled = !canRecognizeVoice;
-    voiceToggle.addEventListener("click", toggleVoiceConversation);
     callToggle.addEventListener("click", () => {
         if (voiceCallActive) {
             stopVoiceConversation("Llamada finalizada.");

@@ -666,8 +666,8 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
     assert "request.endpoint != 'soporte.index'" not in base
-    assert "css/edubot.css') }}?v=20261109_voice_avatar_v2" in base
-    assert "js/asistente.js') }}?v=20261109_markdown_lists_v3" in base
+    assert "css/edubot.css') }}?v=20261118_voice_avatar_v5" in base
+    assert "js/asistente.js') }}?v=20261109_markdown_lists_v4" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
     assert 'if (isOpen) {\n            clearChatPosition();\n            const defaultBounds = root.getBoundingClientRect();' in assistant_script
     assert 'assistantWidget' not in app_js
@@ -734,7 +734,8 @@ def test_edubot_local_se_integra_en_ayuda_sin_iframe_externo():
     assert 'icons/edubot.png' not in plantilla
     assert 'assistant-sidebar-avatar assistant-drone-avatar' in plantilla
     assert 'data-assistant-voice-view hidden' not in plantilla
-    assert 'data-assistant-voice-toggle aria-pressed="false"' in plantilla
+    assert 'data-assistant-voice-toggle' not in plantilla
+    assert 'data-assistant-call-toggle' in plantilla
     assert 'data-create-citation-url=' in plantilla
     assert 'data-assistant-dictate' not in plantilla
     assert 'data-assistant-speak' not in plantilla
