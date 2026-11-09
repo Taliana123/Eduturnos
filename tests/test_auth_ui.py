@@ -437,7 +437,7 @@ def test_resumen_muestra_seguimiento_en_acceso_rapido():
     assert 'dashboard-quick-links {\n        display: grid !important;' in mobile_styles
     assert 'class="dashboard-head-action"' not in dashboard
     assert 'class="desktop-sidebar-logout-form"' in sidebar
-    assert 'class="desktop-sidebar-account-avatar"' in sidebar
+    assert 'class="desktop-sidebar-account-avatar"' not in sidebar
     assert "dar continuidad al acompañamiento de los estudiantes" in seguimiento
     assert 'class="table-wrap seguimiento-historial"' in seguimiento
 
@@ -621,7 +621,7 @@ def test_cierre_sesion_en_fila_de_identidad():
     lateral = Path('templates/_desktop_sidebar.html').read_text(encoding='utf-8')
     assert 'desktop-header-session' not in base
     assert 'desktop-sidebar-logout-form' in lateral
-    assert 'desktop-sidebar-account-avatar' in lateral
+    assert 'desktop-sidebar-account-avatar' not in lateral
     assert 'Acceso institucional' in lateral
     assert 'aria-label="Cerrar sesión"' in lateral
     assert 'Mi cuenta' in lateral

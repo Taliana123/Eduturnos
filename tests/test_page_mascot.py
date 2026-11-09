@@ -176,8 +176,8 @@ def test_floating_agent_opens_voice_call_separate_from_help_chat():
     assert 'android:name="android.permission.RECORD_AUDIO"' in manifest
     assert 'android.speech.RecognitionService' in manifest
     assert 'android.speech.action.RECOGNIZE_SPEECH' in manifest
-    assert 'versionName "3.0.9"' in android_build
-    assert 'versionCode 29' in android_build
+    assert 'versionName "3.1.0"' in android_build
+    assert 'versionCode 30' in android_build
     assert "data-calendar-event-url=\"{{ calendar_open_event_url or '' }}\"" in calendar_template
     assert "calendar_open_event_url=calendar_open_event_url" in calendar_route
     assert "icons/edubot.png" not in Path("templates/_asistente_widget.html").read_text(encoding="utf-8")

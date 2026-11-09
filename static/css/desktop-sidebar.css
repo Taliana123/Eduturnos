@@ -152,7 +152,7 @@ html body.has-desktop-sidebar #contenido .page-head h1{margin:0!important;line-h
   html body .eduturnos-desktop-sidebar a{display:block;padding:10px 12px;color:#142d50;text-decoration:none;font-size:13px;line-height:1.4;border-radius:4px;overflow-wrap:anywhere;}
   html body .eduturnos-desktop-sidebar a:hover{background:#f6f9ff;}
   html body .eduturnos-desktop-sidebar a[aria-current="page"]{background:#e7f0ff;color:#2458d6;font-weight:700;box-shadow:inset 3px 0 #2458d6;}
-  .desktop-sidebar-account{margin-top:auto;padding:16px 10px;border-top:1px solid #d5e1fa;display:grid;grid-template-columns:36px minmax(0,1fr) 36px;align-items:center;gap:8px;}
+  .desktop-sidebar-account{margin-top:auto;padding:16px 10px;border-top:1px solid #d5e1fa;display:grid;grid-template-columns:minmax(0,1fr) 36px;align-items:center;gap:8px;}
   html body aside.eduturnos-desktop-sidebar .dashboard-assistant{width:auto;max-width:100%;margin:0 8px 2px;border:0;flex-shrink:0;}
   html body aside.eduturnos-desktop-sidebar .dashboard-assistant>summary{box-sizing:border-box;padding:9px 12px;height:38px;min-height:38px;gap:8px;font-size:13px;line-height:1.4;color:#142d50;border-radius:4px;}
   html body aside.eduturnos-desktop-sidebar .dashboard-assistant>summary:hover{background:#f6f9ff;}
@@ -167,7 +167,6 @@ html body.has-desktop-sidebar #contenido .page-head h1{margin:0!important;line-h
   html body aside.eduturnos-desktop-sidebar .dashboard-assistant-panel.assistant-expanded{left:254px;right:24px;top:84px;bottom:24px;width:auto;height:auto;max-height:none;}
   html body aside.eduturnos-desktop-sidebar .assistant-desktop-description{font-size:13px;line-height:1.5;margin-bottom:16px;}
   html body aside.eduturnos-desktop-sidebar .assistant-form-actions{flex-wrap:wrap;gap:8px;}
-  .desktop-sidebar-account-avatar{display:grid;flex:0 0 36px;place-items:center;width:36px;height:36px;overflow:hidden;padding:0;border:0;border-radius:50%;background:#e7f0ff;color:#2458d6;font-size:11px;font-weight:700;}
   .desktop-sidebar-account-info{display:grid;min-width:0;gap:3px;}
   .desktop-sidebar-account-info>strong{overflow:hidden;color:#142d50;font-size:12px;line-height:1.3;text-overflow:ellipsis;white-space:nowrap;}
   .desktop-sidebar-account-info>small{overflow:hidden;color:#557096;font-size:11px;line-height:1.3;text-overflow:ellipsis;white-space:nowrap;}
@@ -227,8 +226,7 @@ html body.has-desktop-sidebar #contenido .page-head h1{margin:0!important;line-h
   html body.has-desktop-sidebar.mobile-nav-open .eduturnos-desktop-sidebar>nav>a:hover{background:#f6f9ff!important;}
   html body.has-desktop-sidebar.mobile-nav-open .eduturnos-desktop-sidebar>nav>a[aria-current="page"]{background:#e7f0ff!important;color:#2458d6!important;font-weight:700!important;box-shadow:inset 3px 0 #2458d6!important;}
   html body.has-desktop-sidebar.mobile-nav-open .desktop-sidebar-account-link{display:flex!important;flex:0 0 auto!important;margin:0 8px 8px!important;padding:8px 10px!important;border-radius:4px!important;color:#142d50!important;text-decoration:none!important;}
-  html body.has-desktop-sidebar.mobile-nav-open .desktop-sidebar-account{display:grid!important;flex:0 0 auto!important;grid-template-columns:36px minmax(0,1fr) 36px!important;align-items:center!important;gap:8px!important;margin-top:0!important;padding:10px!important;border-top:1px solid #d5e1fa!important;background:#fff!important;}
-  html body.has-desktop-sidebar.mobile-nav-open .desktop-sidebar-account-avatar{display:grid!important;flex:0 0 36px!important;place-items:center!important;width:36px!important;height:36px!important;overflow:hidden!important;padding:0!important;border:0!important;border-radius:50%!important;background:#e7f0ff!important;color:#2458d6!important;font-size:11px!important;font-weight:700!important;}
+  html body.has-desktop-sidebar.mobile-nav-open .desktop-sidebar-account{display:grid!important;flex:0 0 auto!important;grid-template-columns:minmax(0,1fr) 36px!important;align-items:center!important;gap:8px!important;margin-top:0!important;padding:10px!important;border-top:1px solid #d5e1fa!important;background:#fff!important;}
   html body.has-desktop-sidebar.mobile-nav-open .desktop-sidebar-account-info{display:grid!important;min-width:0!important;gap:3px!important;}
   html body.has-desktop-sidebar.mobile-nav-open .desktop-sidebar-account-info>strong{overflow:hidden!important;color:#142d50!important;font-size:12px!important;line-height:1.3!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
   html body.has-desktop-sidebar.mobile-nav-open .desktop-sidebar-account-info>small{overflow:hidden!important;color:#557096!important;font-size:11px!important;line-height:1.3!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
@@ -735,22 +733,6 @@ html body.has-desktop-sidebar #contenido .boton.pequeno{
   padding:6px 10px!important;
 }
 
-.desktop-sidebar-account-avatar{
-  display:grid!important;
-  flex:0 0 36px!important;
-  width:36px!important;
-  min-width:36px!important;
-  height:36px!important;
-  min-height:36px!important;
-  place-items:center!important;
-  padding:0!important;
-  overflow:hidden!important;
-  border:1px solid #d5e1fa!important;
-  border-radius:50%!important;
-  background:#e7f0ff!important;
-  color:#17365d!important;
-}
-.desktop-sidebar-account-avatar,
 .cuenta-avatar-preview,
 .avatar-customizer-preview{isolation:isolate;}
 .user-avatar-drawing{position:relative;display:block;grid-area:auto;width:100%;height:100%;overflow:hidden;filter:drop-shadow(0 2px 2px rgba(37,54,78,.14));}

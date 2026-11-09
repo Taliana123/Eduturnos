@@ -435,5 +435,5 @@ def test_android_incrementa_la_version_de_la_app():
         encoding="utf-8"
     )
 
-    assert "versionCode 29" in gradle
-    assert 'versionName "3.0.9"' in gradle
+    assert "versionCode 30" in gradle
+    assert 'versionName "3.1.0"' in gradle
