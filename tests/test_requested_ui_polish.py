@@ -166,6 +166,17 @@ def test_busqueda_institucional_y_actualizaciones_de_calendario_y_solicitudes():
     assert 'unordered[1].replace(/^(?:[-*+]\\s+)+/, "")' in assistant
 
 
+def test_cache_de_app_js_se_actualiza_en_login_y_base():
+    login = (ROOT / "templates" / "auth" / "login.html").read_text(
+        encoding="utf-8"
+    )
+    base = (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
+
+    cache_version = "app.js') }}?v=20261109_followup_filter_v1"
+    assert cache_version in login
+    assert cache_version in base
+
+
 def test_android_incrementa_la_version_de_la_app():
     gradle = (ROOT / "mobile-app" / "android" / "app" / "build.gradle").read_text(
         encoding="utf-8"
