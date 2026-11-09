@@ -6,8 +6,13 @@ def test_login_template_has_personal_fields():
     assert 'Sede' in text
     assert 'codigo_institucional' in text
     assert 'pattern="[0-9]{6}"' in text
+    assert 'placeholder="6 dígitos"' in text
     assert 'data-staff-code-field hidden' in text
     assert 'v=20261109_staff_code_by_email_v1' in text
+    assert 'right: 18px !important;' in text
+    assert 'right: 12px !important;' in text
+    assert 'background: #1769aa !important;' in text
+    assert 'color: #fff !important;' in text
 
 
 def test_login_muestra_codigo_solo_para_correo_institucional_del_personal():

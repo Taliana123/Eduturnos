@@ -88,7 +88,8 @@
         .eduturnos-header .mobile-back-link {
             position: absolute;
             top: 50%;
-            left: 18px;
+            left: auto;
+            right: 18px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -98,10 +99,10 @@
             height: 38px;
             margin: 0;
             padding: 0;
-            border: 1px solid #d5e1fa;
+            border: 1px solid #1769aa;
             border-radius: 8px;
-            background: #fff;
-            color: #1769aa;
+            background: #1769aa;
+            color: #fff;
             font-size: 22px;
             line-height: 1;
             text-decoration: none;
@@ -111,9 +112,9 @@
         html body header.eduturnos-header .mobile-back-link,
         html body header.eduturnos-header .mobile-back-link:hover,
         html body header.eduturnos-header .mobile-back-link:focus-visible {
-            border-color: #d5e1fa !important;
-            background: #fff !important;
-            color: #1769aa !important;
+            border-color: #1769aa !important;
+            background: #1769aa !important;
+            color: #fff !important;
             box-shadow: none !important;
             transform: translateY(-50%) !important;
         }
@@ -124,7 +125,8 @@
 
         @media (max-width: 560px) {
             .eduturnos-header .mobile-back-link {
-                left: 12px;
+                left: auto;
+                right: 12px;
                 width: 36px;
                 min-width: 36px;
                 height: 36px;
@@ -1408,27 +1410,34 @@ html body.login-page .personal-login .personal-field-jornada select {
 <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261109_release24_cache_v1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261109_composer_surface_v1">
 <style>
-    @media (min-width: 901px) {
+    html body header.eduturnos-header > .mobile-back-link,
+    html body header.eduturnos-header > .mobile-back-link:hover,
+    html body header.eduturnos-header > .mobile-back-link:focus-visible {
+        display: inline-flex !important;
+        top: 50% !important;
+        left: auto !important;
+        right: 18px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 1px solid #1769aa !important;
+        border-radius: 8px !important;
+        background: #1769aa !important;
+        color: #fff !important;
+        box-shadow: none !important;
+        transform: translateY(-50%) !important;
+    }
+
+    @media (max-width: 560px) {
         html body header.eduturnos-header > .mobile-back-link,
         html body header.eduturnos-header > .mobile-back-link:hover,
         html body header.eduturnos-header > .mobile-back-link:focus-visible {
-            display: inline-flex !important;
-            top: 50% !important;
-            left: 18px !important;
-            right: auto !important;
-            width: 36px !important;
-            min-width: 36px !important;
-            height: 36px !important;
-            min-height: 36px !important;
-            justify-content: center !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            border: 1px solid #d5e1fa !important;
-            border-radius: 8px !important;
-            background: #fff !important;
-            color: #1769aa !important;
-            box-shadow: none !important;
-            transform: translateY(-50%) !important;
+            left: auto !important;
+            right: 12px !important;
         }
     }
 </style>
@@ -1580,7 +1589,8 @@ html body.login-page .personal-login .personal-field-jornada select {
                         <p>
                             Docentes, Coordinadores y Rectoría usan su correo
                             <strong>@jjfh.edu.co</strong>, código de 6 dígitos,
-                            sede y jornada.
+                            sede y jornada. Al escribir el correo institucional,
+                            aparecerá el campo para ingresar el código.
                         </p>
 
 
@@ -1602,6 +1612,7 @@ html body.login-page .personal-login .personal-field-jornada select {
                                     maxlength="6"
                                     pattern="[0-9]{6}"
                                     autocomplete="off"
+                                    placeholder="6 dígitos"
                                    
                                 >
 
