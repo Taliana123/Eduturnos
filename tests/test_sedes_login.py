@@ -12,9 +12,9 @@ def test_login_template_has_personal_fields():
     assert 'value=' not in code_field
     assert 'class="personal-field personal-field-code">' in text
     assert 'html body main.login-page .login-card > .section-heading > h1' in text
-    assert 'margin-left: -10px !important;' not in text
-    assert 'margin-left: -33px !important;' in text
-    assert 'margin-left: -13px !important;' in text
+    assert 'margin-left: -10px !important;' in text
+    assert 'margin-left: -33px !important;' not in text
+    assert 'margin-left: -13px !important;' not in text
     assert 'justify-self: start !important;' in text
     assert 'text-align: left !important;' in text
     assert 'v=20261109_staff_code_always_visible_v1' in text
