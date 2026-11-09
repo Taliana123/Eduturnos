@@ -417,14 +417,13 @@
 <style>
     .public-title-row { display: flex; min-width: 0; align-items: center; gap: 12px; margin: 22px 0 20px; }
     .public-title-row h1 { flex: 1 1 auto; min-width: 0; margin: 0; }
-    .public-back-button { display: none; flex: 0 0 36px; width: 36px; height: 36px; place-items: center; border: 1px solid #d5e1fa; border-radius: 8px; background: #fff; color: #1769aa; text-decoration: none; }
+    .public-back-button { display: grid; flex: 0 0 36px; width: 36px; height: 36px; place-items: center; border: 1px solid #d5e1fa; border-radius: 8px; background: #fff; color: #1769aa; text-decoration: none; }
     .public-back-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     @media (max-width: 720px) {
         body.public-info-page { display: flex; min-height: 100vh; flex-direction: column; }
         body.public-info-page > main { display: flex; position: relative; flex: 1 0 auto; flex-direction: column; }
         body.public-info-page > footer { flex: 0 0 auto; margin-top: auto; padding: 20px 16px; }
         .public-title-row { gap: 10px; margin: 12px 0 10px; }
-        .public-back-button { display: grid; }
         .public-info-page h1, .public-info-page h2 { scroll-margin-top: 90px; }
     }
 </style>

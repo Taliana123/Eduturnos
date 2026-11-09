@@ -243,27 +243,6 @@
     </table>
   </div>
 </section>
-<script>
-(() => {
-  const filtro = document.querySelector('[data-cuentas-filter]');
-  const buscar = document.querySelector('[data-cuentas-search-button]');
-  const filtrar = () => {
-    const termino = filtro.value.trim().toLocaleLowerCase();
-    document.querySelectorAll('[data-cuenta-row]').forEach((fila) => {
-      fila.hidden = !fila.textContent.toLocaleLowerCase().includes(termino);
-    });
-  };
-  filtro?.addEventListener('input', filtrar);
-  filtro?.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      filtrar();
-    }
-  });
-  buscar?.addEventListener('click', filtrar);
-})();
-</script>
-
 </div>
 </div>
 

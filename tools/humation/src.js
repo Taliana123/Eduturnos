@@ -82,8 +82,9 @@ const initialize = () => {
       input.value = currentState.colors[input.dataset.avatarColor] || fallbackColors[input.dataset.avatarColor];
     });
     const transparent = currentState.background === "transparent";
-    const genderInput = fields.querySelector("[data-avatar-gender]");
-    if (genderInput) genderInput.value = currentState.gender || "";
+    fields.querySelectorAll("[data-avatar-gender-choice]").forEach((choice) => {
+      choice.setAttribute("aria-pressed", String(currentState.gender === choice.dataset.avatarGenderChoice));
+    });
     const backgroundToggle = fields.querySelector("[data-avatar-transparent]");
     const backgroundInput = fields.querySelector("[data-avatar-background]");
     if (backgroundToggle) backgroundToggle.checked = transparent;
@@ -105,28 +106,27 @@ const initialize = () => {
   };
 
   const populateParts = () => {
-    const genderGroup = document.createElement("details");
+    const genderGroup = document.createElement("fieldset");
     genderGroup.className = "avatar-option-group avatar-gender-group";
-    genderGroup.open = true;
-    const genderSummary = document.createElement("summary");
-    genderSummary.textContent = "Género del personaje";
-    genderGroup.append(genderSummary);
-    const genderSelect = document.createElement("select");
-    genderSelect.dataset.avatarGender = "";
-    genderSelect.setAttribute("aria-label", "Género del personaje");
-    const genderPlaceholder = document.createElement("option");
-    genderPlaceholder.value = "";
-    genderPlaceholder.textContent = "Selecciona una opción";
-    genderSelect.append(genderPlaceholder);
+    const genderLegend = document.createElement("legend");
+    genderLegend.textContent = "Género del personaje";
+    genderGroup.append(genderLegend);
+    const genderOptions = document.createElement("div");
+    genderOptions.className = "avatar-gender-options";
+    genderOptions.setAttribute("role", "group");
+    genderOptions.setAttribute("aria-label", "Género del personaje");
     for (const [value, label] of genders) {
-      const option = document.createElement("option");
-      option.value = value;
+      const option = document.createElement("button");
+      option.type = "button";
+      option.className = "avatar-gender-choice";
+      option.dataset.avatarGenderChoice = value;
+      option.setAttribute("aria-pressed", "false");
       option.textContent = label;
-      genderSelect.append(option);
+      genderOptions.append(option);
     }
     const genderHint = document.createElement("small");
-    genderHint.textContent = "El cabello, la ropa y los demás rasgos se eligen por separado.";
-    genderGroup.append(genderSelect, genderHint);
+    genderHint.textContent = "El género se guarda como preferencia; cabello, ropa y rasgos se personalizan por separado.";
+    genderGroup.append(genderOptions, genderHint);
     fields.append(genderGroup);
 
     for (const [slot, title] of slots) {
@@ -226,6 +226,11 @@ const initialize = () => {
   });
 
   fields.addEventListener("click", (event) => {
+    const genderChoice = event.target.closest("[data-avatar-gender-choice]");
+    if (genderChoice) {
+      render({ ...currentState, gender: genderChoice.dataset.avatarGenderChoice });
+      return;
+    }
     const choice = event.target.closest("[data-avatar-choice]");
     if (!choice) return;
     render({
@@ -245,9 +250,7 @@ const initialize = () => {
     }
   });
   fields.addEventListener("change", (event) => {
-    if (event.target.matches("[data-avatar-gender]")) {
-      render({ ...currentState, gender: event.target.value || null });
-    } else if (event.target.matches("[data-avatar-transparent]")) {
+    if (event.target.matches("[data-avatar-transparent]")) {
       render({ ...currentState, background: event.target.checked ? "transparent" : "#F6F5F4" });
     }
   });

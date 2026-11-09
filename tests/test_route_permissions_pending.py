@@ -221,6 +221,91 @@ def test_seguimiento_detalle_historial_por_cita(monkeypatch):
     assert "Aún no hay acciones registradas." in detalle18
 
 
+def test_seguimiento_filtra_por_registros_reales_y_no_por_descripcion_de_cita(monkeypatch):
+    from datetime import date, datetime, time
+    from routes import seguimiento
+
+    usuario = _usuario("Rector")
+    procesos = [
+        {
+            "id": 17,
+            "nombres": "Ana",
+            "apellidos": "Perez",
+            "estado": "Pendiente",
+            "fecha": date(2026, 10, 10),
+            "hora": time(8),
+            "descripcion": "Motivo general",
+            "observaciones": "Nota al crear la citación",
+            "requiere_otra_cita": 0,
+            "asistencia": None,
+        },
+        {
+            "id": 18,
+            "nombres": "Luis",
+            "apellidos": "Lopez",
+            "estado": "Pendiente",
+            "fecha": date(2026, 10, 11),
+            "hora": time(9),
+            "descripcion": None,
+            "observaciones": None,
+            "requiere_otra_cita": 1,
+            "asistencia": None,
+        },
+        {
+            "id": 19,
+            "nombres": "Mia",
+            "apellidos": "Diaz",
+            "estado": "Pendiente",
+            "fecha": date(2026, 10, 12),
+            "hora": time(10),
+            "descripcion": None,
+            "observaciones": None,
+            "requiere_otra_cita": 0,
+            "asistencia": None,
+        },
+    ]
+    registros = [
+        {
+            "id_cita": 17,
+            "fecha_seguimiento": datetime(2026, 10, 10, 11),
+            "estado_actual": "Pendiente",
+            "asistencia": "Pendiente",
+            "observaciones": "Anotacion del observador",
+            "usuario_n": "Rector",
+            "usuario_a": "Prueba",
+            "nombres": "Ana",
+            "apellidos": "Perez",
+        },
+        {
+            "id_cita": 19,
+            "fecha_seguimiento": datetime(2026, 10, 12, 11),
+            "estado_actual": "Pendiente",
+            "asistencia": "No asistió",
+            "observaciones": None,
+            "usuario_n": "Rector",
+            "usuario_a": "Prueba",
+            "nombres": "Mia",
+            "apellidos": "Diaz",
+        },
+    ]
+    monkeypatch.setattr(helpers, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(seguimiento, "usuario_actual", lambda: usuario)
+    monkeypatch.setattr(
+        seguimiento,
+        "consultar",
+        lambda sql, params: procesos if "SELECT c.id," in sql else registros,
+    )
+
+    response = app.test_client().get("/seguimiento/")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert 'data-seguimiento-types="observador"' in html
+    assert 'data-seguimiento-types="segunda-cita"' in html
+    assert 'data-seguimiento-types="inasistencia"' in html
+    assert 'data-seguimiento-types="observador segunda-cita"' not in html
+
+
 def test_directorio_estudiantes_pc_busqueda_y_permisos(monkeypatch):
     from routes import estudiantes
 

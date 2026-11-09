@@ -43,7 +43,7 @@ def test_ajustes_visuales_de_edubot_y_administracion():
     assert ".state-list {" in admin_styles
     assert ".administracion-page .configuracion-page .state-form-row" in admin_styles
     assert "grid-template-columns: minmax(0, 1fr) !important;" in admin_styles
-    assert "max-width: 760px !important;" in admin_styles
+    assert "max-width: 780px !important;" in admin_styles
 
 
 def test_mascota_cerrada_sin_fondo_y_chat_conserva_su_avatar():
@@ -78,6 +78,52 @@ def test_filtro_de_seguimiento_es_compacto_y_actualiza_cantidad():
     assert ".seguimiento-filtros select" in template
 
 
+def test_busqueda_de_cuentas_inscritas_usa_un_script_permitido_por_csp():
+    template = (ROOT / "templates" / "configuracion" / "index.html").read_text(
+        encoding="utf-8"
+    )
+    script = (ROOT / "static" / "js" / "app.js").read_text(encoding="utf-8")
+
+    assert 'data-cuentas-filter' in template
+    assert 'data-cuentas-search-button' in template
+    assert "<script>" not in template
+    assert "data-cuenta-row" in script
+    assert "accountsSearchButton?.addEventListener(\"click\", filterAccounts)" in script
+    assert '.normalize("NFD")' in script
+
+
+def test_genero_del_avatar_es_visible_y_refleja_la_seleccion():
+    source = (ROOT / "tools" / "humation" / "src.js").read_text(encoding="utf-8")
+    styles = (ROOT / "static" / "css" / "desktop-sidebar.css").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'className = "avatar-gender-choice"' in source
+    assert 'dataset.avatarGenderChoice = value' in source
+    assert 'currentState.gender === choice.dataset.avatarGenderChoice' in source
+    assert "avatar-gender-options" in styles
+    assert '.avatar-gender-choice[aria-pressed="true"]' in styles
+
+
+def test_registro_conserva_ilustracion_y_enlace_completo_de_regreso():
+    template = (ROOT / "templates" / "auth" / "registro.html").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'class="registro-dibujo"' in template
+    assert 'class="link-back registro-back-button"' in template
+    assert 'class="link-back registro-back-button account-settings-back"' not in template
+
+
+def test_chat_de_ayuda_no_muestra_aviso_de_voz_y_conserva_el_del_agente():
+    widget = (ROOT / "templates" / "_asistente_widget.html").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'class="assistant-privacy"' not in widget
+    assert 'class="assistant-voice-call__privacy"' in widget
+
+
 def test_sedes_calendario_y_seguimiento_muestran_campos_coherentes():
     sedes = (ROOT / "templates" / "configuracion" / "index.html").read_text(
         encoding="utf-8"
@@ -107,6 +153,8 @@ def test_sedes_calendario_y_seguimiento_muestran_campos_coherentes():
     assert "AS estudiante" in calendar_route
     assert "{{ descripcion }}" in followup
     assert "CASE WHEN c.destinatario_usuario_id IS NOT NULL" in followup_route
+    assert "max-width: 1140px !important;" in config_styles
+    assert "max-width: 560px !important;" in config_styles
 
 
 def test_botones_de_regreso_tienen_estilo_unificado():
@@ -129,7 +177,8 @@ def test_botones_de_regreso_tienen_estilo_unificado():
     assert "left: 18px !important;" in login
     assert "border-radius: 8px !important;" in login
     assert "left: 12px !important;" in mobile
-    assert 'class="link-back registro-back-button account-settings-back"' in selection
+    assert 'class="link-back registro-back-button"' in selection
+    assert 'class="link-back registro-back-button account-settings-back"' not in selection
     assert "portal-login-back" in login_portal
     assert '<a class="back"' in institution
 
@@ -172,7 +221,7 @@ def test_cache_de_app_js_se_actualiza_en_login_y_base():
     )
     base = (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
 
-    cache_version = "app.js') }}?v=20261109_followup_filter_v1"
+    cache_version = "app.js') }}?v=20261109_account_search_followup_filter_v2"
     assert cache_version in login
     assert cache_version in base
 
@@ -182,5 +231,5 @@ def test_android_incrementa_la_version_de_la_app():
         encoding="utf-8"
     )
 
-    assert "versionCode 22" in gradle
-    assert 'versionName "3.0.2"' in gradle
+    assert "versionCode 23" in gradle
+    assert 'versionName "3.0.3"' in gradle

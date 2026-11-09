@@ -19,6 +19,31 @@ document.addEventListener("DOMContentLoaded", () => {
 		applySeguimientoFilter();
 	}
 
+	const accountsFilter = document.querySelector("[data-cuentas-filter]");
+	const accountsSearchButton = document.querySelector("[data-cuentas-search-button]");
+	if (accountsFilter) {
+		const rows = [...document.querySelectorAll("[data-cuenta-row]")];
+		const normalize = (value) => (value || "")
+			.normalize("NFD")
+			.replace(/[\u0300-\u036f]/g, "")
+			.toLocaleLowerCase()
+			.trim();
+		const filterAccounts = () => {
+			const query = normalize(accountsFilter.value);
+			rows.forEach((row) => {
+				row.hidden = !normalize(row.textContent).includes(query);
+			});
+		};
+		accountsFilter.addEventListener("input", filterAccounts);
+		accountsFilter.addEventListener("keydown", (event) => {
+			if (event.key === "Enter") {
+				event.preventDefault();
+				filterAccounts();
+			}
+		});
+		accountsSearchButton?.addEventListener("click", filterAccounts);
+	}
+
 	document.querySelectorAll("[data-google-calendar-open]").forEach((link) => {
 		link.addEventListener("click", (event) => {
 			const launcher = window.EDUTURNOSNativeCalendar;

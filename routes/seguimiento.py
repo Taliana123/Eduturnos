@@ -73,11 +73,14 @@ def lista():
     tipos_por_cita = {}
     for proceso in procesos:
         tipos = []
-        if proceso.get("descripcion") or proceso.get("observaciones"):
+        historial = historial_por_cita.get(proceso["id"], [])
+        if any(registro.get("observaciones") for registro in historial):
             tipos.append("observador")
         if proceso.get("requiere_otra_cita"):
             tipos.append("segunda-cita")
-        if proceso.get("asistencia") == "No asistió":
+        if proceso.get("asistencia") == "No asistió" or any(
+            registro.get("asistencia") == "No asistió" for registro in historial
+        ):
             tipos.append("inasistencia")
         tipos_por_cita[proceso["id"]] = tipos or ["general"]
     return render_template(

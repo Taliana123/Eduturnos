@@ -32,9 +32,11 @@ def test_recovery_back_button_matches_institutional_square_and_messages_precede_
 def test_public_menu_back_buttons_align_with_each_page_title():
     page_paths = (
         "templates/publico/como_funciona.html",
+        "templates/publico/creadores.html",
         "templates/publico/beneficios.html",
         "templates/publico/privacidad.html",
         "templates/publico/terminos.html",
+        "templates/publico/compartir_eduturnos.html",
     )
     base = Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
 
@@ -49,6 +51,8 @@ def test_public_menu_back_buttons_align_with_each_page_title():
         text = Path(page_path).read_text(encoding="utf-8")
         title_row = text.split('class="public-title-row"', 1)[1]
         assert title_row.index('class="public-back-button"') < title_row.index("<h1>")
+    share = Path("templates/publico/compartir_eduturnos.html").read_text(encoding="utf-8")
+    assert "{% if not usuario_navegacion %}" not in share
 
     institution = Path("templates/institucion.html").read_text(encoding="utf-8")
     assert 'class="institucion-title-row"' in institution
