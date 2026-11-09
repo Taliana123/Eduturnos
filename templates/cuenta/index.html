@@ -41,13 +41,13 @@
         </dl>
     </section>
 
-    <section class="cuenta-section" aria-labelledby="cuenta-seguridad-title">
+    <section class="cuenta-section cuenta-section--navigation" aria-labelledby="cuenta-seguridad-title">
         <div class="cuenta-section-title">
-            <a class="cuenta-section-back" href="{{ url_for('passwords.cambiar_password') }}" aria-label="Ir a Seguridad" title="Ir a Seguridad">
-                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
-            </a>
             <h2 id="cuenta-seguridad-title">Seguridad</h2>
         </div>
+        <a class="cuenta-section-back" href="{{ url_for('passwords.cambiar_password') }}" aria-label="Ir a Seguridad" title="Ir a Seguridad">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
+        </a>
         <p class="muted">Actualiza tu contraseña cuando lo necesites.</p>
         <a class="boton" href="{{ url_for('passwords.cambiar_password') }}">Cambiar contraseña</a>
     </section>
@@ -66,13 +66,13 @@
         <a class="boton secundario" href="{{ url_for('institucion') }}">Ver institución y sedes</a>
     </section>
 
-    <section class="cuenta-section" aria-labelledby="cuenta-calendario-title">
+    <section class="cuenta-section cuenta-section--navigation" aria-labelledby="cuenta-calendario-title">
         <div class="cuenta-section-title">
-            <a class="cuenta-section-back" href="{{ url_for('integraciones_google.index') }}" aria-label="Ir a Calendarios conectados" title="Ir a Calendarios conectados">
-                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
-            </a>
             <h2 id="cuenta-calendario-title">Calendarios conectados</h2>
         </div>
+        <a class="cuenta-section-back" href="{{ url_for('integraciones_google.index') }}" aria-label="Ir a Calendarios conectados" title="Ir a Calendarios conectados">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
+        </a>
         <p class="muted">Conecta tu Google Calendar personal o revisa la agenda institucional.</p>
         <a class="boton secundario" href="{{ url_for('integraciones_google.index') }}">Administrar calendarios</a>
     </section>
@@ -89,11 +89,13 @@
 .cuenta-avatar-card p{margin:0;}
 .cuenta-avatar-edit{margin-left:auto;white-space:nowrap;}
 .cuenta-section{padding:18px 0;margin:0 0 14px;border:0;background:transparent;}
+.cuenta-section--navigation{position:relative;padding:16px;border:1px solid #dce4eb;border-radius:12px;background:#fff;}
 .cuenta-section[aria-labelledby="cuenta-personal-title"]{padding-top:0;}
 .cuenta-section:last-child{margin-bottom:0;}
 .cuenta-section-title{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.cuenta-section--navigation .cuenta-section-title{padding-right:44px;}
 .cuenta-section-title h2{margin:0;color:#172942;font-size:18px;}
-.cuenta-section-back{display:inline-flex;flex:0 0 32px;width:32px;height:32px;align-items:center;justify-content:center;border:1px solid #d5e1fa;border-radius:8px;background:#fff;color:#1769aa;text-decoration:none;}
+.cuenta-section-back{position:absolute;top:16px;right:16px;display:inline-flex;flex:0 0 32px;width:32px;height:32px;align-items:center;justify-content:center;border:1px solid #d5e1fa;border-radius:8px;background:#fff;color:#1769aa;text-decoration:none;}
 .cuenta-section-back svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .cuenta-section p{margin:0 0 12px;}
 .cuenta-section dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;margin:0;}
@@ -108,6 +110,9 @@
     .cuenta-avatar-preview{flex-basis:60px;width:60px;height:60px;}
     .cuenta-avatar-edit{padding:8px!important;}
     .cuenta-section dl{grid-template-columns:1fr;gap:10px;}
+    .cuenta-section--navigation{padding:14px;}
+    .cuenta-section--navigation .cuenta-section-title{padding-right:42px;}
+    .cuenta-section--navigation .cuenta-section-back{top:14px;right:14px;}
 }
 </style>
 {% endblock %}

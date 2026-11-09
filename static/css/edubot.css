@@ -105,6 +105,7 @@
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto auto auto;
     min-height: 0;
+    background: #f7f9fd;
 }
 
 .dashboard-help-chat .assistant-chat-body[hidden] {
@@ -361,6 +362,7 @@
     margin: 5px 18px 0;
     color: #627790;
     font-size: 11px;
+    background: #f7f9fd;
 }
 
 .dashboard-help-chat .assistant-status:empty {
@@ -372,6 +374,7 @@
     padding: 0 18px 12px;
     color: #75869c;
     font-size: 11px;
+    background: #f7f9fd;
 }
 
 @media (max-width: 600px) {

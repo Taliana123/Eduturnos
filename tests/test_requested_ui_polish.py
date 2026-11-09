@@ -66,6 +66,35 @@ def test_ajustes_visuales_de_edubot_y_administracion():
     assert "max-width: 780px !important;" in admin_styles
 
 
+def test_edubot_mantiene_uniforme_la_franga_inferior_y_las_flechas_dentro_de_mi_cuenta():
+    edubot_styles = (ROOT / "static" / "css" / "edubot.css").read_text(
+        encoding="utf-8"
+    )
+    account = (ROOT / "templates" / "cuenta" / "index.html").read_text(
+        encoding="utf-8"
+    )
+
+    assert ".dashboard-help-chat .assistant-chat-body" in edubot_styles
+    assert ".dashboard-help-chat .assistant-privacy" in edubot_styles
+    assert "background: #f7f9fd;" in edubot_styles
+    assert 'class="cuenta-section cuenta-section--navigation"' in account
+    assert ".cuenta-section--navigation .cuenta-section-back" in account
+    assert "position:absolute;top:16px;right:16px;" in account
+
+
+def test_configuracion_institucional_refresca_estilos_y_conserva_anchos_solicitados():
+    template = (ROOT / "templates" / "configuracion" / "index.html").read_text(
+        encoding="utf-8"
+    )
+    config_styles = (ROOT / "static" / "css" / "configuracion.css").read_text(
+        encoding="utf-8"
+    )
+
+    assert "v=20261109_institution_fields_v3" in template
+    assert "calc((100% - 14px) / 2 + 20px)" in config_styles
+    assert "max-width: 560px !important;" in config_styles
+
+
 def test_mascota_cerrada_sin_fondo_y_chat_conserva_su_avatar():
     styles = (ROOT / "static" / "css" / "edubot.css").read_text(
         encoding="utf-8"
@@ -272,5 +301,5 @@ def test_android_incrementa_la_version_de_la_app():
         encoding="utf-8"
     )
 
-    assert "versionCode 25" in gradle
-    assert 'versionName "3.0.5"' in gradle
+    assert "versionCode 26" in gradle
+    assert 'versionName "3.0.6"' in gradle
