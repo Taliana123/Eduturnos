@@ -200,5 +200,7 @@ def test_menu_y_mi_cuenta_renderizan_las_imagenes_de_avatar():
     assert 'data-avatar-save-url="/cuenta/avatar"' in sidebar
     assert sidebar.count("data-avatar-image") == 1
     assert 'data-avatar-preview-image' in sidebar
+    assert 'class="desktop-sidebar-account-avatar" aria-hidden="true"' in sidebar
+    assert 'data-avatar-open' not in sidebar
     assert 'data-avatar-image' in account
     assert "eduturnos-81" in json.dumps(initial)

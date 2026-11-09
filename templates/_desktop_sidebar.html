@@ -59,9 +59,9 @@
   {% include '_asistente_widget.html' %}
   <a class="desktop-sidebar-account-link" href="{{ url_for('cuenta.index') }}" {% if endpoint.startswith('cuenta.') %}aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#user-circle"></use></svg></span><span class="nav-label">Mi cuenta</span></a>
   <div class="desktop-sidebar-account">
-    <button class="desktop-sidebar-account-avatar" type="button" data-avatar-open data-avatar-user="{{ usuario_navegacion.id_usuario }}" data-avatar-config="{{ avatar_config|tojson|forceescape }}" aria-haspopup="dialog" aria-controls="avatar-customizer" aria-label="Personalizar mi personaje">
+    <div class="desktop-sidebar-account-avatar" aria-hidden="true">
       {{ avatar_art(avatar_config, usuario_navegacion.id_usuario) }}
-    </button>
+    </div>
     <div class="desktop-sidebar-account-info"><strong>Acceso institucional</strong><small>{{ usuario_navegacion.nombres }} {{ usuario_navegacion.apellidos }}</small></div>
     <form class="desktop-sidebar-logout-form" method="post" action="{{ url_for('auth.logout') }}">{{ csrf_field()|safe }}<button class="desktop-sidebar-logout-button" type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><img src="{{ url_for('static', filename='icons/lucide-log-out.svg') }}" alt=""></button></form>
   </div>

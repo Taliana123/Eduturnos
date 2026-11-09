@@ -91,7 +91,7 @@ def test_regresos_de_mi_cuenta_son_especificos_y_no_se_agregan_globalmente():
     assert ".menu-page-title" not in styles
     assert ".menu-section-back" not in styles
     assert ".account-settings-back" in styles
-    assert "20261024_account_back_targeted_v1" in base
+    assert "20261109_account_heading_back_v1" in base
 
     account = Path("templates/cuenta/index.html").read_text(encoding="utf-8")
     password = Path("templates/auth/cambiar_password.html").read_text(encoding="utf-8")
@@ -99,8 +99,11 @@ def test_regresos_de_mi_cuenta_son_especificos_y_no_se_agregan_globalmente():
     calendars = Path("templates/integraciones_google.html").read_text(encoding="utf-8")
     assert 'class="account-back-button"' not in account
     assert 'class="password-account-back account-settings-back history-back-button"' in password
-    assert 'class="link-back institucion-back account-settings-back history-back-button"' in institution
+    assert 'class="institucion-back account-settings-back history-back-button"' in institution
     assert 'class="account-back-button account-settings-back history-back-button"' in calendars
+    desktop_styles = Path("static/css/desktop-ui-fixes.css").read_text(encoding="utf-8")
+    assert "account-subpage-title > .password-account-back" not in desktop_styles
+    assert "integraciones-page > .page-head .account-back-button" not in desktop_styles
 
 
 def test_verificacion_coloca_reenvio_debajo_y_conserva_mismo_diseno():

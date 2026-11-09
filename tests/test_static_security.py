@@ -32,7 +32,7 @@ def test_service_worker_version_invalidates_stale_app_assets():
     service_worker = (ROOT / "static" / "service-worker.js").read_text(encoding="utf-8")
     manifest = json.loads((ROOT / "static" / "manifest.webmanifest").read_text(encoding="utf-8"))
 
-    assert 'const CACHE_VERSION = "eduturnos-v23-force-ui-refresh";' in service_worker
+    assert 'const CACHE_VERSION = "eduturnos-v24-account-navigation";' in service_worker
     assert "keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key))" in service_worker
     assert "/static/icons/eduturnos-192.png?v=20261109_release24_cache_v1" in service_worker
     assert "/static/icons/eduturnos-512.png?v=20261109_release24_cache_v1" in service_worker
@@ -63,9 +63,13 @@ def test_desktop_and_pwa_asset_versions_are_refreshed_across_page_shells():
     for template_path in templates:
         template = (ROOT / template_path).read_text(encoding="utf-8")
         assert "js/pwa.js') }}?v=8" in template
-    for template_path in templates[:3]:
+    for template_path, desktop_style_version in (
+        ("templates/base.html", "20261109_account_heading_back_v1"),
+        ("templates/index.html", "20261107_desktop_pc_updates_v1"),
+        ("templates/publico/base_publica.html", "20261107_desktop_pc_updates_v1"),
+    ):
         template = (ROOT / template_path).read_text(encoding="utf-8")
-        assert "20261107_desktop_pc_updates_v1" in template
+        assert desktop_style_version in template
 
 
 def test_report_exports_neutralize_spreadsheet_formulas():
