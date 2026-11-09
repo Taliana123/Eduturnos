@@ -950,6 +950,168 @@ html body dialog.avatar-customizer .avatar-customizer-actions button{
   html body dialog.avatar-customizer .avatar-customizer-header>[data-avatar-close]{width:36px!important;min-width:36px!important;max-width:36px!important;height:36px!important;min-height:36px!important;max-height:36px!important;}
 }
 
+html body dialog.avatar-customizer{
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+html body dialog.avatar-customizer form{
+  display:grid!important;
+  grid-template-rows:auto auto minmax(120px,1fr) auto auto!important;
+  min-height:0!important;
+  max-height:inherit!important;
+  overflow:hidden!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-header{
+  display:grid!important;
+  grid-template-columns:40px minmax(0,1fr)!important;
+  align-items:center!important;
+  justify-content:start!important;
+  gap:10px!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-back,
+html body dialog.avatar-customizer .avatar-category-back{
+  display:grid!important;
+  flex:0 0 38px!important;
+  width:38px!important;
+  min-width:38px!important;
+  height:38px!important;
+  min-height:38px!important;
+  place-items:center!important;
+  padding:0!important;
+  border:1px solid #d5e1fa!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  color:#1769aa!important;
+  box-shadow:none!important;
+  cursor:pointer!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-back svg,
+html body dialog.avatar-customizer .avatar-category-back svg{
+  width:18px!important;
+  height:18px!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:2!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-fields{
+  display:block!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:auto!important;
+  overscroll-behavior:contain!important;
+  padding:2px!important;
+}
+html body dialog.avatar-customizer .avatar-category-list{
+  display:grid;
+  gap:8px;
+}
+html body dialog.avatar-customizer .avatar-category-list[hidden],
+html body dialog.avatar-customizer .avatar-category-panel[hidden]{
+  display:none!important;
+}
+html body dialog.avatar-customizer .avatar-category-link{
+  display:flex;
+  align-items:center;
+  width:100%;
+  min-height:44px;
+  gap:12px;
+  padding:10px 14px;
+  border:1px solid #d5e1fa;
+  border-radius:11px;
+  background:#fff;
+  color:#31516f;
+  font:inherit;
+  font-weight:800;
+  text-align:left;
+  cursor:pointer;
+}
+html body dialog.avatar-customizer .avatar-category-link::after{
+  margin-left:auto;
+  color:#5275a2;
+  content:"›";
+  font-size:22px;
+  line-height:1;
+}
+html body dialog.avatar-customizer .avatar-category-link:hover,
+html body dialog.avatar-customizer .avatar-category-link:focus-visible{
+  border-color:#8eb4ee;
+  background:#f4f8ff;
+}
+html body dialog.avatar-customizer .avatar-category-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 12px;
+}
+html body dialog.avatar-customizer .avatar-category-header h3{
+  margin:0;
+  color:#17365d;
+  font-size:16px;
+}
+html body dialog.avatar-customizer .avatar-category-content .avatar-option-group{
+  padding:8px!important;
+}
+html body dialog.avatar-customizer .avatar-category-content .avatar-choice-grid{
+  max-height:34dvh;
+  overflow:auto;
+  overscroll-behavior:contain;
+  padding:2px;
+}
+html body dialog.avatar-customizer .avatar-customizer-actions{
+  position:sticky!important;
+  bottom:0!important;
+  z-index:1!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  padding-top:8px!important;
+  background:linear-gradient(180deg,rgba(246,249,255,0),#f6f9ff 28%)!important;
+}
+html body dialog.avatar-customizer .avatar-customizer-status:empty{
+  display:none!important;
+}
+@media(max-width:620px){
+  html body dialog.avatar-customizer form{
+    grid-template-rows:auto auto minmax(100px,1fr) auto auto!important;
+    gap:9px!important;
+    padding:12px!important;
+  }
+  html body dialog.avatar-customizer .avatar-customizer-header{
+    grid-template-columns:36px minmax(0,1fr)!important;
+  }
+  html body dialog.avatar-customizer .avatar-customizer-back{
+    width:34px!important;
+    min-width:34px!important;
+    height:34px!important;
+    min-height:34px!important;
+  }
+  html body dialog.avatar-customizer .avatar-customizer-preview{
+    width:82px!important;
+    height:94px!important;
+  }
+  html body dialog.avatar-customizer .avatar-category-list{
+    gap:6px;
+  }
+  html body dialog.avatar-customizer .avatar-category-link{
+    min-height:40px;
+    padding:8px 11px;
+  }
+  html body dialog.avatar-customizer .avatar-category-content .avatar-choice-grid{
+    max-height:30dvh;
+  }
+  html body dialog.avatar-customizer .avatar-customizer-actions{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;
+  }
+  html body dialog.avatar-customizer .avatar-customizer-actions button{
+    min-height:40px!important;
+    padding:7px 4px!important;
+    font-size:12px!important;
+  }
+}
+
 .user-avatar-drawing{object-fit:contain;filter:none;}
 .avatar-choice{flex-direction:column;justify-content:center;min-width:76px;min-height:76px;padding:6px;}
 .avatar-choice img{display:block;width:48px;height:48px;object-fit:contain;}
@@ -991,3 +1153,8 @@ html body dialog.avatar-customizer .avatar-customizer-actions{display:grid!impor
   html body dialog.avatar-customizer .avatar-customizer-header{grid-template-columns:minmax(0,1fr)!important;}
   html body dialog.avatar-customizer .avatar-customizer-fields{display:flex!important;flex-direction:column!important;gap:7px!important;}
 }
+html body dialog.avatar-customizer .avatar-customizer-header{grid-template-columns:40px minmax(0,1fr)!important;}
+html body dialog.avatar-customizer .avatar-customizer-fields{display:block!important;min-height:0!important;max-height:none!important;overflow:auto!important;}
+html body dialog.avatar-customizer .avatar-category-list[hidden],
+html body dialog.avatar-customizer .avatar-category-panel[hidden]{display:none!important;}
+html body dialog.avatar-customizer .avatar-customizer-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;}

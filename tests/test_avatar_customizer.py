@@ -156,6 +156,9 @@ def test_personalizador_usa_renderizador_y_catalogo_oficiales():
     assert "data-avatar-user" in sidebar
     assert 'data-avatar-open' in account
     assert "data-avatar-cancel" in sidebar
+    assert "avatar-category-list" in source
+    assert "avatar-category-panel" in source
+    assert "discardChanges();" in source
     assert "data-avatar-randomize" not in sidebar
     assert "data-avatar-randomize" not in source
     assert 'mujer: { head: "hm1-p-000024", body: "hm1-p-000030", bottom: "hm1-p-000036" }' in source

@@ -81,8 +81,10 @@ def test_edubot_mantiene_uniforme_la_franga_inferior_y_las_flechas_dentro_de_mi_
     assert ".dashboard-help-chat .assistant-privacy" in edubot_styles
     assert "background: #f7f9fd;" in edubot_styles
     assert 'class="cuenta-section cuenta-section--navigation"' in account
-    assert ".cuenta-section--navigation .cuenta-section-back" in account
-    assert "position:absolute;top:16px;right:16px;" in account
+    assert account.count(
+        '<div class="cuenta-section-title">\n            <a class="cuenta-section-back"'
+    ) == 2
+    assert "position:absolute;top:16px;right:16px;" not in account
 
 
 def test_configuracion_institucional_refresca_estilos_y_conserva_anchos_solicitados():
@@ -397,5 +399,5 @@ def test_android_incrementa_la_version_de_la_app():
         encoding="utf-8"
     )
 
-    assert "versionCode 27" in gradle
-    assert 'versionName "3.0.7"' in gradle
+    assert "versionCode 28" in gradle
+    assert 'versionName "3.0.8"' in gradle

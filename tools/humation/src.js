@@ -2,7 +2,7 @@ import { createAvatar, createPartPreview, getPartsForSlot } from "@humation/core
 import { humation1 } from "@humation/assets-humation-1";
 
 const slots = [
-  ["head", "Cabello y cabeza"],
+  ["head", "Pelo y cabeza"],
   ["body", "Ropa superior"],
   ["bottom", "Ropa inferior"],
   ["item", "Accesorios"],
@@ -112,6 +112,52 @@ const initialize = () => {
   };
 
   const populateParts = () => {
+    const categoryList = document.createElement("nav");
+    categoryList.className = "avatar-category-list";
+    categoryList.dataset.avatarCategoryList = "";
+    categoryList.setAttribute("aria-label", "Categorías del personaje");
+    const categoryPanels = document.createElement("div");
+    categoryPanels.className = "avatar-category-panels";
+
+    const createCategory = (id, title) => {
+      const link = document.createElement("button");
+      link.type = "button";
+      link.className = "avatar-category-link";
+      link.dataset.avatarCategory = id;
+      link.setAttribute("aria-controls", `avatar-category-${id}`);
+      link.textContent = title;
+      categoryList.append(link);
+
+      const panel = document.createElement("section");
+      panel.className = "avatar-category-panel";
+      panel.id = `avatar-category-${id}`;
+      panel.dataset.avatarCategoryPanel = id;
+      panel.setAttribute("aria-labelledby", `avatar-category-title-${id}`);
+      panel.hidden = true;
+      const header = document.createElement("div");
+      header.className = "avatar-category-header";
+      const back = document.createElement("button");
+      back.type = "button";
+      back.className = "avatar-category-back";
+      back.dataset.avatarCategoryBack = "";
+      back.setAttribute("aria-label", "Volver a las categorías");
+      back.title = "Volver a las categorías";
+      back.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>';
+      const heading = document.createElement("h3");
+      heading.id = `avatar-category-title-${id}`;
+      heading.textContent = title;
+      header.append(back, heading);
+      panel.append(header);
+      const content = document.createElement("div");
+      content.className = "avatar-category-content";
+      panel.append(content);
+      categoryPanels.append(panel);
+      return content;
+    };
+
+    fields.append(categoryList, categoryPanels);
+
+    const genderContent = createCategory("gender", "Género");
     const genderGroup = document.createElement("fieldset");
     genderGroup.className = "avatar-option-group avatar-gender-group";
     const genderLegend = document.createElement("legend");
@@ -133,14 +179,12 @@ const initialize = () => {
     const genderHint = document.createElement("small");
     genderHint.textContent = "Al elegir un género se aplica un estilo inicial; después puedes personalizar cada rasgo.";
     genderGroup.append(genderOptions, genderHint);
-    fields.append(genderGroup);
+    genderContent.append(genderGroup);
 
     for (const [slot, title] of slots) {
-      const group = document.createElement("details");
+      const content = createCategory(slot, title);
+      const group = document.createElement("div");
       group.className = "avatar-option-group";
-      const summary = document.createElement("summary");
-      summary.textContent = title;
-      group.append(summary);
       const grid = document.createElement("div");
       grid.className = "avatar-choice-grid";
 
@@ -165,14 +209,12 @@ const initialize = () => {
         grid.append(choice);
       }
       group.append(grid);
-      fields.append(group);
+      content.append(group);
     }
 
-    const colorsGroup = document.createElement("details");
+    const colorsContent = createCategory("colors", "Colores");
+    const colorsGroup = document.createElement("div");
     colorsGroup.className = "avatar-option-group avatar-color-group";
-    const colorsSummary = document.createElement("summary");
-    colorsSummary.textContent = "Colores";
-    colorsGroup.append(colorsSummary);
     const colorGrid = document.createElement("div");
     colorGrid.className = "avatar-color-grid";
     for (const [slot, title] of colorSlots) {
@@ -201,7 +243,25 @@ const initialize = () => {
     transparentToggle.dataset.avatarTransparent = "";
     transparentLabel.append(transparentToggle, document.createTextNode("Fondo transparente"));
     colorsGroup.append(colorGrid, transparentLabel);
-    fields.append(colorsGroup);
+    colorsContent.append(colorsGroup);
+  };
+
+  const showCategory = (category) => {
+    const categoryList = fields.querySelector("[data-avatar-category-list]");
+    const panels = [...fields.querySelectorAll("[data-avatar-category-panel]")];
+    const activePanel = panels.find((panel) => panel.dataset.avatarCategoryPanel === category);
+    if (!activePanel) return;
+    categoryList.hidden = true;
+    panels.forEach((panel) => {
+      panel.hidden = panel !== activePanel;
+    });
+  };
+
+  const showCategoryList = () => {
+    fields.querySelector("[data-avatar-category-list]").hidden = false;
+    fields.querySelectorAll("[data-avatar-category-panel]").forEach((panel) => {
+      panel.hidden = true;
+    });
   };
 
   const saveToServer = async (state) => {
@@ -226,12 +286,22 @@ const initialize = () => {
   triggers.forEach((trigger) => {
     trigger.addEventListener("click", () => {
       render(currentState);
+      showCategoryList();
       status.textContent = "";
       dialog.showModal();
     });
   });
 
   fields.addEventListener("click", (event) => {
+    const categoryLink = event.target.closest("[data-avatar-category]");
+    if (categoryLink) {
+      showCategory(categoryLink.dataset.avatarCategory);
+      return;
+    }
+    if (event.target.closest("[data-avatar-category-back]")) {
+      showCategoryList();
+      return;
+    }
     const genderChoice = event.target.closest("[data-avatar-gender-choice]");
     if (genderChoice) {
       const gender = genderChoice.dataset.avatarGenderChoice;
@@ -269,10 +339,15 @@ const initialize = () => {
     render(savedState);
     status.textContent = "Se restauró la última versión guardada.";
   });
-  dialog.querySelector("[data-avatar-cancel]")?.addEventListener("click", () => {
+  const discardChanges = () => {
     render(savedState);
     status.textContent = "";
-    dialog.close();
+  };
+  dialog.querySelectorAll("[data-avatar-cancel]").forEach((cancelButton) => {
+    cancelButton.addEventListener("click", () => {
+      discardChanges();
+      dialog.close();
+    });
   });
   saveButton.addEventListener("click", async () => {
     saveButton.disabled = true;
@@ -295,7 +370,13 @@ const initialize = () => {
     }
   });
   dialog.addEventListener("click", (event) => {
-    if (event.target === dialog) dialog.close();
+    if (event.target === dialog) {
+      discardChanges();
+      dialog.close();
+    }
+  });
+  dialog.addEventListener("cancel", () => {
+    discardChanges();
   });
 };
 
