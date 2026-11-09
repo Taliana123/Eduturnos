@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Configuración · EDUTURNOS{% endblock %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/configuracion.css') }}?v=20261109_institution_fields_v3">{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/configuracion.css') }}?v=20261109_institution_fields_v4">{% endblock %}
 {% block content %}
 <div class="administracion-page">
 <div class="configuracion-page">
@@ -77,7 +77,7 @@
     <label class="config-address-field">Dirección<input name="direccion" maxlength="255"></label>
     <div class="form-actions catalogo-form-actions"><button class="boton" type="submit">Agregar sede</button><button class="boton pequeno secundario" type="reset" aria-label="Limpiar formulario" title="Limpiar formulario">Limpiar</button></div>
   </form>
-  <div class="config-record-list">
+  <div class="config-record-list config-record-list-sedes">
     {% for s in sedes %}
     <form method="post" action="{{ url_for('configuracion.guardar_sede') }}" class="config-record-form config-record-sede">
       {{ csrf_field()|safe }}<input type="hidden" name="id_sede" value="{{ s.id }}"><input type="hidden" name="id_institucion" value="{{ s.id_institucion }}">

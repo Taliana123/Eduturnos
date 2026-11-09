@@ -1,6 +1,6 @@
 ﻿{% extends 'base.html' %}
 {% from '_hora_cita.html' import selector_hora %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva-cita.css') }}?v=20261109_document_suggestions_v1"><link rel="stylesheet" href="{{ url_for('static', filename='css/citas-form-visibility.css') }}?v=20261102_recipient_panels_v5">{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva-cita.css') }}?v=20261109_document_suggestions_v2"><link rel="stylesheet" href="{{ url_for('static', filename='css/citas-form-visibility.css') }}?v=20261102_recipient_panels_v5">{% endblock %}
 {% block content %}
 <div class="page-head nueva-cita-heading"><div class="menu-page-heading"><div class="menu-page-heading-copy"><h1>Nueva citación</h1><p>Completa los datos del destinatario y agenda la fecha, hora y motivo del encuentro.</p></div></div></div>
 {% set motivo_otro_id = namespace(value='') %}{% for motivo in motivos %}{% if motivo.nombre|lower == 'otro' %}{% set motivo_otro_id.value = motivo.id %}{% endif %}{% endfor %}
@@ -65,7 +65,7 @@
   </section>
   <div class="full-field mobile-command-group citation-form-actions"><button class="boton" type="submit">Crear citación</button><button class="boton secundario" type="reset">Cancelar</button></div>
 </form>
-<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261109_document_suggestions_v1" defer></script>
+<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261109_document_suggestions_v2" defer></script>
 <style>
 .nueva-cita-form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;width:min(100%,820px);margin:0 auto;padding:18px}
 .citation-mode-field,.citation-mode-panel{grid-column:1/-1;min-width:0}
@@ -93,6 +93,9 @@
 .citation-suggestion{display:grid;width:100%;gap:3px;padding:10px 12px;border:1px solid #dce5ef;border-radius:9px;background:#f7faff;color:#17365d;text-align:left;cursor:pointer}
 .citation-suggestion:hover,.citation-suggestion:focus-visible{border-color:#6a91ec;background:#edf3ff;outline:2px solid #6a91ec;outline-offset:1px}
 .citation-suggestion small{color:#60758a}
+#contenido .nueva-cita-form #coincidencias-estudiante .citation-suggestion{display:block!important;width:100%!important;min-width:0!important;min-height:0!important;height:auto!important;padding:7px 10px!important;border:0!important;border-radius:8px!important;background:#f1f7fc!important;box-shadow:none!important;color:#17365d!important;font-size:14px!important;font-weight:600!important;line-height:1.35!important;text-align:left!important;text-transform:none!important}
+#contenido .nueva-cita-form #coincidencias-estudiante .citation-suggestion:hover,
+#contenido .nueva-cita-form #coincidencias-estudiante .citation-suggestion:focus-visible{background:#e8f1f8!important;outline:2px solid #8daec9!important;outline-offset:1px!important}
 .citation-person-card{display:grid;gap:4px;padding:12px;border-radius:10px;background:#f1f7fc;color:#17365d}
 .citation-person-card small{color:#60758a}
 .citation-person-card[hidden]{display:none!important}

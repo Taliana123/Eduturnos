@@ -807,10 +807,13 @@ def test_configuration_catalog_forms_follow_motives_layout_without_changing_inst
     assert 'class="motivo-edit-form config-record-form"' in template
     assert 'class="state-form state-form-row config-record-form"' in template
     assert "config-record-actions" in template
-    assert "20261109_institution_fields_v3" in template
+    assert "20261109_institution_fields_v4" in template
     assert 'class="full-field institution-address"' in template
     assert 'class="institution-identity"' in template
-    assert "minmax(300px, 1.8fr)" in css
+    assert "minmax(340px, 1.9fr)" in css
+    assert "config-record-list-sedes" in template
+    assert "max-width: 560px !important;" in css
+    assert "calc((100% - 14px) / 2 + 20px)" in css
     assert "grid-row: 1 / span 2 !important;" in css
     assert ".configuracion-page .config-entry-form," in css
     assert "height: 38px !important;" in css

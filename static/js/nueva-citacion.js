@@ -60,7 +60,7 @@
     }
   }
 
-  function renderSuggestions(container, matches, chooseMatch, getDetails) {
+  function renderSuggestions(container, matches, chooseMatch, getDetails = null) {
     container.replaceChildren();
     matches.forEach((match) => {
       const button = document.createElement('button');
@@ -70,9 +70,12 @@
       const name = document.createElement('span');
       name.textContent = match.nombre
         || `${match.nombres || ''} ${match.apellidos || ''}`.trim();
-      const details = document.createElement('small');
-      details.textContent = getDetails(match);
-      button.append(name, details);
+      button.append(name);
+      if (getDetails) {
+        const details = document.createElement('small');
+        details.textContent = getDetails(match);
+        button.append(details);
+      }
       button.addEventListener('click', () => chooseMatch(match));
       container.append(button);
     });
@@ -105,11 +108,7 @@
         studentSuggestions.replaceChildren();
         studentSuggestions.hidden = true;
         searchStudent();
-      }, (student) => [
-        `Documento ${student.documento}`,
-        student.grado && `Grado ${student.grado}`,
-        student.jornada,
-      ].filter(Boolean).join(' · '));
+      });
       status.textContent = matches.length
         ? 'Selecciona al estudiante que coincide con el documento.'
         : 'No hay estudiantes activos que coincidan con ese documento.';

@@ -53,6 +53,38 @@ def test_portada_conserva_legibilidad_de_los_botones_al_enfocar():
     assert ".contenedor:has(>.institucion-page){margin-top:20px!important;}" in institution
 
 
+def test_sugerencias_de_estudiantes_son_compactas_y_la_ficha_se_muestra_al_seleccionar():
+    template = (ROOT / "templates" / "citas" / "nueva.html").read_text(
+        encoding="utf-8"
+    )
+    script = (ROOT / "static" / "js" / "nueva-citacion.js").read_text(
+        encoding="utf-8"
+    )
+    student_render = script.split(
+        "renderSuggestions(studentSuggestions, matches,", 1
+    )[1].split("status.textContent", 1)[0]
+
+    assert "nueva-citacion.js') }}?v=20261109_document_suggestions_v2" in template
+    assert "#coincidencias-estudiante .citation-suggestion" in template
+    assert "background:#f1f7fc!important" in template
+    assert "min-height:0!important" in template
+    assert "Documento ${student.documento}" not in student_render
+    assert "getDetails" not in student_render
+    assert "searchStudent();" in student_render
+    assert "studentCard.hidden = false;" in script
+
+
+def test_solicitudes_registradas_reduce_espacio_superior_y_margen_del_titulo():
+    template = (ROOT / "templates" / "solicitudes" / "index.html").read_text(
+        encoding="utf-8"
+    )
+
+    assert "solicitudes-records-card" in template
+    assert "padding-top: 14px !important;" in template
+    assert "padding: 6px 24px 8px !important;" in template
+    assert "padding:10px 12px !important;" in template
+
+
 def test_ajustes_visuales_de_edubot_y_administracion():
     edubot_styles = (ROOT / "static" / "css" / "edubot.css").read_text(
         encoding="utf-8"
@@ -95,7 +127,7 @@ def test_configuracion_institucional_refresca_estilos_y_conserva_anchos_solicita
         encoding="utf-8"
     )
 
-    assert "v=20261109_institution_fields_v3" in template
+    assert "v=20261109_institution_fields_v4" in template
     assert "calc((100% - 14px) / 2 + 20px)" in config_styles
     assert "max-width: 560px !important;" in config_styles
 

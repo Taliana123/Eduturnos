@@ -44,10 +44,19 @@
             overflow: hidden;
         }
 
+        #contenido .solicitudes-page .solicitudes-records-card {
+            padding-top: 14px !important;
+        }
+
         .solicitudes-page .card-header {
             background: #ffffff;
             border-bottom: none;
             padding: 20px 24px 12px;
+        }
+
+        #contenido .solicitudes-page .solicitudes-records-card > .card-header {
+            margin: 0 0 8px !important;
+            padding: 6px 24px 8px !important;
         }
 
         .solicitudes-page .card-header h2,
@@ -140,7 +149,7 @@
 
 
     {% if solicitudes %}
-    <div class="card solicitudes-final-card">
+    <div class="card solicitudes-final-card solicitudes-records-card">
 
         <div class="card-header">
 
@@ -638,6 +647,8 @@ a.solicitudes-final-seguimiento:hover {
     #contenido .solicitudes-page { min-width:0 !important; padding-left:0 !important; padding-right:0 !important; }
     #contenido .solicitudes-final-card { min-width:0 !important; padding:16px !important; overflow:hidden !important; }
     #contenido .solicitudes-final-card > .card-header { margin-bottom:14px !important; }
+    #contenido .solicitudes-page .solicitudes-records-card { padding:10px 12px !important; }
+    #contenido .solicitudes-page .solicitudes-records-card > .card-header { margin:0 0 4px !important; padding:6px 8px 8px !important; }
     #contenido .solicitudes-final-card > .card-header h2 { margin:0 0 6px !important; font-size:22px !important; line-height:1.25 !important; }
     #contenido .solicitudes-final-card > .card-header p { margin:0 !important; line-height:1.45 !important; }
     #contenido .solicitudes-table,

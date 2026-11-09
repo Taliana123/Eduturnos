@@ -1558,6 +1558,33 @@ html body.has-desktop-sidebar #contenido .administracion-page .configuracion-pag
     }
 }
 
+@media (min-width: 901px) {
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .config-entry-form.config-entry-sede {
+        grid-template-columns: minmax(190px, 1.15fr) minmax(110px, .6fr) minmax(130px, .7fr) minmax(340px, 1.9fr) auto !important;
+        width: 100% !important;
+        max-width: 1140px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .config-record-list-sedes {
+        width: 100% !important;
+        max-width: 1140px !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .config-record-sede {
+        grid-template-columns: minmax(190px, 1.15fr) minmax(100px, .6fr) minmax(130px, .7fr) minmax(340px, 1.9fr) !important;
+        width: 100% !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form > .institution-identity {
+        grid-template-columns: minmax(0, calc((100% - 14px) / 2 + 20px)) minmax(0, calc((100% - 14px) / 2 - 20px)) !important;
+    }
+
+    html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page .institucion-form > .institution-address {
+        width: 100% !important;
+        max-width: 560px !important;
+    }
+}
+
 .configuracion-page .institution-identity {
     display: grid;
     gap: 10px;
