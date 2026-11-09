@@ -14,12 +14,18 @@ def test_mi_cuenta_muestra_flechas_en_seguridad_y_calendarios():
         encoding="utf-8"
     )
 
-    assert template.count('class="cuenta-section-back"') == 2
-    assert 'aria-label="Ir a Seguridad"' in template
-    assert 'aria-label="Ir a Calendarios conectados"' in template
+    assert 'class="cuenta-section-back"' not in template
     assert 'class="account-back-button"' not in template
-    assert ".cuenta-page .cuenta-section-back{display:none;}" not in template
     assert '.cuenta-section[aria-labelledby="cuenta-personal-title"]{padding-top:0;}' in template
+
+    password = (ROOT / "templates" / "auth" / "cambiar_password.html").read_text(
+        encoding="utf-8"
+    )
+    calendars = (ROOT / "templates" / "integraciones_google.html").read_text(
+        encoding="utf-8"
+    )
+    assert 'class="password-account-back account-settings-back history-back-button"' in password
+    assert 'class="account-back-button account-settings-back history-back-button"' in calendars
 
 
 def test_cancelar_citacion_limpia_datos_y_cierra_dialogos():
@@ -64,7 +70,7 @@ def test_sugerencias_de_estudiantes_son_compactas_y_la_ficha_se_muestra_al_selec
         "renderSuggestions(studentSuggestions, matches,", 1
     )[1].split("status.textContent", 1)[0]
 
-    assert "nueva-citacion.js') }}?v=20261109_document_suggestions_v2" in template
+    assert "nueva-citacion.js') }}?v=20261109_document_suggestions_v3" in template
     assert "#coincidencias-estudiante .citation-suggestion" in template
     assert "background:#f1f7fc!important" in template
     assert "min-height:0!important" in template
@@ -101,7 +107,7 @@ def test_ajustes_visuales_de_edubot_y_administracion():
     assert "max-width: 780px !important;" in admin_styles
 
 
-def test_edubot_mantiene_uniforme_la_franga_inferior_y_las_flechas_dentro_de_mi_cuenta():
+def test_edubot_mantiene_uniforme_la_franga_inferior_y_mi_cuenta_sin_flechas_externas():
     edubot_styles = (ROOT / "static" / "css" / "edubot.css").read_text(
         encoding="utf-8"
     )
@@ -113,9 +119,7 @@ def test_edubot_mantiene_uniforme_la_franga_inferior_y_las_flechas_dentro_de_mi_
     assert ".dashboard-help-chat .assistant-privacy" in edubot_styles
     assert "background: #f7f9fd;" in edubot_styles
     assert 'class="cuenta-section cuenta-section--navigation"' in account
-    assert account.count(
-        '<div class="cuenta-section-title">\n            <a class="cuenta-section-back"'
-    ) == 2
+    assert 'class="cuenta-section-back"' not in account
     assert "position:absolute;top:16px;right:16px;" not in account
 
 
@@ -127,7 +131,7 @@ def test_configuracion_institucional_refresca_estilos_y_conserva_anchos_solicita
         encoding="utf-8"
     )
 
-    assert "v=20261109_institution_fields_v4" in template
+    assert "v=20261109_institution_fields_v5" in template
     assert "calc((100% - 14px) / 2 + 20px)" in config_styles
     assert "max-width: 560px !important;" in config_styles
 
@@ -431,5 +435,5 @@ def test_android_incrementa_la_version_de_la_app():
         encoding="utf-8"
     )
 
-    assert "versionCode 28" in gradle
-    assert 'versionName "3.0.8"' in gradle
+    assert "versionCode 32" in gradle
+    assert 'versionName "3.1.2"' in gradle

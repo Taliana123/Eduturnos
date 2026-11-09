@@ -1,6 +1,6 @@
 ﻿{% extends 'base.html' %}
 {% from '_hora_cita.html' import selector_hora %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva-cita.css') }}?v=20261109_document_suggestions_v2"><link rel="stylesheet" href="{{ url_for('static', filename='css/citas-form-visibility.css') }}?v=20261102_recipient_panels_v5">{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/nueva-cita.css') }}?v=20261109_document_suggestions_v3"><link rel="stylesheet" href="{{ url_for('static', filename='css/citas-form-visibility.css') }}?v=20261102_recipient_panels_v5">{% endblock %}
 {% block content %}
 <div class="page-head nueva-cita-heading"><div class="menu-page-heading"><div class="menu-page-heading-copy"><h1>Nueva citación</h1><p>Completa los datos del destinatario y agenda la fecha, hora y motivo del encuentro.</p></div></div></div>
 {% set motivo_otro_id = namespace(value='') %}{% for motivo in motivos %}{% if motivo.nombre|lower == 'otro' %}{% set motivo_otro_id.value = motivo.id %}{% endif %}{% endfor %}
@@ -65,7 +65,7 @@
   </section>
   <div class="full-field mobile-command-group citation-form-actions"><button class="boton" type="submit">Crear citación</button><button class="boton secundario" type="reset">Cancelar</button></div>
 </form>
-<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261109_document_suggestions_v2" defer></script>
+<script src="{{ url_for('static', filename='js/nueva-citacion.js') }}?v=20261109_document_suggestions_v3" defer></script>
 <style>
 .nueva-cita-form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;width:min(100%,820px);margin:0 auto;padding:18px}
 .citation-mode-field,.citation-mode-panel{grid-column:1/-1;min-width:0}

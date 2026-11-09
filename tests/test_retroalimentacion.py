@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 import app as app_module
@@ -79,6 +81,49 @@ def test_envio_guarda_categoria_y_contenido_con_la_institucion(monkeypatch):
         "Mejorar el calendario",
         "Sería útil ver la semana completa.",
     )
+
+
+@pytest.mark.parametrize("tipo", ["Me gusta", "No me gusta"])
+def test_envio_conserva_la_opcion_me_gusta_o_no_me_gusta(monkeypatch, tipo):
+    usuario = {
+        "id_usuario": 42,
+        "id_institucion": 8,
+        "rol_nombre": "Estudiante",
+        "nombres": "Ana",
+        "apellidos": "Pérez",
+    }
+    inserciones = []
+    monkeypatch.setattr(
+        retroalimentacion,
+        "ejecutar",
+        lambda sql, params: inserciones.append(params),
+    )
+
+    respuesta = _client(monkeypatch, usuario).post(
+        "/retroalimentacion/",
+        data={
+            "csrf_token": "retro-csrf",
+            "tipo": tipo,
+            "asunto": "Experiencia",
+            "comentario": "Comentario de prueba.",
+        },
+    )
+
+    assert respuesta.status_code == 302
+    assert inserciones[0][2] == tipo
+
+
+def test_opciones_de_retroalimentacion_tienen_estado_seleccionado_visible():
+    template = Path("templates/retroalimentacion/enviar.html").read_text(
+        encoding="utf-8"
+    )
+    styles = Path("static/css/retroalimentacion.css").read_text(encoding="utf-8")
+
+    assert 'name="tipo"' in template
+    assert 'type="radio"' in template
+    assert ':has(input:checked)' in styles
+    assert ':focus-within' in styles
+    assert "retroalimentacion.css') }}?v=2" in template
 
 
 def test_envio_rechaza_datos_invalidos_sin_escribir(monkeypatch):

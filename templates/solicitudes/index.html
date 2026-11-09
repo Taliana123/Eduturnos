@@ -26,6 +26,14 @@
                 + Solicitar cita
             </a>
         </div>
+        {% elif rol == "Acudiente" %}
+        <div class="solicitudes-header-actions">
+            <a href="{{ url_for('solicitudes.nueva_acudiente') }}" class="btn btn-primary solicitudes-seguimiento">+ Solicitar cita</a>
+        </div>
+        {% elif rol == "Estudiante" %}
+        <div class="solicitudes-header-actions">
+            <a href="{{ url_for('solicitudes.nueva_estudiante') }}" class="btn btn-primary solicitudes-seguimiento">+ Solicitar cita</a>
+        </div>
         {% endif %}
 
     </header>
@@ -190,7 +198,7 @@
 
                         <th>Estado</th>
 
-                        {% if rol in ["Super Admin", "Rector", "Administrador / Coordinador"] %}
+                        {% if rol in ["Super Admin", "Rector", "Administrador / Coordinador", "Acudiente", "Estudiante"] %}
                             <th>Acciones</th>
                         {% endif %}
 
@@ -410,6 +418,30 @@
 
                         </td>
 
+                        {% elif rol in ["Acudiente", "Estudiante"] %}
+
+                        <td data-label="Acciones" class="solicitudes-actions-cell">
+                            {% if s.estado == "Propuesta" %}
+                            <form
+                                method="post"
+                                action="{{ url_for('solicitudes.aceptar_propuesta', solicitud_id=s.id) }}"
+                            >
+                                {% if csrf_token is defined %}
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+                                {% endif %}
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Aceptar propuesta
+                                </button>
+                            </form>
+                            {% else %}
+                                <span class="texto-secundario">Sin acciones</span>
+                            {% endif %}
+                        </td>
+
                         {% endif %}
 
                     </tr>
@@ -500,9 +532,6 @@
             <div class="empty-state-icon solicitudes-final-icono">📋</div>
             <h2>No hay solicitudes</h2>
             <p>Cuando se registre una solicitud, aparecerá aquí.</p>
-            {% if rol == "Acudiente" %}
-            <a href="{{ url_for('solicitudes.nueva_acudiente') }}" class="btn btn-primary solicitudes-final-seguimiento">+ Solicitar cita</a>
-            {% endif %}
         </div>
     </div>
     {% endif %}

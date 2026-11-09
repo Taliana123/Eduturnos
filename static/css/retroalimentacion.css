@@ -123,6 +123,12 @@
   border-color: #4285d4;
   background: #eff6ff;
   color: #174e8c;
+  box-shadow: 0 0 0 1px #4285d4;
+}
+
+#contenido .retro-type-option:focus-within {
+  outline: 3px solid rgba(66, 133, 212, .25);
+  outline-offset: 2px;
 }
 
 #contenido .retro-type-option input {

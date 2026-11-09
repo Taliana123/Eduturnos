@@ -228,8 +228,8 @@ def test_llamada_de_voz_usa_sintesis_nativa_con_respaldo_web():
     assert 'eduturnos-native-tts-end' in activity
     assert "TextToSpeech.QUEUE_FLUSH" in activity
     assert "FEMALE_VOICE_NAME" in activity
-    assert 'versionName "3.0.7"' in android_build
-    assert "versionCode 27" in android_build
+    assert 'versionName "3.1.2"' in android_build
+    assert "versionCode 32" in android_build
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
@@ -807,7 +807,7 @@ def test_configuration_catalog_forms_follow_motives_layout_without_changing_inst
     assert 'class="motivo-edit-form config-record-form"' in template
     assert 'class="state-form state-form-row config-record-form"' in template
     assert "config-record-actions" in template
-    assert "20261109_institution_fields_v4" in template
+    assert "20261109_institution_fields_v5" in template
     assert 'class="full-field institution-address"' in template
     assert 'class="institution-identity"' in template
     assert "minmax(340px, 1.9fr)" in css
@@ -1055,7 +1055,8 @@ def test_requested_visual_fixes_are_scoped_to_desktop():
     assert "html body.public-info-page > header.barra {\n        margin-top: -21px !important;\n    }" in desktop_css
     assert "html body.has-desktop-sidebar #contenido .edc-page .edc-kicker" in desktop_css
     assert "html body.has-desktop-sidebar #contenido .directory-page .directory-search > .directory-new" in desktop_css
-    assert "html body.has-desktop-sidebar #contenido .cuenta-page > .page-head .account-back-button" in desktop_css
+    assert "html body.has-desktop-sidebar #contenido .account-subpage-title" in desktop_css
+    assert "html body.has-desktop-sidebar #contenido .account-subpage-title > .password-account-back" not in desktop_css
     assert "html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page > .panel" in desktop_css
     assert 'button[data-citas-state="Pendiente"]' in desktop_css
     assert 'button[data-citas-state="Realizada"]' in desktop_css

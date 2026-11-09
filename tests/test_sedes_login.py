@@ -6,6 +6,16 @@ def test_login_template_has_personal_fields():
     assert 'Sede' in text
     assert 'codigo_institucional' in text
     assert 'pattern="[0-9]{6}"' in text
+    assert 'data-staff-code-field hidden' in text
+    assert 'v=20261109_staff_code_by_email_v1' in text
+
+
+def test_login_muestra_codigo_solo_para_correo_institucional_del_personal():
+    script = Path('static/js/institution-login.js').read_text(encoding='utf-8')
+    assert "const isInstitutionalStaffEmail = /@jjfh\\.edu\\.co$/i.test" in script
+    assert "staffCodeField.hidden = !isJjfh || !isInstitutionalStaffEmail" in script
+    assert "identifier?.addEventListener('input', update)" in script
+    assert "field === staffCodeInput && !isInstitutionalStaffEmail" in script
 
 
 def test_roles_define_the_institutional_sedes():

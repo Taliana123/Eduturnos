@@ -180,6 +180,16 @@ def index():
                LIMIT 500""", (() if not institucion_filter else (u.get("id_institucion"),))
         )
     else:
+        institucion_id = u.get("id_institucion")
+        if not institucion_id and u["rol_nombre"] == "Estudiante":
+            sede = consultar(
+                """SELECT s.id_institucion FROM estudiantes e
+                   JOIN sedes s ON s.id=e.id_sede
+                   WHERE e.id_usuario=%s LIMIT 1""",
+                (u["id_usuario"],),
+                uno=True,
+            )
+            institucion_id = (sede or {}).get("id_institucion")
         rows = consultar(
             """SELECT s.*, CONCAT(COALESCE(du.nombres,e.nombres,''),' ',COALESCE(du.apellidos,e.apellidos,'')) estudiante,
                       CONCAT(d.nombres,' ',d.apellidos) docente,
@@ -195,7 +205,7 @@ def index():
                JOIN roles r ON r.id=u.id_rol
                WHERE s.id_institucion=%s AND (s.solicitante_usuario_id=%s OR s.destinatario_usuario_id=%s)
                ORDER BY s.fecha_creacion DESC,s.id DESC LIMIT 200""",
-            (u.get("id_institucion"), u["id_usuario"], u["id_usuario"]),
+            (institucion_id, u["id_usuario"], u["id_usuario"]),
         )
     solicitudes_reprogramacion = []
     if u["rol_nombre"] in ROLES_REVISAN_REPROGRAMACION:
@@ -324,6 +334,134 @@ def nueva_docente():
     return render_template("solicitudes/nueva_docente.html", estudiantes=estudiantes, motivos=motivos, fecha_minima=date.today().isoformat())
 
 
+@solicitudes_bp.route("/nueva/estudiante", methods=["GET", "POST"])
+@roles_permitidos("Estudiante")
+def nueva_estudiante():
+    usuario = usuario_actual()
+    perfil_estudiante = consultar(
+        """SELECT e.id_estudiante,
+                  COALESCE(u.id_institucion, s.id_institucion) AS id_institucion
+           FROM estudiantes e
+           JOIN usuarios u ON u.id_usuario=e.id_usuario
+           JOIN sedes s ON s.id=e.id_sede
+           WHERE e.id_usuario=%s AND e.estado='Activo' AND u.estado=1
+           LIMIT 1""",
+        (usuario["id_usuario"],),
+        uno=True,
+    )
+    if not perfil_estudiante:
+        flash("Tu cuenta no tiene un perfil de estudiante activo vinculado.", "error")
+        return redirect(url_for("auth.dashboard"))
+
+    institucion_id = usuario.get("id_institucion") or perfil_estudiante["id_institucion"]
+    if not institucion_id:
+        flash("No encontramos la institución asociada a tu perfil.", "error")
+        return redirect(url_for("auth.dashboard"))
+
+    destinatarios = consultar(
+        """SELECT DISTINCT u.id_usuario, u.nombres, u.apellidos, r.nombre AS rol_nombre,
+                  d.id_docente
+           FROM usuarios u
+           JOIN roles r ON r.id=u.id_rol
+           LEFT JOIN docentes d ON d.id_usuario=u.id_usuario AND d.estado=1
+           LEFT JOIN sedes ds ON ds.id=d.id_sede
+           LEFT JOIN directorio_institucional di ON di.id_usuario=u.id_usuario AND di.estado=1
+           LEFT JOIN sedes dis ON dis.id=di.id_sede
+           WHERE u.estado=1
+             AND r.nombre IN ('Rector','Administrador / Coordinador','Docente')
+             AND COALESCE(u.id_institucion, ds.id_institucion, dis.id_institucion)=%s
+             AND (r.nombre<>'Docente' OR d.id_docente IS NOT NULL)
+           ORDER BY FIELD(r.nombre,'Rector','Administrador / Coordinador','Docente'),
+                    u.apellidos,u.nombres""",
+        (institucion_id,),
+    )
+    motivos = consultar(
+        "SELECT id,nombre FROM motivos WHERE estado=1 ORDER BY nombre"
+    )
+    periodo = consultar(
+        """SELECT id FROM periodos_academicos
+           WHERE activo=1 AND cerrado=0 AND (id_institucion=%s OR id_institucion IS NULL)
+           ORDER BY id DESC LIMIT 1""",
+        (institucion_id,),
+        uno=True,
+    )
+
+    if request.method == "POST":
+        try:
+            destinatario_id = request.form.get("destinatario_usuario_id", type=int)
+            motivo_id = request.form.get("id_motivo", type=int)
+            fecha = _validar_fecha_cita(request.form.get("fecha_solicitada"))
+            hora = _normalizar_hora_cita(request.form.get("hora_solicitada"))
+            observaciones = request.form.get("observaciones", "").strip()
+            if not destinatario_id:
+                raise ValueError("Selecciona a quién deseas solicitar la cita.")
+            if not motivo_id or not any(int(motivo["id"]) == motivo_id for motivo in motivos):
+                raise ValueError("Selecciona un motivo válido.")
+            if not periodo:
+                raise ValueError("No hay un periodo académico activo en tu institución.")
+            if len(observaciones) > 2000:
+                raise ValueError("Las observaciones no pueden superar 2000 caracteres.")
+
+            destinatario = next(
+                (persona for persona in destinatarios
+                 if int(persona["id_usuario"]) == destinatario_id),
+                None,
+            )
+            if not destinatario:
+                raise ValueError("El destinatario no está disponible en tu institución.")
+
+            solicitud_id = ejecutar(
+                """INSERT INTO solicitudes_cita(
+                       solicitante_usuario_id,tipo_solicitante,id_estudiante,id_docente,
+                       destinatario_tipo,destinatario_usuario_id,id_motivo,id_periodo,
+                       fecha_solicitada,hora_solicitada,lugar,observaciones,estado,id_institucion
+                   ) VALUES(%s,'Estudiante',%s,%s,%s,%s,%s,%s,%s,%s,'Coordinación',%s,'Pendiente',%s)""",
+                (
+                    usuario["id_usuario"],
+                    perfil_estudiante["id_estudiante"],
+                    destinatario.get("id_docente"),
+                    destinatario["rol_nombre"],
+                    destinatario_id,
+                    motivo_id,
+                    periodo["id"],
+                    fecha,
+                    hora,
+                    observaciones or None,
+                    institucion_id,
+                ),
+            )
+            _notificar_destinatarios_coordinacion(
+                "Nueva solicitud de cita",
+                f"El estudiante envió la solicitud #{solicitud_id} para revisión.",
+                institucion_id,
+            )
+            if destinatario["rol_nombre"] == "Docente":
+                notificar(
+                    destinatario_id,
+                    "Solicitud de cita",
+                    f"El estudiante envió la solicitud #{solicitud_id} para revisión.",
+                    "Solicitud",
+                )
+            auditoria(
+                "CREAR",
+                "Solicitudes de cita",
+                solicitud_id,
+                "Solicitud de cita creada por estudiante",
+            )
+            flash("Solicitud enviada para revisión.", "success")
+            return redirect(url_for("solicitudes.index"))
+        except (KeyError, TypeError, ValueError) as exc:
+            flash(f"Revisa los datos: {exc}", "error")
+
+    return render_template(
+        "solicitudes/nueva_estudiante.html",
+        destinatarios=destinatarios,
+        motivos=motivos,
+        periodo_disponible=bool(periodo),
+        fecha_minima=date.today().isoformat(),
+    )
+
+
 @solicitudes_bp.post("/<int:solicitud_id>/resolver")
 @roles_permitidos("Super Admin", "Rector", "Administrador / Coordinador")
 def resolver(solicitud_id):
@@ -385,7 +523,7 @@ def resolver(solicitud_id):
 
 
 @solicitudes_bp.post("/<int:solicitud_id>/aceptar-propuesta")
-@roles_permitidos("Acudiente")
+@roles_permitidos("Acudiente", "Estudiante")
 def aceptar_propuesta(solicitud_id):
     u = usuario_actual()
     s = consultar("SELECT * FROM solicitudes_cita WHERE id=%s AND solicitante_usuario_id=%s", (solicitud_id, u["id_usuario"]), uno=True)
@@ -400,12 +538,31 @@ def aceptar_propuesta(solicitud_id):
             s["hora_propuesta"],
         )
         cita_id = _cita_desde_solicitud(s, s["fecha_propuesta"], s["hora_propuesta"], "Confirmada", u["id_usuario"])
-        ejecutar("UPDATE solicitudes_cita SET estado='Aceptada',cita_id=%s,respuesta=CONCAT(COALESCE(respuesta,''),' Acudiente aceptó la propuesta.'),fecha_actualizacion=NOW() WHERE id=%s", (cita_id, solicitud_id))
+        texto_aceptacion = (
+            "Estudiante aceptó la propuesta."
+            if u["rol_nombre"] == "Estudiante"
+            else "Acudiente aceptó la propuesta."
+        )
+        ejecutar("UPDATE solicitudes_cita SET estado='Aceptada',cita_id=%s,respuesta=CONCAT(COALESCE(respuesta,''),' ',%s),fecha_actualizacion=NOW() WHERE id=%s", (cita_id, texto_aceptacion, solicitud_id))
         docente_user = consultar("SELECT id_usuario FROM docentes WHERE id_docente=%s", (s["id_docente"],), uno=True)
         if docente_user and docente_user.get("id_usuario"):
-            notificar(docente_user["id_usuario"], "Cita confirmada", f"El acudiente aceptó la nueva hora de la solicitud #{solicitud_id}.", "Solicitud")
-        _notificar_destinatarios_coordinacion("Solicitud confirmada por acudiente", f"La solicitud #{solicitud_id} fue confirmada.", u.get("id_institucion"))
-        auditoria("ACEPTAR_PROPUESTA", "Solicitudes de cita", solicitud_id, f"Cita #{cita_id} aceptada por acudiente")
+            notificar(
+                docente_user["id_usuario"],
+                "Cita confirmada",
+                f"El solicitante aceptó la nueva hora de la solicitud #{solicitud_id}.",
+                "Solicitud",
+            )
+        _notificar_destinatarios_coordinacion(
+            "Solicitud confirmada",
+            f"La solicitud #{solicitud_id} fue confirmada por {u['rol_nombre'].lower()}.",
+            s.get("id_institucion"),
+        )
+        auditoria(
+            "ACEPTAR_PROPUESTA",
+            "Solicitudes de cita",
+            solicitud_id,
+            f"Cita #{cita_id} aceptada por {u['rol_nombre'].lower()}",
+        )
         flash("Propuesta aceptada. La cita quedó confirmada.", "success")
     except Exception as exc:
         flash(str(exc), "error")

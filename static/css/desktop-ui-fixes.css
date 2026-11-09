@@ -511,16 +511,10 @@
         stroke-linejoin: round !important;
     }
 
-    html body.has-desktop-sidebar #contenido .cuenta-page > .page-head .account-back-button,
-    html body.has-desktop-sidebar #contenido .integraciones-page > .page-head .account-back-button,
-    html body.has-desktop-sidebar #contenido .account-subpage-title > .password-account-back {
-        display: none !important;
-    }
-
     html body.has-desktop-sidebar #contenido .cuenta-page > .page-head,
     html body.has-desktop-sidebar #contenido .integraciones-page > .page-head,
     html body.has-desktop-sidebar #contenido .account-subpage-title {
-        gap: 0 !important;
+        gap: 8px !important;
     }
 
     html body.has-desktop-sidebar #contenido .administracion-page .configuracion-page > .page-head {

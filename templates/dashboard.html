@@ -114,6 +114,22 @@
             <span><strong>Nueva citación</strong><small>Agenda un encuentro</small></span>
         </a>
         {% endif %}
+        {% if usuario.rol_nombre == 'Acudiente' %}
+        <a class="dashboard-quick-link quick-citation" href="{{ url_for('solicitudes.nueva_acudiente') }}">
+            <span class="quick-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#calendar-plus"></use></svg></span>
+            <span><strong>Solicitar cita</strong><small>Envía una solicitud a coordinación</small></span>
+        </a>
+        {% elif usuario.rol_nombre == 'Estudiante' %}
+        <a class="dashboard-quick-link quick-citation" href="{{ url_for('solicitudes.nueva_estudiante') }}">
+            <span class="quick-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#calendar-plus"></use></svg></span>
+            <span><strong>Solicitar cita</strong><small>Solicita un espacio con el equipo institucional</small></span>
+        </a>
+        {% elif usuario.rol_nombre == 'Docente' %}
+        <a class="dashboard-quick-link quick-citation" href="{{ url_for('solicitudes.nueva_docente') }}">
+            <span class="quick-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#calendar-plus"></use></svg></span>
+            <span><strong>Solicitar cita</strong><small>Envía una solicitud a coordinación</small></span>
+        </a>
+        {% endif %}
         <a class="dashboard-quick-link quick-calendar" href="{{ url_for('calendario.index') }}">
             <span class="quick-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#calendar-days"></use></svg></span>
             <span><strong>Ver agenda</strong><small>Próximos encuentros</small></span>

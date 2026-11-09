@@ -1388,7 +1388,7 @@ html body.login-page .personal-login .personal-field-jornada select {
     .login-institution-option strong{color:#1b3048;font-size:14px}
     .login-institution-option small,.other-institution-hint{color:#63758a;font-size:12px;line-height:1.45}
     .other-institution-hint{margin:0;padding:10px 12px;border-radius:10px;background:#eef5fc}
-    .personal-login[hidden],.other-institution-hint[hidden]{display:none!important}
+    .personal-login[hidden],.personal-field-code[hidden],.other-institution-hint[hidden]{display:none!important}
     @media(max-width:600px){.login-institution-option{padding:12px}.login-institution-option strong{font-size:13px}.login-institution-options legend{font-size:14px}}
 </style>
 
@@ -1589,7 +1589,7 @@ html body.login-page .personal-login .personal-field-jornada select {
 
                             <!-- Código -->
 
-                            <label class="personal-field personal-field-code">
+                            <label class="personal-field personal-field-code" data-staff-code-field hidden>
 
                                 <span class="personal-field-title">
                                     Código institucional
@@ -1727,7 +1727,7 @@ html body.login-page .personal-login .personal-field-jornada select {
 {% include '_page_mascot.html' %}
 <script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261109_markdown_lists_v4" defer></script>
 <script src="{{ url_for('static', filename='js/app.js') }}?v=20261109_account_search_followup_filter_v2" defer></script>
-<script src="{{ url_for('static', filename='js/institution-login.js') }}?v=20261029_v2" defer></script>
+<script src="{{ url_for('static', filename='js/institution-login.js') }}?v=20261109_staff_code_by_email_v1" defer></script>
 <script src="{{ url_for('static', filename='js/pwa.js') }}?v=8" defer></script>
 </body>
 
