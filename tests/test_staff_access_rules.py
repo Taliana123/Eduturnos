@@ -144,6 +144,7 @@ def test_login_registra_codigo_institucional_incorrecto(monkeypatch):
 
     usuario = {
         "id_usuario": 88,
+        "id_institucion": 1,
         "rol_nombre": "Docente",
         "correo": "docente@jjfh.edu.co",
         "password_hash": generate_password_hash("CorrectPass1"),
@@ -154,13 +155,25 @@ def test_login_registra_codigo_institucional_incorrecto(monkeypatch):
     intentos = []
 
     monkeypatch.setattr(auth, "_asegurar_control_acceso", lambda: True)
-    monkeypatch.setattr(auth, "_buscar_usuario", lambda identificador: usuario)
+    monkeypatch.setattr(
+        auth,
+        "_buscar_usuario",
+        lambda identificador, tipo_acceso="jjfh", institucion_id=None: usuario,
+    )
     monkeypatch.setattr(auth, "_mostrar_login", lambda: "login")
     monkeypatch.setattr(auth, "_registrar_intento_fallido", intentos.append)
 
     def consultar_mock(sql, params=(), uno=False):
         if "FROM control_acceso" in sql:
             return None
+        if "requiere_codigo_institucional FROM instituciones" in sql:
+            return {
+                "id": 1,
+                "nombre": "I.E. José Joaquín Flórez Hernández",
+                "requiere_codigo_institucional": 1,
+            }
+        if "SELECT id FROM instituciones WHERE nombre LIKE" in sql:
+            return {"id": 1}
         if "FROM directorio_institucional" in sql:
             return {"codigo_institucional_hash": generate_password_hash("123456")}
         raise AssertionError(f"Consulta inesperada: {sql}")
