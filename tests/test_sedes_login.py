@@ -11,6 +11,9 @@ def test_login_template_has_personal_fields():
     assert 'placeholder=' not in code_field
     assert 'value=' not in code_field
     assert 'class="personal-field personal-field-code">' in text
+    assert 'html body main.login-page .login-card > .section-heading > h1' in text
+    assert 'justify-self: start !important;' in text
+    assert 'text-align: left !important;' in text
     assert 'v=20261109_staff_code_always_visible_v1' in text
     assert 'right: 18px !important;' in text
     assert 'right: 12px !important;' in text
