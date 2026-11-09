@@ -1,4 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
+	const seguimientoFilter = document.querySelector("[data-seguimiento-filter]");
+	if (seguimientoFilter) {
+		const cards = [...document.querySelectorAll(".seguimiento-proceso[data-seguimiento-types]")];
+		const count = document.querySelector("[data-seguimiento-count]");
+		const empty = document.querySelector("[data-seguimiento-empty]");
+		const applySeguimientoFilter = () => {
+			const filter = seguimientoFilter.value;
+			let visible = 0;
+			cards.forEach((item) => {
+				const matches = filter === "todos" || item.dataset.seguimientoTypes.split(" ").includes(filter);
+				item.hidden = !matches;
+				if (matches) visible += 1;
+			});
+			if (count) count.textContent = `${visible} ${visible === 1 ? "proceso" : "procesos"}`;
+			if (empty) empty.hidden = visible !== 0;
+		};
+		seguimientoFilter.addEventListener("change", applySeguimientoFilter);
+		applySeguimientoFilter();
+	}
+
 	document.querySelectorAll("[data-google-calendar-open]").forEach((link) => {
 		link.addEventListener("click", (event) => {
 			const launcher = window.EDUTURNOSNativeCalendar;

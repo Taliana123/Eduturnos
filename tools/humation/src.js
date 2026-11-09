@@ -15,6 +15,12 @@ const colorSlots = [
   ["bottom", "Ropa inferior"],
   ["stroke", "Contorno"],
 ];
+const genders = [
+  ["mujer", "Mujer"],
+  ["hombre", "Hombre"],
+  ["nina", "Niña"],
+  ["nino", "Niño"],
+];
 const fallbackColors = {
   hair: "#4A3728",
   skin: "#F4C9A8",
@@ -25,6 +31,7 @@ const fallbackColors = {
 
 const cloneState = (state) => ({
   seed: state.seed,
+  gender: state.gender || null,
   selections: { ...state.selections },
   colors: { ...state.colors },
   background: state.background,
@@ -44,6 +51,7 @@ const initialize = () => {
 
   const userId = firstTrigger.dataset.avatarUser;
   const originalState = JSON.parse(firstTrigger.dataset.avatarConfig);
+  let savedState = cloneState(originalState);
   let currentState = cloneState(originalState);
   const csrfToken = form.querySelector('input[name="csrf_token"]').value;
 
@@ -74,6 +82,8 @@ const initialize = () => {
       input.value = currentState.colors[input.dataset.avatarColor] || fallbackColors[input.dataset.avatarColor];
     });
     const transparent = currentState.background === "transparent";
+    const genderInput = fields.querySelector("[data-avatar-gender]");
+    if (genderInput) genderInput.value = currentState.gender || "";
     const backgroundToggle = fields.querySelector("[data-avatar-transparent]");
     const backgroundInput = fields.querySelector("[data-avatar-background]");
     if (backgroundToggle) backgroundToggle.checked = transparent;
@@ -95,12 +105,36 @@ const initialize = () => {
   };
 
   const populateParts = () => {
+    const genderGroup = document.createElement("details");
+    genderGroup.className = "avatar-option-group avatar-gender-group";
+    genderGroup.open = true;
+    const genderSummary = document.createElement("summary");
+    genderSummary.textContent = "Género del personaje";
+    genderGroup.append(genderSummary);
+    const genderSelect = document.createElement("select");
+    genderSelect.dataset.avatarGender = "";
+    genderSelect.setAttribute("aria-label", "Género del personaje");
+    const genderPlaceholder = document.createElement("option");
+    genderPlaceholder.value = "";
+    genderPlaceholder.textContent = "Selecciona una opción";
+    genderSelect.append(genderPlaceholder);
+    for (const [value, label] of genders) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      genderSelect.append(option);
+    }
+    const genderHint = document.createElement("small");
+    genderHint.textContent = "El cabello, la ropa y los demás rasgos se eligen por separado.";
+    genderGroup.append(genderSelect, genderHint);
+    fields.append(genderGroup);
+
     for (const [slot, title] of slots) {
-      const group = document.createElement("fieldset");
+      const group = document.createElement("details");
       group.className = "avatar-option-group";
-      const legend = document.createElement("legend");
-      legend.textContent = title;
-      group.append(legend);
+      const summary = document.createElement("summary");
+      summary.textContent = title;
+      group.append(summary);
       const grid = document.createElement("div");
       grid.className = "avatar-choice-grid";
 
@@ -128,11 +162,11 @@ const initialize = () => {
       fields.append(group);
     }
 
-    const colorsGroup = document.createElement("fieldset");
+    const colorsGroup = document.createElement("details");
     colorsGroup.className = "avatar-option-group avatar-color-group";
-    const colorsLegend = document.createElement("legend");
-    colorsLegend.textContent = "Colores";
-    colorsGroup.append(colorsLegend);
+    const colorsSummary = document.createElement("summary");
+    colorsSummary.textContent = "Colores";
+    colorsGroup.append(colorsSummary);
     const colorGrid = document.createElement("div");
     colorGrid.className = "avatar-color-grid";
     for (const [slot, title] of colorSlots) {
@@ -211,24 +245,27 @@ const initialize = () => {
     }
   });
   fields.addEventListener("change", (event) => {
-    if (event.target.matches("[data-avatar-transparent]")) {
+    if (event.target.matches("[data-avatar-gender]")) {
+      render({ ...currentState, gender: event.target.value || null });
+    } else if (event.target.matches("[data-avatar-transparent]")) {
       render({ ...currentState, background: event.target.checked ? "transparent" : "#F6F5F4" });
     }
   });
-  dialog.querySelector("[data-avatar-close]")?.addEventListener("click", () => dialog.close());
   dialog.querySelector("[data-avatar-reset]")?.addEventListener("click", () => {
-    render(originalState);
-    status.textContent = "Vista previa restablecida. Guarda para confirmar el cambio.";
+    render(savedState);
+    status.textContent = "Se restauró la última versión guardada.";
   });
-  dialog.querySelector("[data-avatar-randomize]")?.addEventListener("click", () => {
-    render({ ...currentState, seed: crypto.randomUUID(), selections: {} });
-    status.textContent = "Nuevo personaje generado. Guarda para conservarlo.";
+  dialog.querySelector("[data-avatar-cancel]")?.addEventListener("click", () => {
+    render(savedState);
+    status.textContent = "";
+    dialog.close();
   });
   saveButton.addEventListener("click", async () => {
     saveButton.disabled = true;
     status.textContent = "Guardando tu personaje…";
     try {
       const saved = await saveToServer(currentState);
+      savedState = cloneState(saved);
       currentState = cloneState(saved);
       triggers.forEach((trigger) => {
         trigger.dataset.avatarConfig = JSON.stringify(saved);

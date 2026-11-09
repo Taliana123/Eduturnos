@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block contenido %}
 <div class="tarjeta formulario">
-    <p><a href="{{ url_for('auth.login') }}">← Cambiar tipo de acceso</a></p>
+    <p><a class="portal-login-back" href="{{ url_for('auth.login') }}" aria-label="Volver a elegir el tipo de acceso"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg><span>Cambiar tipo de acceso</span></a></p>
     <h1>{{ info.label }}</h1>
     <p>{{ info.instruccion }}</p>
     <form method="post">{{ csrf_field()|safe }}
@@ -14,8 +14,10 @@
     </form>
     <p style="margin-top:14px;">¿Todavía no tienes cuenta? <a href="{{ url_for('auth.registro_portal', portal=portal) }}">Crear cuenta</a></p>
 </div>
-
-
-
-
+<style>
+.portal-login-back{display:inline-flex;align-items:center;gap:9px;min-height:40px;padding:7px 12px;border:1px solid #d5e1fa;border-radius:8px;background:#fff;color:#1769aa;text-decoration:none;font-weight:700;transition:background-color .15s,border-color .15s,transform .15s;}
+.portal-login-back svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.portal-login-back:hover{background:#f2f7ff;border-color:#9bb9e3;transform:translateY(-1px);}
+.portal-login-back:focus-visible{outline:2px solid #2f76d2;outline-offset:2px;}
+</style>
 {% endblock %}

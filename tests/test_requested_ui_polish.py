@@ -15,6 +15,8 @@ def test_mi_cuenta_muestra_flechas_en_seguridad_y_calendarios():
     assert 'aria-label="Ir a Seguridad"' in template
     assert 'aria-label="Ir a Calendarios conectados"' in template
     assert 'class="account-back-button"' not in template
+    assert ".cuenta-page .cuenta-section-back{display:none;}" in template
+    assert '.cuenta-section[aria-labelledby="cuenta-personal-title"]{padding-top:0;}' in template
 
 
 def test_portada_conserva_legibilidad_de_los_botones_al_enfocar():
@@ -62,6 +64,7 @@ def test_filtro_de_seguimiento_es_compacto_y_actualiza_cantidad():
     template = (ROOT / "templates" / "seguimiento" / "lista.html").read_text(
         encoding="utf-8"
     )
+    script = (ROOT / "static" / "js" / "app.js").read_text(encoding="utf-8")
 
     assert 'id="seguimiento-filtro-situacion"' in template
     assert '<select id="seguimiento-filtro-situacion"' in template
@@ -69,9 +72,66 @@ def test_filtro_de_seguimiento_es_compacto_y_actualiza_cantidad():
     assert "data-seguimiento-count" in template
     assert 'data-seguimiento-filter="observador"' not in template
     assert 'data-seguimiento-filter="segunda-cita"' not in template
-    assert "const matches = filter === \"todos\"" in template
-    assert "if (empty) empty.hidden = visible !== 0" in template
+    assert "const matches = filter === \"todos\"" in script
+    assert "if (empty) empty.hidden = visible !== 0" in script
+    assert "<script>" not in template
     assert ".seguimiento-filtros select" in template
+
+
+def test_sedes_calendario_y_seguimiento_muestran_campos_coherentes():
+    sedes = (ROOT / "templates" / "configuracion" / "index.html").read_text(
+        encoding="utf-8"
+    )
+    config_styles = (ROOT / "static" / "css" / "configuracion.css").read_text(
+        encoding="utf-8"
+    )
+    calendar = (ROOT / "templates" / "calendario" / "index.html").read_text(
+        encoding="utf-8"
+    )
+    calendar_route = (ROOT / "routes" / "calendario.py").read_text(
+        encoding="utf-8"
+    )
+    followup = (ROOT / "templates" / "seguimiento" / "lista.html").read_text(
+        encoding="utf-8"
+    )
+    followup_route = (ROOT / "routes" / "seguimiento.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'class="config-field-status"' in sedes
+    assert sedes.index('class="config-field-status"') < sedes.index('class="config-field-code"')
+    assert ".config-entry-sede > .config-field-status" in config_styles
+    assert "{{ cita.estudiante }}" in calendar
+    assert "{{ cita.estudiante_n }}" not in calendar
+    assert "LEFT JOIN usuarios dest" in calendar_route
+    assert "AS estudiante" in calendar_route
+    assert "{{ descripcion }}" in followup
+    assert "CASE WHEN c.destinatario_usuario_id IS NOT NULL" in followup_route
+
+
+def test_botones_de_regreso_tienen_estilo_unificado():
+    login = (ROOT / "templates" / "auth" / "login.html").read_text(
+        encoding="utf-8"
+    )
+    mobile = (ROOT / "static" / "css" / "mobile" / "eduturnos-mobile.css").read_text(
+        encoding="utf-8"
+    )
+    selection = (ROOT / "templates" / "auth" / "registro.html").read_text(
+        encoding="utf-8"
+    )
+    login_portal = (ROOT / "templates" / "auth" / "login_portal.html").read_text(
+        encoding="utf-8"
+    )
+    institution = (ROOT / "templates" / "auth" / "crear_institucion.html").read_text(
+        encoding="utf-8"
+    )
+
+    assert "left: 18px !important;" in login
+    assert "border-radius: 8px !important;" in login
+    assert "left: 12px !important;" in mobile
+    assert 'class="link-back registro-back-button account-settings-back"' in selection
+    assert "portal-login-back" in login_portal
+    assert '<a class="back"' in institution
 
 
 def test_modal_avatar_movil_tiene_cierre_de_tamano_limitado():
@@ -111,5 +171,5 @@ def test_android_incrementa_la_version_de_la_app():
         encoding="utf-8"
     )
 
-    assert "versionCode 21" in gradle
-    assert 'versionName "3.0.1"' in gradle
+    assert "versionCode 22" in gradle
+    assert 'versionName "3.0.2"' in gradle

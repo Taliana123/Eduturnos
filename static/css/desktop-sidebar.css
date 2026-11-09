@@ -959,7 +959,32 @@ html body dialog.avatar-customizer .avatar-customizer-actions button{
 .avatar-color-choice input[type=color]{width:36px;height:30px;padding:2px;border:1px solid #d9e3f0;border-radius:7px;background:#fff;cursor:pointer;}
 .avatar-transparent-choice{display:flex;align-items:center;gap:7px;margin-top:8px;color:#38536f;font-size:12px;}
 .avatar-color-group{grid-column:1/-1;}
+.avatar-customizer-fields{display:flex;flex-direction:column;gap:7px;max-height:min(42dvh,390px);overflow:auto;padding:2px;}
+.avatar-option-group{padding:0;overflow:hidden;}
+.avatar-option-group>summary{display:flex;align-items:center;min-height:40px;padding:9px 12px;color:#31516f;font-size:13px;font-weight:800;cursor:pointer;list-style:none;}
+.avatar-option-group>summary::-webkit-details-marker{display:none;}
+.avatar-option-group>summary::after{content:"+";margin-left:auto;color:#5275a2;font-size:18px;line-height:1;}
+.avatar-option-group[open]>summary::after{content:"−";}
+.avatar-option-group[open]>summary{border-bottom:1px solid #e6edf6;}
+.avatar-option-group>.avatar-choice-grid,
+.avatar-option-group>.avatar-color-grid,
+.avatar-option-group>.avatar-transparent-choice{margin:10px 12px;}
+.avatar-gender-group{padding:0;}
+.avatar-gender-group select{width:100%;min-height:40px;padding:8px 10px;border:1px solid #d9e3f0;border-radius:8px;background:#fff;color:#31516f;font:inherit;}
+.avatar-gender-group small{display:block;margin-top:5px;color:#61758d;font-size:11px;line-height:1.35;}
+.avatar-gender-group select,
+.avatar-gender-group small{margin-left:12px;margin-right:12px;width:calc(100% - 24px);}
+.avatar-gender-group small{margin-bottom:10px;}
+.avatar-customizer-header{grid-template-columns:minmax(0,1fr)!important;}
+.avatar-customizer-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));}
+.avatar-customizer-actions [data-avatar-cancel]{border-color:#d5e1fa;background:#fff;color:#31516f;}
+html body dialog.avatar-customizer .avatar-customizer-header{grid-template-columns:minmax(0,1fr)!important;}
+html body dialog.avatar-customizer .avatar-customizer-fields{display:flex!important;flex-direction:column!important;gap:7px!important;}
+html body dialog.avatar-customizer .avatar-customizer-actions{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;}
 @media(max-width:620px){
   .avatar-choice{min-width:68px;min-height:70px;}
   .avatar-choice img{width:42px;height:42px;}
+  html body dialog.avatar-customizer .avatar-customizer-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+  html body dialog.avatar-customizer .avatar-customizer-header{grid-template-columns:minmax(0,1fr)!important;}
+  html body dialog.avatar-customizer .avatar-customizer-fields{display:flex!important;flex-direction:column!important;gap:7px!important;}
 }

@@ -1082,6 +1082,9 @@ def test_calendario_conserva_citas_si_faltan_datos_relacionados(monkeypatch):
     assert registros[0]["fecha"] == "2026-12-08"
     assert consulta["params"] == (12,)
     assert "LEFT JOIN estudiantes e" in consulta["sql"]
+    assert "LEFT JOIN usuarios dest" in consulta["sql"]
+    assert "c.destinatario_usuario_id IS NOT NULL" in consulta["sql"]
+    assert "'Destinatario sin estudiante'" in consulta["sql"]
     assert "LEFT JOIN estados_cita ec" in consulta["sql"]
     assert "COALESCE(m.nombre, 'Sin motivo')" in consulta["sql"]
 

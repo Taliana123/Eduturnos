@@ -69,8 +69,7 @@
 <dialog id="avatar-customizer" class="avatar-customizer" aria-labelledby="avatar-customizer-title">
   <form method="dialog" data-avatar-form data-avatar-save-url="{{ url_for('cuenta.actualizar_avatar') }}">
     <header class="avatar-customizer-header">
-      <div><h2 id="avatar-customizer-title">Personaliza tu personaje</h2><p>Combina las piezas del personaje; su estilo y proporciones se mantienen.</p></div>
-      <button type="button" data-avatar-close aria-label="Cerrar personalización">×</button>
+      <div><h2 id="avatar-customizer-title">Realiza tu personaje</h2><p>Elige sus piezas, colores y género. Puedes cambiar cada detalle a tu gusto.</p></div>
     </header>
     <div class="avatar-customizer-preview" data-avatar-user="{{ usuario_navegacion.id_usuario }}">
       <img class="user-avatar-drawing" data-avatar-preview-image data-avatar-user="{{ usuario_navegacion.id_usuario }}" alt="" aria-hidden="true" decoding="async">
@@ -79,8 +78,8 @@
     <div class="avatar-customizer-fields" data-avatar-fields></div>
     <footer class="avatar-customizer-actions">
       <button type="button" data-avatar-reset>Restablecer</button>
-      <button type="button" data-avatar-randomize>Generar otro</button>
       <button type="button" data-avatar-save>Guardar avatar</button>
+      <button type="button" data-avatar-cancel>Cancelar</button>
     </footer>
     <p class="avatar-customizer-status" data-avatar-status role="status" aria-live="polite"></p>
   </form>

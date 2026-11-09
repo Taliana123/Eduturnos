@@ -8,7 +8,9 @@ from database.db import consultar, ejecutar
 
 HUMATION_SLOTS = ("head", "body", "bottom", "item", "glasses")
 HUMATION_COLORS = ("hair", "clothes", "bottom", "skin", "stroke")
-AVATAR_FIELDS = {"seed", "selections", "colors", "background"}
+AVATAR_FIELDS = {"seed", "gender", "selections", "colors", "background"}
+AVATAR_GENDERS = {"mujer", "hombre", "nina", "nino"}
+_AVATAR_FIELDS_WITHOUT_GENDER = AVATAR_FIELDS - {"gender"}
 _HEX_COLOR = re.compile(r"#[0-9a-fA-F]{6}\Z")
 _SEED = re.compile(r"[A-Za-z0-9._:-]{1,128}\Z")
 
@@ -55,6 +57,7 @@ def avatar_inicial(id_usuario):
     user_id = _valid_user_id(id_usuario)
     return {
         "seed": f"eduturnos-{user_id}",
+        "gender": None,
         "selections": {},
         "colors": {
             "hair": _HAIR_COLORS[user_id % len(_HAIR_COLORS)],
@@ -66,8 +69,12 @@ def avatar_inicial(id_usuario):
 
 
 def normalizar_avatar(value):
-    if not isinstance(value, dict) or set(value) != AVATAR_FIELDS:
+    if not isinstance(value, dict) or set(value) not in (AVATAR_FIELDS, _AVATAR_FIELDS_WITHOUT_GENDER):
         raise ValueError("La configuración del personaje no tiene el formato esperado.")
+
+    gender = value.get("gender")
+    if gender is not None and (not isinstance(gender, str) or gender not in AVATAR_GENDERS):
+        raise ValueError("El género del personaje no es válido.")
 
     seed = value.get("seed")
     if not isinstance(seed, str) or not _SEED.fullmatch(seed):
@@ -100,6 +107,7 @@ def normalizar_avatar(value):
 
     return {
         "seed": seed,
+        "gender": gender,
         "selections": normalized_selections,
         "colors": normalized_colors,
         "background": background.upper() if isinstance(background, str) and background != "transparent" else "transparent",

@@ -17,6 +17,7 @@ def test_avatar_inicial_es_estable_y_variado_por_usuario():
     assert first != avatar.avatar_inicial(2)
     assert set(first) == avatar.AVATAR_FIELDS
     assert first["seed"] == "eduturnos-1"
+    assert first["gender"] is None
     assert first["selections"] == {}
     assert first["background"] == "transparent"
 
@@ -26,6 +27,11 @@ def test_normalizar_avatar_acepta_solo_partes_y_colores_humation():
     valid = avatar.avatar_inicial(5)
     valid["selections"] = {"head": catalog["head"][0]["id"], "glasses": catalog["glasses"][0]["id"]}
     assert avatar.normalizar_avatar(valid) == valid
+    valid["gender"] = "nina"
+    assert avatar.normalizar_avatar(valid) == valid
+    with pytest.raises(ValueError, match="género"):
+        avatar.normalizar_avatar({**valid, "gender": "otro"})
+    assert avatar.normalizar_avatar({key: value for key, value in valid.items() if key != "gender"})["gender"] is None
 
     invalid_part = {**valid, "selections": {"head": "not-an-official-part"}}
     with pytest.raises(ValueError, match="catálogo oficial"):
@@ -149,7 +155,10 @@ def test_personalizador_usa_renderizador_y_catalogo_oficiales():
     assert "data-avatar-image" in art
     assert "data-avatar-user" in sidebar
     assert 'data-avatar-open' in account
-    assert "data-avatar-randomize" in sidebar
+    assert "data-avatar-cancel" in sidebar
+    assert "data-avatar-randomize" not in sidebar
+    assert "data-avatar-randomize" not in source
+    assert '["nina", "Niña"]' in source
     assert "Copyright (c) 2026 Humation contributors" in license_text
     assert not (ROOT / "static" / "js" / "avatar-customizer.js").exists()
 

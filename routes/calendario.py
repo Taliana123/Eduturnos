@@ -134,11 +134,18 @@ def citas_visibles(usuario=None):
             e.documento AS estudiante_documento,
             e.codigo_estudiantil,
 
-            COALESCE(CONCAT(
-                e.nombres,
-                ' ',
-                e.apellidos
-            ), 'Sin estudiante') AS estudiante,
+            CASE
+                WHEN c.destinatario_usuario_id IS NOT NULL THEN
+                    COALESCE(
+                        NULLIF(TRIM(CONCAT(COALESCE(dest.nombres, ''), ' ', COALESCE(dest.apellidos, ''))), ''),
+                        NULLIF(TRIM(c.destinatario_tipo), ''),
+                        'Destinatario'
+                    )
+                ELSE COALESCE(
+                    NULLIF(TRIM(CONCAT(COALESCE(e.nombres, ''), ' ', COALESCE(e.apellidos, ''))), ''),
+                    'Destinatario sin estudiante'
+                )
+            END AS estudiante,
 
             COALESCE(CONCAT(
                 a.nombres,
@@ -165,6 +172,9 @@ def citas_visibles(usuario=None):
 
         LEFT JOIN estudiantes e
             ON e.id_estudiante = c.id_estudiante
+
+        LEFT JOIN usuarios dest
+            ON dest.id_usuario = c.destinatario_usuario_id
 
         LEFT JOIN acudientes a
             ON a.id_acudiente = c.id_acudiente
