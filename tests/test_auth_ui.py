@@ -190,12 +190,13 @@ def test_login_back_link_has_desktop_text_and_mobile_icon_only():
 
 def test_login_back_arrow_matches_square_institutional_navigation():
     login = Path("templates/auth/login.html").read_text(encoding="utf-8")
-    desktop_rules = login.rsplit("@media (min-width: 901px)", 1)[1].split("</style>", 1)[0]
+    desktop_rules = login.rsplit("<style>", 1)[1].split("</style>", 1)[0]
 
     assert "header.eduturnos-header > .mobile-back-link" in desktop_rules
-    assert "left: 18px !important;" in desktop_rules
-    assert "background: #fff !important;" in desktop_rules
-    assert "color: #1769aa !important;" in desktop_rules
+    assert "left: auto !important;" in desktop_rules
+    assert "right: 18px !important;" in desktop_rules
+    assert "background: #1769aa !important;" in desktop_rules
+    assert "color: #fff !important;" in desktop_rules
     assert "border-radius: 8px !important;" in desktop_rules
 
 
