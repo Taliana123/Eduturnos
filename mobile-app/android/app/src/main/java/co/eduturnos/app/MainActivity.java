@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Build;
 import android.provider.CalendarContract;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -31,10 +32,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends BridgeActivity {
     private static final int REQUEST_RECORD_AUDIO = 4002;
     private static final int REQUEST_SYSTEM_VOICE_INPUT = 4003;
+    private static final int REQUEST_POST_NOTIFICATIONS = 4004;
+    private static final String APPOINTMENT_NOTIFICATION_CHANNEL = "appointment_reminders";
     private static final Pattern FEMALE_VOICE_NAME = Pattern.compile(
             "(female|feminine|fem|mujer)", Pattern.CASE_INSENSITIVE
     );
@@ -47,6 +52,7 @@ public class MainActivity extends BridgeActivity {
     private boolean voiceStartPending;
     private boolean voiceFallbackPending;
     private boolean voiceCancellationRequested;
+    private final ExecutorService notificationExecutor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +61,12 @@ public class MainActivity extends BridgeActivity {
         // A native bridge is required because Android browsers do not reliably
         // dispatch intent:// links originating from a remote page.
         getBridge().getWebView().addJavascriptInterface(new CalendarLauncher(), "EDUTURNOSNativeCalendar");
+        getBridge().getWebView().addJavascriptInterface(
+                new AppointmentNotificationsLauncher(),
+                "EDUTURNOSNativeNotifications"
+        );
         getBridge().getWebView().addJavascriptInterface(new VoiceLauncher(), "EDUTURNOSNativeVoice");
+        AppointmentNotificationScheduler.createChannel(this, APPOINTMENT_NOTIFICATION_CHANNEL);
         initializeSpeechSynthesizer();
     }
 
@@ -71,6 +82,7 @@ public class MainActivity extends BridgeActivity {
             speechSynthesizer.shutdown();
             speechSynthesizer = null;
         }
+        notificationExecutor.shutdown();
         super.onDestroy();
     }
 
@@ -102,6 +114,10 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_POST_NOTIFICATIONS) {
+            dispatchNotificationPermissionEvent(hasNotificationPermission());
+            return;
+        }
         if (requestCode != REQUEST_RECORD_AUDIO) return;
         if (!voiceStartPending) return;
         voiceStartPending = false;
@@ -110,6 +126,50 @@ public class MainActivity extends BridgeActivity {
         } else {
             dispatchVoiceEvent("eduturnos-native-voice-error", "error", "not-allowed");
         }
+    }
+
+    private boolean hasNotificationPermission() {
+        return AppointmentNotificationScheduler.hasPermission(this);
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                || hasNotificationPermission()) {
+            dispatchNotificationPermissionEvent(hasNotificationPermission());
+            return;
+        }
+        ActivityCompat.requestPermissions(
+                this,
+                new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                REQUEST_POST_NOTIFICATIONS
+        );
+    }
+
+    private void dispatchNotificationPermissionEvent(boolean granted) {
+        String script = "window.dispatchEvent(new CustomEvent("
+                + JSONObject.quote("eduturnos-native-notifications-permission")
+                + ",{detail:{granted:"
+                + granted
+                + "}}));";
+        runOnUiThread(() -> getBridge().getWebView().evaluateJavascript(script, null));
+    }
+
+    private void dispatchNotificationsScheduledEvent(boolean ok, int count) {
+        String script = "window.dispatchEvent(new CustomEvent("
+                + JSONObject.quote("eduturnos-native-notifications-scheduled")
+                + ",{detail:{ok:"
+                + ok
+                + ",count:"
+                + count
+                + "}}));";
+        runOnUiThread(() -> getBridge().getWebView().evaluateJavascript(script, null));
+    }
+
+    private void dispatchNotificationsErrorEvent() {
+        String script = "window.dispatchEvent(new CustomEvent("
+                + JSONObject.quote("eduturnos-native-notifications-error")
+                + "));";
+        runOnUiThread(() -> getBridge().getWebView().evaluateJavascript(script, null));
     }
 
     private void requestOrStartVoiceRecognition() {
@@ -435,6 +495,60 @@ public class MainActivity extends BridgeActivity {
                 } catch (ActivityNotFoundException error) {
                     Toast.makeText(MainActivity.this,
                             "Google Calendar no está disponible en este dispositivo.", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+
+    private final class AppointmentNotificationsLauncher {
+        @JavascriptInterface
+        public boolean hasPermission() {
+            return hasNotificationPermission();
+        }
+
+        @JavascriptInterface
+        public void requestPermission() {
+            runOnUiThread(MainActivity.this::requestNotificationPermission);
+        }
+
+        @JavascriptInterface
+        public void schedule(String appointmentsJson) {
+            final org.json.JSONArray appointments;
+            try {
+                appointments = new org.json.JSONArray(appointmentsJson);
+            } catch (org.json.JSONException error) {
+                android.util.Log.e("EDUTURNOS", "Invalid appointment reminder data.", error);
+                dispatchNotificationsErrorEvent();
+                return;
+            }
+            notificationExecutor.execute(() -> {
+                if (!AppointmentNotificationScheduler.hasPermission(MainActivity.this)) {
+                    dispatchNotificationsErrorEvent();
+                    return;
+                }
+                try {
+                    int count = AppointmentNotificationScheduler.replaceSchedule(
+                            MainActivity.this,
+                            appointments
+                    );
+                    dispatchNotificationsScheduledEvent(true, count);
+                } catch (org.json.JSONException | IllegalArgumentException
+                         | IllegalStateException | SecurityException error) {
+                    android.util.Log.e("EDUTURNOS", "Could not schedule appointment reminders.", error);
+                    dispatchNotificationsErrorEvent();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void cancelAll() {
+            notificationExecutor.execute(() -> {
+                try {
+                    AppointmentNotificationScheduler.cancelAll(MainActivity.this);
+                    dispatchNotificationsScheduledEvent(true, 0);
+                } catch (IllegalStateException | SecurityException error) {
+                    android.util.Log.e("EDUTURNOS", "Could not cancel appointment reminders.", error);
+                    dispatchNotificationsErrorEvent();
                 }
             });
         }

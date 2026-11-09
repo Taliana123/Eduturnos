@@ -31,14 +31,14 @@
 }
 
 .dashboard-help-chat .assistant-avatar {
-    flex: 0 0 76px;
-    width: 76px;
-    height: 76px;
+    flex: 0 0 88px;
+    width: 88px;
+    height: 88px;
     object-fit: cover;
-    padding: 3px;
-    background: #fff;
-    border: 1px solid #dce8f8;
-    border-radius: 12px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
 }
 
 .dashboard-help-chat .assistant-drone-avatar {
@@ -105,6 +105,7 @@
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto auto auto;
     min-height: 0;
+    background: #f7f9fd;
 }
 
 .dashboard-help-chat .assistant-chat-body[hidden] {
@@ -361,6 +362,7 @@
     margin: 5px 18px 0;
     color: #627790;
     font-size: 11px;
+    background: #f7f9fd;
 }
 
 .dashboard-help-chat .assistant-status:empty {
@@ -372,6 +374,7 @@
     padding: 0 18px 12px;
     color: #75869c;
     font-size: 11px;
+    background: #f7f9fd;
 }
 
 @media (max-width: 600px) {
@@ -388,9 +391,9 @@
     }
 
     .dashboard-help-chat .assistant-avatar {
-        flex-basis: 68px;
-        width: 68px;
-        height: 68px;
+        flex-basis: 76px;
+        width: 76px;
+        height: 76px;
     }
 
     .dashboard-help-chat .assistant-brand small {
@@ -632,12 +635,13 @@
 }
 
 .eduturnos-desktop-sidebar .dashboard-help-chat .assistant-avatar {
-    flex-basis: 76px;
-    width: 76px;
-    height: 76px;
-    background-color: #fff !important;
+    flex-basis: 88px;
+    width: 88px;
+    height: 88px;
+    background-color: transparent !important;
+    padding: 0;
     border: 0 !important;
-    border-radius: 0;
+    border-radius: 50%;
 }
 
 .eduturnos-desktop-sidebar .dashboard-help-chat .assistant-composer button {
@@ -1139,13 +1143,13 @@
 
     .dashboard-help-chat .assistant-header .assistant-drone-avatar {
         box-sizing: border-box;
-        width: 52px;
-        height: 52px;
-        flex-basis: 52px;
-        padding: 4px;
-        border: 1px solid #e4edf7;
-        border-radius: 12px;
-        background-color: #fff;
+        width: 72px;
+        height: 72px;
+        flex-basis: 72px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background-color: transparent;
     }
 
     .assistant-voice-call__header {

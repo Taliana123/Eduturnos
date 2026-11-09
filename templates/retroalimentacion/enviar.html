@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Quejas, reseñas y mejoras · EDUTURNOS{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/retroalimentacion.css') }}?v=1">{% endblock %}
+{% block content %}
+<section class="retro-page" aria-labelledby="retro-title">
+  <header class="retro-heading">
+    <span class="retro-eyebrow">Voz de la comunidad</span>
+    <h1 id="retro-title">Quejas, reseñas y mejoras</h1>
+    <p>Cuéntanos qué funciona, qué no y qué podríamos mejorar en EDUTURNOS.</p>
+  </header>
+
+  <div class="retro-form-card">
+    <div class="retro-card-heading">
+      <span class="retro-icon" aria-hidden="true">✦</span>
+      <div>
+        <h2>Comparte tu experiencia</h2>
+        <p>Tu comentario lo recibirán Rectoría y Coordinación de tu institución.</p>
+      </div>
+    </div>
+    <p class="retro-privacy">Se compartirá tu nombre y rol para que puedan dar seguimiento.</p>
+    {% if sin_institucion %}
+    <p class="retro-empty" role="status">No encontramos la institución asociada a tu cuenta. Pide que actualicen tus datos para poder enviar el comentario.</p>
+    {% endif %}
+
+    <form method="post" class="retro-form">
+      {{ csrf_field()|safe }}
+      <fieldset class="retro-types">
+        <legend>¿Qué quieres contarnos?</legend>
+        {% for tipo in tipos_comentario %}
+        <label class="retro-type-option">
+          <input type="radio" name="tipo" value="{{ tipo }}" required {% if request.form.get('tipo') == tipo or (not request.form.get('tipo') and tipo == 'Idea de mejora') %}checked{% endif %}>
+          <span>{{ tipo }}</span>
+        </label>
+        {% endfor %}
+      </fieldset>
+
+      <label class="retro-field">
+        <span>Asunto</span>
+        <input type="text" name="asunto" maxlength="120" required value="{{ request.form.get('asunto', '') }}" placeholder="Por ejemplo: Una mejora para el calendario">
+      </label>
+      <label class="retro-field">
+        <span>Cuéntanos más</span>
+        <textarea name="comentario" rows="5" maxlength="4000" required placeholder="Describe qué te gusta, qué te gustaría cambiar o qué ocurrió.">{{ request.form.get('comentario', '') }}</textarea>
+        <small>Máximo 4000 caracteres.</small>
+      </label>
+      <button class="retro-submit" type="submit" {% if sin_institucion %}disabled{% endif %}>Enviar comentario</button>
+    </form>
+  </div>
+
+  <section class="retro-history" aria-labelledby="retro-history-title">
+    <div class="retro-section-heading">
+      <div><h2 id="retro-history-title">Mis comentarios</h2><p>Consulta el estado de lo que ya compartiste.</p></div>
+      <span>{{ comentarios|length }}</span>
+    </div>
+    {% for comentario in comentarios %}
+    <article class="retro-history-item">
+      <div class="retro-history-meta">
+        <span class="retro-category">{{ comentario.tipo }}</span>
+        <span class="retro-status retro-status-{{ comentario.estado|lower|replace(' ', '-') }}">{{ comentario.estado }}</span>
+      </div>
+      <h3>{{ comentario.asunto }}</h3>
+      <p>{{ comentario.comentario }}</p>
+      <time datetime="{{ comentario.fecha_creacion.isoformat() }}">{{ comentario.fecha_creacion.strftime('%d/%m/%Y · %I:%M %p') }}</time>
+    </article>
+    {% else %}
+    <p class="retro-empty">Todavía no has enviado comentarios.</p>
+    {% endfor %}
+  </section>
+</section>
+{% endblock %}

@@ -14,7 +14,7 @@
 
     <section class="cuenta-avatar-card" aria-label="Tu personaje">
         <button class="cuenta-avatar-preview" type="button" data-avatar-open data-avatar-user="{{ usuario.id_usuario }}" data-avatar-config="{{ avatar_config|tojson|forceescape }}" aria-haspopup="dialog" aria-controls="avatar-customizer" aria-label="Personalizar mi personaje">
-            {{ avatar_art(avatar_config) }}
+            {{ avatar_art(avatar_config, usuario.id_usuario) }}
         </button>
         <div>
             <h2>Tu personaje</h2>
@@ -41,7 +41,7 @@
         </dl>
     </section>
 
-    <section class="cuenta-section" aria-labelledby="cuenta-seguridad-title">
+    <section class="cuenta-section cuenta-section--navigation" aria-labelledby="cuenta-seguridad-title">
         <div class="cuenta-section-title">
             <a class="cuenta-section-back" href="{{ url_for('passwords.cambiar_password') }}" aria-label="Ir a Seguridad" title="Ir a Seguridad">
                 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
@@ -66,7 +66,7 @@
         <a class="boton secundario" href="{{ url_for('institucion') }}">Ver institución y sedes</a>
     </section>
 
-    <section class="cuenta-section" aria-labelledby="cuenta-calendario-title">
+    <section class="cuenta-section cuenta-section--navigation" aria-labelledby="cuenta-calendario-title">
         <div class="cuenta-section-title">
             <a class="cuenta-section-back" href="{{ url_for('integraciones_google.index') }}" aria-label="Ir a Calendarios conectados" title="Ir a Calendarios conectados">
                 <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
@@ -82,15 +82,18 @@
 .cuenta-page .page-head{display:flex;align-items:center;justify-content:flex-start;gap:12px;margin-bottom:22px;}
 .cuenta-page .account-subpage-title{display:flex;align-items:center;gap:10px;}
 .cuenta-page .page-head h1{margin:0;color:#172942;font-size:28px;}
-.cuenta-avatar-card{display:flex;align-items:center;gap:16px;margin:0 0 18px;padding:16px;border:1px solid #dce7f5;border-radius:14px;background:linear-gradient(120deg,#f5f9ff,#fff);}
+.cuenta-avatar-card{display:flex;align-items:center;gap:16px;margin:0 0 8px;padding:16px;border:1px solid #dce7f5;border-radius:14px;background:linear-gradient(120deg,#f5f9ff,#fff);}
 .cuenta-avatar-preview{display:grid;flex:0 0 76px;width:76px;height:76px;place-items:center;overflow:hidden;padding:0;border:1px solid #d5e1fa;border-radius:50%;background:#e7f0ff;cursor:pointer;}
 .cuenta-avatar-preview .user-avatar-drawing{width:100%;height:100%;}
 .cuenta-avatar-card h2{margin:0 0 4px;color:#172942;font-size:17px;}
 .cuenta-avatar-card p{margin:0;}
 .cuenta-avatar-edit{margin-left:auto;white-space:nowrap;}
 .cuenta-section{padding:18px 0;margin:0 0 14px;border:0;background:transparent;}
+.cuenta-section--navigation{padding:16px;border:1px solid #dce4eb;border-radius:12px;background:#fff;}
+.cuenta-section[aria-labelledby="cuenta-personal-title"]{padding-top:0;}
 .cuenta-section:last-child{margin-bottom:0;}
 .cuenta-section-title{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.cuenta-section--navigation .cuenta-section-title{padding-right:0;}
 .cuenta-section-title h2{margin:0;color:#172942;font-size:18px;}
 .cuenta-section-back{display:inline-flex;flex:0 0 32px;width:32px;height:32px;align-items:center;justify-content:center;border:1px solid #d5e1fa;border-radius:8px;background:#fff;color:#1769aa;text-decoration:none;}
 .cuenta-section-back svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
@@ -107,6 +110,8 @@
     .cuenta-avatar-preview{flex-basis:60px;width:60px;height:60px;}
     .cuenta-avatar-edit{padding:8px!important;}
     .cuenta-section dl{grid-template-columns:1fr;gap:10px;}
+    .cuenta-section--navigation{padding:14px;}
+    .cuenta-section--navigation .cuenta-section-title{padding-right:0;}
 }
 </style>
 {% endblock %}

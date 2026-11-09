@@ -69,7 +69,7 @@
             min-height: 76px;
 
             padding:
-                0 46px;
+                0 46px 0 70px;
 
             display: flex;
 
@@ -88,7 +88,7 @@
         .eduturnos-header .mobile-back-link {
             position: absolute;
             top: 50%;
-            right: 46px;
+            left: 18px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -98,10 +98,10 @@
             height: 38px;
             margin: 0;
             padding: 0;
-            border: 1px solid rgba(255, 255, 255, .55);
-            border-radius: 50%;
-            background: transparent;
-            color: #ffffff;
+            border: 1px solid #d5e1fa;
+            border-radius: 8px;
+            background: #fff;
+            color: #1769aa;
             font-size: 22px;
             line-height: 1;
             text-decoration: none;
@@ -111,10 +111,11 @@
         html body header.eduturnos-header .mobile-back-link,
         html body header.eduturnos-header .mobile-back-link:hover,
         html body header.eduturnos-header .mobile-back-link:focus-visible {
-            border-color: rgba(255, 255, 255, .55) !important;
-            background: transparent !important;
-            color: #fff !important;
+            border-color: #d5e1fa !important;
+            background: #fff !important;
+            color: #1769aa !important;
             box-shadow: none !important;
+            transform: translateY(-50%) !important;
         }
 
         .eduturnos-header .mobile-back-link-label {
@@ -123,22 +124,24 @@
 
         @media (max-width: 560px) {
             .eduturnos-header .mobile-back-link {
-                right: 14px;
-                width: 38px;
+                left: 12px;
+                width: 36px;
+                min-width: 36px;
+                height: 36px;
                 padding: 0;
-                border-radius: 50%;
+                border-radius: 8px;
             }
 
             .eduturnos-header .mobile-back-link:hover,
             .eduturnos-header .mobile-back-link:focus-visible {
-                border-color: #fff;
-                background: rgba(255,255,255,.12) !important;
-                outline: 2px solid #f2c14e;
-                outline-offset: 3px;
+                border-color: #1769aa !important;
+                background: #f2f7ff !important;
+                outline: 2px solid rgba(23,105,170,.18);
+                outline-offset: 2px;
             }
 
             .eduturnos-header .mobile-back-link:active {
-                transform: translateY(-50%) scale(.96);
+                transform: translateY(-50%) scale(.98);
             }
 
             .eduturnos-header .mobile-back-link-label {
@@ -1400,10 +1403,35 @@ html body.login-page .personal-login .personal-field-jornada select {
     .login-page .form-links-institution{display:block;text-align:center}
     @media(max-width:600px){.login-page .form-links-primary{grid-template-columns:1fr;gap:12px}.login-page .form-links-primary a{font-size:12px}.login-page .form-links-institution{font-size:12px}}
 </style>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261023_login_center_v2" media="(max-width: 900px)">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile/eduturnos-mobile.css') }}?v=20261109_login_back_square_v1" media="(max-width: 900px)">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/password-controls.css') }}?v=20261012_password_desktop_v1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/page-mascot.css') }}?v=20261109_release24_cache_v1">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261118_voice_avatar_v3">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/edubot.css') }}?v=20261109_composer_surface_v1">
+<style>
+    @media (min-width: 901px) {
+        html body header.eduturnos-header > .mobile-back-link,
+        html body header.eduturnos-header > .mobile-back-link:hover,
+        html body header.eduturnos-header > .mobile-back-link:focus-visible {
+            display: inline-flex !important;
+            top: 50% !important;
+            left: 18px !important;
+            right: auto !important;
+            width: 36px !important;
+            min-width: 36px !important;
+            height: 36px !important;
+            min-height: 36px !important;
+            justify-content: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 1px solid #d5e1fa !important;
+            border-radius: 8px !important;
+            background: #fff !important;
+            color: #1769aa !important;
+            box-shadow: none !important;
+            transform: translateY(-50%) !important;
+        }
+    }
+</style>
 </head>
 
 
@@ -1697,10 +1725,10 @@ html body.login-page .personal-login .personal-field-jornada select {
     </main>
 
 {% include '_page_mascot.html' %}
-<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261109_voice_avatar_v2" defer></script>
-<script src="{{ url_for('static', filename='js/app.js') }}?v=20261107_service_worker_register_v2" defer></script>
+<script src="{{ url_for('static', filename='js/asistente.js') }}?v=20261109_markdown_lists_v4" defer></script>
+<script src="{{ url_for('static', filename='js/app.js') }}?v=20261109_account_search_followup_filter_v2" defer></script>
 <script src="{{ url_for('static', filename='js/institution-login.js') }}?v=20261029_v2" defer></script>
-<script src="{{ url_for('static', filename='js/pwa.js') }}?v=7" defer></script>
+<script src="{{ url_for('static', filename='js/pwa.js') }}?v=8" defer></script>
 </body>
 
 </html>

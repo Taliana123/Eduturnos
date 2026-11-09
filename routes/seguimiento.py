@@ -29,7 +29,14 @@ def lista():
         tuple(params),
     )
     procesos = consultar(
-        f"""SELECT c.id,COALESCE(e.nombres,dest.nombres) nombres,COALESCE(e.apellidos,dest.apellidos) apellidos,ec.nombre estado,
+        f"""SELECT c.id,
+                   CASE WHEN c.destinatario_usuario_id IS NOT NULL
+                        THEN COALESCE(NULLIF(TRIM(dest.nombres),''),NULLIF(TRIM(c.destinatario_tipo),''),'Destinatario')
+                        ELSE COALESCE(NULLIF(TRIM(e.nombres),''),'Estudiante') END nombres,
+                   CASE WHEN c.destinatario_usuario_id IS NOT NULL
+                        THEN COALESCE(NULLIF(TRIM(dest.apellidos),''),'')
+                        ELSE COALESCE(NULLIF(TRIM(e.apellidos),''),'') END apellidos,
+                   ec.nombre estado,
                    c.fecha,c.hora,c.lugar,c.observaciones,g.nombre grado,gr.nombre grupo,
                    sede.nombre sede,m.nombre motivo,CONCAT(a.nombres,' ',a.apellidos) acudiente,
                    COALESCE((SELECT NULLIF(TRIM(s.observaciones),'') FROM seguimiento_citas s
@@ -66,11 +73,14 @@ def lista():
     tipos_por_cita = {}
     for proceso in procesos:
         tipos = []
-        if proceso.get("descripcion") or proceso.get("observaciones"):
+        historial = historial_por_cita.get(proceso["id"], [])
+        if any(registro.get("observaciones") for registro in historial):
             tipos.append("observador")
         if proceso.get("requiere_otra_cita"):
             tipos.append("segunda-cita")
-        if proceso.get("asistencia") == "No asistió":
+        if proceso.get("asistencia") == "No asistió" or any(
+            registro.get("asistencia") == "No asistió" for registro in historial
+        ):
             tipos.append("inasistencia")
         tipos_por_cita[proceso["id"]] = tipos or ["general"]
     return render_template(

@@ -29,6 +29,8 @@
       'configuracion.index': 'settings',
       'justificaciones.index': 'file-text',
       'soporte.index': 'mail',
+      'retroalimentacion.enviar': 'file-text',
+      'retroalimentacion.administrar': 'inbox',
     } %}
     {% set enlaces = [('auth.dashboard', 'Resumen')] %}
     {% if personal %}{% set enlaces = enlaces + [('citas.nueva', 'Nueva citación')] %}{% endif %}
@@ -36,9 +38,11 @@
     {% if personal %}{% set enlaces = enlaces + [('estudiantes.lista', 'Estudiantes'), ('seguimiento.lista', 'Seguimiento'), ('solicitudes.index', 'Solicitudes')] %}{% endif %}
     {% if gestion %}{% set enlaces = enlaces + [('reportes.index', 'Reportes'), ('acudientes.lista', 'Acudientes'), ('docentes.lista', 'Docentes')] %}{% endif %}
     {% if gestion %}{% set enlaces = enlaces + [('configuracion.index', 'Administración')] %}{% endif %}
+    {% if rol in ['Rector', 'Administrador / Coordinador'] %}{% set enlaces = enlaces + [('retroalimentacion.administrar', 'Opiniones de usuarios')] %}{% endif %}
     {% if visitante %}{% set enlaces = enlaces + [('justificaciones.index', 'Justificaciones')] %}{% endif %}
     {% set enlaces = enlaces + [('soporte.index', 'Ayuda y soporte')] %}
     {% set enlaces = enlaces + [('compartir_eduturnos', 'Compartir EDUTURNOS')] %}
+    {% if rol in ['Docente', 'Estudiante', 'Acudiente'] %}{% set enlaces = enlaces + [('retroalimentacion.enviar', 'Quejas, reseñas y mejoras')] %}{% endif %}
     {% for destino, nombre in enlaces %}
     {% if destino == 'citas.nueva' %}
     {% set activo = endpoint == destino %}
@@ -56,7 +60,7 @@
   <a class="desktop-sidebar-account-link" href="{{ url_for('cuenta.index') }}" {% if endpoint.startswith('cuenta.') %}aria-current="page"{% endif %}><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="{{ url_for('static', filename='icons/dashboard-symbols.svg') }}#user-circle"></use></svg></span><span class="nav-label">Mi cuenta</span></a>
   <div class="desktop-sidebar-account">
     <button class="desktop-sidebar-account-avatar" type="button" data-avatar-open data-avatar-user="{{ usuario_navegacion.id_usuario }}" data-avatar-config="{{ avatar_config|tojson|forceescape }}" aria-haspopup="dialog" aria-controls="avatar-customizer" aria-label="Personalizar mi personaje">
-      {{ avatar_art(avatar_config) }}
+      {{ avatar_art(avatar_config, usuario_navegacion.id_usuario) }}
     </button>
     <div class="desktop-sidebar-account-info"><strong>Acceso institucional</strong><small>{{ usuario_navegacion.nombres }} {{ usuario_navegacion.apellidos }}</small></div>
     <form class="desktop-sidebar-logout-form" method="post" action="{{ url_for('auth.logout') }}">{{ csrf_field()|safe }}<button class="desktop-sidebar-logout-button" type="submit" aria-label="Cerrar sesión" title="Cerrar sesión"><img src="{{ url_for('static', filename='icons/lucide-log-out.svg') }}" alt=""></button></form>
@@ -65,31 +69,20 @@
 <dialog id="avatar-customizer" class="avatar-customizer" aria-labelledby="avatar-customizer-title">
   <form method="dialog" data-avatar-form data-avatar-save-url="{{ url_for('cuenta.actualizar_avatar') }}">
     <header class="avatar-customizer-header">
-      <div><h2 id="avatar-customizer-title">Personaliza tu personaje</h2><p>Combina las piezas del personaje; su estilo y proporciones se mantienen.</p></div>
-      <button type="button" data-avatar-close aria-label="Cerrar personalización">×</button>
+      <button class="avatar-customizer-back" type="button" data-avatar-cancel aria-label="Volver a Mi cuenta" title="Volver a Mi cuenta">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
+      </button>
+      <div><h2 id="avatar-customizer-title">Realiza tu personaje</h2><p>Elige sus piezas, colores y género. Puedes cambiar cada detalle a tu gusto.</p></div>
     </header>
     <div class="avatar-customizer-preview" data-avatar-user="{{ usuario_navegacion.id_usuario }}">
-      {{ avatar_art(avatar_config) }}
+      <img class="user-avatar-drawing" data-avatar-preview-image data-avatar-user="{{ usuario_navegacion.id_usuario }}" alt="" aria-hidden="true" decoding="async">
     </div>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="avatar-customizer-fields" data-avatar-fields>
-      {% for field, group in avatar_choices.items() %}
-      <fieldset class="avatar-option-group">
-        <legend>{{ group.title }}</legend>
-        <div class="avatar-choice-grid">
-          {% for option in group.options %}
-          <button type="button" class="avatar-choice" data-avatar-choice data-field="{{ field }}" data-value="{{ option.value }}" aria-pressed="false" aria-label="{{ group.title }}: {{ option.label }}" title="{{ option.label }}">
-            <span class="avatar-choice-swatch" data-choice-field="{{ field }}" data-choice-value="{{ option.value }}" style="--avatar-choice:{{ option.swatch }}" aria-hidden="true"></span>
-            <span>{{ option.label }}</span>
-          </button>
-          {% endfor %}
-        </div>
-      </fieldset>
-      {% endfor %}
-    </div>
+    <div class="avatar-customizer-fields" data-avatar-fields></div>
     <footer class="avatar-customizer-actions">
       <button type="button" data-avatar-reset>Restablecer</button>
       <button type="button" data-avatar-save>Guardar avatar</button>
+      <button type="button" data-avatar-cancel>Cancelar</button>
     </footer>
     <p class="avatar-customizer-status" data-avatar-status role="status" aria-live="polite"></p>
   </form>

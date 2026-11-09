@@ -11,14 +11,16 @@ from flask import current_app
 
 INSTRUCCION = (
     "Eres EDUBOT, el asistente de ayuda de EDUTURNOS, una plataforma escolar colombiana. "
-    "Responde en español, de forma amable, breve y práctica, a preguntas sobre cualquier módulo o "
-    "flujo de EDUTURNOS. Presenta respuestas pulcras con párrafos breves y listas sencillas cuando "
-    "ayuden; evita tablas y no muestres etiquetas Markdown sin formato. Nombra las secciones y pasos "
-    "confirmados; adapta permisos al perfil "
-    "recibido y no inventes opciones, políticas, horarios, estados ni datos institucionales. "
+    "Responde en español natural, de forma amable, breve y práctica, cualquier pregunta general o sobre "
+    "EDUTURNOS. Habla directamente de la información solicitada, usando frases completas y párrafos breves. "
+    "Usa conocimiento general cuando corresponda y, para EDUTURNOS, basa las respuestas en las guías "
+    "confirmadas. Distingue claramente los hechos de las suposiciones; no inventes opciones, políticas, "
+    "horarios, estados ni datos institucionales. Adapta los permisos al perfil recibido. "
+    "No uses listas, tablas, Markdown ni símbolos de formato como asteriscos, guiones o numerales al inicio "
+    "de las frases. "
     "No tienes acceso a cuentas, datos personales ni expedientes; no solicites nombres, documentos, teléfonos, "
-    "contraseñas ni códigos. Si no hay información suficiente para una respuesta segura, dilo "
-    "brevemente y pregunta qué sección o acción necesita aclarar."
+    "contraseñas ni códigos. Si no sabes algo o falta información para responder con seguridad, dilo "
+    "brevemente y ofrece una orientación útil sin presentar una conjetura como un hecho."
 )
 
 
@@ -206,6 +208,30 @@ def anonimizar_consulta(pregunta: str) -> str:
     return consulta[:1200].strip()
 
 
+def _limpiar_formato_respuesta(respuesta: str) -> str:
+    lineas = []
+    for linea in respuesta.replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+        texto = linea.strip()
+        if not texto:
+            lineas.append("")
+            continue
+        texto = re.sub(r"^(?:(?:\*\*|__)\s*)?[-*+]\s+", "", texto)
+        texto = re.sub(r"^\d+[.)]\s+", "", texto)
+        texto = re.sub(r"^#{1,3}\s+", "", texto)
+        texto = re.sub(r"^```(?:\w+)?\s*$", "", texto)
+        if re.fullmatch(r"[*_#=-]{3,}", texto):
+            continue
+        texto = re.sub(
+            r"\*\*(.+?)\*\*|__(.+?)__",
+            lambda match: match.group(1) or match.group(2),
+            texto,
+        )
+        texto = re.sub(r"(?<!\*)\*([^*\n]+)\*(?!\*)", r"\1", texto)
+        texto = re.sub(r"`([^`]+)`", r"\1", texto)
+        lineas.append(texto)
+    return "\n".join(lineas).strip()
+
+
 def generar_respuesta(pregunta: str, rol: str | None = None) -> str:
     respuesta = respuesta_rapida(pregunta)
     if respuesta:
@@ -257,6 +283,7 @@ def generar_respuesta(pregunta: str, rol: str | None = None) -> str:
         respuesta = result["choices"][0]["message"]["content"].strip()
     except (KeyError, IndexError, TypeError) as exc:
         raise RuntimeError("El asistente no devolvió una respuesta utilizable.") from exc
+    respuesta = _limpiar_formato_respuesta(respuesta)
     if not respuesta:
         raise RuntimeError("El asistente no devolvió una respuesta utilizable.")
     return respuesta[:4000]

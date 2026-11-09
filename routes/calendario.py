@@ -134,27 +134,34 @@ def citas_visibles(usuario=None):
             e.documento AS estudiante_documento,
             e.codigo_estudiantil,
 
-            CONCAT(
-                e.nombres,
-                ' ',
-                e.apellidos
-            ) AS estudiante,
+            CASE
+                WHEN c.destinatario_usuario_id IS NOT NULL THEN
+                    COALESCE(
+                        NULLIF(TRIM(CONCAT(COALESCE(dest.nombres, ''), ' ', COALESCE(dest.apellidos, ''))), ''),
+                        NULLIF(TRIM(c.destinatario_tipo), ''),
+                        'Destinatario'
+                    )
+                ELSE COALESCE(
+                    NULLIF(TRIM(CONCAT(COALESCE(e.nombres, ''), ' ', COALESCE(e.apellidos, ''))), ''),
+                    'Destinatario sin estudiante'
+                )
+            END AS estudiante,
 
-            CONCAT(
+            COALESCE(CONCAT(
                 a.nombres,
                 ' ',
                 a.apellidos
-            ) AS acudiente,
+            ), '') AS acudiente,
 
-            CONCAT(
+            COALESCE(CONCAT(
                 d.nombres,
                 ' ',
                 d.apellidos
-            ) AS docente,
+            ), 'Sin asignar') AS docente,
 
-            m.nombre AS motivo_nombre,
+            COALESCE(m.nombre, 'Sin motivo') AS motivo_nombre,
 
-            ec.nombre AS estado_nombre,
+            COALESCE(ec.nombre, 'Sin estado') AS estado_nombre,
 
             s.nombre AS sede_nombre,
 
@@ -163,19 +170,22 @@ def citas_visibles(usuario=None):
 
         FROM citas c
 
-        INNER JOIN estudiantes e
+        LEFT JOIN estudiantes e
             ON e.id_estudiante = c.id_estudiante
 
-        INNER JOIN acudientes a
+        LEFT JOIN usuarios dest
+            ON dest.id_usuario = c.destinatario_usuario_id
+
+        LEFT JOIN acudientes a
             ON a.id_acudiente = c.id_acudiente
 
-        INNER JOIN docentes d
+        LEFT JOIN docentes d
             ON d.id_docente = c.id_docente
 
-        INNER JOIN motivos m
+        LEFT JOIN motivos m
             ON m.id = c.id_motivo
 
-        INNER JOIN estados_cita ec
+        LEFT JOIN estados_cita ec
             ON ec.id = c.id_estado
 
         LEFT JOIN usuarios creador
@@ -360,6 +370,18 @@ def _aplicar_filtros(citas):
         resultado.append(cita)
 
     return resultado
+
+
+def _calendar_snapshot(citas):
+    return [
+        {
+            "id": int(cita["id"]),
+            "fecha": str(cita.get("fecha") or "")[:10],
+            "hora": str(cita.get("hora") or "")[:8],
+            "estado": str(cita.get("estado_nombre") or ""),
+        }
+        for cita in citas
+    ]
 
 
 @calendario_bp.route("/")
@@ -658,6 +680,7 @@ def index():
         ultimo_dia=ultimo_dia,
         semanas=semanas,
         citas=citas,
+        calendar_snapshot=_calendar_snapshot(citas),
         usuario=usuario,
         usuario_id=usuario["id_usuario"],
         rol_usuario=usuario["rol_nombre"],
@@ -686,11 +709,13 @@ def index():
 @login_requerido
 def api_citas():
     usuario = usuario_actual()
+    citas = _aplicar_filtros(citas_visibles(usuario))
 
     return jsonify(
         {
             "ok": True,
-            "citas": citas_visibles(usuario),
+            "citas": citas,
+            "snapshot": _calendar_snapshot(citas),
         }
     )
 

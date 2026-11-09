@@ -32,7 +32,7 @@ def test_service_worker_version_invalidates_stale_app_assets():
     service_worker = (ROOT / "static" / "service-worker.js").read_text(encoding="utf-8")
     manifest = json.loads((ROOT / "static" / "manifest.webmanifest").read_text(encoding="utf-8"))
 
-    assert 'const CACHE_VERSION = "eduturnos-v18-release24-cache";' in service_worker
+    assert 'const CACHE_VERSION = "eduturnos-v22-config-avatar-refresh";' in service_worker
     assert "keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key))" in service_worker
     assert "/static/icons/eduturnos-192.png?v=20261109_release24_cache_v1" in service_worker
     assert "/static/icons/eduturnos-512.png?v=20261109_release24_cache_v1" in service_worker
@@ -49,7 +49,7 @@ def test_service_worker_has_a_single_versioned_registration():
     pwa_script = (ROOT / "static" / "js" / "pwa.js").read_text(encoding="utf-8")
 
     assert 'navigator.serviceWorker.register("/service-worker.js")' not in app_script
-    assert 'navigator.serviceWorker.register("/service-worker.js?v=6"' in pwa_script
+    assert 'navigator.serviceWorker.register("/service-worker.js?v=8"' in pwa_script
 
 
 def test_desktop_and_pwa_asset_versions_are_refreshed_across_page_shells():
@@ -62,7 +62,7 @@ def test_desktop_and_pwa_asset_versions_are_refreshed_across_page_shells():
 
     for template_path in templates:
         template = (ROOT / template_path).read_text(encoding="utf-8")
-        assert "js/pwa.js') }}?v=6" in template
+        assert "js/pwa.js') }}?v=8" in template
     for template_path in templates[:3]:
         template = (ROOT / template_path).read_text(encoding="utf-8")
         assert "20261107_desktop_pc_updates_v1" in template

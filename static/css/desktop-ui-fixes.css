@@ -81,7 +81,7 @@
     }
 
     html body #contenido .institucion-page {
-        padding-top: 12px !important;
+        padding-top: 0 !important;
     }
 
     html body #contenido .institucion-heading {

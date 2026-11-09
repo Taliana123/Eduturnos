@@ -119,6 +119,42 @@ def test_open_assistant_question_uses_groq_and_anonymizes_personal_data(monkeypa
     assert "El perfil actual es «Docente»." in payload["messages"][0]["content"]
 
 
+def test_open_assistant_question_returns_natural_text_without_markdown_markers(monkeypatch):
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            return json.dumps(
+                {
+                    "choices": [
+                        {
+                            "message": {
+                                "content": "**- Abre Seguimiento desde el menú.\n"
+                                "**- **Selecciona el proceso** que necesitas."
+                            }
+                        }
+                    ]
+                }
+            ).encode("utf-8")
+
+    monkeypatch.setitem(app.config, "GROQ_API_KEY", "fake-groq-key")
+    with app.app_context():
+        with patch.object(assistant_service, "urlopen", return_value=FakeResponse()):
+            answer = assistant_service.generar_respuesta(
+                "¿Cómo se configura la ventana de continuidad institucional?"
+            )
+
+    assert answer == "Abre Seguimiento desde el menú.\nSelecciona el proceso que necesitas."
+    assert "**" not in answer
+    assert "Responde en español natural" in assistant_service.INSTRUCCION
+    assert "cualquier pregunta general o sobre EDUTURNOS" in assistant_service.INSTRUCCION
+    assert "No uses listas, tablas, Markdown" in assistant_service.INSTRUCCION
+
+
 def test_support_reports_when_receipt_fails_after_request_delivery():
     with app.app_context():
         app.config.update(

@@ -104,7 +104,13 @@ def test_reserva_persiste_la_tarea_de_google_en_la_transaccion_local(monkeypatch
     monkeypatch.setattr(
         google_calendar,
         "encolar_cita_cursor",
-        lambda cursor, cita_id, creador_id: eventos.append(("outbox", cita_id, creador_id)),
+        lambda cursor, cita_id, creador_id: eventos.append(("outbox", cita_id, creador_id)) or 1,
+    )
+    monkeypatch.setattr(
+        google_calendar,
+        "procesar_cola_google",
+        lambda limite, cita_id: eventos.append(("process", limite, cita_id))
+        or {"procesadas": 1, "sincronizadas": 1, "fallidas": 0},
     )
     parametros = (2, 3, 1, 4, 5, 6, date.today() + timedelta(days=1), time(7), "", "", 77)
 
@@ -112,7 +118,12 @@ def test_reserva_persiste_la_tarea_de_google_en_la_transaccion_local(monkeypatch
         cita_id = reuniones.reservar_cita("INSERT INTO citas VALUES (...) ", parametros)
 
     assert cita_id == 321
-    assert eventos == ["insert", ("outbox", 321, 77), "commit"]
+    assert eventos == [
+        "insert",
+        ("outbox", 321, 77),
+        "commit",
+        ("process", 20, 321),
+    ]
 
 
 def test_fallo_temporal_de_google_se_programa_para_reintento(monkeypatch):

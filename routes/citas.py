@@ -5,7 +5,7 @@ from io import BytesIO
 from flask import Blueprint, Response, render_template, request, redirect, url_for, flash, abort, jsonify
 
 from database.db import consultar, ejecutar, transaccion
-from servicios.reuniones import PERSONAL, bloquear_agenda, comprobar_hueco, datos_escolares, formatear_hora, reservar_cita, validar_compromiso, validar_disponibilidad, validar_franja
+from servicios.reuniones import PERSONAL, bloquear_agenda, comprobar_hueco, datos_escolares, formatear_hora, procesar_sincronizacion_inmediata, reservar_cita, validar_compromiso, validar_disponibilidad, validar_franja
 from routes.helpers import (
     usuario_actual,
     login_requerido,
@@ -460,6 +460,42 @@ def catalogos(usuario=None):
 def buscar_estudiante_documento():
     """Busca por documento y devuelve solo el estudiante y sus acudientes vinculados."""
     documento = request.args.get("documento", "").strip()
+    if request.args.get("coincidencias") == "1":
+        if not documento.isdigit() or len(documento) < 2 or len(documento) > 30:
+            return jsonify({"ok": True, "estudiantes": []})
+
+        usuario = usuario_actual()
+        estudiantes = consultar(
+            """SELECT e.id_estudiante,e.documento,
+                      CONCAT(e.nombres,' ',e.apellidos) AS nombre,
+                      COALESCE(g.nombre,'') AS grado,
+                      COALESCE(j.nombre,'') AS jornada
+               FROM estudiantes e
+               JOIN sedes s ON s.id=e.id_sede
+               LEFT JOIN grados g ON g.id=e.id_grado
+               LEFT JOIN jornadas j ON j.id=e.id_jornada
+               WHERE e.documento LIKE %s AND e.estado='Activo'
+                 AND (%s='Super Admin' OR s.id_institucion=%s)
+                 AND (%s<>'Docente' OR EXISTS (
+                     SELECT 1 FROM docentes d
+                     JOIN asignaciones_docentes ad
+                       ON ad.id_docente=d.id_docente AND ad.estado=1
+                     WHERE d.id_usuario=%s
+                       AND (ad.id_estudiante=e.id_estudiante
+                            OR (ad.id_estudiante IS NULL AND ad.id_grupo=e.id_grupo))
+                 ))
+               ORDER BY e.documento,e.apellidos,e.nombres
+               LIMIT 8""",
+            (
+                f"{documento}%",
+                usuario["rol_nombre"],
+                usuario.get("id_institucion"),
+                usuario["rol_nombre"],
+                usuario["id_usuario"],
+            ),
+        )
+        return jsonify({"ok": True, "estudiantes": estudiantes})
+
     if not documento or len(documento) > 30:
         return jsonify({"ok": False, "error": "Ingresa un número de documento válido."}), 400
 
@@ -529,6 +565,31 @@ def buscar_destinatario_documento():
     if tipo not in tipos_permitidos.get(usuario["rol_nombre"], set()):
         return jsonify({"ok": False, "error": "No puedes buscar ese tipo de destinatario."}), 403
 
+    if request.args.get("coincidencias") == "1":
+        if not documento.isdigit() or len(documento) < 2:
+            return jsonify({"ok": True, "destinatarios": []})
+        destinatarios = consultar(
+            "SELECT u.id_usuario,u.nombres,u.apellidos, "
+            "COALESCE(NULLIF(d.documento,''),NULLIF(a.documento,''),u.documento,'') AS documento, "
+            "r.nombre AS rol_nombre,d.id_docente,a.id_acudiente "
+            "FROM usuarios u JOIN roles r ON r.id=u.id_rol "
+            "LEFT JOIN docentes d ON d.id_usuario=u.id_usuario AND d.estado=1 "
+            "LEFT JOIN acudientes a ON a.id_usuario=u.id_usuario AND a.estado=1 "
+            "WHERE u.estado=1 AND r.nombre=%s "
+            "AND COALESCE(NULLIF(d.documento,''),NULLIF(a.documento,''),u.documento,'') LIKE %s "
+            "AND (r.nombre<>'Docente' OR d.id_docente IS NOT NULL) "
+            "AND (r.nombre<>'Acudiente' OR a.id_acudiente IS NOT NULL) "
+            "AND (%s='Super Admin' OR u.id_institucion=%s) "
+            "ORDER BY documento,u.apellidos,u.nombres LIMIT 8",
+            (
+                tipo,
+                f"{documento}%",
+                usuario["rol_nombre"],
+                usuario.get("id_institucion"),
+            ),
+        )
+        return jsonify({"ok": True, "destinatarios": destinatarios})
+
     destinatario = consultar(
         "SELECT u.id_usuario,u.nombres,u.apellidos, "
         "COALESCE(NULLIF(d.documento,''),NULLIF(a.documento,''),u.documento,'') AS documento, "
@@ -549,6 +610,15 @@ def buscar_destinatario_documento():
     if tipo == "Acudiente" and not destinatario.get("id_acudiente"):
         return jsonify({"ok": False, "error": "El padre o acudiente no tiene un perfil institucional activo."}), 404
     return jsonify({"ok": True, "destinatario": destinatario})
+
+
+def _validar_hora_jornada(hora, jornada):
+    nombre_jornada = str(jornada or "").strip().casefold()
+    hora_minutos = int(hora[:2]) * 60 + int(hora[3:5])
+    if nombre_jornada == "mañana" and hora_minutos >= 12 * 60:
+        raise ValueError("El estudiante pertenece a la jornada de mañana. Selecciona una hora de la mañana.")
+    if nombre_jornada == "tarde" and hora_minutos < 12 * 60:
+        raise ValueError("El estudiante pertenece a la jornada de tarde. Selecciona una hora de la tarde.")
 
 
 # =========================================================
@@ -1038,10 +1108,12 @@ def nueva():
                     id_estudiante,
                     id_usuario,
                     nombres,
-                    apellidos
+                    apellidos,
+                    jornada.nombre AS jornada
 
                 FROM estudiantes e
                 JOIN sedes s ON s.id=e.id_sede
+                LEFT JOIN jornadas jornada ON jornada.id=e.id_jornada
 
                 WHERE e.id_estudiante = %s
                   AND e.estado = 'Activo'
@@ -1057,6 +1129,8 @@ def nueva():
                 raise ValueError(
                     "El estudiante seleccionado no está activo."
                 )
+            validar_disponibilidad(docente_id, fecha_obj, hora)
+            _validar_hora_jornada(hora, estudiante.get("jornada"))
 
             # ---------------------------------------------
             # VALIDAR ACUDIENTE
@@ -1460,6 +1534,7 @@ def cambiar_estado(cita_id):
     # ACTUALIZAR ESTADO
     # ---------------------------------------------
 
+    tareas_google = 0
     with transaccion() as cnx:
         cursor = cnx.cursor(dictionary=True)
         try:
@@ -1475,7 +1550,7 @@ def cambiar_estado(cita_id):
                 return redirect(url_for("citas.index"))
             from servicios.google_calendar import encolar_cita_cursor
 
-            encolar_cita_cursor(
+            tareas_google = encolar_cita_cursor(
                 cursor,
                 cita_id,
                 cita.get("creado_por") or usuario["id_usuario"],
@@ -1483,6 +1558,9 @@ def cambiar_estado(cita_id):
             )
         finally:
             cursor.close()
+
+    if tareas_google:
+        procesar_sincronizacion_inmediata(cita_id)
 
     # ---------------------------------------------
     # NOTIFICAR CAMBIO
@@ -1593,6 +1671,7 @@ def reprogramar_cita(cita_id):
         if not motivo or len(motivo) > 2000:
             raise ValueError("Indica el motivo del cambio de fecha, hasta 2000 caracteres.")
         validar_disponibilidad(cita["id_docente"], fecha, hora)
+        tareas_google = 0
         with transaccion() as cnx:
             cursor = cnx.cursor(dictionary=True)
             try:
@@ -1615,12 +1694,14 @@ def reprogramar_cita(cita_id):
                 cursor.execute("INSERT INTO reprogramaciones_cita(id_cita,fecha_anterior,hora_anterior,fecha_nueva,hora_nueva,motivo,realizado_por) VALUES(%s,%s,%s,%s,%s,%s,%s)", (nueva_cita_id, actual["fecha"], actual["hora"], fecha, hora, motivo, usuario["id_usuario"]))
                 from servicios.google_calendar import encolar_cita_cursor
 
-                encolar_cita_cursor(cursor, nueva_cita_id, usuario["id_usuario"])
+                tareas_google = encolar_cita_cursor(cursor, nueva_cita_id, usuario["id_usuario"])
             finally:
                 cursor.close()
     except ValueError as exc:
         flash(str(exc), "error")
         return redirect(url_for("citas.index", _anchor=f"cita-dialog-{cita_id}"))
+    if tareas_google:
+        procesar_sincronizacion_inmediata(nueva_cita_id)
     auditoria("REPROGRAMAR", "Citas", nueva_cita_id, f"Cita anterior: {cita_id}. Nueva fecha: {fecha} {formatear_hora(hora)}")
     _notificar(nueva_cita_id, "Citación reprogramada", f"La nueva fecha de tu citación es {fecha} a las {formatear_hora(hora)}.")
     flash("Cita reprogramada y participantes notificados.", "success")
@@ -1763,6 +1844,7 @@ def resolver_solicitud_reprogramacion(solicitud_id):
 
     solicitud = None
     aceptada = accion == "aceptar"
+    tareas_google = 0
     try:
         with transaccion() as conexion:
             cursor = conexion.cursor(dictionary=True)
@@ -1894,7 +1976,7 @@ def resolver_solicitud_reprogramacion(solicitud_id):
                     )
                     from servicios.google_calendar import encolar_cita_cursor
 
-                    encolar_cita_cursor(
+                    tareas_google = encolar_cita_cursor(
                         cursor,
                         solicitud["id_cita"],
                         usuario["id_usuario"],
@@ -1921,6 +2003,8 @@ def resolver_solicitud_reprogramacion(solicitud_id):
         return redirect(url_for("solicitudes.index"))
 
     if aceptada:
+        if tareas_google:
+            procesar_sincronizacion_inmediata(solicitud["id_cita"])
         auditoria(
             "ACEPTAR_REPROGRAMACION",
             "Citas",

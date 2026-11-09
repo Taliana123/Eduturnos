@@ -138,23 +138,28 @@ def test_qr_publico_azul_abre_el_sitio_desde_la_seccion_de_compartir(monkeypatch
     assert b"Compartir EDUTURNOS" in share.data
     assert b"Comparte el acceso a EDUTURNOS con la comunidad educativa" in share.data
     assert b'data-share-eduturnos' in share.data
-    assert b"QR EDUTURNOS" in share.data
-    assert b"Imagen del drag\xc3\xb3n" in share.data
-    assert b"Normal (azul institucional)" in share.data
-    assert b'data-qr-dragon="/compartir/eduturnos.svg?v=5"' in share.data
-    assert b'data-qr-institutional="/compartir/eduturnos.svg?estilo=navy&amp;v=2"' in share.data
-    assert b"mascots/qr-dragon-eduturnos.png?v=2" in share.data
-    assert b'value="institutional" selected' in share.data
+    assert b"QR EDUTURNOS" not in share.data
+    assert b"ESCANEA PARA ABRIR EDUTURNOS" not in share.data
+    assert b"QR con dise\xc3\xb1o del drag\xc3\xb3n" in share.data
+    assert b"QR normal" in share.data
+    assert b'data-qr-dragon="/compartir/eduturnos.svg?v=6"' in share.data
+    assert b'data-qr-institutional="/compartir/eduturnos.svg?v=6"' in share.data
+    assert b"mascots/qr-dragon-eduturnos.png?v=3" in share.data
+    assert b'value="dragon" selected' in share.data
+    assert b'class="eduturnos-share-qr-frame is-dragon"' in share.data
+    assert b"share-eduturnos.js?v=5" in share.data
     assert Path("static/mascots/qr-dragon-eduturnos.png").is_file()
     qr_script = Path("static/js/share-eduturnos.js").read_text(encoding="utf-8")
     qr_styles = Path("static/css/qr-compartir.css").read_text(encoding="utf-8")
     assert 'document.querySelector(".eduturnos-qr-code-image")' in qr_script
     assert "is-dragon" in qr_script
+    assert "qrDescription" not in qr_script
     assert "animation:" not in qr_styles
     assert "@keyframes eduturnos-qr-dragon-float" not in qr_styles
     assert "aspect-ratio: 1;" in qr_styles
     assert "top: 34%;" in qr_styles
     assert "left: 30%;" in qr_styles
+    assert ".eduturnos-share-qr-frame .eduturnos-qr-frame-label" in qr_styles
     assert ".eduturnos-share-qr-frame.is-dragon .eduturnos-qr-frame-label" in qr_styles
     assert "@media (prefers-reduced-motion: reduce)" not in qr_styles
     assert b"Descargar c\xc3\xb3digo QR" not in share.data
@@ -223,8 +228,8 @@ def test_llamada_de_voz_usa_sintesis_nativa_con_respaldo_web():
     assert 'eduturnos-native-tts-end' in activity
     assert "TextToSpeech.QUEUE_FLUSH" in activity
     assert "FEMALE_VOICE_NAME" in activity
-    assert 'versionName "2.9"' in android_build
-    assert "versionCode 19" in android_build
+    assert 'versionName "3.0.7"' in android_build
+    assert "versionCode 27" in android_build
 
 
 def test_correos_de_acudiente_y_personal_se_validan_sin_texto_auxiliar():
@@ -802,10 +807,13 @@ def test_configuration_catalog_forms_follow_motives_layout_without_changing_inst
     assert 'class="motivo-edit-form config-record-form"' in template
     assert 'class="state-form state-form-row config-record-form"' in template
     assert "config-record-actions" in template
-    assert "20261118_vertical_institution_v3" in template
+    assert "20261109_institution_fields_v4" in template
     assert 'class="full-field institution-address"' in template
     assert 'class="institution-identity"' in template
-    assert "minmax(300px, 1.8fr)" in css
+    assert "minmax(340px, 1.9fr)" in css
+    assert "config-record-list-sedes" in template
+    assert "max-width: 560px !important;" in css
+    assert "calc((100% - 14px) / 2 + 20px)" in css
     assert "grid-row: 1 / span 2 !important;" in css
     assert ".configuracion-page .config-entry-form," in css
     assert "height: 38px !important;" in css

@@ -220,6 +220,21 @@ const initializeEduturnosAssistant = () => {
         const isTableRow = (line) => line.includes("|");
         const isTableSeparator = (line) => line.includes("-") && /^[\s|:-]+$/.test(line);
         const tableCells = (line) => line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim());
+        const parseListItem = (line) => {
+            const ordered = line.match(/^(\d+[.)])\s+(.+)$/);
+            if (ordered) {
+                return {
+                    ordered: true,
+                    text: ordered[2].replace(/^(?:[-*+]\s+)+/, ""),
+                };
+            }
+            const unordered = line.match(/^[-*+]\s+(.+)$/);
+            if (!unordered) return null;
+            return {
+                ordered: false,
+                text: unordered[1].replace(/^(?:[-*+]\s+)+/, ""),
+            };
+        };
         let index = 0;
 
         while (index < lines.length) {
@@ -269,15 +284,14 @@ const initializeEduturnosAssistant = () => {
                 continue;
             }
 
-            const listItem = line.match(/^(\s*)([-*+]|\d+[.)])\s+(.+)$/);
+            const listItem = parseListItem(line);
             if (listItem) {
-                const ordered = /^\d/.test(listItem[2]);
-                const list = document.createElement(ordered ? "ol" : "ul");
+                const list = document.createElement(listItem.ordered ? "ol" : "ul");
                 while (index < lines.length) {
-                    const item = lines[index].trim().match(/^([-*+]|\d+[.)])\s+(.+)$/);
-                    if (!item || /^\d/.test(item[1]) !== ordered) break;
+                    const item = parseListItem(lines[index].trim());
+                    if (!item || item.ordered !== listItem.ordered) break;
                     const element = document.createElement("li");
-                    appendInlineMarkdown(element, item[2]);
+                    appendInlineMarkdown(element, item.text);
                     list.append(element);
                     index += 1;
                 }
@@ -573,7 +587,6 @@ const initializeEduturnosAssistant = () => {
     const button = form?.querySelector("button[type='submit']");
     const status = root.querySelector("[data-assistant-status]");
     const body = root.querySelector("[data-assistant-body]");
-    const voiceToggle = root.querySelector("[data-assistant-voice-toggle]");
     const callPanel = section?.querySelector("[data-assistant-call]");
     const callState = callPanel?.querySelector("[data-assistant-call-state]");
     const callTranscript = callPanel?.querySelector("[data-assistant-call-transcript]");
@@ -587,7 +600,7 @@ const initializeEduturnosAssistant = () => {
     const sidebarToggles = [...(section?.querySelectorAll("[data-assistant-toggle]") || [])];
     const voiceLaunchers = [...document.querySelectorAll("[data-assistant-voice-launch]")];
     const openButton = sidebarToggles.find((toggle) => toggle.hasAttribute("data-assistant-open"));
-    if (!form || !input || !output || !button || !status || !body || !voiceToggle || !openButton
+    if (!form || !input || !output || !button || !status || !body || !openButton
         || !callPanel || !callState || !callTranscript || !callSpeaker || !callToggle || !callWave || !callClose
         || !callAction || !callActionLink || !callConfirmAction) return false;
 
@@ -664,11 +677,6 @@ const initializeEduturnosAssistant = () => {
     };
     const refreshSend = () => {
         button.disabled = input.disabled || !input.value.trim();
-        voiceToggle.disabled = !canRecognizeVoice;
-        voiceToggle.setAttribute("aria-pressed", String(voiceCallActive));
-        const label = voiceCallActive ? "Finalizar conversación por voz" : "Iniciar conversación por voz";
-        voiceToggle.setAttribute("aria-label", label);
-        voiceToggle.title = label;
     };
 
     const stopVoiceConversation = (message = "") => {
@@ -873,8 +881,6 @@ const initializeEduturnosAssistant = () => {
         setStatus("Solicitando acceso al micrófono…");
         startVoiceRecognition(true);
     };
-    voiceToggle.disabled = !canRecognizeVoice;
-    voiceToggle.addEventListener("click", toggleVoiceConversation);
     callToggle.addEventListener("click", () => {
         if (voiceCallActive) {
             stopVoiceConversation("Llamada finalizada.");

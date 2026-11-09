@@ -33,6 +33,10 @@ def ensure_database(config=None):
 
         migracion_avatar = Path(__file__).resolve().parents[1] / "sql" / "user_avatars.sql"
         cursor.execute(migracion_avatar.read_text(encoding="utf-8"))
+        migracion_retroalimentacion = (
+            Path(__file__).resolve().parents[1] / "sql" / "retroalimentacion.sql"
+        )
+        cursor.execute(migracion_retroalimentacion.read_text(encoding="utf-8"))
 
         # Aislamiento institucional incremental: asigna lo ya existente a
         # JJFH y habilita instituciones independientes sin tocar sus datos.

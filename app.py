@@ -28,6 +28,7 @@ from routes.justificaciones import justificaciones_bp
 from routes.notificaciones import notificaciones_bp
 from routes.passwords import passwords_bp
 from routes.reportes import reportes_bp
+from routes.retroalimentacion import retroalimentacion_bp
 from routes.seguimiento import seguimiento_bp
 from routes.solicitudes import solicitudes_bp
 from routes.soporte import soporte_bp
@@ -36,7 +37,7 @@ from roles import SEDES_INSTITUCIONALES
 from security import csrf_token, require_configured_secret, validar_csrf
 from servicios.mail import mail
 from servicios.reuniones import HORARIOS_CITAS, formatear_hora
-from servicios.avatar import AVATAR_CHOICES, avatar_inicial, obtener_o_crear_avatar
+from servicios.avatar import avatar_inicial, obtener_o_crear_avatar
 
 
 class EduturnosSvgPathImage(SvgPathImage):
@@ -135,7 +136,6 @@ def create_app():
         return {
             "usuario_navegacion": usuario,
             "avatar_config": avatar_config,
-            "avatar_choices": AVATAR_CHOICES,
         }
 
     # Blueprint de autenticaciÃ³n
@@ -148,6 +148,7 @@ def create_app():
         calendario_bp,
         notificaciones_bp,
         reportes_bp,
+        retroalimentacion_bp,
         estudiantes_bp,
         acudientes_bp,
         docentes_bp,

@@ -2,17 +2,15 @@
     const qrPicker = document.querySelector("[data-qr-style]");
     const qrImage = document.querySelector(".eduturnos-qr-code-image");
     const qrFrame = document.querySelector(".eduturnos-share-qr-frame");
-    const qrDescription = document.querySelector("[data-qr-description]");
     if (qrPicker && qrImage) {
         qrPicker.addEventListener("change", () => {
             const dragon = qrPicker.value === "dragon";
             qrImage.src = dragon ? qrImage.dataset.qrDragon : qrImage.dataset.qrInstitutional;
             qrImage.alt = dragon
-                ? "Código QR azul de EDUTURNOS sobre la imagen del dragón para abrir el sitio oficial"
-                : "Código QR azul institucional de EDUTURNOS para abrir el sitio oficial";
+                ? "Código QR para abrir EDUTURNOS, integrado al diseño del dragón"
+                : "Código QR azul para abrir EDUTURNOS";
             qrFrame.classList.toggle("is-dragon", dragon);
             qrFrame.classList.toggle("is-institutional", !dragon);
-            qrDescription.textContent = "Escanea el código para abrir EDUTURNOS e iniciar sesión.";
         });
     }
 

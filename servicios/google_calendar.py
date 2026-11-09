@@ -649,17 +649,31 @@ def sincronizar_cita(
     return resultado
 
 
-def _tomar_tarea_google():
+def _tomar_tarea_google(cita_id: int | None = None):
     with transaccion() as cnx:
         cursor = cnx.cursor(dictionary=True)
         try:
-            cursor.execute(
+            sql = (
                 "SELECT * FROM google_calendar_sync_queue "
-                "WHERE (estado IN ('Pendiente','Reintentar') "
+                "WHERE ((estado IN ('Pendiente','Reintentar') "
                 "AND (proximo_intento IS NULL OR proximo_intento<=NOW())) "
-                "OR (estado='Procesando' AND lease_until<=NOW()) "
-                "ORDER BY COALESCE(proximo_intento,fecha_creacion),id LIMIT 1 FOR UPDATE"
+                "OR (estado='Procesando' AND lease_until<=NOW()))"
             )
+            parametros = ()
+            if cita_id is not None:
+                try:
+                    cita_id = int(cita_id)
+                except (TypeError, ValueError) as exc:
+                    raise ValueError("El identificador de la cita no es válido.") from exc
+                if cita_id < 1:
+                    raise ValueError("El identificador de la cita no es válido.")
+                sql += " AND id_cita=%s"
+                parametros = (cita_id,)
+            sql += " ORDER BY COALESCE(proximo_intento,fecha_creacion),id LIMIT 1 FOR UPDATE"
+            if parametros:
+                cursor.execute(sql, parametros)
+            else:
+                cursor.execute(sql)
             tarea = cursor.fetchone()
             if not tarea:
                 return None
@@ -843,10 +857,10 @@ def _es_reintentable(error: Exception) -> bool:
     return True
 
 
-def procesar_cola_google(limite: int = 20) -> dict:
+def procesar_cola_google(limite: int = 20, cita_id: int | None = None) -> dict:
     procesadas = sincronizadas = fallidas = 0
     for _ in range(max(1, min(int(limite), 100))):
-        tarea = _tomar_tarea_google()
+        tarea = _tomar_tarea_google(cita_id) if cita_id is not None else _tomar_tarea_google()
         if not tarea:
             break
         procesadas += 1

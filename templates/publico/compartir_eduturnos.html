@@ -3,11 +3,9 @@
 <span class="etiqueta">Comparte la plataforma</span>
 
 <div class="public-title-row">
-    {% if not usuario_navegacion %}
     <a class="public-back-button" href="{{ url_for('inicio') }}" aria-label="Volver al inicio" title="Volver al inicio">
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
     </a>
-    {% endif %}
     <h1>EDUTURNOS, a un escaneo de distancia.</h1>
 </div>
 
@@ -18,7 +16,7 @@
 
 {% include "_qr_compartir.html" %}
 
-<script src="{{ url_for('static', filename='js/share-eduturnos.js') }}?v=4" defer></script>
+<script src="{{ url_for('static', filename='js/share-eduturnos.js') }}?v=5" defer></script>
 {% endset %}
 
 {% include "publico/base_publica.html" %}

@@ -31,9 +31,125 @@
     </header>
 
 
-    {% if solicitudes %}
+    <style>
+        .solicitudes-page {
+            background: transparent;
+        }
 
-    <div class="card solicitudes-final-card">
+        .solicitudes-page .solicitudes-final-card {
+            background: #ffffff;
+            border: 1px solid #edf2f8;
+            border-radius: 16px;
+            box-shadow: none;
+            overflow: hidden;
+        }
+
+        #contenido .solicitudes-page .solicitudes-records-card {
+            padding-top: 14px !important;
+        }
+
+        .solicitudes-page .card-header {
+            background: #ffffff;
+            border-bottom: none;
+            padding: 20px 24px 12px;
+        }
+
+        #contenido .solicitudes-page .solicitudes-records-card > .card-header {
+            margin: 0 0 8px !important;
+            padding: 6px 24px 8px !important;
+        }
+
+        .solicitudes-page .card-header h2,
+        .solicitudes-page .card-header p {
+            margin: 0;
+        }
+
+        .solicitudes-page .card-header h2 {
+            color: #162942;
+        }
+
+        .solicitudes-page .card-header p {
+            color: #5c6d83;
+            margin-top: 6px;
+        }
+
+        .solicitudes-page .table-responsive {
+            background: #ffffff;
+            border-top: none;
+        }
+
+        .solicitudes-page .solicitudes-table {
+            background: #ffffff;
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+
+        .solicitudes-page .solicitudes-table thead th {
+            background: #ffffff;
+            color: #49678d;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-bottom: 1px solid #edf2f8;
+            border-top: none;
+            padding: 14px 16px;
+        }
+
+        .solicitudes-page .solicitudes-table tbody td {
+            background: #ffffff;
+            color: #213654;
+            border-bottom: 1px solid #edf2f8;
+            border-top: none;
+            padding: 14px 16px;
+            vertical-align: middle;
+        }
+
+        .solicitudes-page .solicitudes-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .solicitudes-page .solicitudes-table tbody tr:hover td {
+            background: #f8fbff;
+        }
+
+        .solicitudes-page .solicitudes-table .acciones-tabla {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 6px;
+            width: min(100%, 112px);
+        }
+
+        .solicitudes-page .solicitudes-table .acciones-tabla form,
+        .solicitudes-page .solicitudes-table .acciones-tabla button {
+            width: 100%;
+            min-width: 0;
+            margin: 0;
+        }
+
+        .solicitudes-page .solicitudes-table .acciones-tabla button {
+            display: inline-flex;
+            min-height: 40px;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 900px) {
+            .solicitudes-page .solicitudes-final-card {
+                border-radius: 14px;
+            }
+
+            .solicitudes-page .table-responsive {
+                border-top: none;
+            }
+        }
+    </style>
+
+
+    {% if solicitudes %}
+    <div class="card solicitudes-final-card solicitudes-records-card">
 
         <div class="card-header">
 
@@ -531,6 +647,8 @@ a.solicitudes-final-seguimiento:hover {
     #contenido .solicitudes-page { min-width:0 !important; padding-left:0 !important; padding-right:0 !important; }
     #contenido .solicitudes-final-card { min-width:0 !important; padding:16px !important; overflow:hidden !important; }
     #contenido .solicitudes-final-card > .card-header { margin-bottom:14px !important; }
+    #contenido .solicitudes-page .solicitudes-records-card { padding:10px 12px !important; }
+    #contenido .solicitudes-page .solicitudes-records-card > .card-header { margin:0 0 4px !important; padding:6px 8px 8px !important; }
     #contenido .solicitudes-final-card > .card-header h2 { margin:0 0 6px !important; font-size:22px !important; line-height:1.25 !important; }
     #contenido .solicitudes-final-card > .card-header p { margin:0 !important; line-height:1.45 !important; }
     #contenido .solicitudes-table,
@@ -560,7 +678,7 @@ a.solicitudes-final-seguimiento:hover {
     #contenido .solicitud-mobile-toggle { display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; flex:0 0 auto !important; width:auto !important; min-width:58px !important; min-height:32px !important; margin-left:auto !important; padding:5px 9px !important; border:1px solid #dce5ef !important; border-radius:999px !important; background:#f4f8fc !important; color:#1769aa !important; font-size:12px !important; font-weight:700 !important; line-height:1 !important; box-shadow:none !important; }
     #contenido .solicitud-mobile-toggle span { display:inline-block; transition:transform .15s ease; }
     #contenido .solicitudes-table tbody tr.is-expanded .solicitud-mobile-toggle span { transform:rotate(180deg); }
-    #contenido .solicitudes-table tbody tr.is-expanded td[data-label="Solicitud"] { grid-column:1/-1 !important; border-bottom:1px solid #e8eef5 !important; }
+    #contenido .solicitudes-table tbody tr.is-expanded td[data-label="Solicitud"] { grid-column:1/-1 !important; border-bottom:0 !important; }
     #contenido .solicitudes-table tbody tr.is-expanded td[data-label="Solicitud"]::before { display:none !important; }
     #contenido .solicitudes-table tbody td {
         display:grid !important;
@@ -577,6 +695,8 @@ a.solicitudes-final-seguimiento:hover {
         word-break:normal !important;
         box-sizing:border-box !important;
     }
+    #contenido .solicitudes-table tbody tr.is-expanded,
+    #contenido .solicitudes-table tbody tr.is-expanded td { background:#ffffff !important; }
     #contenido .solicitudes-table tbody td::before {
         content:attr(data-label);
         color:#71849a;

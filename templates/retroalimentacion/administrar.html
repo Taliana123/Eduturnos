@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Opiniones de la comunidad · EDUTURNOS{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/retroalimentacion.css') }}?v=1">{% endblock %}
+{% block content %}
+<section class="retro-page retro-admin-page" aria-labelledby="retro-admin-title">
+  <header class="retro-heading">
+    <span class="retro-eyebrow">Gestión institucional</span>
+    <h1 id="retro-admin-title">Opiniones de la comunidad</h1>
+    <p>Revisa las quejas, reseñas y propuestas de docentes, estudiantes y acudientes de tu institución.</p>
+  </header>
+
+  {% if sin_institucion %}
+  <p class="retro-empty" role="status">Tu cuenta no tiene una institución asociada; no se muestran comentarios de otras instituciones.</p>
+  {% else %}
+  <div class="retro-counts" aria-label="Resumen de comentarios">
+    {% for estado, total in conteos.items() %}
+    <div><strong>{{ total }}</strong><span>{{ estado }}</span></div>
+    {% endfor %}
+  </div>
+
+  <div class="retro-inbox">
+    {% for comentario in comentarios %}
+    <article class="retro-inbox-item">
+      <header class="retro-inbox-heading">
+        <div>
+          <span class="retro-category">{{ comentario.tipo }}</span>
+          <h2>{{ comentario.asunto }}</h2>
+          <p>{{ comentario.nombres }} {{ comentario.apellidos }} · {{ comentario.rol_nombre }}</p>
+        </div>
+        <time datetime="{{ comentario.fecha_creacion.isoformat() }}">{{ comentario.fecha_creacion.strftime('%d/%m/%Y · %I:%M %p') }}</time>
+      </header>
+      <p class="retro-comment">{{ comentario.comentario }}</p>
+      <form method="post" class="retro-status-form">
+        {{ csrf_field()|safe }}
+        <input type="hidden" name="id_comentario" value="{{ comentario.id }}">
+        <label>
+          <span>Estado</span>
+          <select name="estado">
+            {% for estado in estados_comentario %}
+            <option value="{{ estado }}" {% if comentario.estado == estado %}selected{% endif %}>{{ estado }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button type="submit">Guardar estado</button>
+      </form>
+    </article>
+    {% else %}
+    <p class="retro-empty">Aún no hay comentarios para revisar.</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

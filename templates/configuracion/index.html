@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Configuración · EDUTURNOS{% endblock %}
-{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/configuracion.css') }}?v=20261118_vertical_institution_v3">{% endblock %}
+{% block page_styles %}<link rel="stylesheet" href="{{ url_for('static', filename='css/configuracion.css') }}?v=20261109_institution_fields_v4">{% endblock %}
 {% block content %}
 <div class="administracion-page">
 <div class="configuracion-page">
@@ -69,15 +69,15 @@
   <form method="post" action="{{ url_for('configuracion.guardar_sede') }}" class="form-grid catalogo-form config-entry-form config-entry-sede">
     {{ csrf_field()|safe }}
     <input type="hidden" name="id_institucion" value="{{ institucion.id if institucion else '' }}">
-    <label class="full-field">Nombre<input name="nombre" maxlength="140" required placeholder="Nueva sede"></label>
-    <label>Código (6 dígitos)<input name="codigo_sede" maxlength="6" pattern="[0-9]{6}" placeholder="000001"></label>
-    <label class="config-address-field">Dirección<input name="direccion" maxlength="255"></label>
-    <label>Estado<select name="estado">
+    <label class="full-field config-field-name">Nombre<input name="nombre" maxlength="140" required placeholder="Nueva sede"></label>
+    <label class="config-field-status">Estado<select name="estado">
 <option value="" selected disabled hidden></option>
 <option value="1" selected>Activa</option><option value="0">Inactiva</option></select></label>
+    <label class="config-field-code">Código (6 dígitos)<input name="codigo_sede" maxlength="6" pattern="[0-9]{6}" placeholder="000001"></label>
+    <label class="config-address-field">Dirección<input name="direccion" maxlength="255"></label>
     <div class="form-actions catalogo-form-actions"><button class="boton" type="submit">Agregar sede</button><button class="boton pequeno secundario" type="reset" aria-label="Limpiar formulario" title="Limpiar formulario">Limpiar</button></div>
   </form>
-  <div class="config-record-list">
+  <div class="config-record-list config-record-list-sedes">
     {% for s in sedes %}
     <form method="post" action="{{ url_for('configuracion.guardar_sede') }}" class="config-record-form config-record-sede">
       {{ csrf_field()|safe }}<input type="hidden" name="id_sede" value="{{ s.id }}"><input type="hidden" name="id_institucion" value="{{ s.id_institucion }}">
@@ -202,9 +202,13 @@
       <p>Total de usuarios registrados: <strong>{{ total_cuentas_inscritas }}</strong>. Bloquear impide iniciar sesión durante 30 días; retirar acceso desactiva la cuenta y conserva su historial.</p>
     </div>
   </header>
-  <label class="cuentas-inscritas-search">Buscar usuario
-    <input type="search" data-cuentas-filter placeholder="Nombre, documento, correo o rol">
-  </label>
+  <div class="cuentas-inscritas-search">
+    <label for="cuentas-inscritas-filter">Buscar usuario</label>
+    <div class="cuentas-inscritas-search-controls">
+      <input id="cuentas-inscritas-filter" type="search" data-cuentas-filter placeholder="Nombre, documento, correo o rol">
+      <button class="boton pequeno" type="button" data-cuentas-search-button>Buscar</button>
+    </div>
+  </div>
   <div class="table-wrap">
     <table class="cuentas-inscritas-table">
       <thead><tr><th>Usuario</th><th>Documento</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
@@ -239,15 +243,6 @@
     </table>
   </div>
 </section>
-<script>
-document.querySelector('[data-cuentas-filter]')?.addEventListener('input', function () {
-  const termino = this.value.trim().toLocaleLowerCase();
-  document.querySelectorAll('[data-cuenta-row]').forEach(function (fila) {
-    fila.hidden = !fila.textContent.toLocaleLowerCase().includes(termino);
-  });
-});
-</script>
-
 </div>
 </div>
 

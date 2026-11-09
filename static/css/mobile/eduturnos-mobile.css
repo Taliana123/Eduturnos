@@ -1268,7 +1268,7 @@
     html body .eduturnos-header {
         min-height: 58px !important;
         height: 58px !important;
-        padding: 0 16px !important;
+        padding: 0 16px 0 58px !important;
     }
 
     html body .eduturnos-header .eduturnos-logo {
@@ -1635,7 +1635,7 @@ html body #contenido .dashboard-page .dashboard-card h2 {
         height: 58px !important;
         min-height: 58px !important;
         margin: 0 !important;
-        padding: 0 16px !important;
+        padding: 0 16px 0 58px !important;
         background: #172942 !important;
         box-sizing: border-box !important;
     }
@@ -1647,6 +1647,10 @@ html body #contenido .dashboard-page .dashboard-card h2 {
     }
 
     html body header.eduturnos-header .mobile-back-link {
+        position: absolute !important;
+        top: 50% !important;
+        left: 12px !important;
+        right: auto !important;
         display: inline-grid !important;
         place-items: center !important;
         flex: 0 0 36px !important;
@@ -1656,12 +1660,13 @@ html body #contenido .dashboard-page .dashboard-card h2 {
         min-height: 36px !important;
         margin: 0 !important;
         padding: 0 !important;
-        border: 1px solid rgba(255, 255, 255, .4) !important;
-        border-radius: 50% !important;
-        background: transparent !important;
-        color: #ffffff !important;
+        border: 1px solid #d5e1fa !important;
+        border-radius: 8px !important;
+        background: #ffffff !important;
+        color: #1769aa !important;
         font-size: 0 !important;
         box-shadow: none !important;
+        transform: translateY(-50%) !important;
     }
 
     html body header.eduturnos-header .mobile-back-link::before {
@@ -2389,8 +2394,8 @@ html body.auth-page .registro-contenedor h1 {
 @media (max-width: 900px) {
     html body header.eduturnos-header > .mobile-back-link {
         background: #ffffff !important;
-        color: #17365d !important;
-        border-color: #ffffff !important;
+        color: #1769aa !important;
+        border-color: #d5e1fa !important;
     }
 
     html body .pagina > main .hero {

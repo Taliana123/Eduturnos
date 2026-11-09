@@ -74,8 +74,8 @@
             </div>
 
             <div class="registro-retorno">
-                <a href="{{ url_for('auth.login') }}" class="link-back">
-                    <span aria-hidden="true">←</span>
+                <a href="{{ url_for('auth.login') }}" class="link-back registro-back-button" aria-label="Volver al inicio de sesión">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 12H5m7 7-7-7 7-7"></path></svg>
                     <span>Volver al inicio de sesión</span>
                 </a>
             </div>
@@ -88,6 +88,10 @@
     body.auth-page { background: #f4f7fb !important; }
 
     .registro-pagina { width: 100%; max-width: 1120px; margin: 0 auto; padding: 28px 18px 42px; }
+    .registro-back-button{display:inline-flex;align-items:center;gap:9px;min-height:40px;margin-top:18px;padding:7px 12px;border:1px solid #d5e1fa;border-radius:8px;background:#fff;color:#1769aa;text-decoration:none;font-weight:700;transition:background-color .15s,border-color .15s,transform .15s;}
+    .registro-back-button svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .registro-back-button:hover{background:#f2f7ff;border-color:#9bb9e3;transform:translateY(-1px);}
+    .registro-back-button:focus-visible{outline:2px solid #2f76d2;outline-offset:2px;}
     .registro-layout { display: grid; grid-template-columns: minmax(280px, .9fr) minmax(0, 1fr); align-items: center; gap: 38px; }
     .registro-ilustracion { position: relative; min-height: 430px; display: flex; align-items: center; justify-content: center; background: transparent !important; border: 0 !important; box-shadow: none !important; }
     .registro-dibujo { width: min(100%, 430px); height: auto; overflow: visible; animation: registro-flotar 5s ease-in-out infinite; }
@@ -1425,32 +1429,40 @@ body.auth-page {
 
 {% endblock %}
 
-/* REGISTRO - regreso a login: texto limpio, sin cuadro */
+/* REGISTRO - conservar el enlace de regreso como botón */
 .registro-retorno .link-back {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 6px !important;
+    gap: 9px !important;
+    min-height: 40px !important;
     width: auto !important;
     min-width: 0 !important;
     height: auto !important;
-    padding: 0 !important;
+    padding: 7px 12px !important;
     margin: 0 !important;
-    background: transparent !important;
-    border: 0 !important;
-    border-radius: 0 !important;
+    background: #fff !important;
+    border: 1px solid #d5e1fa !important;
+    border-radius: 8px !important;
     box-shadow: none !important;
-    color: #2f78ff !important;
-    font-size: 12px !important;
+    color: #1769aa !important;
+    font-size: 14px !important;
     font-weight: 700 !important;
     text-decoration: none !important;
 }
 
 .registro-retorno .link-back:hover {
-    background: transparent !important;
-    border: 0 !important;
+    background: #f2f7ff !important;
+    border-color: #9bb9e3 !important;
     box-shadow: none !important;
     text-decoration: underline !important;
+}
+
+.registro-retorno .registro-back-button svg {
+    display: block !important;
+    width: 18px !important;
+    height: 18px !important;
+    flex: 0 0 18px !important;
 }
 
 .registro-retorno .link-back span:first-child {

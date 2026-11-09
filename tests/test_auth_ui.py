@@ -32,9 +32,11 @@ def test_recovery_back_button_matches_institutional_square_and_messages_precede_
 def test_public_menu_back_buttons_align_with_each_page_title():
     page_paths = (
         "templates/publico/como_funciona.html",
+        "templates/publico/creadores.html",
         "templates/publico/beneficios.html",
         "templates/publico/privacidad.html",
         "templates/publico/terminos.html",
+        "templates/publico/compartir_eduturnos.html",
     )
     base = Path("templates/publico/base_publica.html").read_text(encoding="utf-8")
 
@@ -49,6 +51,8 @@ def test_public_menu_back_buttons_align_with_each_page_title():
         text = Path(page_path).read_text(encoding="utf-8")
         title_row = text.split('class="public-title-row"', 1)[1]
         assert title_row.index('class="public-back-button"') < title_row.index("<h1>")
+    share = Path("templates/publico/compartir_eduturnos.html").read_text(encoding="utf-8")
+    assert "{% if not usuario_navegacion %}" not in share
 
     institution = Path("templates/institucion.html").read_text(encoding="utf-8")
     assert 'class="institucion-title-row"' in institution
@@ -179,6 +183,17 @@ def test_login_back_link_has_desktop_text_and_mobile_icon_only():
     assert 'class="mobile-back-link-label">Volver al inicio</span>' in login
     assert ".mobile-back-link-label" in mobile_rules
     assert "display: none;" in mobile_rules
+
+
+def test_login_back_arrow_matches_square_institutional_navigation():
+    login = Path("templates/auth/login.html").read_text(encoding="utf-8")
+    desktop_rules = login.rsplit("@media (min-width: 901px)", 1)[1].split("</style>", 1)[0]
+
+    assert "header.eduturnos-header > .mobile-back-link" in desktop_rules
+    assert "left: 18px !important;" in desktop_rules
+    assert "background: #fff !important;" in desktop_rules
+    assert "color: #1769aa !important;" in desktop_rules
+    assert "border-radius: 8px !important;" in desktop_rules
 
 
 def test_account_title_and_description_align_with_personal_info_heading_on_mobile():
@@ -651,8 +666,8 @@ def test_ayuda_eduturnos_esta_plegada_en_menu_antes_de_mi_cuenta():
     assert 'css/edubot.css' in base
     assert 'js/asistente.js' in base
     assert "request.endpoint != 'soporte.index'" not in base
-    assert "css/edubot.css') }}?v=20261109_voice_avatar_v2" in base
-    assert "js/asistente.js') }}?v=20261109_voice_avatar_v2" in base
+    assert "css/edubot.css') }}?v=20261109_composer_surface_v1" in base
+    assert "js/asistente.js') }}?v=20261109_markdown_lists_v4" in base
     assert 'setChatOpen(toggleButton.hasAttribute("data-assistant-open"), toggleButton)' in assistant_script
     assert 'if (isOpen) {\n            clearChatPosition();\n            const defaultBounds = root.getBoundingClientRect();' in assistant_script
     assert 'assistantWidget' not in app_js
@@ -719,7 +734,8 @@ def test_edubot_local_se_integra_en_ayuda_sin_iframe_externo():
     assert 'icons/edubot.png' not in plantilla
     assert 'assistant-sidebar-avatar assistant-drone-avatar' in plantilla
     assert 'data-assistant-voice-view hidden' not in plantilla
-    assert 'data-assistant-voice-toggle aria-pressed="false"' in plantilla
+    assert 'data-assistant-voice-toggle' not in plantilla
+    assert 'data-assistant-call-toggle' in plantilla
     assert 'data-create-citation-url=' in plantilla
     assert 'data-assistant-dictate' not in plantilla
     assert 'data-assistant-speak' not in plantilla

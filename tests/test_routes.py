@@ -1054,6 +1054,64 @@ def test_calendario_disponibilidad_docente_se_limita_a_su_usuario(monkeypatch):
     assert contexto["docente_disponibilidad_id"] == 8
 
 
+def test_calendario_conserva_citas_si_faltan_datos_relacionados(monkeypatch):
+    consulta = {}
+    cita = {
+        "id": 44,
+        "fecha": date(2026, 12, 8),
+        "hora": "09:30:00",
+        "estudiante": "Sin estudiante",
+        "acudiente": "",
+        "docente": "Sin asignar",
+        "motivo_nombre": "Sin motivo",
+        "estado_nombre": "Sin estado",
+    }
+
+    def fake_consultar(sql, params=(), uno=False):
+        consulta["sql"] = sql
+        consulta["params"] = params
+        return [cita]
+
+    monkeypatch.setattr(calendario_routes, "consultar", fake_consultar)
+    registros = calendario_routes.citas_visibles(
+        {"rol_nombre": "Rector", "id_institucion": 12, "id_usuario": 3}
+    )
+
+    assert len(registros) == 1
+    assert registros[0]["id"] == 44
+    assert registros[0]["fecha"] == "2026-12-08"
+    assert consulta["params"] == (12,)
+    assert "LEFT JOIN estudiantes e" in consulta["sql"]
+    assert "LEFT JOIN usuarios dest" in consulta["sql"]
+    assert "c.destinatario_usuario_id IS NOT NULL" in consulta["sql"]
+    assert "'Destinatario sin estudiante'" in consulta["sql"]
+    assert "LEFT JOIN estados_cita ec" in consulta["sql"]
+    assert "COALESCE(m.nombre, 'Sin motivo')" in consulta["sql"]
+
+
+def test_api_calendario_incluye_snapshot_de_citas_visibles(monkeypatch):
+    cita = {
+        "id": 55,
+        "fecha": "2026-12-10",
+        "hora": "10:00:00",
+        "estado_nombre": "Confirmada",
+    }
+    monkeypatch.setattr(
+        calendario_routes,
+        "usuario_actual",
+        lambda: {"id_usuario": 3, "rol_nombre": "Rector"},
+    )
+    monkeypatch.setattr(calendario_routes, "citas_visibles", lambda _usuario: [cita])
+    monkeypatch.setattr(calendario_routes, "_aplicar_filtros", lambda citas: citas)
+
+    with app.test_request_context("/calendario/api/citas"):
+        response = calendario_routes.api_citas.__wrapped__()
+
+    assert response.get_json()["snapshot"] == [
+        {"id": 55, "fecha": "2026-12-10", "hora": "10:00:00", "estado": "Confirmada"}
+    ]
+
+
 def test_home_publico():
     client = app.test_client()
     response = client.get('/')
