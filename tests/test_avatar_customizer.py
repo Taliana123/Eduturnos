@@ -145,6 +145,7 @@ def test_personalizador_usa_renderizador_y_catalogo_oficiales():
     art = (ROOT / "templates" / "_avatar_art.html").read_text(encoding="utf-8")
     source = (ROOT / "tools" / "humation" / "src.js").read_text(encoding="utf-8")
     base = (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
+    styles = (ROOT / "static" / "css" / "desktop-sidebar.css").read_text(encoding="utf-8")
     license_text = (ROOT / "static" / "vendor" / "HUMATION-LICENSE.md").read_text(encoding="utf-8")
 
     assert "@humation/core" in source
@@ -156,7 +157,16 @@ def test_personalizador_usa_renderizador_y_catalogo_oficiales():
     assert 'data-avatar-user="{{ usuario_navegacion.id_usuario }}"' in sidebar
     assert 'data-avatar-open' in sidebar
     assert sidebar.count('<dialog id="avatar-customizer"') == 1
+    assert sidebar.count('data-avatar-open') == 1
     assert 'data-avatar-open' in account
+    assert account.count('data-avatar-open') == 2
+    assert sidebar.count("Realiza tu personaje") == 1
+    assert "Realiza tu personaje" not in account
+    assert "html body dialog.avatar-customizer:not([open])" in styles
+    assert "display:none!important;" in styles.split(
+        "html body dialog.avatar-customizer:not([open])", 1
+    )[1].split("}", 1)[0]
+    assert "html body dialog.avatar-customizer[open]" in styles
     assert "data-avatar-cancel" in sidebar
     assert "avatar-category-list" in source
     assert "avatar-category-panel" in source

@@ -941,6 +941,12 @@ html body dialog.avatar-customizer{
   flex-direction:column!important;
   overflow:hidden!important;
 }
+html body dialog.avatar-customizer:not([open]){
+  display:none!important;
+}
+html body dialog.avatar-customizer[open]{
+  display:flex!important;
+}
 html body dialog.avatar-customizer form{
   display:grid!important;
   grid-template-rows:auto auto minmax(120px,1fr) auto auto!important;
